@@ -16,3 +16,5 @@
     "remotePath": "/home/cky/workspace/blog/md"
 }
 ```
+
+## Better Align 对齐插件

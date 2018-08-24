@@ -46,7 +46,7 @@ MongoDB server version: 3.6.3
   - `connectTimeoutMS=ms`可以打开连接的时间
   - `socketTimeoutMS=ms`发送和接受sockets的时间
 
-## 数据库操作命令
+## 数据库操作
 
 ```bash
 > show dbs;
@@ -77,7 +77,7 @@ local   0.078GB
 runoob  0.078GB
 ```
 
-## 创建集合
+## 集合操作
 
 ```bash
 > db.createCollection(name, options) # 格式
@@ -112,7 +112,7 @@ system.indexes
   - `size` 数值 可选 为固定集合指定一个最大值 以字节计 。如果 capped 为 true，也需要指定该字段。
   - `max` 数值 可选 指定固定集合中包含文档的最大数量。
 
-## 向集合里插入文档
+## 文档操作
 
 ```bash
 > db.logs.insert({"test":"测试集合生成情况","hehe":"haha"});  # 往集合里面插入数据
