@@ -3,11 +3,10 @@
 ## 连上MongoDB服务器
 
 ```bash
-➜  ~ mongo              # 先运行 mongo shell 客户端
-MongoDB shell version v3.6.3
-connecting to: mongodb://127.0.0.1:27017
-MongoDB server version: 3.6.3
-# 链接到到某个具体的服务器数据库格式
+mongo                      # 运行 mongo shell 客户端 链接的默认服务器
+mongo 101.200.144.41:10246 # 链接到远程的mongod服务器m
+mongo --nodb               # 启动 mongo shell 而不连接到任何服务器
+
 > mongodb://[username:password@]host1[:port1],...[,hostN[:portN]]][/[database][?options]]
 
 # 示例
@@ -77,7 +76,9 @@ local   0.078GB
 runoob  0.078GB
 ```
 
-## 集合操作
+## 集合
+
+### 创建集合
 
 ```bash
 > db.createCollection(name, options) # 格式
@@ -112,13 +113,167 @@ system.indexes
   - `size` 数值 可选 为固定集合指定一个最大值 以字节计 。如果 capped 为 true，也需要指定该字段。
   - `max` 数值 可选 指定固定集合中包含文档的最大数量。
 
-## 文档操作
+### 删除数据库 删除集合
 
 ```bash
-> db.logs.insert({"test":"测试集合生成情况","hehe":"haha"});  # 往集合里面插入数据
+> use runoob;           # 切换到要删除的数据库
+switched to db runoob
+> show tables;          # 显示当前数据库的集合
+runoob
+system.indexes
+> db.runoob.drop();     # 删除指定的集合
+true
+> show tables;
+system.indexes
+> db.dropDatabase()     # 删除当前数据库
+{ "dropped" : "runoob", "ok" : 1 }
 ```
 
-## 更新数据
+## 文档
+
+### 新增文档
+
+```bash
+> db.logs.insert({"test":"测试集合生成情况","hehe":"haha"});  # 往集合里面插入文档
+```
+
+### 给集合里的文档加索引
+
+```bash
+> db.collection.createIndex(keys, options) # 格式
+> db.col.createIndex({"title":1});    # 按 title 字段建立正序索引
+> db.col.createIndex({"title":1,"description":-1}) # 按 title 字段建立正序索引 然再按 description 倒序
+> db.values.createIndex({open: 1, close: 1}, {background: true})
+```
+
+- background	Boolean	建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 "background" 可选参数。 "background" 默认值为false。
+- unique	Boolean	建立的索引是否唯一。指定为true创建唯一索引。默认值为false.
+- name	string	索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。
+- sparse	Boolean	对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 false.
+- expireAfterSeconds	integer	指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。
+- v	index version	索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。
+- weights	document	索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。
+- default_language	string	对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语
+- language_override	string	对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.
+
+
+### 查询文档
+
+```bash
+> db.logs.find().pretty() # 查出 logs 里所有集合
+{ "_id" : ObjectId("5b7abeeccb91d5ed6e8bd691"), "test" : "测试集合生成情况" }
+{ "_id" : ObjectId("5b7ac295cb91d5ed6e8bd693"), "oncemore" : "再来一条" }
+
+> db.col.find({"name":"菜鸟教程"}).pretty()   # 类似条件 where name = "菜鸟教程"
+> db.col.find({"likes":{$lt:50}}).pretty()    # where likes < 50
+> db.col.find({"likes":{$gt:50}}).pretty()    # where likes > 50
+> db.col.find({"likes":{$lte:50}}).pretty()   # where likes <= 50
+> db.col.find({"likes":{$gte:50}}).pretty()   # where likes >= 50
+> db.col.find({"likes":{$ne:50}}).pretty()    # where likes != 50
+
+> db.col.find({title:/教/})  # 查询 title 包含"教"字的文档
+> db.col.find({title:/^教/}) # 查询 title 字段以"教"字开头的文档
+> db.col.find({title:/教$/}) # 查询 titl e字段以"教"字结尾的文档
+> db.col.find({"key1":"value1", "key2":"value2"}).pretty() # where key1 = value1 and key2 = value2
+> db.col.find({likes : {$lt :200, $gt : 100}}).pretty()    # where likes > 100 AND  likes < 200;
+
+> db.col.find({"title" : {$type : 'string'}}); # 如果想获取 "col" 集合中 title 为 String类型 的数据
+
+> db.col.find({},{"title":1,_id:0}); # 取集合中所有文档中的 title 字段, _id = 0 则表示不取 _id 字段
+
+> db.col.find({},{"title":1,_id:0}).limit(1).skip(1) # 从第一条开始，跳过1条，取一条
+
+> db.col.find( { $or: [ {"key1": "value1"}, {"key2":"value2"} ] } ).pretty() # or 链接
+
+# 混合使用 'where likes > 50 AND (name = '菜鸟教程' OR title = 'MongoDB 教程')
+> db.col.find({"likes": {$gt:50}, $or: [{"name": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty();
+```
+
+### 查询聚合数据
+
+```bash
+#  select by_user as _id, count(*) as num_tutorial from mycol group by by_user
+> db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$sum : 1}}}])
+
+# 计算总和
+> db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$sum : "$likes"}}}])
+
+# 计算平均值
+db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$avg : "$likes"}}}])
+
+# 获取集合中所有文档对应值得最小值
+db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$min : "$likes"}}}])
+
+# 获取集合中所有文档对应值得最大值
+db.mycol.aggregate([{$group : {_id : "$by_user", num_tutorial : {$max : "$likes"}}}])
+
+# 在结果文档中插入值到一个数组中
+db.mycol.aggregate([{$group : {_id : "$by_user", url : {$push: "$url"}}}])
+
+# 在结果文档中插入值到一个数组中，但不创建副本
+db.mycol.aggregate([{$group : {_id : "$by_user", url : {$addToSet : "$url"}}}])
+
+# 根据资源文档的排序获取第一个文档数据
+db.mycol.aggregate([{$group : {_id : "$by_user", first_url : {$first : "$url"}}}])
+
+# 根据资源文档的排序获取最后一个文档数据
+db.mycol.aggregate([{$group : {_id : "$by_user", last_url : {$last : "$url"}}}])
+```
+
+### 查询管道
+
+- `$project`：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
+- `$match`：用于过滤数据，只输出符合条件的文档。`$match`使用`MongoDB`的标准查询操作。
+- `$limit`：用来限制 MongoDB 聚合管道返回的文档数。
+- `$skip`：在聚合管道中跳过指定数量的文档，并返回余下的文档。
+- `$unwind`：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
+- `$group`：将集合中的文档分组，可用于统计结果。
+- `$sort`：将输入文档排序后输出。
+- `$geoNear`：输出接近某一地理位置的有序文档。
+
+```bash
+# 这样的话结果中就只还有tilte和author字段了
+db.article.aggregate(
+    { $project : {
+        _id : 0 ,
+        title : 1 ,
+        author : 1
+    }});
+
+# $match用于获取分数大于70小于或等于90记录，然后将符合条件的记录送到下一阶段$group管道操作符进行处理
+db.articles.aggregate( [
+                        { $match : { score : { $gt : 70, $lte : 90 } } },
+                        { $group: { _id: null, count: { $sum: 1 } } }
+                       ] );
+
+# 经过$skip管道操作符处理后，前五个文档被"过滤"掉
+db.article.aggregate({ $skip : 5 });
+
+# 按日、按月、按年、按周、按小时、按分钟聚合
+db.getCollection('m_msg_tb').aggregate(
+[
+    {$match:{m_id:10001,mark_time:{$gt:new Date(2017,8,0)}}},
+    {$group: {
+       _id: {$dayOfMonth:'$mark_time'},
+        pv: {$sum: 1}
+        }
+    },
+    {$sort: {"_id": 1}}
+])
+#  $dayOfYear: 返回该日期是这一年的第几天（全年 366 天）。
+#  $dayOfMonth: 返回该日期是这一个月的第几天（1到31）。
+#  $dayOfWeek: 返回的是这个周的星期几（1：星期日，7：星期六）。
+#  $year: 返回该日期的年份部分。
+#  $month： 返回该日期的月份部分（ 1 到 12）。
+#  $week： 返回该日期是所在年的第几个星期（ 0 到 53）。
+#  $hour： 返回该日期的小时部分。
+#  $minute: 返回该日期的分钟部分。
+#  $second: 返回该日期的秒部分（以0到59之间的数字形式返回日期的第二部分，但可以是60来计算闰秒）。
+#  $millisecond：返回该日期的毫秒部分（ 0 到 999）。
+#  $dateToString： { $dateToString: { format: , date: } }。
+```
+
+### 更新文档
 
 ```bash
 # 格式
@@ -166,15 +321,7 @@ system.indexes
 })
 ```
 
-## 查取数据
-
-```bash
-> db.logs.find().pretty() # 查出 logs 里所有集合
-{ "_id" : ObjectId("5b7abeeccb91d5ed6e8bd691"), "test" : "测试集合生成情况" }
-{ "_id" : ObjectId("5b7ac295cb91d5ed6e8bd693"), "oncemore" : "再来一条" }
-```
-
-## 删除文档
+### 删除文档
 
 ```bash
 # 格式
@@ -187,21 +334,5 @@ system.indexes
 )
 
 > db.col.remove({'title':'MongoDB 教程'})
-> db.col.remove({}) # 删除集合里所有数据
-```
-
-## 删除数据库 删除集合
-
-```bash
-> use runoob;           # 切换到要删除的数据库
-switched to db runoob
-> show tables;          # 显示当前数据库的集合
-runoob
-system.indexes
-> db.runoob.drop();     # 删除指定的集合
-true
-> show tables;
-system.indexes
-> db.dropDatabase()     # 删除当前数据库
-{ "dropped" : "runoob", "ok" : 1 }
+> db.col.remove({})                       # 删除col集合里所有文档
 ```
