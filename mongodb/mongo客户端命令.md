@@ -4,7 +4,7 @@
 
 ```bash
 mongo                      # 运行 mongo shell 客户端 链接的默认服务器
-mongo 101.200.144.41:10246 # 链接到远程的mongod服务器m
+mongo 101.200.144.41:10246 # 链接到远程的mongod服务器
 mongo --nodb               # 启动 mongo shell 而不连接到任何服务器
 
 > mongodb://[username:password@]host1[:port1],...[,hostN[:portN]]][/[database][?options]]
@@ -45,6 +45,13 @@ mongo --nodb               # 启动 mongo shell 而不连接到任何服务器
   - `connectTimeoutMS=ms`可以打开连接的时间
   - `socketTimeoutMS=ms`发送和接受sockets的时间
 
+## 关闭服务器
+
+```bash
+> use admin;           # 先切换到 admin
+> db.shutdownServer(); # 关闭服务器
+```
+
 ## 数据库操作
 
 ```bash
@@ -81,20 +88,11 @@ runoob  0.078GB
 ### 创建集合
 
 ```bash
-> db.createCollection(name, options) # 格式
-
-> use test
-switched to db test
-> db.createCollection("product");   # 创建一个集合
-{ "ok" : 1 }
-> show tables;
-product
-system.indexes
+> db.createCollection(name, options)  # 格式
+> show tables;                        # 查看数据库中有哪些集合
+> db.createCollection("product");     # 创建一个集合
 > db.createCollection("logs",{capped:true,autoIndexId:true,size:65523,max:1000}); # 创建一个集合
-{
-	"note" : "the autoIndexId option is deprecated and will be removed in a future release",
-	"ok" : 1
-}
+
 > show tables;
 logs
 product
@@ -137,26 +135,6 @@ system.indexes
 > db.logs.insert({"test":"测试集合生成情况","hehe":"haha"});  # 往集合里面插入文档
 ```
 
-### 给集合里的文档加索引
-
-```bash
-> db.collection.createIndex(keys, options) # 格式
-> db.col.createIndex({"title":1});    # 按 title 字段建立正序索引
-> db.col.createIndex({"title":1,"description":-1}) # 按 title 字段建立正序索引 然再按 description 倒序
-> db.values.createIndex({open: 1, close: 1}, {background: true})
-```
-
-- background	Boolean	建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 "background" 可选参数。 "background" 默认值为false。
-- unique	Boolean	建立的索引是否唯一。指定为true创建唯一索引。默认值为false.
-- name	string	索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。
-- sparse	Boolean	对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 false.
-- expireAfterSeconds	integer	指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。
-- v	index version	索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。
-- weights	document	索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。
-- default_language	string	对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语
-- language_override	string	对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.
-
-
 ### 查询文档
 
 ```bash
@@ -187,6 +165,11 @@ system.indexes
 
 # 混合使用 'where likes > 50 AND (name = '菜鸟教程' OR title = 'MongoDB 教程')
 > db.col.find({"likes": {$gt:50}, $or: [{"name": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty();
+
+> db.imooc_collection.find().count(); # 计算集合里有多少个文档
+
+# 按 x 字段排序，跳过 3 条，取 2 条
+> db.imooc_collection.find().skip(3).limit(2).sort({x:1});
 ```
 
 ### 查询聚合数据
@@ -278,17 +261,16 @@ db.getCollection('m_msg_tb').aggregate(
 ```bash
 # 格式
 > db.collection.update(
-   <query>,
-   <update>,
-   {
-     upsert: <boolean>,
-     multi: <boolean>,
-     writeConcern: <document>
-   }
+   <query>,     # 要查找的记录 条件查询
+   <update>,    # 要更新成的数据
+   upsert: <boolean>,
+   multi: <boolean>,
+   writeConcern: <document>
 )
 
-> db.col.update({'title':'MongoDB 教程'},{$set:{'title':'MongoDB'}})
-> db.col.update( { "count" : { $gt : 15 } } , { $inc : { "count" : 1} },false,true );
+> db.imooc_collection.update({x:1},{x:999}); # 更新整条文档
+> db.col.update( {'title':'MongoDB 教程'},{$set:{'title':'MongoDB'}}); # 只更新 title 字段
+> db.col.update( { "count" : { $gt : 15 } } , { $inc : { "count" : 1} }, false , true ); # 更新找到的多条数据
 ```
 
 - `query` : update的查询条件，类似`sql update`查询内where后面的。
@@ -327,12 +309,153 @@ db.getCollection('m_msg_tb').aggregate(
 # 格式
 > db.collection.remove(
    <query>,
-   {
-     justOne: <boolean>,
-     writeConcern: <document>
-   }
+   justOne: <boolean>,
+   writeConcern: <document>
 )
 
 > db.col.remove({'title':'MongoDB 教程'})
 > db.col.remove({})                       # 删除col集合里所有文档
+```
+
+## 索引
+
+- 好处：加快索引相关的查询
+- 缺陷: 增加磁盘空间消耗，降低写入性能
+
+```bash
+> db.imooc_collection.getIndexes();                  # 获取当前集合所有索引
+
+> db.collection.createIndex( keys, options )         # 格式
+> db.col.createIndex( {"title":1} );                 # 按 title 字段建立正序索引
+> db.col.createIndex( {"title":1,"description":-1} ) # 按 title 字段建立正序索引 然再按 description 倒序
+
+> db.values.createIndex({open: 1, close: 1}, {background: true});
+> db.values.createIndex({name: 1}, {unique: true});  # 唯一索引，name字段相同的值只能允许有一个
+> db.values.createIndex({name:1},{sparse:true});     # 不为不存在该字段的 文档 创建索引
+
+> db.imooc.dropIndex("normal_index"); # 删除 normal_index 索引
+```
+
+- `background` Boolean 建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 "background" 可选参数。 "background" 默认值为false。
+- `unique Boolean` 建立的索引是否唯一。指定为true创建唯一索引。默认值为false.
+- `name string` 索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。
+- `sparse Boolean` 对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 false.
+- `expireAfterSeconds integer` 指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。
+- `v index version`索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。
+- `weights document`索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。
+- `default_language string`对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语
+- `language_override string` 对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.
+
+### _id 索引
+
+- 每个插入的文档，MongoDb都会自动生成唯一的 _id 字段
+- 默认自动在 _id 创建索引
+
+### 单键索引
+
+- 对集合中的某个键创建索引,值为一个单一的值 例如字符串，数字，日期
+
+### 多键索引
+
+- 值具有多个记录，比如数组
+
+### 复合索引
+
+```bash
+> db.imooc.createIndex({x:1,num:1});  # 在使用 x 和 num 一起查询时，就可以使用这个索引了
+```
+
+### 过期索引
+
+- 在一段时间后会过期的索引，过期后对应的数据也会被删除
+- 适合存储一些在一段时间之后会失效的数据，比如用户的登录信息，存储的日志等
+- 存储在过期索引字段的值必须是指定的时间类型,ISODate 或者 ISODate数组，不能使用时间戳，否则不能被自动删除
+- 如果指定了ISODate数组，则按照最小的时间进行删除
+- 过期索引不能是复合索引
+- 删除时间不精确，删除过程是后台程序每 60s 跑一次，并且删除也需要一些时间，所以存在误差
+
+```bash
+> db.imooc.createIndex({x:1},{expireAfterSeconds:10});
+
+> db.imooc.createIndex({time:1},{expireAfterSeconds:30});
+> db.imooc.insert({time:new Date()}); # 这条文档会在 30s 后自动删除
+```
+
+### 全文索引
+
+- 对字符串与字符串数组创建全文可搜索的索引
+
+```bash
+db.articles.createIndex({title:"text"});
+db.articles.createIndex({title:"text",content:"text"});
+db.articles.createIndex({"$**":"text"});  # 对集合中所有字段创建一个大的全文索引
+
+# 利用全文索引进行查询
+db.articles.find({$text:{$search:"coffee"}});
+db.articles.find({$text:{$search:"aa bb cc"}});     # 查找多个关键字 用空格分开
+db.articles.find({$text:{$search:"aa bb -cc"}});    # 查找多个关键字 用空格分开，-cc 表示不包含 cc
+db.articles.find({$text:{$search:"\"aa\" \"bb\" \"cc\""}}); # 查询同时包含 aa bb cc 的文章
+```
+
+- 全文索引相识度
+
+```bash
+# 查询 并且按照 相识度排序
+> db.imooc.find({$text:{$search:"aa bb"}},{score:{$meta:"textScore"}}).sort({score:{$meta:"textScore"}});
+```
+
+- 全文索引限制
+  - 每次查询只能指定一个 $text 查询
+  - $text查询不能出现在$nor查询
+  - 查询中如果包含了$text, hint 不再起作用
+  - 目前不支持中文
+
+### 地理位置索引
+
+- 将一些点的位置存储在MongoDB中，创建索引后可以按照位置来查找其他的点
+- `2d`索引:用于存储和查找平面上的点，`2dsphere`索引，用于存储和查找球面上的点
+- 举例： 1.查找距离某个点一定距离内的点 2.查找包含在某区域内的点
+- 限制 经度: [-180,180] ,纬度 : [-90,90]
+
+```bash
+> db.user_location.createIndex({"w":"2d"});
+> db.user_location.insert({"w":[1,1]});
+
+> db.user_location.find({w:{$near:[1,1]}}); # 返回 100 个距离 [1,1] 最近的点
+> db.user_location.find({w:{$near:[1,1],$maxDistance:10}}); # 返回距离 [1,1] 距离10以内的点
+
+> db.location.find({w:{$geoWithin:{$box:[[0,0],[3,3]]}}}); # 查询在矩形内的点
+> db.location.find({w:{$geoWithin:{$center:[[0,0],5]}}});  # 查询圆心为 0,0 半径为5的圆内的点
+> db.location.find({w:{$geoWithin:{$polygon:[[0,0],[1,1],[0,1]]}}}); # 查询多边形内的点
+> db.runCommand({
+  geoNear:<collection>,
+  near:[x,y]
+  minDistance: # 对 2d 无效
+  maxDistance:
+  num:
+});
+```
+
+- `2dsphere` 球面地理位置索引
+
+### 查询索引构建情况
+
+- `mongostat -h 127.0.0.1:12027` 查看mongod服务运行情况
+
+### profile 启用慢查询
+
+```bash
+> db.getProfilingStatus();
+```
+
+### 日志
+
+```bash
+verbose = vvvvv # 记录日志的级别
+```
+
+### explain 分析 特定查询执行情况
+
+```bash
+> db.imooc.find({x:1}).explain();
 ```
