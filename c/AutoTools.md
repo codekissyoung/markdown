@@ -1,29 +1,5 @@
 # AutoTools
 
-## 安装整个 GNU 工具链
-
-```bash
-➜  learn git:(master) yes | sudo apt-get install gcc make autoconf automake libtool
-```
-
-## 检查 AutoTools 是否齐全
-
-```bash
-➜  learn git:(master) autoconf --version
-autoconf (GNU Autoconf) 2.69
-...
-
-➜  learn git:(master) automake --version
-automake (GNU automake) 1.15
-...
-
-Written by Tom Tromey <tromey@redhat.com>
-       and Alexandre Duret-Lutz <adl@gnu.org>.
-➜  learn git:(master) libtool --version
-libtool (GNU libtool) 2.4.6
-...
-```
-
 ## 准备 configure.ac 文件
 
 1. 使用 `autoscan` 命令生成参考文件 `configure.scan` 如下
