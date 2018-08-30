@@ -17,18 +17,17 @@ target ...: file1 file2 ...
 ```
 
 - 例子
-    ```makefile
-    foo.o:foo.c foo.h
-        gcc -c foo.c
 
-    lexer.c: lexer.l
-        flex -t lexer.l > lexer.c
+```makefile
+foo.o:foo.c foo.h
+    gcc -c foo.c
 
-    count_words:count_words.o lexer.o -lfl
-        gcc count_words.o lexer.o -lfl -o count_words
-    ```
-  - `-lfl` : `make`对`-l<NAME>`语法提供了支持, 指示`make`去系统库优先搜索`libNAME.so`,然后再搜索`libNAME.a`
-  - 然后 `gcc` 将系统程序库`libNAME.so`链接进`count_words`
+lexer.c: lexer.l
+    flex -t lexer.l > lexer.c
+
+count_words:count_words.o lexer.o -lfl
+    gcc count_words.o lexer.o -lfl -o count_words
+```
 
 ## Make 执行选项
 
@@ -41,8 +40,8 @@ target ...: file1 file2 ...
 ## 错误提示
 
 ```bash
-make: `count_words` is up to date.  表示目标已经是最新编译版
-make: *** No rule to make target `lexer.o`.Stop   表示编译成lexer.o的规则没写，或者有问题
+make: `count_words` is up to date.                # 表示目标已经是最新编译版
+make: *** No rule to make target `lexer.o`.Stop   # 表示编译成lexer.o的规则没写，或者有问题
 ```
 
 ## 具体规则 explicit rule
@@ -117,7 +116,6 @@ $(variable-name)
 - `$*` 工作目标的主文件名
 
 ```makefile
-# 替换成自动变量的例子
 count_words: count_words.o counter.o lexer.o -libfl
     gcc $^ -o $@
 count_words.o: count_words.c
@@ -133,13 +131,11 @@ lexer.c: lexer.l
 ## 参考实例
 
 ```makefile
-# 定义变量
 CC=g++
 CPPFLAGS=-Wall -g -pedantic
 BIN=main
 OBJS=main.o error.o func.o
 
-# 书写构建规则
 $(BIN):$(OBJS)
     $(CC) $(CPPFLAGS) $^ -lpthread -o $@
 
