@@ -7,44 +7,95 @@
 - `#` 注释
 - `\\` 是另起一行，来延续过长的文本
 
-## 默认规则 default rule
+## 例子
+
+- 生成`edit`程序需要8个c文件和3个h文件
 
 ```makefile
-target ...: file1 file2 ...
-    command1
-    command2
-    ...
+edit : main.o kbd.o command.o display.o insert.o search.o files.o utils.o
+    cc -o edit main.o kbd.o command.o display.o insert.o search.o files.o utils.o
+main.o : main.c defs.h
+    cc -c main.c
+kbd.o : kbd.c defs.h command.h
+    cc -c kbd.c
+command.o : command.c defs.h command.h
+    cc -c command.c
+display.o : display.c defs.h buffer.h
+    cc -c display.c
+insert.o : insert.c defs.h buffer.h
+    cc -c insert.c
+search.o : search.c defs.h buffer.h
+    cc -c search.c
+files.o : files.c defs.h buffer.h command.h
+    cc -c files.c
+utils.o : utils.c defs.h
+    cc -c utils.c
+
+clean :
+    rm edit main.o kbd.o command.o display.o insert.o search.o files.o utils.o
 ```
 
-- 例子
+## 使用变量
+
+- 定义是直接用 `=` 赋值, 而使用该变量则是`$(var_name)`,可以简化上面的例子如下
 
 ```makefile
-foo.o:foo.c foo.h
-    gcc -c foo.c
+objects = main.o kbd.o command.o display.o insert.o search.o files.o utils.o
 
-lexer.c: lexer.l
-    flex -t lexer.l > lexer.c
-
-count_words:count_words.o lexer.o -lfl
-    gcc count_words.o lexer.o -lfl -o count_words
+edit : $(objects)
+    cc $(objects) -o edit
+# 中间的省略 缩减篇幅 ...
+clean:
+    rm edit $(objects)
 ```
 
-## Make 执行选项
+## 隐含规则
 
-- `make --just-print` 打印 make 将要执行的命令，但不实际执行它们
+- `abcde.o`在没有明确的命令行生成的情况话,make自动会执行`gcc -c abcde.c -o abcde.o`命令，称为隐含命令,所以简化上面例子如下:
+- 通过 `.PHONY` 特殊目标将`clean`目标声明为伪目标。避免当磁盘上存在一个名为`clean`文件时,目标`clean`所在规则的命令无法执行
+- 在命令行之前使用 `-`,意思是忽略命令`rm`的执行错误
 
-## 两阶段执行模型 two phase execution model
+```makefile
+objects = main.o kbd.o command.o display.o insert.o search.o files.o utils.o
 
-## 递归变量 recursive variable
+edit : $(objects)
+    cc -o edit $(objects)
 
-## 错误提示
+main.o : defs.h
+kbd.o : defs.h command.h
+command.o : defs.h command.h
+display.o : defs.h buffer.h
+insert.o : defs.h buffer.h
+search.o : defs.h buffer.h
+files.o : defs.h buffer.h command.h
+utils.o : defs.h
 
-```bash
-make: `count_words` is up to date.                # 表示目标已经是最新编译版
-make: *** No rule to make target `lexer.o`.Stop   # 表示编译成lexer.o的规则没写，或者有问题
+.PHONY : clean
+clean :
+    -rm edit $(objects)
 ```
 
-## 具体规则 explicit rule
+### 一个不好的makefile书写方式
+
+```makefile
+objects = main.o kbd.o command.o display.o insert.o search.o files.o utils.o
+
+edit : $(objects)
+    cc -o edit $(objects)
+
+$(objects) : defs.h
+kbd.o command.o files.o : command.h
+display.o insert.o search.o files.o : buffer.h
+
+.PHONY : clean
+clean :
+    -rm edit $(objects)
+```
+
+- 这个makefile把依赖相同文件的目标合并了,一个规则中含有多个目标文件,这样导致规则定义不明了,比较混乱,后期维护将会是一件非常痛苦的事情
+- 书写规则建议的方式是:单目标,多依赖。就是说尽量要做到一个规则中只存在一个目标文件,可有多个依赖文件。尽量避免使用多目标,单依赖的方式。
+
+## 具体规则
 
 ```makefile
 # 确定 vpath.c 在编译之前， lexer.c 已经存在
@@ -57,6 +108,23 @@ vpath.o : vpath.c
 # 引入别的依存关系
 include auto-generated-dependencies.d
 ```
+
+## Make 执行选项
+
+- `make --just-print` 打印 make 将要执行的命令，但不实际执行它们
+
+## 两阶段执行模型
+
+## 递归变量
+
+## 错误提示
+
+```bash
+make: `count_words` is up to date.                # 表示目标已经是最新编译版
+make: *** No rule to make target `lexer.o`.Stop   # 表示编译成lexer.o的规则没写，或者有问题
+```
+
+
 
 ## 模式规则 pattern rule
 
@@ -96,14 +164,6 @@ distclean   删除编译过程中产生的任何文件
 TAGS        建立可供编辑器使用的标记表
 info        ...
 check       执行与应用程序相关的任何测试
-```
-
-## 变量
-
-- 单字符可以不用 `()` `{}` 去解引用
-
-```makefile
-$(variable-name)
 ```
 
 ## 自动变量
