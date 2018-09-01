@@ -1,11 +1,33 @@
 # GNU Make 项目管理
 
-- `将源代码转换成可执行文件` 的自动化
-- `Make`程序读取`makefile`文件，根据它来编译程序
-- 将程序各元素之间的关系告诉 `Make`, `Make` 会根据这些关系和时间戳判断应该重新进行哪些步骤，以重新产生你需要的程序
-- `[tab]`开头，后面的字符会被当做 commands , 传给 `subshell` 执行，如果在非命令行前面加上了`[tab]`，会报错
-- `#` 注释
-- `反斜杠 \\` 是另起一行,来延续过长的文本,注意它后面不能有空格
+## Makefile格式
+
+```makefile
+target ... : prerequisites ...
+    command
+```
+
+- target 工作目标, 可以是 Object File, 也可以是可执行文件
+- prerequisites - 生成 target 所需要的文件或者目标
+- command       - make需要执行的命令 (任意的shell命令), Makefile中的命令必须以 [tab] 开头
+
+## Makefile的构成
+
+- 显示规则 : 说明如何生成一个或多个目标文件(包括 生成的文件, 文件的依赖文件, 生成的命令)
+- 隐晦规则 : make的自动推导功能所执行的规则
+- 变量定义 : Makefile中定义的变量
+- 文件指示 : Makefile中引用其他Makefile; 指定Makefile中有效部分; 定义一个多行命令
+- 注释     : Makefile只有行注释 "#", 如果要使用或者输出"#"字符, 需要进行转义
+
+## Make工作方式
+
+- 读入主Makefile (主Makefile中可以引用其他Makefile)
+- 读入被include的其他Makefile
+- 初始化文件中的变量
+- 推导隐晦规则, 并分析所有规则
+- 为所有的目标文件创建依赖关系链
+- 根据依赖关系, 决定哪些目标要重新生成
+- 执行生成命令
 
 ## 例子
 
@@ -60,12 +82,14 @@ clean:
 - `$*` 工作目标的主文件名, 比如 foo.o, foo 就是主文件名
 
 ```makefile
-count_words: count_words.o counter.o lexer.o -libfl
+count_words: count_words.o counter.o lexer.o -lfl
     gcc $^ -o $@
 # 中间的省略 缩减篇幅 ...
 lexer.c: lexer.l
     flex -t $< > $@
 ```
+
+- 必要条件中 `-lfl`, GNU Make对这个语法提供了特别的支持,它会去检查系统库中`libfl.a`或者`libfl.so`的存在
 
 ### 内置的变量
 
@@ -78,7 +102,7 @@ lexer.c: lexer.l
 - `COMPILE.c`就是内置变量,其中 : `COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c`, 它也是其他内置变量构成的
 - `OUTPUT_OPTION = -o $@`
 - `CC = gcc`, 也就是说，改变`CC`变量的设定值就可以更换 C 编译器，改变`CFLAGS` `CPPFLAGS` 就可以更换编译选项
-- 直接修改这些内置变量要特别小心,比如`make CPPFLAGS=-DDEBUG`就会将在makefile里定义的`CPPFLAGS = -I include`覆盖掉，推荐做法如下: 
+- 直接修改这些内置变量要特别小心,比如`make CPPFLAGS=-DDEBUG`就会将在makefile里定义的`CPPFLAGS = -I include`覆盖掉，推荐做法如下:
 
 ```makefile
 INCLUDES = -I include

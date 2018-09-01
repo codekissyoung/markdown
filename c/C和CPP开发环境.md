@@ -63,6 +63,8 @@ sudo apt-get install gcc gdb make autoconf automake libtool build-essential
 
 - `-fpack-struct=4` 强制按照`4Byte`对齐内存,`-fpack-struct=2` 强制按照`2Byte`对齐内存,`-fpack-struct`不用对齐内存
 
+- `-pthread` 与 `-lpthread` : gcc手册里则指出应该在编译和链接时都增加 `-pthread` 选项,编译选项中指定 -pthread 会附加一个宏定义 -D_REENTRANT，该宏会导致 libc 头文件选择那些thread-safe的实现；链接选项中指定 -pthread 则同 -lpthread 一样，只表示链接 POSIX thread 库。由于 libc 用于适应 thread-safe 的宏定义可能变化，因此在编译和链接时都使用 -pthread 选项而不是传统的 -lpthread 能够保持向后兼容，并提高命令行的一致性。
+
 ### 编译成 .o 文件
 
 ```bash
