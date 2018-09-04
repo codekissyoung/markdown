@@ -8,6 +8,9 @@
 $cfg['AllowArbitraryServer'] = true; // 允许在界面上 选择服务器
 $cfg['Servers'][$i]['host'] = '10.10.61.57';
 $cfg['blowfish_secret'] = 'abcdefghijklmnopqrstuvwxyz111111';
+
+// 修改这个参数需要在 php.ini 设置 session.gc_maxlifetime = 86400 或者更大值
+$cfg['LoginCookieValidity'] = 86400; // 保持session一天
 ```
 
 ## 允许 MySQL 远程连接

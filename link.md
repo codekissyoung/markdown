@@ -2,6 +2,7 @@
 
 ## 在线工具
 
+- [postman教程](https://segmentfault.com/a/1190000011991458)
 - [代码在线运行工具](https://tool.lu/)
 - [Json格式化工具](http://json.awesomes.cn/)
 - [小影志](http://c7sky.com/)
@@ -27,6 +28,14 @@
 
 ## 个人博客
 
+- [Sun Blog](http://blog.dayuren.top/)
+- [匠心零度](http://www.jiangxinlingdu.com/)
+- [cmsblogs](http://cmsblogs.com/)
+- [徐靖峰](https://www.cnkirito.moe/)
+- [Zhisheng Tian](http://www.54tianzhisheng.cn/)
+- [王亚普](http://wangyapu.com/)
+- [芋道源码](http://www.iocoder.cn/)
+- [纯洁的微笑](http://ityouknow.com/)
 - [Poll的笔记](https://www.cnblogs.com/maybe2030/)
 - [ideawu blog](http://www.ideawu.net/blog/)
 - [C/C++ reference](http://zh.cppreference.com/)

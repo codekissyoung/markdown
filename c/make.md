@@ -253,15 +253,34 @@ vpath %.h include           # 在include中只搜寻 .h 文件
 - `make --just-print` 或者 `make -n` 打印 make 将要执行的命令，但不实际执行它们
 - `make --print-data-base` 打印出所有内置的以及写在makefile的默认规则和变量
 
-## 两阶段执行模型
+## wildcard notdir patsubst 函数
 
-## 递归变量
+- 在Makefile规则中，通配符会被自动展开。但在变量的定义和函数引用时，通配符将失效。这种情况下如果需要通配符有效，就需要使用函数 wildcard
+- `$(wildcard PATTERN...)` 。在Makefile中，它被展开为已经存在的、使用空格分开的、匹配此模式的所有文件列表。如果不存在任何符合此模式的文件，函数会忽略模式字符并返回空。需要注意的是：这种情况下规则中通配符的展开和上一小节匹配通配符的区别。
+- `$(wildcard *.c)` 来获取工作目录下的所有的.c文件列表
+- `$(patsubst %.c,%.o,$(wildcard *.c))` : 首先使用 wildcard 函数获取工作目录下的.c文件列表；之后将列表中所有文件名的后缀.c替换为.o。这样我们就可以得到在当前目录可生成的.o文件列表。因此在一个目录下可以使用如下内容的Makefile来将工作目录下的所有的.c文件进行编译并最后连接成为一个可执行文件：
 
-## 错误提示
+```makefile
+objects := $(patsubst %.c,%.o,$(wildcard *.c))
 
-```bash
-make: `count_words` is up to date.                # 表示目标已经是最新编译版
-make: *** No rule to make target `lexer.o`.Stop   # 表示编译成lexer.o的规则没写，或者有问题
+foo : $(objects)
+    cc -o foo $(objects)
+```
+
+```makefile
+src = $(wildcard *.c ./sub/*.c)       # 扩展通配符,把 ./ 和 ./sub/ 下的所有后缀是c的文件全部展开
+dir = $(notdir $(src))                # 去除路径, 把展开的文件去除掉路径信息
+obj = $(patsubst %.c,%.o,$(dir) )     # 替换通配符, patsubst把$(dir)中的变量符合后缀是.c的全部替换成.o
+
+.PHONY = all
+all:
+ @echo $(src)       # 输出 a.c b.c ./sub/sa.c ./sub/sb.c
+ @echo $(dir)       # 输出 a.c b.c sa.c sb.c
+ @echo $(obj)       # 输出 a.o b.o sa.o sb.o
+ @echo "end"
+
+# 别的一些类似的语法
+obj = $(dir:%.c=%.o) # $(var:a=b) 或 ${var:a=b}, 它的含义是把变量var中的每一个值结尾用b替换掉a
 ```
 
 ## 参考实例
@@ -281,4 +300,15 @@ $(BIN):$(OBJS)
 .PHONY:clean
 clean:
     rm -f *.o $(BIN)
+```
+
+## 两阶段执行模型
+
+## 递归变量
+
+## 错误提示
+
+```bash
+make: `count_words` is up to date.                # 表示目标已经是最新编译版
+make: *** No rule to make target `lexer.o`.Stop   # 表示编译成lexer.o的规则没写，或者有问题
 ```
