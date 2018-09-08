@@ -2,7 +2,6 @@
 
 ## 在线工具
 
-- [postman教程](https://segmentfault.com/a/1190000011991458)
 - [代码在线运行工具](https://tool.lu/)
 - [Json格式化工具](http://json.awesomes.cn/)
 - [小影志](http://c7sky.com/)
@@ -17,6 +16,9 @@
 - [极客搜索](http://s.geekbang.org/)
 - [亚马逊云](https://amazonaws-china.com/cn)
 - [46个非常有用的PHP代码片段](http://www.techug.com/useful-code)
+- [ncckl云盘搜索](http://so.ncckl.cn/)
+- [小不点网盘搜索](https://www.xiaoso.net/)
+- [胖次网盘搜索](https://www.panc.cc/)
 
 ### [Server酱](http://sc.ftqq.com/3.version)
 
@@ -28,14 +30,9 @@
 
 ## 个人博客
 
-- [Sun Blog](http://blog.dayuren.top/)
-- [匠心零度](http://www.jiangxinlingdu.com/)
-- [cmsblogs](http://cmsblogs.com/)
-- [徐靖峰](https://www.cnkirito.moe/)
-- [Zhisheng Tian](http://www.54tianzhisheng.cn/)
-- [王亚普](http://wangyapu.com/)
-- [芋道源码](http://www.iocoder.cn/)
-- [纯洁的微笑](http://ityouknow.com/)
+- [推库周刊](https://www.tuicool.com/mags)
+- [码农周刊](https://weekly.manong.io/issues/)
+- [InfoQ](http://www.infoq.com/cn/#)
 - [Poll的笔记](https://www.cnblogs.com/maybe2030/)
 - [ideawu blog](http://www.ideawu.net/blog/)
 - [C/C++ reference](http://zh.cppreference.com/)
