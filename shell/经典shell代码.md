@@ -1,16 +1,22 @@
-# 执行一个命令 直到命令运行成功
+# 经典 shell 代码
+
+## 执行一个命令 直到命令运行成功
+
 ```bash
-repeat (){
-    while : ; do  # : 总会返回0的退出码 比 true 快
+function repeat ()
+{
+    while : ; # : 总会返回0的退出码 比 true 快
+    do  
         $@ && return ;
-        sleep 5; # 如果失败了,那么就再延迟5秒，再循环执行命令 
+        sleep 5; # 如果失败了,那么就再延迟5秒，再循环执行命令
     done
 }
 #　eg.
 repeat wget -c http://www.xunlei.com/software-aa.tar.gz
 ```
 
-# 创建一个临时交换空间 (类似于swap分区)
+## 创建一个临时交换空间 (类似于swap分区)
+
 ```bash
 # 创建一个交换文件，参数为创建的块数量（不带参数则为默认），一块为1024B（1K）
 ROOT_UID=0         # Root 用户的 $UID 是 0.    
@@ -44,7 +50,8 @@ echo "Swap file created and activated."
 exit $SUCCESS
 ```
 
-# 为特定的目的而用零去填充一个指定大小的文件
+## 为特定的目的而用零去填充一个指定大小的文件
+
 ```bash
 #!/bin/bash    
 # 如挂载一个文件系统到环回设备 （loopback device） 或"安全地" 删除一个文件。
@@ -85,11 +92,12 @@ echo """$MOUNTPT"" now available for use."
 # 注意, ramdisk是易失的, 所以当计算机系统重启或关机时ramdisk里的内容会消失.    
 # 重启之后, 运行这个脚本再次建立起一个 ramdisk.    
 # 仅重新加载 /mnt/ramdisk 而没有其他的步骤将不会正确工作.    
-# 如果加以改进, 这个脚本可以放在 /etc/rc.d/rc.local，以使系统启动时能自动设立一个ramdisk。这样很合适速度要求高的数据库服务器.    
+# 如果加以改进, 这个脚本可以放在 /etc/rc.d/rc.local，以使系统启动时能自动设立一个ramdisk。这样很合适速度要求高的数据库服务器.
 exit 0 
 ```
 
-# 批量重命名 和 移动
+## 批量重命名 和 移动
+
 ```bash
 #!/bin/bash
 count=1;

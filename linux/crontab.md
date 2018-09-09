@@ -12,17 +12,7 @@ crontab -e
 / 代表”每”
 - 代表从某个数字到某个数字
 , 分开几个离散的数字
-2>&1  把错误输出和标准输出都输出到标准输出中，而标准输出又被重定向到mylog.log中
-最后一个 & 表示后台执行
 ```
-
-
-
-* 解释
-ls 2>1测试一下，不会报没有2文件的错误，但会输出一个空的文件1；
-ls xxx 2>1测试，没有xxx这个文件的错误输出到了1中；
-ls xxx 2>&1测试，不会生成1这个文件了，不过错误跑到标准输出了；
-ls xxx >out.txt 2>&1, 实际上可换成 ls xxx 1>out.txt 2>&1；重定向符号>默认是1,错误和输出都传到out.txt了。
 
 ## 终止任务调度
 * crontab -r
@@ -33,6 +23,8 @@ ls xxx >out.txt 2>&1, 实际上可换成 ls xxx 1>out.txt 2>&1；重定向符号
 写个 shell 脚本，将要执行的命令写在 shell 里面，然后定时将 shell 执行!
 
 ## 例子
+
+```crontab
 30 21 * * * /usr/local/etc/rc.d/lighttpd restart       #每晚的21:30重启apache
 
 45 4 1,10,22 * * /usr/local/etc/rc.d/lighttpd restart  #每月1、10、22日的4 : 45重启apache
@@ -50,6 +42,6 @@ ls xxx >out.txt 2>&1, 实际上可换成 ls xxx 1>out.txt 2>&1；重定向符号
 0 11 4 * mon-wed /usr/local/etc/rc.d/lighttpd restart  #每月的4号与每周一到周三的11点重启apache
 
 0 4 1 jan * /usr/local/etc/rc.d/lighttpd restart       #一月一号的4点重启apache
-
+```
 参考
 http://blog.csdn.net/xiyuan1999/article/details/8160998

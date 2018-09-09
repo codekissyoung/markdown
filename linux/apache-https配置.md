@@ -1,6 +1,10 @@
-# 申请证书
-[腾讯免费证书申请](https://www.qcloud.com/product/ssl)
-```
+# apache https 配置
+
+## 申请证书
+
+- [腾讯免费证书申请](https://www.qcloud.com/product/ssl)
+
+```bash
 ➜ www.dadishe.com tree
 .
 ├── Apache
@@ -19,8 +23,9 @@
 └── www.dadishe.com.zip
 ```
 
-# 开启Apache ssl mod
-```
+## 开启Apache ssl mod
+
+```bash
 ➜ apache2 apache2 -v
 Server version: Apache/2.4.18 (Ubuntu)
 Server built: 2017-06-26T11:58:04
@@ -34,8 +39,9 @@ Module socache_shmcb already enabled
 Module ssl already enabled
 ```
 
-# 配置虚拟站点 参考配置
-```
+## 配置虚拟站点 参考配置
+
+```bash
 <VirtualHost *:80>
 ServerName www.dadishe.com
 Redirect permanent / https://www.dadishe.com
