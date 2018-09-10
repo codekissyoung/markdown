@@ -119,4 +119,21 @@ export CFLAGS
 gcc -I/home/hello/include -L/home/hello/lib -lword  hello.c -o hello  
 ```
 
+### 同时使用动态库和静态库
+
+- 场景:写一个Nginx模块，使用MySQL的C客户端接口库libmysqlclient，当然mysqlclient还引用了其他的库，比如libm, libz, libcrypto等等。对于使用mysqlclient的代码来说，需要关心的只是mysqlclient引用到的动态库。大部分情况下，不是每台机器都安装有libmysqlclient，所以我想把这个库静态链接到Nginx模块中，但又不想把mysqlclient引用的其他库也静态的链接进来。
+- 简单地使用-static显得有些暴力，因为他会把命令行中`-static`后面的所有`-l`指明的库都静态链接，更主要的是，有些库可能并没有提供静态库（.a），而只提供了动态库（.so）。这样的话，使用-static就会造成链接错误。
+- `-Wl,-Bstatic` `-Wl,-Bdynamic` 是gcc的特殊选项，它会将选项的参数传递给链接器，作为链接器的选项
+- `-Wl,-Bstatic` 告诉链接器使用`-Bstatic`选项，该选项是告诉链接器，对接下来的`-l`选项使用静态链接
+- `-Wl,-Bdynamic` 就是告诉链接器对接下来的`-l`选项使用动态链接
+　　
+```makefile
+# 修改前
+CORE_LIBS="$CORE_LIBS -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm -L/usr/lib64 -lssl -lcrypto"
+
+# 修改后
+CORE_LIBS="$CORE_LIBS -L/usr/lib64/mysql -Wl,-Bstatic -lmysqlclient \
+-Wl,-Bdynamic -lz -lcrypt -lnsl -lm -L/usr/lib64 -lssl -lcrypto"
+```
+
 ## Make

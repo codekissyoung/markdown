@@ -126,3 +126,19 @@ php-fpm 也是使用nginx 或者php-fpm用户运行的(php-fpm不能使用root�
 1. 将nginx设置为root用户运行 , php-fpm 设置为本用户运行
 2. 将本用户目录的权限修改为 `drwxr-xr-x` , 开放写和执行权限给外部用户,这样可能带来隐私泄露问题,
 可以通过建立个 `~/own` 文件夹 ,权限设置为 `drwx------`,将所有隐私文件放在里面
+
+
+# centos 命令
+##服务相关
+`systemctl start|stop|restart nginx.service` 启动｜关闭｜重启某项服务
+`systemctl enable httpd.service` 开机自启动
+`systemctl disable httpd.service` 关闭开机自启动
+`systemctl status httpd.service` 查看服务状态
+`systemctl list-units --type=service` 列出启动的服务
+
+## 更新yum源到阿里云
+第一步：备份你的原镜像文件，以免出错后可以恢复
+mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo
+第三步：运行yum makecache生成缓存
+yum makecache
