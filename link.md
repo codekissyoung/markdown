@@ -30,6 +30,7 @@
 
 ## 个人博客
 
+- [小专栏](https://xiaozhuanlan.com/)  里面有很多不错的专栏文章
 - [推库周刊](https://www.tuicool.com/mags)
 - [码农周刊](https://weekly.manong.io/issues/)
 - [InfoQ](http://www.infoq.com/cn/#)
