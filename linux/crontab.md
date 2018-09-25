@@ -43,5 +43,11 @@ crontab -e
 
 0 4 1 jan * /usr/local/etc/rc.d/lighttpd restart       #一月一号的4点重启apache
 ```
+
 参考
 http://blog.csdn.net/xiyuan1999/article/details/8160998
+
+
+## crontab 输出限制
+
+- 原来，这是由于在部分机器上，crontab对于执行程序的输出有大小限制，输出超出一定的字节之后就会自动停止程序。而我的程序每发送1000条数据即会输出一条log，所以每次正好输出49000这条log之后，就超出了大小限制，因此每次都会自动停止在48999条了。解决方案：可以 重定向输出至 >/dev/null
