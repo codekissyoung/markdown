@@ -10,10 +10,22 @@
 {
     "protocol": "sftp",
     "host": "101.200.144.41",
-    "username": "username",
-    "password": "password",
+    "username": "cky",
+    "port": 22,
+    "interactiveAuth": true,
+    "remotePath": "/home/cky/workspace/markdown",
     "uploadOnSave": true,
-    "remotePath": "/home/cky/workspace/blog/md"
+    "privateKeyPath": "/Users/iqingyi/.ssh/id_rsa",
+    "watcher": {
+        "files": "**/*",
+        "autoUpload": true,
+        "autoDelete": true
+    },
+    "ignore": [
+        ".vscode",
+        ".git",
+        ".DS_Store"
+    ]
 }
 ```
 
