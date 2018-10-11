@@ -1,18 +1,11 @@
 # Nginx
 
-## 安装
-```
-sudo aptitude install -y nginx
-```
+## ubuntu apt-get 安装
 
-## 启动
-```
-sudo systemctl start nginx.service
-```
-
-## 检测是否启动
-```shell
-cky@codekissyoung2:~$ sudo lsof -i:80
+```bash
+sudo aptitude install -y nginx          # 安装
+sudo systemctl start nginx.service      # 启动
+cky@codekissyoung2:~$ sudo lsof -i:80   # 检测是否启动
 COMMAND     PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 AliYunDun   957     root   18u  IPv4  14418      0t0  TCP 192.168.1.189:51318->140.205.140.205:http (CLOSE_WAIT)
 AliYunDun   979     root   18u  IPv4  14418      0t0  TCP 192.168.1.189:51318->140.205.140.205:http (CLOSE_WAIT)
@@ -21,23 +14,21 @@ nginx     29624     root    6u  IPv4 364742      0t0  TCP *:http (LISTEN)
 nginx     29624     root    7u  IPv6 364743      0t0  TCP *:http (LISTEN)
 nginx     29625 www-data    6u  IPv4 364742      0t0  TCP *:http (LISTEN)
 nginx     29625 www-data    7u  IPv6 364743      0t0  TCP *:http (LISTEN)
-```
 
-## 配置目录
-```shell
+# 配置目录
 cky@codekissyoung2:/etc/nginx$ ls -l
 total 56
-drwxr-xr-x 2 root root 4096 Jul 12 18:34 conf.d  # 一般性的配置文件
--rw-r--r-- 1 root root 1077 Feb 12  2017 fastcgi.conf  # FastCGI 配置文件 
+drwxr-xr-x 2 root root 4096 Jul 12 18:34 conf.d         # 一般性的配置文件
+-rw-r--r-- 1 root root 1077 Feb 12  2017 fastcgi.conf   # FastCGI 配置文件 
 -rw-r--r-- 1 root root 1007 Feb 12  2017 fastcgi_params # FastCGI 默认参数
 -rw-r--r-- 1 root root 2837 Feb 12  2017 koi-utf
 -rw-r--r-- 1 root root 2223 Feb 12  2017 koi-win
--rw-r--r-- 1 root root 3957 Feb 12  2017 mime.types  # 资源的媒体类型相关配置
--rw-r--r-- 1 root root 1462 Feb 12  2017 nginx.conf  # 主配置文件
+-rw-r--r-- 1 root root 3957 Feb 12  2017 mime.types     # 资源的媒体类型相关配置
+-rw-r--r-- 1 root root 1462 Feb 12  2017 nginx.conf     # 主配置文件
 -rw-r--r-- 1 root root  180 Feb 12  2017 proxy_params
 -rw-r--r-- 1 root root  636 Feb 12  2017 scgi_params
 drwxr-xr-x 2 root root 4096 Aug  8 17:39 sites-available # 所有配置的虚拟主机的配置
-drwxr-xr-x 2 root root 4096 Aug  8 17:39 sites-enabled  # 已经启用的虚拟主机的配置
+drwxr-xr-x 2 root root 4096 Aug  8 17:39 sites-enabled   # 已经启用的虚拟主机的配置
 drwxr-xr-x 2 root root 4096 Aug  8 17:39 snippets
 -rw-r--r-- 1 root root  664 Feb 12  2017 uwsgi_params
 -rw-r--r-- 1 root root 3071 Feb 12  2017 win-utf
@@ -56,6 +47,40 @@ sudo apt-get --purge remove nginx
 sudo apt-get --purge remove nginx-common
 sudo apt-get --purge remove nginx-core
 ```
+
+## 编译安装Nginx
+
+```bash
+# 安装依赖
+sudo apt-get install openssl libssl-dev
+sudo apt-get install libpcre3 libpcre3-dev
+sudo apt-get install zlib1g-dev
+
+cd /home/cky/software/nginx-1.15.5              # 进入解压好的安装包目录
+./configure --prefix=/home/cky/software/nginx   # 配置好软件安装目录
+
+cd /home/cky/software/nginx/sbin                         # 进入可执行文件目录
+sudo ./nginx -c /home/cky/software/nginx/conf/nginx.conf # 运行Nginx
+
+sudo ./nginx -s [ stop | quit | reopen | reload ]        # 常用命令
+sudo ./nginx -t -c /home/cky/software/nginx/conf/nginx.conf # 检查配置是否有语法错误
+
+# 也可以使用信号控制 Nginx 进程 kill -信号 master-pid
+TERM, INT 快速关闭
+QUIT 平滑关闭
+HUP 平滑重启
+USR1 重新打开日志文件，在切割日志时用途比较大
+USR2 平滑升级可执行程序
+WINCH 从容关闭工作进程
+```
+
+## Nginx 平滑升级
+
+- 将`./sbin/nginx`旧版本备份成`./sbin/nginx.2018.10.09`,然后将新编译好的nginx版本移入`./sbin`
+- 执行`sudo kill -USR2 旧版本的Nginx主进程号`
+- 旧版本Nginx的主进程将重新命名它的`.pid`文件为`.pid.oldbin`,然后执行新版本的Nginx可执行程序，依次启动新的主进程和新的工作进程
+- 此时新、旧版本的Nginx实例会同时运行，共同处理输入的请求，要逐步停止旧版本的Nginx实例，必须发送`WINCH`信号给旧的主进程，平滑关闭它,命令为`sudo kill -WINCH 旧版本Nginx主进程号`
+- 一段时间后，旧的工作进程处理了所有已连接的请求后退出，仅由新的Nginx工作进程来处理输入的请求了
 
 ## 配置
 
