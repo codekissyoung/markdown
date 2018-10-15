@@ -84,30 +84,35 @@ WINCH 从容关闭工作进程
 
 ## 配置
 
-```nginx
+```bash
 # 全局块 主要设置一些影响Ngnix整体运行的配置指令
-
-worker_processes  3; # 启动的worker进程数为3,启动进程,通常设置成和cpu的数量相等
-user nobody nobody;  # user指令设置哪些用户/组可以启动nginx,nobody是所有用户都可以
+worker_processes  3;        # 启动的worker进程数为3,启动进程,通常设置成和cpu的数量相等
+user nobody nobody;         # user指令设置哪些用户/组可以启动nginx,nobody是所有用户都可以
 pid /home/caokaiyan/workspace/etc_sh/nginx/nginx.pid; # 设置nginx运行时,pid的存放路径
-# 错误日志,debug 以上级别错误会被记录下来，日志级别：debug info notice warn error crit alert emerg
-error_log /home/caokaiyan/workspace/etc_sh/nginx/nginx_error.log debug;
+# 错误日志路径,日志级别：debug info notice warn error crit alert emerg
+error_log /home/caokaiyan/workspace/etc_sh/nginx/nginx_error.log warn;
 
 # events 块
 events {
     worker_connections  1024; # 每个worker进程的最大链接数为1024
-    accept_mutex on;          # 对多个nginx进程接收链接进行序列化,防止进程对连接的抢夺
+    accept_mutex on;          # 对多个nginx进程接收链接进行序列化,防止惊群
+    # 惊群问题: 当一个网络连接到来时，多个睡眠进程会被同时唤醒
+    # 但只有一个进程会获得连接，如果每次唤醒的进程数目太多，会影响一部分系统性能,在Nginx多进程下会出现这样的问题
+    multi_accept on;          # 设置每个worker process都能同时接收多个新到达的网络连接，在off情况下只能接收一个
     use epoll;                # 使用 epoll 事件驱动模型(其余模型有select,poll等)
 }
 
 # http 块
 http {
-    include       mime.types;                # 将其他nginx配置(写在别的文件里)包含进来
+    include       mime.types;                # 将其他nginx配置包含进来,相对路径
     default_type  application/octet-stream;  # 处理前端请求的MIME类型
-    access_log    /var/log/nginx/access.log; # 日志文件
+
+    access_log    /var/log/nginx/access.log combined; # 日志文件
+
     sendfile        on;                      # 允许传输文件
     sendfile_max_chunk 1024k;                # 上传的文件不能超过1M,设置为０的话表示无限制
-    keepalive_timeout  65;                   #  设置连接超时
+
+    keepalive_timeout  65;                   # 服务端对链接的保持时间
     gzip  on;                                # 开启压缩
     client_header_buffer_size    1k;         # 设定请求缓冲
     large_client_header_buffers  4 4k;       #
@@ -116,13 +121,16 @@ http {
     server{
         listen       80;                       # 监听80端口上的所有ip连接
         server_name  nginx.codekissyoung.com;  # 绑定域名
+        error_page   500 502 503 504 /50x.html;
+
+        # location 块基于 域名/uri-string 中的 /uri-string 部分进行匹配，对特定的请求进行处理。
+        # 地址重定向，数据缓存，应答控制等功能都是在这部分实现
         location / {
             root /var/www/site1;    # 站点根目录
             index  index.php index.html index.htm;
         }
 
         # 定义错误提示页面
-        error_page   500 502 503 504 /50x.html;
         location = /50x.html {
             root   /root;
         }
