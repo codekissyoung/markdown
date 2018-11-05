@@ -67,6 +67,11 @@ printf("yellow = %d\n", YELLOW);
 - C不会对数组下标索引进 范围检查,编码时需要注意过界检查
 - c 不允许数组作为一个单元赋值给另一个数组
 
+#### 数组变量不保存在存储器中
+- 程序编译时，会把数组变量的引用替换成数组的地址，也就是说在最后的可执行文件中，数组变量并不存在，既然数组变量从来不需要指向别的地方，有和没有其实都一样
+
+
+
 #### 数组初始化
 
 ```c
@@ -545,7 +550,7 @@ char *Func ( void )
 - `#define` 给出的是立即数，宏是在预编译时进行替换，有若干个拷贝，没有类型
 
 ```c
-#define M 3 // 定义宏 M
+#define M 3
 const int N       = 5;            // N 只读
 const int    a[5] = {1,2,3,4,5};  // 数组只读
 const int *p;    // 指针指向的对象只读
@@ -558,176 +563,6 @@ extern const int i;      // 引用在另一个文件中  const 只读变量
 void display( const int array[], int limit ); // array 指向的值是不能变的
 void display( const int *array, int limit );  // array 指向的值是不能变的
 char *strcat( char *, const char* ); // 第一个参数在函数内可以被修改，第二个参数只读
-```
-
-## 指针
-
-- `指针` : 指针是一个变量，其值为另一个变量的起始内存地址，指针的类型决定了如何取该内存地址后面的数据(取几个字节，如何切分)
-- 指针记录的是"某数据结构"的"起始内存地址+指针类型",指针类型标明了该内存地址处的数据该如何读取,如：int型就该按4个字节依次读取 传递指针时，传递的是"内存地址+指针类型"
-
-```c
-int var = 10; // 定义变量
-int* a　= &var; // 定义指针
-*a; // 访问指针的值
-a+1; // 将内存地址加4
-
-short* b;
-b+1; // 将内存地址加２,指针存储的内存地址的加减跟"指针类型"有直接关系
-
-int arr[3] = {1,2,3}; // 声明数组
-int* parr = arr;      // 声明指针指向数组
-printf("%d",*parr);      // 输出1
-printf("%d",*(parr+1));  // 输出2
-printf("%d",parr[2]);    // 输出３
-```
-
-### 数组指针
-
-```c
-int (* p_arr)[10];
-int arr[3] = {1,2,3}; // arr为数组,也是指针常量,arr的值不可变, arr++是错误的
-int* prr = arr;       // 将arr赋值给prr指针,prr++正确
-*arr;                 // 等价于 arr[0]
-*(arr+1);             // 等价于 arr[1]
-*(arr+2);             // 等价于arr[2]
-&arr[2] - &arr[0];    // 2  地址相差2
-int sum (int *ar,int n){} // 等价于 int sum (int ar[],int n){}
-```
-
-### 指向多维数组的指针
-
-```c
-// 指向多维数组的指针
-int zippo[3][2] =
-{
-    {2,3},
-    {4,5},
-    {6,7}
-};
-int (* pz)[2]; // 指向一个含有两个int类型值的数组
-pz = zippo;
-printf("zippo : %p , zippo[0]: %p :zippo[0][0] : %d \n",zippo,zippo[0],zippo[0][0]);
-printf("pz : %p , *pz: %p : **pz: %d \n",pz,*pz,**pz);
-printf("pz = %p,pz + 1:%p \n",pz,pz+1);
-printf("pz[0] = %p,pz[0] + 1:%p \n",pz[0],pz[0]+1);
-printf("*pz = %p,*pz + 1:%p \n",*pz,*pz+1);
-printf("**pz = %d,*(*pz + 1):%d \n",**pz,*(*pz+1));
-printf("**(pz + 1) = %d,*(*(pz + 1) + 1):%d \n",**(pz + 1),*(*(pz + 1)+1));
-printf("pz[0][0] = %d,pz[0][1]:%d \n",pz[0][0],pz[0][1]);
-```
-
-- `[]`的优先级高于`*`
-- `int (*pz)[2]` pz先与`*`结合，说明它是一个指针，`[2]`说明了这个指针指向的内存字节大小
-- `int *pz[2]` pz先与`[2]`结合，说明它是含有两个元素的数组，`int *` 说明它的两个元素是`int`类型的指针
-- `char *argc[]` pz先与`[]`结合，说明是一个不定个数元素的数组，`char*`说明这些元素都是`char`类型的指针,结合`char *ch = "test";`,可以得出`argc[0]` `argc[1]`等都是字符串
-- `zippo` 存的是一个地址,`zippo[0]`存的也是一个地址,前一个地址类型为两个int的数组，后一个地址的类型是int,`zippo[0][0]`就是该地址处的值了
-- `pz` 存的是一个地址,`*pz`存的也是一个地址,前一个地址类型为两个int的数组，后一个地址的类型是int，`**pz`就是该地址处的值了
-
-### 函数指针
-
-- `函数指针` : 指向函数函数指针可以像一般函数一样，用于调用函数、传递参数
-- 声明一个指向函数的指针，函数指针常用作另一个函数的参数
-
-```c
-int (* p_fun)( int , int);
-typedef int (*fun_ptr)(int,int); // 声明一个指向同样参数、返回值的函数指针类型
-
-#include <stdio.h>
-int get_big(int i,int j){
-    return i > j ? i : j;
-}
-//将指向函数的指针int (*p)(int,int) 作为形参，传递函数
-int get_max( int i, int j, int k, int (*p)(int ,int) )
-{
-    int ret;
-    ret = p(i,j);//使用函数指针掉用函数，跟使用函数是一样的！
-    ret = p(ret,k);
-    return ret;
-}
-int main(int argc,char **argv){
-    int i = 5,j = 10,k = 15,ret;
-    // 将get_big函数传进去，在get_max里面调用
-    ret = get_max(i,j,k,get_big);
-    printf("the max is %d\n",ret);
-    return 0;
-}
-
-// 传递二维数组的地址
-func(int arr[][4],int length){}
-// 等价于
-func(int (*arr)[4],int length){}
-(*arr)[4];               // 指向列数为4的二维数组的指针, arr+1 就是移动 4 x 4 个字节
-*(*(index + 2)+1)        // 等价于 index[2][1]
-int  (*pz)[2];           // 声明指向二维数组的指针
-int  *pax[2];            // 声明装有两个int型指针的数组;
-int array[][4];          // 定义二维数组
-int *p2array = array;  // 二维数组的指针
-*(*(p2array+3)+2)        // 等价于 array[3][2] 等价于 p2array[3][2]
-
-void ToUpper(char *); // 函数
-void (*pf)(char *); // 指向函数的指针
-
-// 区别于
-void *pf(char *); // pf 是一个函数，它返回字符指针
-```
-
-### 指针的指针
-
-```c
-int **p_point;
-```
-
-### void任意类型指针
-
-```c
-// ANSI错误: 进行算法操作的指针必须是确定知道其 指向数据类型 大小的
-// 也就是说，不但要知道器内存地址，还要知道 可以访问 内存地址后的几个字节
-void *povid;
-povid++;
-povid+=1;  
-
-// 这两个函数都是操作一片内存，而不关心知道参数 指针 是什么类型 并且 其返回的也是任意类型的 指针
-void *memcpy(void *dest , const  void *src, size_t,len);
-void *memset(void *buffer , int c,size_t num);
-```
-
-### const 修饰指针
-
-```c
-// 表示该函数不会使用指针改变数据
-void show_array( const double *ar, int n );
-
-// 不能改变指针的指向 , 但是可以改变它指向处的值
-double * const pc = rates;
-pc = &rates[2]; // 编译错误
-*pc = 11; // 可以改变它指向处的值
-```
-
-### 指针的兼容性
-
-- 不同类型的指针不能相互赋值
-
-```c
-int n = 5;
-double x = 4.2;
-int *p1 = &n;
-double *pd = &x;
-x = n; // 隐式类型转换
-pd = p1; // 错误　int 类型指针赋值给　double 类型指针
-
-int *pt;
-int (*pa)[3];
-int ar1[2][3];
-int ar2[3][2];
-int **p2;
-pt = &ar1[0][0]; // 指向int的指针
-pt = ar1[0]; //　等价上
-pt = ar1; // 错误, ar1 是指向内含3个int类型元素的数组的指针
-pa = ar1; //　都是指向内含3个int类型元素的数组的指针
-pa = ar2; // 错误，ar2 是指向内含2个int类型元素的数组的指针
-p2 = &pt; // 指针的指针，
-*p2 = ar2[0]; // *p2 等价于　pt , pt 是指向int类型的指针,ar2[0]也是指向int类型的指针
-p2 = ar2; // p2 为指向int类型指针的指针，ar2 是指向内含2个int类型元素的指针
 ```
 
 ## 算术运算/运算符/表达式
