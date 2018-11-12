@@ -2,40 +2,12 @@
 
 ## 数据类型
 
-- `bit`位: `0` 或 `1`
-- `Byte`字节: `1 Byte = 8 bit`
-- `Word`字: 32位计算机: `1 word = 32bit` 64位计算机 `1 word = 64 bit`
-
 ### 整数
 
-- `char`: 有符号 8 位整数
-- `short`: 有符号 16 位整数
-- `int`: 有符号32位整数,取值范围: -20亿～20亿; `unsigned int` 0～42亿
-- `long`: 在64位系统则是64位整数,取值范围: – 900 亿亿 ～ 900亿亿 或者 0 ～ 1800 亿亿
-- `long long`: 有符号 64 位整数 `long long int`
 - `bool`: 8 位整数,在c99标准中`stdbool.h` 中定义了 `bool / true / false` 宏便于使用
 - `stdint.h` 定义了 `uint64_t` , `int64_t` 等在任何操作系统上，位数更加准确的类型,还定义了大小限制
 - `char c = 'a';`字符常量,默认是 个`int` 整数,但编译器可以决定将其解释为`char`或`int`
 - `stdint`定义了后缀表示常数的常量类型，`56U` 表示 `unsigned int`, `76LL`表示 `76` 类型是`long long`
-
-```c
-#if __WORDSIZE == 64
-    typedef long int int64_t;
-    typedef unsigned long int uint64_t;
-    typedef unsigned long int uintptr_t;  /* void * 指针值的类型 */
-    #define __INT64_C(c) c ## L
-    #define __UINT64_C(c) c ## UL /* 宏定义中的 "##" 运算符表 把左和右结合在 起,作为 个符号 */
-#else
-    __extension__
-    typedef long long int int64_t;
-    typedef unsigned long long int  uint64_t;
-    typedef unsigned int uintptr_t; /* void*的类型,常用 sizeof(char*) 来兼容处理32位与64位*/
-#endif
-#define INT32_MIN (-2147483647-1)
-#define INT32_MAX (2147483647)
-#define INT64_MIN (-__INT64_C(9223372036854775807)-1)
-#define INT64_MAX (__INT64_C(9223372036854775807))
-```
 
 ### 浮点数
 
@@ -53,73 +25,41 @@ enum color r = red;
 enum color g = green;
 enum color y = yellow;
 printf("black = %d red = %d green = %d yellow = %d", b, r, g, y); // 0 5 6 7
-
-enum { BLACK = 1, RED, GREEN = 1, YELLOW };
-printf("black = %d\n", BLACK);
-printf("red = %d\n", RED);
-printf("green = %d\n", GREEN);
-printf("yellow = %d\n", YELLOW);
 ```
 
 ### 数组
 
-- 数组名默认为指向第一元素的常量指针，即数组名的地址不可变
-- C不会对数组下标索引进 范围检查,编码时需要注意过界检查
-- c 不允许数组作为一个单元赋值给另一个数组
-
-#### 数组变量不保存在存储器中
-- 程序编译时，会把数组变量的引用替换成数组的地址，也就是说在最后的可执行文件中，数组变量并不存在，既然数组变量从来不需要指向别的地方，有和没有其实都一样
-
-
-
-#### 数组初始化
+#### 初始化
 
 ```c
-int a[3] = {10,9};
-int a[] = {11, 7, 6};
-// 指定初始化器 (C99标准)
-int arr[] = { 0, 89, [5] = 212, 11 }; // 指定第6个元素的值为212, 元素个数在编译时确定为 7
-int count = sizeof(arr) / sizeof(arr[0]); // 数组元素个数
+int a[3]  = {10,9};
+int a[]   = {11, 7, 6};
+int arr[] = { 0, 89, [5] = 212, 11 };      // 指定初始化器 (C99标准) 指定第6个元素的值为212, 元素个数在编译时确定为 7
+int count = sizeof(arr) / sizeof(arr[0]);  // 数组元素个数
+
 int z[][2] = {
     { 1, 1 },
     { 2, 1 },
     { 3, 1 },
 };
 
-int *p_int = &arr[6]; // 返回 int* 类型指针,指向 标序号元素
-p_int = arr; // 数组名是指向数组首地址的常量指针 指针之间赋值
+int *p_int = &arr[6];   // 返回 int* 类型指针,指向 标序号元素
+p_int = arr;            // 数组名是指向数组首地址的常量指针 指针之间赋值
 
 int oxen[4] = {1,2,3,4};
 int yaks[4];
-yaks = oxen; // error : assignment to expression with array type
+yaks = oxen;            // error : assignment to expression with array type
 ```
 
-#### 可变长度数组
-
-- 如果数组具有动态存周期,且没有`static`修饰符,那么可以用变量来定义数组
-
-```c
-void test(int n)
-{
-    int x[n];
-    for (int i = 0; i < n; i++)
-        x[i] = i;
-
-    struct data { int x[n]; } d;
-    printf("%d\n", sizeof(d));
-}
-int main(int argc, char* argv[])
-{
-    int x[] = { 1, 2, 3, 4 };
-    printf("%d\n", sizeof(x));
-    test(2);
-    return EXIT_SUCCESS;
-}
-```
+- c中数组是连续的内存区域，是固定长度的 , 对于 c 的数组，未赋值的元素一律取 0
+- 数组名`arr`在程序编译时，会替换成数组的首地址,也就是说在最后的可执行文件中，数组变量并不存在; 所有讨论数组名`arr`能不能指向别的值并没有意义
+- 指针变量`p_int`在程序编译完成后，在内存是有实体的，有自己的内存存储空间(一般是固定8个字节),该空间首地址即为该指针本身的地址; 而存储的值即为它指向的内存地址，这个值是可以重新赋予的，也就是所谓的将指针指向别的变量
+- C 程序里实际上只有一种类型的指针,这个指针取多少个内存字节、如何解释这块内存，全靠编译器在编译时根据代码里 强制转换(cast) 或者 预先声明好的类型来生成汇编代码的
+- C 不会对数组下标索引进 范围检查,编码时需要注意过界检查
+- c 不允许数组作为一个单元赋值给另一个数组
 
 #### 多维数组
 
-- c中数组是连续的内存区域，是固定长度的 , 对于 c 的数组，未赋值的元素一律取 0
 - 多维只是概念上的，实际存储上还是线性连续的
 
 ```c
@@ -128,11 +68,7 @@ int a[3][4] = {
     {4, 5, 6, 7} ,   /*  初始化索引号为 1 的行 */
     {8, 9, 10, 11}   /*  初始化索引号为 2 的行 */
 };
-```
 
-- 处理多维数组的函数
-
-```c
 // 在函数定义时对形参数组可以指定每一维的长度，也可省去第一维的长度因此，以下写法都是合法的
 int MA(int a[3][10])
 int MA(int a[][10])
@@ -149,8 +85,7 @@ int sum4d(int (*ar)[12][20][30],int rows); // 等价上句,ar指向一个 12 x 2
 
 #### 字符串
 
-- 字符串是以 `\\0` 结尾的char类型数组
-- `\\0` 字符的 ASSIC码是 \\000, 系统检测到该字符时,就认为字符串已经结束了
+- 字符串是以字符 `\\0` (ASSIC码是 \\000) 结尾的char类型数组, 系统检测到该字符时,就认为字符串已经结束了
 - `"string"` 双引号的字符串写法，编译器会在字符`g`后面自动补上`\\0`
 
 ```c
@@ -168,8 +103,7 @@ char *str = "something is pointing at me";
 
 ```c
 char c[] = {'c', ' ','p','r','o','g','r','a','m','\0'};
-// 等价于
-char c[]="C program";
+char c[] = "C program"; // 等价上句
 
 // 二维数组 存放 字符数组
 char names[6][50] = {"马超","关平","赵云","张飞","关羽","刘备"};
@@ -180,13 +114,17 @@ for (int i = 0; i < 6; i++)
 - 字符char与字符串区别 : `"s"` 等价于 `s` `\\0`  两个字符连起来
 
 ```c
-char ch = "A"; //错误
-char ch = 'A'; //正确
-char *ch = "A";//正确
-char *ch = 'ch'; //错误
+char ch  = "A";     //错误
+char ch  = 'A';     //正确
+char *ch = "A";     //正确
+char *ch = 'ch';    //错误
 ```
 
-- 数组字符串与指针字符串的区别 : 字符常量MSG存储在静态存储区，ar数组则是开辟一块内存，将MSG拷贝至该内存处，而指针则是直接指向MSG的内存地址
+##### 数组字符串与指针字符串的区别
+
+- 字符常量MSG存储在静态存储区
+- ar数组则是开辟一块内存，将MSG拷贝至该内存处
+- 而指针则是直接指向MSG的内存地址
 
 ```c
 // 数组字符串和指针字符串的区别
@@ -225,8 +163,7 @@ for(int k = 0;k < 5;k++)
 // pointer_str[0] : 0x401930 : str
 // pointer_str[1] : 0x401934 : string2 ,sdfadfsfssdfasfsa
 // pointer_str[2] : 0x40194f : string3 hdhdhdh
-// pointer_str[3] : 0x40195f : xxixixixi
-// pointer_str[4] : 0x401969 : codsdadfsssss
+...
 
 // 每个数组元素之间相差 40 个字节
 char array_str[5][40] = {
@@ -241,8 +178,7 @@ for(int p = 0;p < 5;p++)
 // array_str[0] : 0x7ffc689c84b0 : sdfaiisisis
 // array_str[1] : 0x7ffc689c84d8 : xixixiix sss
 // array_str[2] : 0x7ffc689c8500 : hahah
-// array_str[3] : 0x7ffc689c8528 : codekissyoung
-// array_str[4] : 0x7ffc689c8550 :  
+...
 ```
 
 #### 数组越界
@@ -268,7 +204,7 @@ int main(int argc, char *argv[])
 
 ```c
 // rows　和　cols 必须在 ar 前面
-int sum2d(int rows,int cols,int ar[rows][cols]){
+int sum2d(int rows, int cols, int ar[rows][cols]){
     int r;
     int c;
     int tot = 0;
@@ -293,7 +229,7 @@ int *point_arr[10];
 int ( *func_arr[10] )( int, int );
 ```
 
-### 结构体
+## 结构体
 
 - 在 网络协议中 ,通信控制,嵌入式系统,驱动开发 等地方，我们传送的不是简单的字节流(char 型数组),而是多种数据组合起来的一个整体，其表现形式是一个结构体
 - 空结构体：一个字节大小，不可能造出 没有任何容量的容器吧
@@ -301,7 +237,6 @@ int ( *func_arr[10] )( int, int );
 - 和数组不同的是,结构名并不是结构的地址
 
 ```c
-// 定义结构体类型
 struct Books
 {
    char  title[50];
@@ -309,31 +244,32 @@ struct Books
    char  subject[100];
    int   book_id;
 };
-// 使用结构体类型 声明变量
-struct Books b1, b2;
+struct Books b1, b2; // 使用结构体类型 声明变量
 
-// 也可以用typedef创建新类型
 typedef struct
 {
     int a;
     char b;
     double c;
 } Simple2;
-// 现在可以用 Simple2 作为类型, 声明新的结构体变量
-Simple2 u1, u2[20], *u3;
+Simple2 u1, u2[20], *u3; // 也可以用typedef创建新类型, 现在可以用 Simple2 作为类型, 声明新的结构体变量
 
-//此结构体的声明包含了指向自己类型的指针
+// 此结构体的声明包含了指向自己类型的指针
 struct NODE
 {
     char string[100];
     struct NODE *next_node;
 };
 
-typedef struct Student {char *name,int age}std, *pstd; //定义结构体struct Student,取别名为std
-std st1 = {"codekissyoung",21}; // 定义一个std结构体变量
-pstd pst1 = &st1;               // 定义一个std结构体指针,指向st1
-st1.name = "hello li";          // 结构体访问单个元素
-pst->name;                      // 通过结构体指针访问单个元素
+typedef struct Student {
+    char *name,
+    int age
+} std, *pstd; //定义结构体struct Student,取别名为 std,指针别名为 pstd
+
+std  st1      = {"codekissyoung",21};  // 定义一个std结构体变量
+pstd pst1     = &st1;                  // 定义一个std结构体指针,指向st1
+st1.name      = "hello li";            // 结构体访问单个元素
+pst->name;                             // 通过结构体指针访问单个元素
 
 struct book library[10]; // book结构的数组
 library[2].title;        // 使用结构数组内的变量
@@ -370,13 +306,8 @@ him = &fellow[0]; // 该指针指向结构数组的第一个元素
 printf(" %s %s %s\n",him->income,(*him).income,him->handle.last); // 两种方法使用数组内的元素
 
 // 使用指针向函数传递结构 有const 保证函数不会修改结构的内容，如果需要修改则不用const
-double sum(const struct funds *money){
-    // code
-}
-// 处理结构数组的函数
-double sum(const struct funds money [],int n){
-    // code
-}
+double sum(const struct funds *money){ ... }
+double sum(const struct funds money[],int n){ ... } // 等价上句
 
 // 结构中的字符数组和字符指针
 struct names{
