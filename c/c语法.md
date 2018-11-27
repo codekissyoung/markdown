@@ -321,7 +321,7 @@ struct names{
 }; // 在输入数据到　first 中时会有问题，因为该指针根本没有指向的内存地址以及它的大小
 ```
 
-#### 结构体内存对齐
+### 结构体内存对齐
 
 ```c
 struct Test
@@ -361,6 +361,10 @@ bt1.c = 5;
 bt1.d = 6;
 bt1.e = 2;
 ```
+
+### 变长结构体
+
+- [零长度数组的妙用](http://elkpi.com/topics/zero-length-arrays.html)
 
 ### 联合体
 

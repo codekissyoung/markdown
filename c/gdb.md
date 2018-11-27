@@ -224,10 +224,11 @@ Make sum return now(y or n) y
 Type "apropos word" to search for commands related to "word"...
 Reading symbols from main...done.
 Attaching to program: /home/cky/workspace/C/2018-05/main, process 29955
-Reading symbols from /lib/x86_64-linux-gnu/libc.so.6...Reading symbols from /usr/lib/debug//lib/x86_64-linux-gnu/libc-2.23.so...done.
-done.
-Reading symbols from /lib64/ld-linux-x86-64.so.2...Reading symbols from /usr/lib/debug//lib/x86_64-linux-gnu/ld-2.23.so...done.
-done.
+Reading symbols from /lib/x86_64-linux-gnu/libc.so.6...done
+Reading symbols from /usr/lib/debug//lib/x86_64-linux-gnu/libc-2.23.so...done.
+
+Reading symbols from /lib64/ld-linux-x86-64.so.2...done.
+Reading symbols from /usr/lib/debug//lib/x86_64-linux-gnu/ld-2.23.so...done.
 0x00007f6eb14342f0 in __nanosleep_nocancel () at ../sysdeps/unix/syscall-template.S:84
 84	../sysdeps/unix/syscall-template.S: 没有那个文件或目录.
 (gdb) bt
@@ -249,6 +250,8 @@ $1 = 11
 ```
 
 ## 调试多进程 ( GDB > V7.0 )
+
+- [gdb调试多进程多线程](https://blog.csdn.net/flowing_wind/article/details/80553778)
 
 | follow-fork-mode |  detach-on-fork |  说明 |
 | ---------------- | --------------- |------ |

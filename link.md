@@ -31,6 +31,8 @@
 
 ## 个人博客
 
+- [JellyBool弄的视频网站](https://www.codecasts.com/)
+- [lvyilong316 linux epoll相关的博文很不错](http://blog.chinaunix.net/uid/28541347.html)
 - [小专栏](https://xiaozhuanlan.com/)  里面有很多不错的专栏文章
 - [推库周刊](https://www.tuicool.com/mags)
 - [码农周刊](https://weekly.manong.io/issues/)
