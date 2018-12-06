@@ -130,14 +130,12 @@ gcc -I/home/hello/include -L/home/hello/lib -lword  hello.c -o hello
 - `-Wl,-Bstatic` `-Wl,-Bdynamic` 是gcc的特殊选项，它会将选项的参数传递给链接器，作为链接器的选项
 - `-Wl,-Bstatic` 告诉链接器使用`-Bstatic`选项，该选项是告诉链接器，对接下来的`-l`选项使用静态链接
 - `-Wl,-Bdynamic` 就是告诉链接器对接下来的`-l`选项使用动态链接
-　　
-```makefile
+
+```bash
 # 修改前
-CORE_LIBS="$CORE_LIBS -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm -L/usr/lib64 -lssl -lcrypto"
+CORE_LIBS="$CORE_LIBS -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm -L/usr/lib64 -lssl"
 
 # 修改后
 CORE_LIBS="$CORE_LIBS -L/usr/lib64/mysql -Wl,-Bstatic -lmysqlclient \
--Wl,-Bdynamic -lz -lcrypt -lnsl -lm -L/usr/lib64 -lssl -lcrypto"
+-Wl,-Bdynamic -lz -lcrypt -lnsl -lm -L/usr/lib64 -lssl"
 ```
-
-## Make
