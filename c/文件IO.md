@@ -269,3 +269,97 @@ int ioctl( int fd, int request, ... );
 - 终端IO是ioctl用的最多的地方,通常还要求另外的设备专用头文件,比如`<termios.h>`
 - request 指定在 fd 上执行控制操作
 - ... 根据 request 的参数来 填入的不定参数
+
+## 设置流的定向
+
+```c
+#include <stdio.h>
+#include <wchar.h>
+int fwide( FILE *fp, int mode );
+```
+
+- 流是多字节宽定向的 返回正值；是单字节则返回负值，0表示未定向
+- mode
+  - 填入正值，试图将流设置为宽定向的
+  - 填入负值，试图将流设置为单字节
+  - 填入0, 试图清除流的定向
+
+## 更改标准输入输出流的缓冲类型
+
+```c
+void setbuf( FILE *restrict fp, char *restrict buf );
+void setvbuf( FILE *restrict fd, char *restrict buf, int mode, size_t size );
+```
+
+![WX20181207-173836.png](https://i.loli.net/2018/12/07/5c0a3fb995c41.png)
+
+## 强制冲洗一个流
+
+```c
+int fflush( FILE *fp ); // 1. 出错返回 EOF 2. fp 为NULL会冲洗进程内所有输入输出流
+```
+
+## 打开一个标准IO流
+
+```c
+FILE *fopen( const char *restrict pathname, const char *restrict type );
+
+// 在指定流上打开指定文件
+FILE *freopen( const char *restrict pathname, const char *restrict type, FILE *restrict fp );
+
+// 将文件描述符对应的文件，对应返回一个标准IO流
+FILE *fdopen( int fd, const char *type );
+// 出错返回NULL
+```
+
+![WX20181207-194004.png](https://i.loli.net/2018/12/07/5c0a5c48404d7.png)
+![WX20181207-194240.png](https://i.loli.net/2018/12/07/5c0a5cdb7bbb5.png)
+
+## 关闭一个打开的流
+
+```c
+int fclose( FILE *fp );
+```
+
+## 从流里一次读取一个字符
+
+```c
+int getc( FILE *fp );
+int fgetc( FILE *fp );
+int getchar( void ); // 等同于 getc( stdin );
+
+// 三个函数不管是出错或者到达文件尾端，都返回EOF,所以为了区分，用下面两个函数
+int ferror( FILE *fp );
+int feof( FILE *fp );
+
+// FILE 维护了两个标志，出错标志，文件结束标志
+int clearerr( FILE *fp ); // 两个标志清0
+```
+
+## 将读出的数据压回流内
+
+```c
+int ungetc( int c, FILE *fp ); // 出错返回 EOF
+```
+
+## 将一个字符输出到流
+
+```c
+int putc( int c, FILE *fp );
+int fputc( int c, FILE *fp );
+int putchar( int c ); // 等同于 putc( int c, stdout );
+```
+
+## 从流里读取一行
+
+```c
+char *fgets( char *restrict buf, int n, FILE *restrict fp );
+char *gets( char *buf ); // 从stdin中读取
+```
+
+## 输出一行
+
+```c
+int fputs( const char *restrict str, FILE *restrict fp );
+int puts( const char *str ); // 输出到 stdout
+```
