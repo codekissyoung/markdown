@@ -429,3 +429,41 @@ FILE *tmpfile( void );
 char *mkdtemp( char *template ); // 返回指向目录名的指针
 int mkstemp( char *template ); // 返回文件描述符
 ```
+
+## 内存流IO
+
+```c
+FILE *fmemopen( void *restrict buf, size_t size, const char *restrict type );
+FILE *open_memstream( char **bufp, size_t *sizep ); //面向字节流
+FILE *open_wmemstream( wchar_t **bufp, size_t *sizep ); // 面向宽字节
+```
+
+- 没有底层文件，所有IO都是通过在缓冲区与主存之间来回传送字节流来完成的
+- buf 指向缓冲区开始的位置
+- size 缓冲区字节数
+- type 控制如何使用内存流 `r` `w` `a`
+
+## 系统数据文件和信息
+
+```c
+struct passwd *getpwuid( uid_t uid );
+struct passwd *getpwnam( const char *name );
+struct passwd *getpwent( void );
+void setpwent( void );
+void endpwent( void );
+
+#include <shadow.h>
+struct spwd *getspnam( const char *name );
+struct spwd *getspent( void );
+void setspent( void );
+void endspent( void );
+
+#include <grp.h>
+struct group *getgrgid( gid_t gid );
+struct group *getgrnam( const char *name );
+struct group *getgrent( void );
+void setgrent( void );
+void endgrent( void );
+```
+
+![WX20181210-192737.png](https://i.loli.net/2018/12/10/5c0e4dc43c906.png)

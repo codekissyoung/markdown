@@ -2,6 +2,7 @@
 
 ## 在线工具
 
+- [鸠摩搜索电子书](https://www.jiumodiary.com)
 - [sm.ms图床](https://sm.ms/)
 - [代码在线运行工具](https://tool.lu/)
 - [Json格式化工具](http://json.awesomes.cn/)
