@@ -363,3 +363,69 @@ char *gets( char *buf ); // 从stdin中读取
 int fputs( const char *restrict str, FILE *restrict fp );
 int puts( const char *str ); // 输出到 stdout
 ```
+
+## 二进制IO
+
+```c
+size_t fread( void *restrict ptr, size_t size, size_t nobi, FILE *restrict fp );
+size_t fwrite( const void *restrict ptr, size_t size, size_t nobj, FILE *restrict fp );
+```
+
+- 在网络异构系统通信时，两个系统中，对于结构体中的成员的偏移量可能随编译程序和系统的不同而不同
+- 用来存储多字节整数和浮点值的二进制格式在不同的系统里也可能不同
+- 不同系统之间交换二进制数据的实际解决方法是使用互认的规范格式
+
+## 定位流中的位置
+
+```c
+long ftell( FILE *fp );
+off_t ftello( FILE *fp );
+int fseek( FILE *fp, long offset, int whence );
+int fseeko( FILE *fp, off_t offset, int whence );
+void rewind( FILE *fp );
+
+int fgetpos( FILE *restrict fp, fpos_t *restrict pos );
+int fsetpos( FILE *fp, const fpos_t *pos );
+```
+
+## 格式化输出
+
+```c
+int printf(const char *format, ...); //输出到标准输出
+int fprintf(FILE *stream, const char *format, ...); //输出到文件
+int dprintf( int fd, const char *restrict format, ... );
+int sprintf(char *str, const char *format, ...);    //输出到字符串str中
+int snprintf(char *str, size_t size, const char *format, ...); //按size大小输出到字符串str中
+
+// 以下函数功能与上面的一一对应相同，只是在函数调用时，把上面的 ... 
+// 对应的一个个变量用va_list调用所替代。在函数调用前 ap 要通过va_start()宏来动态获取
+#include <stdarg.h>
+int vprintf(const char *format, va_list ap);
+int vfprintf(FILE *stream, const char *format, va_list ap);
+int vdprintf( int fd, const char *restrict format, va_list arg );
+int vsprintf(char *str, const char *format, va_list ap);
+int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+```
+
+## 格式化输入
+
+```c
+int scanf(const char *restrict format, ... );
+int fscanf( FILE *restrict fp, const char *restrict format, ... );
+int sscanf( const char *restrict buf, const char *restrict format, ...);
+```
+
+## 从流中获取文件描述符
+
+```c
+int fileno( FILE *fp );
+```
+
+## 创建临时文件、目录
+
+```c
+char *tmpnam( char *ptr ); // 返回指向唯一路径名的指针
+FILE *tmpfile( void );
+char *mkdtemp( char *template ); // 返回指向目录名的指针
+int mkstemp( char *template ); // 返回文件描述符
+```
