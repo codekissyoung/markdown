@@ -21,6 +21,11 @@
 - [ncckl云盘搜索](http://so.ncckl.cn/)
 - [小不点网盘搜索](https://www.xiaoso.net/)
 - [胖次网盘搜索](https://www.panc.cc/)
+- [80s电影](http://www.80s.la)
+- [电影天堂](https://www.dytt8.net)
+- [BD影视](http://www.bddysf.com)
+- [4K屋](http://www.kkkkmao.com)
+- [高清电影网](http://www.520hdhd.com)
 
 ### [Server酱](http://sc.ftqq.com/3.version)
 
