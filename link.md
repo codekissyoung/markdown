@@ -37,6 +37,11 @@
 
 ## 个人博客
 
+- [左岸读书](http://www.zreading.cn/)
+- [褪墨・时间管理](https://www.mifengtd.cn/)
+- [刘未鹏 Mind Hacks 心智探索](http://mindhacks.cn/)
+- [UCD China 用户体验设计](http://ucdchina.com/)
+- [白鸦 有赞](http://ucdchina.com/baiya/)
 - [JellyBool弄的视频网站](https://www.codecasts.com/)
 - [lvyilong316 linux epoll相关的博文很不错](http://blog.chinaunix.net/uid/28541347.html)
 - [小专栏](https://xiaozhuanlan.com/)  里面有很多不错的专栏文章
@@ -63,7 +68,7 @@
 - [韩天峰博客](http://rango.swoole.com)
 - [孟岩博客](http://blog.csdn.net/myan)
 
-### [风雪之隅](http://www.laruence.com/)
+### [PHP 鸟哥](http://www.laruence.com/)
 
 - [php-header函数](http://www.laruence.com/2007/12/16/308.html)
 
