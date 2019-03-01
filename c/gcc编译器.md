@@ -1,38 +1,39 @@
 # GCC 编译器
 
-## gcc 概述
+## 基本概念
 
-C 和 C++编译器是集成的.他们都要用四个步骤中的一个或多个处理输入文件: 预处理 (preprocessing),编译(compilation),汇编(assembly)和连接(linking)
+- **编译**：把高级语言书写的代码转换为机器可识别的机器指令。编译只检查高级语言的语法、函数、声明等是否正确。
 
-源文件后缀名 标识 源文件的语言,但是对编译器来说,后缀名控制着缺省设定:
+- **可重定位目标文件**: 编译成的机器指令和数据存放的文件`.o`
 
-- gcc 认为预处理后的文件 `.i` 是 C文件,并且设定 C 形式的连接
-- g++ 认为预处理后的文件 `.i` 是 C++文件,并且设定 C++形式的连接
+- **链接**：将多个`.o`文件链接成可被操作系统执行的程序。`.o`往往引用了其他`xx.o`中的符号，所以不能单独直接执行。需要将这些引用所在的`.o`文件链接进来，这种操作称为重定向。链接器不检查函数所在源文件，只检查`.o`文件中定义的符号。将`.o`文件中使用的函数和其他`.o`或库文件中的相关符号合并，最后生成一个可执行的程序。
 
-- `.c` : C 源程序;预处理,编译,汇编 
-- `.C` `.cc` `.cxx`: C++源程序;预处理,编译,汇编
+- **静态库**: `.a`文件,又称为文档文件`Archive file`。是多个`.o`文件的集合。静态库中的各个`.o`文件没有特殊的存在格式，仅仅是一个`.o`文件的集合。使用`ar`工具维护和管理静态库。
 
-- `.m` : Objective-C 源程序;预处理,编译,汇编 
-- `.i` : 预处理后的 C 文件;编译,汇编
-- `.ii` : 预处理后的 C++文件;编译,汇编
-- `.s` : 汇编语言源程序;汇编
-- `.S` : 汇编语言源程序;预处理,汇编
-- `.h` : 预处理器文件; 通常不出现在命令行上
-
-其他后缀名的文件被传递给连接器(linker).通常包括:
-
-- `.o` 目标文件(Object file)
-- `.a` 归档库文件(Archive file)
-
-除非使用了-c, -S,或-E 选项(或者编译错误阻止了完整的过程),否则连接总是最后的步骤. 在连接阶段中,所有对应于源程序的.o 文件, -l 库文件,无法识别的文件名(包括指定的 .o 目 标文件和.a 库文件)按命令行中的顺序传递给连接器.
-
-- **可重定位目标文件**: `*.o` 编译成的机器指令和数据，因为它往往引用了其他 `xx.o` 中的符号，所以不能单独直接执行，需要将这些引用所在的文件链接进来，这种操作称为重定向
-
-- **共享目标文件**: `*.so` 特殊的 `*.o` 文件，程序运行时候才动态加载到内存中运行
+- **共享目标文件**: `*.so`文件，也是多个`.o`文件的集合。但是这些`.o`文件由编译器按照一种特殊的方式生成。对象(变量引用和函数调用)模块的各个成员的地址都是相对地址。因此在程序运行时，可动态加载库文件和执行`.so`文件。多个程序可以共享使用库中的某一个模块。
 
 - **可执行目标文件**: 已经将所有引用到的符号的所在文件链接起来，每一个符号都已经得到了解析和重定位，每个符号都是已知的，所以可以被机器直接执行
 
-在C语言中头文件其实起了一个很大的作用:
+## gcc 概述
+
+### 文件名后缀
+
+源文件后缀名 标识 源文件的语言,但是对编译器来说,后缀名控制着缺省设定:
+
+- `gcc` 认为预处理后文件`.i` 是 `C` 文件,并且设定 `C` 形式的连接
+- `g++` 认为 `.i` 是 `C++` 文件,并且设定 `C++`形式的连接
+
+- `.c` : `C`源程序;预处理,编译,汇编 
+- `.C` : `.cc` `.cxx`: `C++`源程序;预处理,编译,汇编
+- `.m` : `Objective-C` 源程序;预处理,编译,汇编 
+- `.i` : 预处理后的`C`文件;编译,汇编
+- `.ii`: 预处理后的`C++`文件;编译,汇编
+- `.s` : 汇编语言源程序;汇编
+- `.S` : 汇编语言源程序;预处理,汇编
+- `.h` : 预处理器文件; 通常不出现在命令行上
+- `.o` 目标文件`Object file`与`.a` 归档库文件`Archive file`还有`.so`文件传递给连接器`ld`,在链接阶段中,所有对应于源程序的`.o`文件, `-l`库文件按命令行中的顺序传递给连接器
+
+### 头文件作用
 
 - 头文件可以不需要编译
 - 可以查看具体的声明
@@ -40,6 +41,28 @@ C 和 C++编译器是集成的.他们都要用四个步骤中的一个或多个�
 - `.o`文件预先编译，所以整个项目编译时，会大大提高编译的时间 
 - 当一个文件`A.c`依赖于头文件`b.h`时 ，如果`b.c`编译之后形成的`b.o`文件重新编译后，`a.o`文件不需要重新编译 
 - 可以极大降低手工复制，粘贴的错误几率
+
+## 编译链接命令
+
+### 编译成 .o 文件
+
+```bash
+gcc -E xxx.c -o xxx.i   # 生成预编译文件
+gcc -S xxx.c -o xxx.s   # 生成 汇编源文件，也就是汇编代码
+gcc -c xxx.c -o xxx.o   # 生成 .o 文件
+```
+
+### 打包 .o 成 .a 静态库
+
+```bash
+ar rcsU zzz.a xxx.o yyy.o
+```
+
+### 编译成 .so 动态库
+
+```bash
+gcc -shared -fPIC xxx.c -o xxx.so
+```
 
 ## gcc 参数
 
@@ -103,51 +126,19 @@ C 和 C++编译器是集成的.他们都要用四个步骤中的一个或多个�
 
 - `-pthread` 与 `-lpthread` : 手册里则指出应该在编译和链接时都增加 `-pthread` 选项,编译选项中指定`-pthread` 会附加一个宏定义 `-D_REENTRANT`，该宏会导致`libc`头文件选择那些`thread-safe`的实现；链接选项中指定`-pthread` 则同`-lpthread`一样，只表示链接`POSIX thread` 库。由于`libc`用于适应`thread-safe`的宏定义可能变化，因此在编译和链接时都使用`-pthread`选项而不是传统的`-lpthread` 能够保持向后兼容，并提高命令行的一致性。
 
-- `-fpic` 如果支持这种目标机,编译器就生成位置无关目标码.适用于共享库(shared library)
+- `-fpic` 如果支持这种目标机,编译器就生成位置无关目标码.适用于共享库`shared library`
 
-- `-fPIC` 如果支持这种目标机,编译器就输出位置无关目标码.适用于动态连接(dynamic linking),即使分支需要大范围转移.
+- `-fPIC` 如果支持这种目标机,编译器就输出位置无关目标码.适用于动态连接`dynamic linking`,即使分支需要大范围转移.
 
-- 预处理器选项 (Preprocessor Option) ：（-Aassertion -C -dD -dM -dN -Dmacro[=defn] -E -H -idirafter dir -include file -imacros file -iprefix file -iwithprefix dir -M -MD -MM -MMD -nostdinc -P -Umacro 相当于C语言中的#undef macro -undef -DMACRO 以字符串“1”定义 MACRO 宏, -DMACRO=DEFN 以字符串“DEFN”定义 MACRO 宏）
+- 预处理器选项 ：`-Aassertion -C -dD -dM -dN -Dmacro[=defn] -E -H -idirafter dir -include file -imacros file -iprefix file -iwithprefix dir -M -MD -MM -MMD -nostdinc -P -Umacro -DMACRO`
 
-- 汇编器选项 (ASSEMBLER OPTION) ：（-Wa,option ）
+- 汇编器选项: `-Wa,option`
 
-- 连接器选项 (LINKER OPTION) ：（-llibrary -nostartfiles -nostdlib -static -shared -symbolic -Xlinker option -Wl,option -u symbol ）
+- 连接器选项: `-llibrary -nostartfiles -nostdlib -static -shared -symbolic -Xlinker option -Wl,option -u symbol`
 
-- 目录选项 (DIRECTORY OPTION) ：（-Bprefix -Idir -I- -Ldir）
+- 调试选项 `-a -dletters -fpretend-float -g -glevel -gcoff -gxcoff -gxcoff+ -gdwarf -gdwarf+ -gstabs -gstabs+ -ggdb -p -pg -save-temps -print-file-name=library -print-libgcc-file-name -print-prog-name=program`
 
-- 警告选项 (WARNING OPTION) ：（-w 不生成任何警告信息，-Wall 生成所有警告信息）
 
-- 调试选项 (DEBUGGING OPTION) ：（-a -dletters -fpretend-float -g -glevel -gcoff -gxcoff -gxcoff+ -gdwarf -gdwarf+ -gstabs -gstabs+ -ggdb -p -pg -save-temps -print-file-name=library -print-libgcc-file-name -print-prog-name=program ）
-
-- 优化选项 (OPTIMIZATION OPTION) ：（-O0不进行优化处理，-O或-O1优化生成代码 -O2进一步优化 -O3比-O2更进一步优化，包括inline函数）
-
-- 目标机选项 (TARGET OPTION) ：（-b machine -V version ）
-
-- 机器相关选项 (MACHINE DEPENDENT OPTION）：（-m486 针对 486 进行代码优化）
-
-- 代码生成选项 (CODE GENERATION OPTION) ：(-fpic -fPIC)
-
-## 编译链接命令
-
-### 编译成 .o 文件
-
-```bash
-gcc -E xxx.c -o xxx.i   # 生成预编译文件
-gcc -S xxx.c -o xxx.s   # 生成 汇编源文件，也就是汇编代码
-gcc -c xxx.c -o xxx.o   # 生成 .o 文件
-```
-
-### 打包 .o 成 .a 静态库
-
-```bash
-ar rcsU zzz.a xxx.o yyy.o
-```
-
-### 编译成 .so 动态库
-
-```bash
-gcc -shared -fPIC xxx.c -o xxx.so
-```
 
 ## GCC环境变量
 
