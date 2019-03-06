@@ -12,22 +12,18 @@
 
 ## 基本概念
 
-`Unix`文件具有三种时间属性：`atime`最近被读取的时间、`ctime`文件模式被修改的时间、`mtime`文件被修改的时间。文件的时间戳指的是`mtime`。
-
 ```makefile
 target : prerequisites ...
     command;
-
-# 展开模式：目标与依赖中的函数和变量会立即展开，而命令中的变量是延后展开的。
-IMMEDIATE : IMMEDIATE;
-    DEFERRED;
 ```
 
-- **target** : 目标文件、工作目标、伪目标，可以是`Object File`、也可以是可执行文件
+- **`target`** : 目标文件、工作目标、伪目标，可以是`Object File`、也可以是可执行文件
 
-- **prerequisites** : 生成 `target` 所需要的文件或者目标
+- **`prerequisites`** : 生成 `target` 所需要的文件或者目标
 
-- **command** : 生成 `target`需要执行的`shell`命令,命令必须以`[tab]`开头,每条命令占一行。第一个规则之后的所有以`[Tab]`字符开始的的行，`make`都会将其给`shell`去解释执行
+- **`command`** : 生成 `target`需要执行的`shell`命令,命令必须以`[tab]`开头,每条命令占一行。第一个规则之后的所有以`[Tab]`字符开始的的行，`make`都会将其给`shell`去解释执行
+
+- **伪目标**：那些没有任何依赖，只有执行动作的工作目标。
 
 - **显式规则**：说明如何生成一个或多个目标文件(包括 生成的文件, 文件的依赖文件, 生成的命令)
 
@@ -41,21 +37,23 @@ IMMEDIATE : IMMEDIATE;
 
 - **终极目标**：第一个规则的第一个目标称之为终极目标，有些书也称为默认目标,只有目标文件是 **终极目标** 的必要文件或间接必要文件的规则才会被执行，除非`make`明确指定执行这个规则，比如`make clean`。
 
-- **立即展开**: `GNU Make`的执行分为两个阶段，在执行第一阶段时，变量和函数被展开在需要构建的结构链表的对应规则中。后文中`IMMEDIATE`表示立即展开。
-
-- **延后展开**: `GNU Make`的执行分为两个阶段，第一阶段不展开，而是知道后续某些规则须要使用时、或者在`make`处理的第二阶段展开。后文`DEFERRED`表示延后展开。
-
-- **伪目标**：那些没有任何依赖，只有执行动作的工作目标。
+`Unix`文件具有三种时间属性：`atime`最近被读取的时间、`ctime`文件模式被修改的时间、`mtime`文件被修改的时间。文件的时间戳指的是`mtime`。
 
 ## 工作方式
 
-`GNU Make`的执行分为两个阶段：
+### 两阶段执行
 
 - 第一阶段：读取所有的`makefile`文件，内建所有变量、明确规则和隐含规则，并建立所有目标和依赖之间的依赖关系结构链表。
 
 - 第二阶段：根据第一阶段已经建立的依赖关系结构链表，决定哪些目标需要更新，并使用对应的规则来重建这些目标。
 
-`make`的工作步骤：
+- **立即展开**: 在执行第一阶段时，变量和函数被展开在需要构建的结构链表的对应规则中。后文中`IMMEDIATE`表示立即展开。
+
+- **延后展开**: 第一阶段不展开，在后续某些规则须要使用时、或者在`make`处理的第二阶段展开。后文`DEFERRED`表示延后展开。
+
+`target`与`prerequisites` 中的函数和变量会立即展开，而命令中的变量是延后展开的。
+
+### `make`的工作步骤：
 
 - 依次读取环境变量`MAKEFILES`定义的`makefile`文件列表
 - 读入工作目录下主`makefile`
@@ -66,6 +64,13 @@ IMMEDIATE : IMMEDIATE;
 - 根据依赖关系, 决定哪些目标要重新生成
 - 执行除 终极目标 以外的所有目标的规则
 - 执行 终极目标 所在的规则
+
+## 环境变量
+
+- `MAKEFILES` : `make`执行时首先将此变量作为需要读入的`makefile`文件
+- `MAKEFILE_LIST` :  所有`make`加载的变量，都会被追加记录到 `MAKEFILE_LIST` 中
+- `.VARIABLES` : `makefile`中所定义的所有全局变量列表、包括：空变量和make内嵌变量
+- `.LIBPATTERNS` : 默认值为`lib%.so lib%.a`,因此`-lNAME`默认加载`libNAME.so`
 
 ## 变量
 
@@ -172,22 +177,13 @@ dest/%.txt: src/%.txt
 
 上面代码将`src`目录下的`txt`文件，拷贝到`dest`目录下。首先判断`dest`目录是否存在，如果不存在就新建，然后`$<` 指代前置文件`src/%.txt`， `$@`指代目标文件`dest/%.txt`。
 
-## 函数
-
-### 函数格式
-
-```makefile
-# 函数调用
-$(function-name arg1[,argn])
-```
-
 ## 执行选项
 
-- `make --debug=[a,b,v]` 输出`make`调试信息
+- `make --debug=[a,b,v]` 输出调试信息
 - `make -j` 同时运行的命令的个数，也就是多线程执行`Makefile`
-- `make -n` 打印 make 将要执行的命令，但不实际执行它们
+- `make -n` 打印将要执行的命令，但不实际执行它们
 - `make --print-data-base` 打印出所有规则和变量
-- `make -w` 让`make`在编译一个目录之前和完成此目录的编译之后，给出相应的提示信息
+- `make -w` 在编译一个目录之前和完成此目录的编译之后，给出相应的提示信息
 - `make -f rules.txt` 指定make命令依据`rules.txt`文件中的规则，进行构建
 - `make -r` 禁止使用任何隐含规则
 - `make -R` 禁止使用任何作用于变量上的隐含规则
@@ -337,40 +333,9 @@ foo.c : foo.y
     $(run-yacc)
 ```
 
-## make的递归执行
-
-进入子目录（那个子目录下有`makefile`文件），然后执行`make`命令。
-
-```makefile
-subsystem:
-    cd subdir && $(MAKE);
-
-# 等价于
-subsystem:
-    $(MAKE) -C subdir;
-```
-
-父`makefile`中将变量传递给子`makefile`:
-
-```makefile
-# 父makefile
-export VARIABLE;   # export 后，子makefile就能访问到该变量了
-unexport VARIABLE; # 不希望将一个变量传递给子makefile
-
-export; # 不带任何参数，则表示将父makefile中的所有变量都传递给子makefile
-```
-
-`MAKELEVEL`环境变量是`make`递归调用的深度，最上一级是`0`。子`makefile`则是`1`,孙子`makefile`是`2`，以此类推。
-
-```makefile
-.PHONY : test
-test :
-    @echo "makelevel : $(MAKELEVEL)";
-```
-
 ## 模式规则 pattern rule
 
-使用 **通配符 wildcard** 而不是明确的文件名称书写的规则。模式里的 `%` 等效于Unix shell中的 `*` 号，可以代表任意多字符，用法举例: `%,v` , `s%.o` , `wrapper_%`
+使用 通配符 而不是明确的文件名称书写的规则。模式里的 `%` 等效于Unix shell中的 `*` 号，可以代表任意多字符，用法举例: `%,v` , `s%.o` , `wrapper_%`
 
 ```makefile
 prog : %.c
@@ -403,50 +368,77 @@ $(OBJECTS) : %.o : %.c
 
 一个工作目标，如果找不到可以更新它的具体规则，就会使用隐含规则,`abcde.o`在没有明确的命令行生成的情况话,make自动会执行`gcc -c abcde.c -o abcde.o`
 
-在命令行之前使用 `-`,意思是忽略命令的执行错误，比如`-rm`
-
 `GNU Make`对`-lfl`这种语法提供了特别的支持,它会去库搜索路径中查找，确认`libfl.a`或者`libfl.so`的存在
 
-- 如何从一个`.c`文件编译出一个 `.o` 文件
+### 常用的隐含规则一览
 
 ```makefile
+# 编译C程序 : N.o 自动由 N.c 生成
 %.o : %.c
-    $(COMPILE.c) $(OUTPUT_OPTIION) $<
-```
+    $(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
-- 如何从`.c`文件编译出一个不具拓展名的文件
+# 编译C++程序 ：N.o 自动由 N.cc 生成
+%.o : %.cc
+    $(CXX) -c $(CPPFLAGS) $(CFLAGS) $<
 
-```makefile
+# 汇编和需要预处理的汇编程序
+%.o : %.s
+    $(AS) $(ASFLAGS) $<
+
+%.s : %.S
+    $(CPP) $(CPPFLAGS)
+
+# 链接单一 object 文件 ： N自动由多个N.o生成
+% : %.o
+    $(CC) $(LDFLAGS) $< $(LOADLIBES) $(LDLIBS)
+
 % : %.c
     $(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
 ```
 
-### 内置的变量
+### 隐含变量
+
+隐含规则的命令中，使用的变量都是预定义变量，称为 隐含变量。
 
 ![WX20190221-194042.png](https://i.loli.net/2019/02/21/5c6e8e801891b.png)
 
-- `CC = gcc`, 也就是说，改变`CC`变量的设定值就可以更换 C 编译器，改变`CFLAGS` `CPPFLAGS` 就可以更换编译选项
+常见命令隐含变量：
+
+- `CC = gcc` : `C`编译程序, 改变`CC`变量的设定值就可以更换`C`编译器
+- `CPP = $(CC) -E` ： `C`程序的预处理器
+- `AS = as` ：汇编程序
+- `AR = ar` ：函数库打包程序，可创建静态库文档`.a`
+- `CXX = g++`: `C++`编译程序
+- `RM = rm -f`
+
+常见命令参数隐含变量：
+
+- `ARFLAGS = rv` : `$(AR)` 命令使用的参数
+- `ASFLAGS` : `$(AS)` 汇编程序使用的参数
+- `CFLAGS` : `$(CC)` 使用的参数
+- `CXXFLAGS` : 执行`g++`编译器时，使用的参数
+- `CPPFLAGS` ：执行`$(CC) -E`时，使用的参数
+- `LDFLAGS` : 链接器参数 如 `ld`
+- `LOADLIBES` `LDLIBS` 包含了要链接的程序库列表
+
+常见组合起来的隐含变量：
+
 - `COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c`
 - `OUTPUT_OPTION = -o $@`
-- `LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)`, `LDFLAGS`用来保存链接选项（比如`-L`选项），`LOADLIBES`和`LDLIBS`包含了要链接的程序库列表
-- 直接修改这些内置变量要特别小心,比如`make CPPFLAGS=-DDEBUG`就会将在makefile里定义的`CPPFLAGS = -I include`覆盖掉
-- `RM = rm -f`
-- `AR = ar`
-- `CXX = g++`
-- `ARFLAGS`: `$(AR)` 命令使用的参数
-- `CFLAGS` : `$(CC)` 使用的参数
-- `CXXFLAGS`: `$(CC)` 使用的参数
+- `LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)`
 
-### 环境变量
+直接修改这些内置变量要特别小心,比如`make CPPFLAGS=-DDEBUG`就会将在makefile里定义的`CPPFLAGS = -I include`覆盖掉
+
+## 函数
+
+### 函数格式
 
 ```makefile
-MAKEFILES       # make执行时首先将此变量作为需要读入的makefile文件
-MAKEFILE_LIST   # 所有make加载的变量，都会被追加记录到 makefile_LIST 中
-.VARIABLES      # makefile中所定义的所有全局变量列表、包括：空变量和make内嵌变量
-.LIBPATTERNS    # 默认值为 lib%.so lib%.a,是依赖文件列表中-lNAME默认加载libNAME.so时用到
+# 函数调用
+$(function-name arg1[,argn])
 ```
 
-- `Rule`中，通配符会被自动展开。但在变量的定义和函数引用时，通配符将失效。这种情况下如果需要通配符有效，就需要使用函数`$(wildcard PATTERN...)`。它被展开为已经存在的、使用空格分开的、匹配此模式的所有文件列表。如果不存在任何符合此模式的文件，函数会忽略模式字符并返回空。
+在规则中通配符会被自动展开，但在变量的定义和函数引用时，通配符将失效。这种情况下如果需要通配符有效，就需要使用函数`$(wildcard PATTERN...)`。它被展开为已经存在的、使用空格分开的、匹配此模式的所有文件列表。如果不存在任何符合此模式的文件，函数会忽略模式字符并返回空。
 
 ```makefile
 # 首先使用 wildcard 获取工作目录下的 .c 文件列表
@@ -470,15 +462,17 @@ all:
  @echo "end"
 ```
 
+### 常用函数
+
 ```makefile
 # filter 把text当做一系列被空格隔开的单词，与pattern比较后，会返回相符者
 $(filter pattern ...,text)
-
+eg.
 files = foo.elc bar.o lose.o
 $(filter %.o,$(files)) : %.o:%.c
     $(CC) -c $(CFLAGS) $< -o $@
 
-eg. $(filter %.o %.a,program.c program.o program.a)
+$(filter %.o %.a,program.c program.o program.a)
 
 # 与filter相反，返回不符合者
 $(filter-out pattern ...,text)
@@ -600,42 +594,6 @@ Makefile:2: there is an warning!
 
 ```
 
-## 实例
-
-```makefile
-# 生成 edit 程序，需要 8 个 c 文件和 3 个 h 文件
-edit : main.o kbd.o command.o display.o insert.o search.o files.o utils.o
-    cc main.o kbd.o command.o display.o insert.o search.o files.o utils.o -o edit
-
-main.o : main.c defs.h
-    cc -c main.c
-kbd.o : kbd.c defs.h command.h
-    cc -c kbd.c
-command.o : command.c defs.h command.h
-    cc -c command.c
-display.o : display.c defs.h buffer.h
-    cc -c display.c
-insert.o : insert.c defs.h buffer.h
-    cc -c insert.c
-search.o : search.c defs.h buffer.h
-    cc -c search.c
-files.o : files.c defs.h buffer.h command.h
-    cc -c files.c
-utils.o : utils.c defs.h
-    cc -c utils.c
-
-clean :
-    rm edit main.o kbd.o command.o display.o insert.o search.o files.o utils.o
-```
-
-### 使用变量后
-
-```makefile
-objects = main.o kbd.o command.o display.o insert.o search.o files.o utils.o
-edit : $(objects)
-    cc $(objects) -o edit
-```
-
 ## 参考实例
 
 ```makefile
@@ -680,6 +638,37 @@ $ cd virt/kvm/
 $ gcc -MM kvm_main.c
 kvm_main.o: kvm_main.c iodev.h coalesced_mmio.h async_pf.h
 # 上句就可以加到 Makefile 中作为编译 kvm_main.o 的依赖关系
+```
+
+## make的递归执行
+
+进入子目录（那个子目录下有`makefile`文件），然后执行`make`命令。
+
+```makefile
+subsystem:
+    cd subdir && $(MAKE);
+
+# 等价于
+subsystem:
+    $(MAKE) -C subdir;
+```
+
+父`makefile`中将变量传递给子`makefile`:
+
+```makefile
+# 父makefile
+export VARIABLE;   # export 后，子makefile就能访问到该变量了
+unexport VARIABLE; # 不希望将一个变量传递给子makefile
+
+export; # 不带任何参数，则表示将父makefile中的所有变量都传递给子makefile
+```
+
+`MAKELEVEL`环境变量是`make`递归调用的深度，最上一级是`0`。子`makefile`则是`1`,孙子`makefile`是`2`，以此类推。
+
+```makefile
+.PHONY : test
+test :
+    @echo "makelevel : $(MAKELEVEL)";
 ```
 
 ## 嵌套 Makefile 之间传递参数
