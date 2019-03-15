@@ -80,6 +80,7 @@ main()
    printf("Time :%s\n", __TIME__ ); // 这会包含当前文件名，一个字符串常量。
    printf("Line :%d\n", __LINE__ ); // 这会包含当前行号，一个十进制常量。
    printf("ANSI :%d\n", __STDC__ ); // 当编译器以 ANSI 标准编译时，则定义为 1。
+   printf("func :%s\n", __FUNCTION__ ); // 外部函数的名字
 }
 // File :test.c
 // Date :Jun 2 2012
