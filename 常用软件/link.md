@@ -29,6 +29,7 @@
 
 ### 配色工具
 
+- [your logos](https://mybrandnewlogo.com) 你提供产品的描述，该网站会自动生成 Logo 图案。
 - [小影志](http://c7sky.com/)
 - [小影的工具箱](http://tool.c7sky.com/)
 - [千图网配色工具](http://www.58pic.com/peise/)
