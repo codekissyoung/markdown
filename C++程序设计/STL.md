@@ -1,4 +1,30 @@
-# <vector> <list> 和 string 类型 都支持以下操作
+# STL 库
+
+本文是STL常用数据类型的笔记。
+
+## vector
+
+向量不仅存储数据元素，还存储元素的个数。第一个数据元素的索引号是`0`、第二个是`1`,依次类推。所有的数据元素要求为同一种数据类型。
+
+```c++
+vector<数据类型> 变量名( 元素个数 );
+
+vector<double> vec;
+
+vec.push_back( 4.5 );   // 添加新元素到向量中
+
+
+// 遍历向量中元素
+for(int i = 0; i < vec.size(); ++i)
+    cout << vec[i] << endl;
+
+```
+
+
+
+
+## vector、list、string
+
 ```c++
 container<T>::iterator
 container<T>::const_iterator
