@@ -418,3 +418,160 @@ while( mid != end && *mid != target ) // 当还有元素未检查到，并且中
     mid = beg + (end - beg) / 2; // 新的中间元素
 }
 ```
+
+### 指针也是迭代器
+
+`vector`与`string`迭代器支持的运算，数组的指针全都支持。例如`++`、`--`改变指针指向的元素，遍历数组中的元素。当然，这需要先获得指向数组第一个元素的指针，类似于`vec.begin()`操作。而`vec.end()`操作，则可以用`int *e = &arr[ sizeof(arr) ]` 代替，即获得最后一个元素的下一个位置。
+
+为了让指针的使用更加简单和安全，C++为数组提供了`begin( arr )`与`end( arr )`函数：
+
+```c++
+int ia[] = { 0, 1, 2, 34, 45, 42, 45, 56, 12 };
+int *beg = begin( ia ); // 获取指向首元素的指针
+int *end = end( ia );   // 获取指向尾元素下一个位置的指针
+vector<int> ivec( begin( ia ), end( ia ) );  // 使用数组初始化 vecotr
+```
+
+缓冲区溢出 buffer overflow、C-style string、class template、compiler extension 编译器拓展、container 容器、
+
+index 索引、instantiation 实例化、iterator 迭代器、迭代器运算 iterator arithmetic
+
+off-the-end iterator 尾后迭代器、pointer arithmetic 指针运算
+
+direct initialization 直接初始化、copy initialization 拷贝初始化、、值初始化 value initailization 
+
+## 第4章 表达式
+
+C++提供了一套丰富的运算符，并且定义了运算符作用于内置类型时所执行的操作。作用于类类型时，由程序员指定上述运算符所要执行的操作，称之为 **重载运算符**。使用重载运算符时，运算对象的类型和返回值的类型，都是由该运算符定义；但是运算对象的个数、运算符的优先级和结合律都是无法改变的。
+
+**一元运算符**、**二元运算符**、**三元运算符**、函数调用可以看做特殊的运算符，它对运算对象的个数没有限制。
+
+下面这种混合使用解引用和递增运算符的做法，在C++与C中是非常广泛的，要习惯这种写法。
+
+```c++
+cout << *pbeg++ << endl; // 输出当前值，并将pbeg向后移动一位
+```
+
+## 第5章 语句
+
+异常是在运行时的反常行为，这些行为超出了函数正常功能的范围。
+
+典型的异常包括失去数据库连接、意外的的输入等。
+
+检测出异常的代码，无须知道如何处理异常、只需发出某种信号以表明程序遇到了故障。通常也会设计专门的异常处理代码。
+
+`throw`语句用于检测出异常的代码，用来通知发生异常。`try-catch` 语句块则用来捕获并处理异常。一套异常类，用于在`throw`和`catch`之间传递异常信息。
+
+```c++
+try{
+    // 正常代码
+}catch( 异常声明1 )
+{
+    // 处理异常
+}catch( 异常声明2 )
+{
+    // 处理异常
+}
+```
+
+> **异常安全**
+> 异常中断了程序的正常流程。异常发生时，调用者请求的一部分计算可能已经完成了，另一部分尚未完成。
+> 这就有可能导致部分资源未能够正常释放。
+> 那些在异常发生期间正确执行了“清理”工作的代码，被称为是 **异常安全** 的代码。这就要求我们必须时刻清楚异常何时会发生，异常发生后程序应如何确保对象有效、资源无泄漏、程序处于合理的状态。
+
+![WX20190327-150443.png](https://i.loli.net/2019/03/27/5c9b20ae60d91.png)
+
+## 第六章 函数
+
+![WX20190327-153903.png](https://i.loli.net/2019/03/27/5c9b28bfcfd6c.png)
+
+切记，不要返回局部对象的引用或指针。
+
+### inline 内联函数
+
+```c++
+inline const string& shorterString( const string &s1, const string &s2 )
+{
+    return s1.size() <= s2.size() ? s1 : s2;
+}
+```
+
+### constexpr 函数
+
+constexpr 是指能用于常量表达式的函数。它表明函数遵守几项约定：函数的返回类型及所有形参的类型都是字面值类型，并且函数体中必须有且仅有一条`return`语句。
+
+```c++
+constexpr int new_sz
+{
+    return 42;
+}
+constexpr int foo = new_sz();
+```
+
+> 内联函数 与 constexpr 函数需要定义在`.h`文件中。
+
+### 调试手段assert 和 NDEBUG 预处理变量
+
+```c++
+assert( expr ); // 如果 expr 为假，则输出出错信息，并停止程序运行；为真，则忽略
+```
+
+如果`#define NDEBUG`，则`assert`什么也不做。默认状态下没有定义`NDEBUG`，此时`assert`将执行运行时检查。
+
+```bash
+$CC -D NDEBUG main.c -o main      # 编译时，指定关闭运行时检查
+```
+
+条件编译
+
+```c++
+void print( const int ia[], size_t size )
+{
+    #ifndef NDEBUG
+        cerr << __func__ << ": array size is " << size << endl;
+    #endif
+}
+```
+
+### 重载函数匹配
+
+1. 先确定候选函数集合，要求是：函数名一样，函数声明在调用处可见。
+2. 函数的参数个数相等，参数的类型要相同，至少要能转换成声明中参数的类型
+3. 找到最佳匹配函数：每个实参的匹配都不劣于其他可行函数，且至少有一个优于其他；若找不到最佳匹配则报二义性错误
+
+为了确定最佳匹配，实参类型到形参类型的转换划分为几个等级：精确匹配>const转换>类型提升>算术类型或指针转换>类类型转换
+
+### 函数指针
+
+函数指针指向的是函数，它指向某种特定类型。函数的类型由它的返回类型和形参类型共同决定，与函数名无关。
+
+```c++
+bool lengthCompare( const string& , const string & );
+// 函数类型为 bool(const string&, const string&)
+```
+
+想要声明一个可以指向该函数的指针，只需要将函数名替换成指针就行。
+
+```c++
+bool (*pf)( const string&, const string&);
+```
+
+当我们将函数名作为参数使用时，该函数名会自动地装换成 函数指针。当我们想使用指针调用函数时，也无须解引用。
+
+```c++
+bool b1 = pf("hello","goodbye");
+bool b2 = (*pf)("hello","goodbye");
+bool b3 = lengthCompare("hello","goodbye");
+```
+
+重载函数的指针：指针类型必须与重载函数中的某一个精确匹配。
+
+### 返回指向函数的指针
+
+```c++
+using F = int(int*, int);
+using PF = int(*)(int*, int);
+PF f1( int );
+F* f1( int );
+auto f1( int ) -> int(*)(int*, int); // 尾置返回类型
+```
