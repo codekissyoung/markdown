@@ -1,6 +1,8 @@
 # C 风格的字符串
+
 - 就是一个以 '\0' 字符结尾的字符数组
 - string 类型 转换成 c 字符串
+
 ```c++
 string name = "codekissyoung";
 printf("name : %s\n", name.c_str());
