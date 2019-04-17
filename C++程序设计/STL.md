@@ -20,9 +20,6 @@ for(int i = 0; i < vec.size(); ++i)
 
 ```
 
-
-
-
 ## vector、list、string
 
 ```c++
