@@ -52,18 +52,6 @@ Sales_item book_gone_with_wind; // 使用自定义的类型，去定义一个变
 
 成员函数`member function`：类的一部分，用于实现类提供的各种操作。也称方法`method`。通常使用`.`号来调用成员函数，如`book.isbn()`。`.`运算符左侧必须为该类型的对象，右侧为函数名调用。
 
-### 术语表
-
-参数 argument、赋值 assignment、程序块 block、缓冲区 buffer、内置类型 built-in type、字符串字面量 string literal、类 class
-
-类类型 class type、注释 comment、条件 condition、花括号 curly brace、数据结构 data struture、编辑-编译-调试 edit-compile-debug
-
-文件结束符 end-of-file、表达式 expression、for 语句 for statement、函数 function、头文件 header、初始化 initialize、库类型 library type
-
-操纵符 manipulater（如 std::endl）、成员函数 member function、形参列表 parameter list、返回类型 return type、源文件 source type、标准错误输出流 standard error
-
-标准输入流 standard input、标准输出 stardard output、标准库 standard library、语句 statement、未初始化变量 uninitialized variable、 变量 variable
-
 ## 第二章 变量和基本类型
 
 ![WX20190325-152354.png](https://i.loli.net/2019/03/25/5c988226c546d.png)
@@ -233,20 +221,6 @@ decltype( cj ) z;     // 错误，z 是引用 必须初始化
 ```
 
 编译器实际不调用函数 f，而是使用当调用发生时，f的返回类型作为 sum 的类型。
-
-### 术语
-
-地址 address、别名声明 alias declaration、算术类型 arithmetic type、数组 array、基本类型 base type、绑定 bind、类成员 class member
-
-复合类型 compound type、常量指针 const pointer 它指向的值永不改变、常量引用 const reference 指向常量的引用、常量表达式 const expression 能在编译时获得结果
-
-constexpr 代表一条常量表达式、转换 conversion 一种类型的值转变为另一种类型、数据成员 data member、声明 declaration、声明符 declarator
-
-默认初始化 default initialization、定义 definition、转义序列 escape sequence、头文件保护符 header guard、标识符 identifier
-
-类内初始值 in-class initializer、列表初始化 list initialization、不可打印字符 nonprintable character、空指针 null pointer、 预处理器 preprocessor
-
-分离式编译 separate compilation、类型别名 type alias、类型检查 type checking、类型说明符 type specifier
 
 ## 第三章 字符串 向量 和 数组
 
@@ -434,9 +408,9 @@ index 索引、instantiation 实例化、iterator 迭代器、迭代器运算 it
 
 off-the-end iterator 尾后迭代器、pointer arithmetic 指针运算
 
-direct initialization 直接初始化、copy initialization 拷贝初始化、、值初始化 value initailization 
+direct initialization 直接初始化、copy initialization 拷贝初始化、、值初始化 value initailization
 
-## 第4章 表达式
+## 第四章 表达式
 
 C++提供了一套丰富的运算符，并且定义了运算符作用于内置类型时所执行的操作。作用于类类型时，由程序员指定上述运算符所要执行的操作，称之为 **重载运算符**。使用重载运算符时，运算对象的类型和返回值的类型，都是由该运算符定义；但是运算对象的个数、运算符的优先级和结合律都是无法改变的。
 
@@ -448,7 +422,7 @@ C++提供了一套丰富的运算符，并且定义了运算符作用于内置�
 cout << *pbeg++ << endl; // 输出当前值，并将pbeg向后移动一位
 ```
 
-## 第5章 语句
+## 第五章 语句
 
 异常是在运行时的反常行为，这些行为超出了函数正常功能的范围。
 
