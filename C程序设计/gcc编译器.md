@@ -138,7 +138,6 @@ gcc -shared -fPIC xxx.c -o xxx.so
 - 调试选项 `-a -dletters -fpretend-float -g -glevel -gcoff -gxcoff -gxcoff+ -gdwarf -gdwarf+ -gstabs -gstabs+ -ggdb -p -pg -save-temps -print-file-name=library -print-libgcc-file-name -print-prog-name=program`
 
 
-
 ## GCC环境变量
 
 ### gcc在编译时用到的环境变量
@@ -245,3 +244,9 @@ prefix/lib/gcc-lib/xxxx-xxx-xxx-gnulibc/2.8.1/include
 
 - 查看库文件提供了哪些调用，可以用`nm`命令自己查看库文件提供了哪些调用
 - 通过头文件查看函数的定义
+
+## 动态链接库
+
+- [LINUX下动态链接库的使用-dlopen dlsym dlclose dlerror](http://blog.csdn.net/jernymy/article/details/6903683)
+- [gcc/g++ 链接库的编译与链接](http://blog.csdn.net/surgewong/article/details/39236707)
+- [crontab读取环境变量方法](https://www.cnblogs.com/simplelogic/p/3287911.html)
