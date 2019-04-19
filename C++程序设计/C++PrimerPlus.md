@@ -246,3 +246,445 @@ p_fun (*pd)[3] = &pa;  // 想想看 &pa 的类型是什么？
 ```
 
 ## 第8章 函数探幽
+
+### 内联函数
+
+通常的做法是将内联函数的定义放在`.h`文件中，并在函数定义前面加上`inline`。
+
+```c++
+// a.h
+inline double square( double x ) { return x * x; }
+```
+
+### 引用变量
+
+引用变量的主要用途是作为函数的形参，通过引用，函数内部使用的是传递进来的参数的原始数据，而不是拷贝出来的副本。引入引用主要为了结构与类，减少拷贝，提升性能。
+
+引用在声明的时候，就必须初始化，并且关联一个变量后，就不能够更改它关联的变量了。
+
+```c++
+int rats;
+int &rodents = rats; // 声明引用变量 rodents
+
+void swap( int &a, int &b ) // 引用变量作为 形参
+{
+    int temp;
+    temp = a;
+    a = b;
+    b = temp;
+}
+```
+
+常规变量 与 const 变量都可以视为左值，因为可以通过地址访问它们。但常规变量属于可修改的左值，const变量属于不可修改的左值。
+
+```c++
+double refcube( const double &ra ) { return ra * ra * ra; }
+double side = 3.0;
+double *pd  = &side;
+double &rd  = side;
+double lens[4] = { 1.0, 2.0, 3.0, 4.0 };
+
+double c1 = refcube( side );    // ra is side
+double c2 = refcube( lens[2] ); // ra is lens[2]
+double c3 = refcube( rd );      // ra is rd is side
+double c4 = refcube( *pd );     // ra is *pd is side
+double c5 = refcube( 7.0 );     // ra is 临时变量 的引用
+double c6 = refcube( side + 10.0 ); // ra is 临时变量 的引用
+```
+
+应尽可能使用 const
+
+- const 可以避免函数无意中修改数据
+- const 让函数可以处理const与非const变量，否则将只能接受非const数据
+- const 使函数能够正确生成并使用临时变量
+
+使用引用需注意，在函数中不要返回，函数终止时会销毁的内存单元的引用。
+
+什么时候应该使用引用？什么时候应该使用指针？什么时候按值传递呢？
+
+- 如果数据很小，如内置类型或小型结构：如果不需要修改传递的值，使用按值传递；如果需要修改参数值，则使用指针。
+- 如果数据是数组，指针是唯一选择。
+- 如果是较大的结构，则使用引用，或者是指针，提高效率。
+- 如果数据对象是类对象，则标准方式，就是按引用传递。
+
+### 默认参数
+
+可以只在函数原型中，声明默认参数即可。
+
+```c++
+char *left( const char *, int n = 1 );
+
+char *left( const char *str, int n ){ ... }
+```
+
+### 函数重载
+
+通过函数重载来设计一系列函数，它们名称相同，完成相同的工作，但是使用不同的参数列表。
+
+```c++
+void print( const char *, int );
+void print( double, int );
+void print( int, int );
+void print( const char * );
+```
+
+编译器在函数调用时，根据函数的实际参数的特征，去查找匹配对应的重载函数。
+
+### 函数模板
+
+如果需要将同一算法应用在不同参数类型上，可以使用模板。
+
+在开发中，模板的定义直接写在`.h`中。最终编译后的代码，不包含任何模板，只包含为程序生成的实际调用到的函数。
+
+```c++
+template <typename AnyType>
+void swap( AnyType &a, AnyType &b )
+{
+    AnyType temp;
+    temp = a;
+    a = b;
+    b = temp;
+}
+```
+
+为特定类型提供具体化的模板定义：
+
+```c++
+struct job {
+    char name[40];
+    double salary;
+    int floor;
+};
+
+// 正常函数
+void swap( job &, job & );
+
+// 模板函数
+template <typename T>
+void swap( T &, T & );
+
+// 具体化模板函数
+template<> void swap( job &, job & );
+```
+
+对于函数重载、函数模板、函数模板重载，C++编译器需要使用一个优先级策略，来决定最终为调用方，生成和使用哪一个函数定义：
+
+- 第一步：创建候选函数列表，包括与被调用函数同名的函数以及模板函数
+- 第二步：创建可行函数列表，这些函数的参数数目要与被调用方一致，参数类型的话，可以有隐式转换
+- 第三步：确定最佳的可行函数，如果有，则使用它，无则报错
+
+```c++
+may( 'B' ); // 函数调用
+
+// 候选函数列表
+void may( int );                            # 1
+float may( float, float = 3 );              # 2
+void may( char );                           # 3
+char *may( const char * );                  # 4
+char may( const char & );                   # 5
+template<typename T> void may( const T & ); # 6
+template<typename T> void may( T * );       # 7
+```
+
+对上述代码，先判断可行函数列表：参数数目一致，且类型能够隐式转换成功。#4 与 #7 中`char`是无法自动转换为指针类型的，所以排除掉。
+
+接下来确定最佳可行函数，从最佳到最差的顺序：
+
+1. 完全匹配，常规函数 优于 模板
+2. 提升转换，比如 `char` `short` 转换为 `int`
+3. 标准转换，比如 `int` 转换为 `char`，`long`转换为`double`
+4. 用户自定义转换，比如类声明中定义的转换
+
+所以，#1(提升转换) 优于 #2(标准转换)。#3 #5 #6 是完全匹配的，都优于 #1 和 #2。#3 与 #5 优于 #6，因为 #6 是模板。
+
+### decltype 类型推断
+
+```c++
+template<typename T1, typename T2>
+void ft( T1 x, T2 y )
+{
+    decltype( x + y ) xpy = x + y;
+}
+
+double x = 5.5;
+double y = 7.0;
+double rx = x;
+const double *pd;
+long indeed( int );
+
+
+decltype(x) w;      // w is type double
+decltype(rx) u = y; // u is type double &
+decltype(pd) v;     // v is type double *
+decltype( indeed(3) ) m; // m is type long
+```
+
+### 后置返回类型
+
+```c++
+auto ft( int x, float y ) -> double; // 函数返回 double 类型
+
+template<typename T1, typename T2>
+auto gt( T1 x, T2 y ) -> decltype(x + y)
+{
+    return x + y;
+}
+```
+
+## 第9章 内存模型与名字空间
+
+### 源文件分开单独编译
+
+一般放在头文件中的内容：
+
+- 函数原型
+- 使用`#define`与`const`声明的符号常量
+- 结构声明
+- 类声明
+- 模板定义
+- 内联函数
+
+### 变量的生存周期、作用域 和 链接性
+
+C++ 中使用 4 中方案来存储数据:
+
+- 自动：函数定义里的变量，代码块中的变量，随着代码块执行创建，代码块结束则销毁
+- 静态：函数定义之外的全局变量，函数中使用`static`声明的，它们在程序的运行期都存在。C++中区分了 3 种静态类型。
+- 线程：使用`thread_local`声明，其生命周期与所属线程一样长
+- 动态：程序运行时，使用`new`动态申请，使用`delete`释放的变量。
+
+作用域`scope`：描述了 名称 在文件的多大范围内可见，例如：函数A内的变量只在函数A内可以使用；函数定义之前声明的变量可在所有函数中使用。
+
+链接性`linkage`：描述了 名称 在不同 翻译单元 之间的共享，链接性为 外部的 可以在文件间共享，链接性为 内部的 则只能在当前文件内的函数中使用。
+
+### 静态持续变量
+
+```c++
+// a.cpp
+int global          = 1000; // 静态变量，外部链接性，即其他文件也能访问
+static int one_file = 50;   // 静态变量，内部链接性，即只能在本文件使用
+
+void funct( int n )
+{
+    static int count = 0;   // 静态变量，无链接性，只在本函数内有效
+}
+```
+
+单定义原则：变量只能有一次定义。
+
+### volatile
+
+在编译过程中，如果编译器发现程序在近几条语句中多次使用了某个变量，则编译器会进行优化：将这个值缓存到寄存器中，这样程序就不用多次访问内存取得该值。这种优化的假设前提是，两次取用内存之间，该内存处的值时不变的。但是如果这个变量所在的内存 如果是 某个硬件地址（比如串口），硬件会改变其值；或者 该变量所在的内存是 共享内存，有其他进程 或者 线程会修改 该内存处的值。那么这种编译器的优化，会导致该变量值不一致。当前程序应该使用内存处的值，而不是寄存器缓存的值。对变量声明为 `volatile` 就是为了避免这种优化，让对该变量的读取始终使用内存处的值。
+
+### mutable 结构内可变变量
+
+```c++
+struct data
+{
+    char name[30];
+    mutable int access;
+};
+
+const data veep = { "codekissyoung", 0 };
+
+strcpy( veep.name, "zhangjian" ); // not allowed
+veep.access ++; // allowed
+```
+
+### const 对链接性的影响
+
+默认情况下，全局变量的链接性都是外部的，但是使用`const`定义的全局变量，会将链接性修改为内部的。可以使用`extern`强制将链接性修改为外部的。因此有两种对全局常量的使用方式
+
+第一种：默认内部链接性，每个`.cpp`文件都有一份相同的常量定义，而不是共享一份常量。
+
+```c++
+// const.h
+const double Pi = 3.14159;
+
+// a.cpp
+#include "const.h"
+
+// b.cpp
+#include "const.h"
+```
+
+第二种：声明使用强制使用外部链接性，定义只放在一个`.cpp`文件
+
+```c++
+// const.h
+extern const double Pi;
+
+// const.cpp
+#include "const.h"
+const double Pi = 3.14159;
+
+// a.cpp
+#include "const.h"
+```
+
+### 函数的链接性
+
+函数默认都是外部链接性，但是可以使用`static`声明，将链接性改为内部的。
+
+```c++
+static int private_func( double x );
+```
+
+C++如何查找函数的定义呢？
+
+假设在程序的某个文件中调用一个函数：如果该文件中，函数声明指出该函数是`static`的，则编译器只在本文件查找该函数定义，否则编译器将在所有程序文件中查找。如果找到两个定义，则报错重复定义。如果程序文件中没有找到，则继续在库中搜索。这意味着，如果定义了一个与库函数同名的函数，则编译器将使用程序员自定义的版本，而不是库函数。
+
+### 语言链接性
+
+链接程序要求每个不同的函数要有不同的符号名。在C语言中，一个名称只能对应一个函数，所以C语言的编译器可能将`spiff`这样的函数名，设置其符号名为`_spiff`，称为C语言的链接性。
+
+在C++语言中，由于函数重载、函数模板的存在。对于`spiff(int)`，符号名为`_spiff_i`，而`spiff(double,double)`的符号名为：`_spiff_d_d`,称为C++语言链接性。
+
+假设在 C++中要使用由 C编译器 编译出来的库：
+
+```C++
+spiff( 22 ); // from C library
+```
+
+它在C库中符号名为`_spiff`，但是对于C++链接程序来说，C++的查找约定是`_spiff_i`,为了解决这个问题，我们需要在函数原型中指出要使用的约定：
+
+```c++
+extern "C" void spiff( int ); // 使用 C 的编译约定
+```
+
+### 存储方案 和 动态分配
+
+```c++
+float *p_fees = new float[20];
+```
+
+由`new`分配的80个字节将一直保留在内存内，直到使用`delete`删除。但是，当包含该声明的语句块结束时，`p_fees`指针将消失。如果希望另一个函数能够使用这80字节，则必须将该指针传递给该函数。如果该指针被声明为一个全局变量，并拥有外部链接性，则代码中任意地方都可以通过该指针来使用这块内存。
+
+## 第10章 对象和类
+
+### 类声明
+
+```c++
+// stock.h
+class Stock
+{
+    private:
+        // data member 声明
+    public:
+        // 方法声明
+};
+```
+
+### 类的构造 和 析构函数
+
+类构造函数专门用于，在创建对象时，将初始值赋给对象的数据成员。
+
+```c++
+// stock.cpp
+Stock::Stock() // 默认构造函数定义
+{
+    company = "no name";
+    shares = 0;
+    share_val = 0.0;
+}
+
+Stock::Stock( const string &co, long n, double pr ) // 构造函数定义
+{
+    // ...
+}
+
+Stock::~Stock() // 析构函数，对象被销毁时调用
+{
+    cout << "Bye" << endl;
+}
+
+Stock food = Stock( "World Cabbage", 250, 1.25 );
+```
+
+### this 指针
+
+```c++
+const Stock &Stock::topval( const Stock &s ) const
+{
+    if( s.total_val > this->total_val )
+        return s;
+    else
+        return *this;
+}
+```
+
+### 作用域内枚举
+
+```c++
+enum class t_shirt { Small, Medium, Large, Xlarge };
+t_shirt Floyd = t_shirt::Large;
+```
+
+## 第11章 使用类
+
+### 运算符重载
+
+运算符重载使得操作对象更美观，更优雅。
+
+```c++
+class Time
+{
+    public:
+        Time operator+( const Time &t ) const; // 通过成员函数 重载运算符 +
+};
+
+// T1 = T2 + T3 转换为 T1 = T2.operator+( T3 );
+Time Time::operator+( const Time &t ) const
+{
+    Time sum;
+    sum.minutes = minutes + t.minutes;
+    sum.hours = hours + t.hours + sum.minutes / 60;
+    sum.minutes %= 60;
+    return sum;
+}
+```
+
+`+`运算符左侧的对象是调用方，右边的对象是作为参数被传递到`operator+`方法里的对象。
+
+### 友元
+
+通过在类内部声明 某函数 为本类的友元函数，则该函数可以使用类内部的私有数据。
+
+```c++
+class Time
+{
+    public:
+        friend Time operator*( double m, const Time &t ) { return t * m; }
+        friend std::ostream &operator<<( std::ostream &os, const Time &t );
+};
+
+std::ostream &operator<<( std::ostream &os, const Time &t )
+{
+    os << t.hours << " hours, " << t.minutes << " minutes"; // 能直接使用 t 的私有数据了
+    return os;
+}
+```
+
+### 非成员函数的运算符重载
+
+```c++
+class Time
+{
+    public:
+        // T1 = T2 + T3; 转换为 T1 = operator+( T2, T3 );
+        friend Time operator+( const Time &t1, const Time &t2 );
+};
+
+Time operator+( const Time &t1, const Time &t2 )
+{
+    Time sum;
+    sum.minutes = t1.minutes + t2.minutes;
+    sum.hours = t1.hours + t2.hours + sum.minutes / 60;
+    sum.minutes %= 60;
+    return sum;
+}
+```
+
+### 类的自动装换 和 强制类型装换
+
+P 428 页
