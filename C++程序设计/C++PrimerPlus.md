@@ -687,4 +687,266 @@ Time operator+( const Time &t1, const Time &t2 )
 
 ### 类的自动装换 和 强制类型装换
 
-P 428 页
+```c++
+class Stonewt
+{
+    private:
+        enum{ Lbs_per_stn = 14 };
+        int stone;
+        double pds_left;
+        double pounds;
+
+    public:
+        Stonewt( double lbs );
+        operator int() const;
+        operator double() const;
+};
+
+// 当 对象 = double类型; 时，自动调用
+Stonewt::Stonewt( double lbs )
+{
+    stone = int(lbs) / Lbs_per_stn;
+    pds_left = int(lbs) % Lbs_per_stn + lbs - int(lbs);
+    pounds = lbs;
+}
+
+// 当对象作为 int 时，自动调用本函数
+Stonewt::operator int() const
+{
+    return int ( pounds + 0.5 );
+}
+
+// 当对象作为 double 时，自动调用本函数
+Stonewt::operator double() const
+{
+    return pounds;
+}
+```
+
+C++允许指定在类和内置类型之间进行转换:
+
+- 只有一个参数的构造函数，用于将类型与该参数相同的值转换为 类类型，例如，将 `double` 值赋值给 `Stonewt` 对象时，接受 `double` 参数的 `Stonewt` 类构造函数将自动被调用。
+- 通过转换函数`operator typeName();`,将类对象赋值给`typeName`变量时，或将类强制转换为`typeName`变量时，该转换函数自动被调用
+
+## 第12章 类和动态内存分配
+
+C++自动为类提供以下成员函数：
+
+- 默认构造函数
+- 默认析构函数
+- 复制构造函数，用于初始化过程中，原型为`Class_name(const Class_name &)`
+- 赋值运算符，将一个对象赋值给另一个对象时，自动调用
+- 地址运算符，默认返回this指针的地址
+- 移动构造函数(C++11)
+- 移动赋值运算符(C++11)
+
+### 复制构造函数
+
+复制构造函数的调用时机，一般来说，在涉及到按值传递的时候，都会调用：
+
+```c++
+// motto is StringBad object
+StringBad ditto( motto );
+StringBad metoo = motto;
+StringBad also = StringBad(motto);
+StringBad *pStringBad = new StringBad( motto );
+```
+
+默认的复制构造函数的作用是：逐个复制非静态成员的值到新对象，也称为浅拷贝。
+
+浅拷贝带来的问题：
+
+- 指针成员的问题，如果只是复制指针，那么两个对象的该指针成员将会指向同一块内存。
+
+### StringBad 类实例
+
+```c++
+// StringBad.h
+class StringBad
+{
+    private:
+        char *str;
+        int len;
+        static int num_strings;
+
+    public:
+        StringBad( const char *s );       // 构造函数
+        StringBad();                      // 默认构造函数
+        StringBad( const StringBad &st ); // 复制构造函数
+        ~StringBad();                     // 析构函数
+
+        StringBad &operator=( const StringBad &st );
+        StringBad &operator=( const char * );
+        char &operator[]( int i );
+        const char &operator[]( int i ) const;
+
+        friend bool operator<( const StringBad &st, const StringBad &st2 );
+        friend bool operator>( const StringBad &st, const StringBad &st2 );
+        friend std::ostream &operator<<(std::ostream &os, const StringBad &st );
+        friend std::istream &operator>>(std::istream &is, StringBad &st);
+
+        static int HowMany(){ return num_strings; }
+};
+
+std::ostream &operator<<( std::ostream &os, const StringBad &st );
+std::istream &operator>>(std::istream &is, StringBad &st);
+bool operator<( const StringBad &st, const StringBad &st2 );
+bool operator>( const StringBad &st, const StringBad &st2 );
+
+// StringBad.cpp
+
+using namespace std;
+
+int StringBad::num_strings = 0;
+
+StringBad::StringBad()
+{
+    len = 0;
+    str = new char[1];
+    str[0] = '\0';
+    ++num_strings;
+    cout << num_strings << " : " << str << " object created" << endl;
+}
+
+StringBad::StringBad( const char *s )
+{
+    len = strlen( s );
+    str = new char[len + 1];
+    strcpy( str, s );
+    ++num_strings;
+
+    cout << num_strings << " : " << str << " object created" << endl;
+}
+
+StringBad::StringBad( const StringBad &st ){
+    ++num_strings;
+    len = st.len;
+    str = new char[len + 1];
+    strcpy( str, st.str );
+    cout << num_strings << " object copyed" << endl;
+}
+
+// assign StringBad to StringBad
+StringBad &StringBad::operator=( const StringBad &st ){
+    cout << "= operator run" << endl;
+    if( this == &st )
+        return *this;
+    delete[] str;
+
+    len = st.len;
+    str = new char[len + 1];
+    strcpy(str, st.str);
+    return *this;
+}
+
+// assign C-Style-string to StringBad
+StringBad &StringBad::operator=(const char *s ) {
+    delete[] str;
+    len = strlen(s);
+    str = new char[len + 1];
+    strcpy( str, s );
+    return *this;
+}
+
+// read-write char access for StringBad
+char &StringBad::operator[](int i) {
+    return str[i];
+}
+
+// read-only char access for const StringBad
+const char& StringBad::operator[](int i) const {
+    return str[i];
+}
+
+bool operator<( const StringBad &st1, const StringBad &st2 ) {
+    return strcmp(st1.str, st2.str ) < 0 ;
+}
+
+bool operator>( const StringBad &st1, const StringBad &st2 ){
+    return st2 < st1;
+}
+
+istream &operator>>( istream &is, StringBad &st ){
+    char temp[80];
+    is.get( temp, 80 );
+    if( is )
+        st = temp;
+    while( is && is.get() != '\n' )
+        continue;
+    return is;
+}
+
+ostream &operator<<( ostream &os, const StringBad &st )
+{
+    os << st.str;
+    return os;
+}
+```
+
+### 在构造函数中动态申请内存注意事项
+
+- 多个构造函数只对应一个析构函数，所以使用`new`声明，与使用`new[]`申请的内存，在析构函数中必须使用对应的`delete`与`delete[]`，对于同一个变量，在不同的构造函数中，不允许即使用`new`声明，又使用`new[]`声明。
+
+- 必须定义复制构造函数，通过深度复制将一个对象初始化为另一个对象
+
+- 还需要重载`=`运算符，通过深度复制将一个对象复制给另一个对象
+
+### 使用指向对象的指针
+
+```c++
+Class_name *p_class = new Class_name(value); // 调用构造函数 Class_name(Type_name value);
+Class_name *ptr = new Class_name; // 调用默认构造函数
+
+
+delete p_class; // 使用delete后，才调用 Class_name 的析构函数
+```
+
+## 第13章 类继承
+
+```c++
+// 公有继承
+class A : public B { }
+
+// 派生类的构造函数 需要使用 成员初始化列表来调用 基类构造函数
+A::A( type a, type b ) : B( a, b ) { }
+```
+
+派生类对象可以使用基类对象的`public`方法。
+
+基类的指针和引用可以直接指向或引用派生类对象，但是该指针和引用只能使用在 基类 中有声明的方法。
+
+## 第14章 C++的代码重用
+
+### 包含对象成员的类
+
+### 私有继承
+
+### 从多个基类继承
+
+### 类模板
+
+## 第15章 友元、异常和其他
+
+### 友元类与友元成员函数
+
+### 异常
+
+### RTTI 运行时类型识别
+
+## 第16章 string类与标准模板库
+
+### string类
+
+### 智能指针模板类
+
+### 标准模板库
+
+### 泛型编程
+
+### 函数对象
+
+### 算法
+
+## 第17章 输入 输出和文件
+
+## 第18章 探讨C++新标准
