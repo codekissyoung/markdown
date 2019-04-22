@@ -1,8 +1,8 @@
 # C/C++开发
 
-> - [C与C++编译过程-阮一峰的网络日志](http://www.ruanyifeng.com/blog/2014/11/compiler.html)
-
 本文记录的是编译链接中各个工具的使用。
+
+- [C与C++编译过程-阮一峰的网络日志](http://www.ruanyifeng.com/blog/2014/11/compiler.html)
 
 ## C版本
 

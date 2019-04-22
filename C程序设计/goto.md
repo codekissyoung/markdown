@@ -1,8 +1,10 @@
 # goto
 
-- 每一步的错误处理需要把之前申请或注册成功的资源全部都释放掉,比如 class_create 失败需要注销irq和驱动(因为它们已经成功了,到这一步失败了,那么之前的成功就没有意义了,所以因为一切要恢复到最初的样子),所以这会产生大量重复的代码,free_irq这个函数写了三次,unregister_chrdev写了二次
+c 的 goto 跳转只能存在于函数内部，是一种局部跳转
 
-- c 的 goto 跳转只能存在于函数内部，是一种局部跳转
+## 例子
+
+每一步的错误处理需要把之前申请或注册成功的资源全部都释放掉,比如 class_create 失败需要注销irq和驱动(因为它们已经成功了,到这一步失败了,那么之前的成功就没有意义了,所以因为一切要恢复到最初的样子),所以这会产生大量重复的代码,free_irq这个函数写了三次,unregister_chrdev写了二次
 
 ```c
 retval = request_irq(IRQ_EINT(20), buttons_interrupt, IRQF_DISABLED,

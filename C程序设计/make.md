@@ -1,14 +1,16 @@
 # GNU Make 项目管理
 
-> - [GNU Make Manual](http://www.gnu.org/software/make/manual/make.html#Bugs)
-> - [makefile使用总结](https://www.cnblogs.com/wang_yb/p/3990952.html)
-> - [Make 命令教程-阮一峰的网络日志](http://www.ruanyifeng.com/blog/2015/02/make.html)
-
 代码变成可执行文件，叫做编译`compile`；先编译这个，还是先编译那个（即编译的安排），叫做构建`build`。
 
 `Make`是最常用的构建工具，诞生于1977年，主要用于C语言的项目。但是实际上 ，任何只要某个文件有变化，就要重新构建的项目，都可以用Make构建。
 
 `make`的作用是让 **将源代码转换为可执行文件** 之类的例行性工作自动化，把可执行文件到源代码的依赖关系通过`makefile`告知`make`，然后`make`会根据这些关系以及文件的时间戳判断，应该重新执行哪些步骤，用以编译出可执行文件。
+
+## 参考
+
+> - [GNU Make Manual](http://www.gnu.org/software/make/manual/make.html#Bugs)
+> - [makefile使用总结](https://www.cnblogs.com/wang_yb/p/3990952.html)
+> - [Make 命令教程-阮一峰的网络日志](http://www.ruanyifeng.com/blog/2015/02/make.html)
 
 ## 基本概念
 

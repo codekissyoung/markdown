@@ -1,7 +1,8 @@
 # C零碎的一些知识
 
+C零碎的一些知识，还未整理到我的知识框架里面去。
 
-
+## 零碎的一些知识
 
 对齐处理（Alignment）的标准化（包括_Alignas标志符，alignof运算符，aligned_alloc函数以及<stdalign.h>头文件）。
 
@@ -96,8 +97,11 @@ sizeof关键字：很多人也许会大吃一斤，我类个去，sizeof居然�
 
 typedef关键字： typedef说白了就是给一个已知的类型起一个外号。让我们考虑一个问题：
 
-#define PCHAR char*
+```c
+# define PCHAR char*
 typedef char* pchar;
+```
+
 这两个语句都是给char*类型起一个别名，那么哪个比较好呢？ 要想知道答案，看下面：
 
 PCHAR p1, p2;

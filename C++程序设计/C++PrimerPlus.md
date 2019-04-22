@@ -6,13 +6,11 @@
 
 C语言：数据 + 算法 = 程序
 
-OOP: 强调数据，设计出与问题本质相对应的数据格式。
+OOP: 强调数据，设计出与问题本质相对应的数据格式
 
-泛型编程：强调独立于特定的数据类型，创建出独立于类型的代码。
+泛型编程：强调独立于特定的数据类型，创建出独立于类型的代码
 
 ## 第2章 开始学习C++
-
-C++对大小写敏感。
 
 `函数声明`描述了 函数 与 调用方 之间的接口，指明了 `返回类型` 与 `调用参数列表`。
 
@@ -20,15 +18,15 @@ C++对大小写敏感。
 
 同一个运算符号，在不同的上下文中，作用于不同的对象上，具有不同的含义与表现，即`运算符重载`。
 
-使用一个变量之前必须声明，声明指明了变量的名称以及它的类型，但并不分配内存空间。变量的定义为变量分配了内存空间。如果`a.cpp`需要使用`b.cpp`中定义的`全局变量`，则必须使用`extern`声明它，表明它是来自于其他文件的`全局变量`。当然更一般的做法是，由`b.h`提供`全局变量`的声明，`a.cpp`只需要`#include b.h`即可以使用`b.cpp`中定义的全局变量。
+使用一个变量之前必须声明，声明指明了变量的名称以及它的类型，但并不分配内存空间。
+
+变量的定义为变量分配了内存空间。如果`a.cpp`需要使用`b.cpp`中定义的`全局变量`，则必须使用`extern`声明它，表明它是来自于其他文件的`全局变量`。更一般的做法是，由`b.h`提供`全局变量`的声明，`a.cpp`只需要`#include b.h`即可以使用`b.cpp`中定义的全局变量。
 
 ```c++
 // b.cpp
 const double PI = 3.14159;
-
 // b.h
 extern double PI;
-
 // a.cpp
 #include "b.h"
 cout << PI << endl;
@@ -39,14 +37,9 @@ cout << PI << endl;
 ```c++
 // a.h
 type functionname( argumentlist ); // 函数声明
-
 // a.cpp
 #include "a.h"
-type functionname( argumentlist ) // 函数定义
-{
-    // ...
-}
-
+type functionname( argumentlist ) { } // 函数定义
 // b.cpp
 #include "a.h"
 type a = functionname( b, c, d ); // 函数调用
@@ -56,7 +49,10 @@ type a = functionname( b, c, d ); // 函数调用
 
 OOP的本质是设计并拓展自己的数据类型，自定义数据类型 与 内置类型的使用是一样的。
 
-运算符的 `优先级` 与 `结合性`。`优先级`指示了先进行什么运算，后进行什么运算。`结合性` 在多个相同`优先级`运算符的情况下，是从左往右开始运算，还是从右往左开始运算。
+运算符的 `优先级` 与 `结合性`。
+
+- `优先级`指示了先进行什么运算，后进行什么运算。
+- `结合性` 在多个相同`优先级`运算符的情况下，是从左往右开始运算，还是从右往左开始运算。
 
 C++中有11种整形 与 3种浮点型，不同的数值类型进行运算时，计算机自动为它们进行类型转换后，再运算。
 
@@ -81,7 +77,7 @@ typdeName( value ); // 只有C++支持
 
 ### 数组
 
-元素的类型，数组名，数组中的元素个数。
+数组关键点：元素的类型，数组名，数组中的元素个数。
 
 ```c++
 typeName arrayName[arraySize];
@@ -151,14 +147,14 @@ short (*pas)[20] = &tell; // pas 是一个指针，指向 20 字节的内存块
 
 ## 第7章 函数 C++的编程模块
 
-函数的返回值的类型限制：基本类型、指针、数组、结构体、对象。
+函数的返回值的类型限制：内置类型、指针、数组、结构体、对象。
 
 传递参数：C++通常按值传递，这意味着将数值传递给函数，而后函数将其赋给一个新变量，用于函数内部使用。将一个地址传递给函数，也是按值传递，只不过函数内部可以通过该地址，修改函数外部的值。
 
 如果函数的定义中，将函数的参数声明为引用，则新变量与函数外部变量指向的是同一个数据对象。
 
 ```c++
-void swap( int a, int b );   // 按值传递，变量副本
+void swap( int a, int b );    // 按值传递，变量副本
 void swap2( int *a, int *b ); // 按值传递，要求值时一个地址
 void swap3( int &a, int &b ); // 按引用传递，变量副本 与 外部变量执行同一个数据对象
 
@@ -412,7 +408,6 @@ double rx = x;
 const double *pd;
 long indeed( int );
 
-
 decltype(x) w;      // w is type double
 decltype(rx) u = y; // u is type double &
 decltype(pd) v;     // v is type double *
@@ -500,10 +495,8 @@ veep.access ++; // allowed
 ```c++
 // const.h
 const double Pi = 3.14159;
-
 // a.cpp
 #include "const.h"
-
 // b.cpp
 #include "const.h"
 ```
@@ -513,11 +506,9 @@ const double Pi = 3.14159;
 ```c++
 // const.h
 extern const double Pi;
-
 // const.cpp
 #include "const.h"
 const double Pi = 3.14159;
-
 // a.cpp
 #include "const.h"
 ```
@@ -895,8 +886,7 @@ ostream &operator<<( ostream &os, const StringBad &st )
 
 ```c++
 Class_name *p_class = new Class_name(value); // 调用构造函数 Class_name(Type_name value);
-Class_name *ptr = new Class_name; // 调用默认构造函数
-
+Class_name *ptr     = new Class_name;        // 调用默认构造函数
 
 delete p_class; // 使用delete后，才调用 Class_name 的析构函数
 ```
