@@ -1,5 +1,7 @@
 # 大象 Thingking in UML
 
+本文是《大象 thinking in UML》一书的笔记。
+
 ## 面向过程还是面向对象
 
 ### 面向过程
