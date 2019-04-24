@@ -353,17 +353,46 @@ vector<string> find_urls( const string &s )
 最常见的一种关联数据结构存储了**键-值**对，这种结构每个键与一个值联系起来，并且让我们根据键值可以快速地插入和检索元素，这种结构被称为**关联数组**。C++中最常用的一种关联数组是`map`映射表。
 
 单词计数程序：
+`counters[s]`是一个整型的值，当我们循环读取一个`map`时，需要同时读取`键`和`值`。所以，库提供了**数对**`pair`这种数据类型，它保存了`first`与`second`两个元素。`map`的每一个元素都是一个数对，`first`是**键**,而`second`是**值**。上述程序中，对应的`pair`为`pair<const string, int>`。
 
 ```c++
 string s;
 map<string, int> counters;
-
 while( cin >> s )
     ++counters[s];
-
 cout << counters;
 ```
 
-`counters[s]`是一个整型的值，当我们循环读取一个`map`时，需要同时读取`键`和`值`。所以，库提供了**数对**`pair`这种数据类型，它保存了`first`与`second`两个元素。`map`的每一个元素都是一个数对，`first`是**键**,而`second`是**值**。上述程序中，对应的`pair`为`pair<const string, int>`。
+记录输入的单词，以及单词出现的行数:
 
-P144
+```c++
+// 声明中第二个参数是函数指针，并且默认使用函数为 split
+std::map<std::string, std::vector<int>>
+xref( std::istream &in, std::vector<std::string> (*)(const std::string &) = split );
+
+map<string, vector<int>> xref( istream &in, vector<string> (*explode_words)(const string&) )
+{
+    string line;
+    int line_number = 0;
+    map<string, vector<int>> ret;
+
+    while( getline( in, line ) )
+    {
+        ++line_number;
+        auto words = explode_words( line );
+        for( auto it = words.begin(); it != words.end(); ++it )
+            ret[*it].push_back( line_number );
+    }
+    return ret;
+}
+
+// 测试代码
+auto ret = xref( cin );
+for( auto x : ret )
+{
+    cout << x.first << " : ";
+    cout << x.second;
+}
+```
+
+P 148
