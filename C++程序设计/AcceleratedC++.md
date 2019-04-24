@@ -155,5 +155,215 @@ vector<Student_info> extract_fails( vector<Student_info> &students )
     }
     return fail;
 }
-
 ```
+
+## 第6章 使用库算法
+
+泛型算法是一个不属于任何特定类别容器的算法，它会根据不同的数据类型使用其对应的实现。标准库的泛型算法通常使用迭代器来处理容器里面的元素。
+
+```c++
+// 对容器 c 产生一个迭代器，用于从尾部添加元素，要求容器要支持 push_back() 操作
+back_inserter( c );
+
+// 对容器 c 产生一个迭代器，用于从头部添加元素，要求容器支持 push_front() 操作
+front_inserter( c );
+
+// 判断两个序列是否相等，equal 假定第二个序列与第一个序列长度相等
+equal( c1.begin(), c1.end(), c2.begin() );
+
+// 从序列中查找值
+find( c.begin(), c.end(), value );
+
+// 查找符合 func 条件的元素，返回该元素的迭代器
+find_if( c.begin(), c.end(), func );
+
+// 查找 序列2 在 序列1 中的位置，如果没有找到，则返回 c1.end()
+search( c1.begin(), c1.end(), c2.begin(), c2.end() );
+
+// 使用 func 处理 c1 序列的每个元素，并且将结果添加在 c2 序列的后面
+transform( c1.begin(), c1.end(), back_inserter(c2), func );
+
+// 复制bottom中所有元素，添加到 ret 的末尾
+copy( bottom.begin(), bottom.end(), back_inserter(ret) );
+
+remove( b, e, v )               // [b,e) 删 value
+remove_if( b, e, func )         // [b,e) 删 func 条件
+remove_copy( b, e, r, v )       // [b,e) 删 v，结果存入 r
+remove_copy_if( b, e, r, func ) // [b,e) 删 func 条件，结果存入 r
+
+// 累加求和, 从初始值42开始，将 vec 中的各元素累加，它的返回值类型就是初始值的类型
+accumulate( vec.begin() , vec.end() , 42 );
+// 从空字符串开始，将 vec_str 里每一个元素链接成一个字符串
+accumulate( vec_str.begin(), vec_str.end(), string(" "));
+
+// 分组，将序列里的元素按条件 func 分为两部分，返回指向第二部分的第一个元素的迭代器
+partition( vec.begin(), vec.end(), func );
+
+// 同 partition， 但是分组后 元素 之间的相对顺序 是保留的
+stable_partition( vec.begin(), vec.end(), func );
+```
+
+使用`find_if`改造算法，将句子分割为单词数组。
+
+```c++
+bool space( char c )
+{
+    return isspace( c );
+}
+
+bool not_space( char c )
+{
+    return !isspace( c );
+}
+
+vector<string> split( const string &s )
+{
+    vector<string> ret;
+
+    string::size_type i = 0; // 单词的第一个字符 索引
+    string::size_type j = 0; // 单词的最后一个字符索引的 后一位
+
+    while ( i != s.size() )
+    {
+        // 第一个不是空白的字符，即为单词的开始
+        while ( i != s.size() && space(s[i]) )
+            ++i;
+
+        // 从单词的开始处寻找，第一个空白处即为单词的结束
+        j = i;
+        while ( j != s.size() && not_space(s[j]) )
+            ++j;
+
+        if( i != j )
+        {
+            ret.push_back( s.substr( i, j - i ) );
+            i = j;
+        }
+    }
+
+    return ret;
+}
+
+vector<string> split1( const string &str )
+{
+    vector<string> ret;
+
+    auto b_iter = str.begin();
+
+    while( b_iter != str.end() )
+    {
+        // 第一个不是空白的字符，即为单词的开始，b_iter 即为单词的开始
+        b_iter = find_if( b_iter, str.end(), not_space );
+
+        // 从单词的开始处寻找，第一个空白处即为单词的结束，e_iter即为单词的结束
+        auto e_iter = find_if( b_iter, str.end(), space );
+
+        // 复制[b_iter,e_iter)中的字符
+        if( b_iter != str.end() )
+            ret.push_back( string( b_iter, e_iter ) );
+
+        b_iter = e_iter;
+    }
+    return ret;
+}
+```
+
+判断字符串是回文
+
+```c++
+bool is_palindrome( const string& s )
+{
+    // s.rbegin() 是 s 从逆序开始，作为第二个序列
+    return equal( s.begin(), s.end(), s.rbegin() );
+}
+```
+
+查找一个字符串中的所有 链接
+
+```c++
+using namespace std;
+typedef string::const_iterator iter;
+
+bool not_url_char( char c )
+{
+    // URL 中允许的字符
+    static string url_ch = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                           "abcdefghijklmnopqrstuvwxyz-_.~!*'();:@&=+$,/?#[]";
+    return find( url_ch.begin(), url_ch.end(), c ) == url_ch.end();
+}
+bool url_char( char c )
+{
+    return !not_url_char( c );
+}
+
+iter url_beg( iter b, iter e )
+{
+    static const string sep = "://";
+
+    auto i = b;
+
+    while( (i = search( i, e, sep.begin(), sep.end() ) ) != e )
+    {
+        auto beg = i;
+
+        // 将 beg 往前移动, 第一个不是字母处，即是 url 的开始处
+        while( beg != b && isalpha( *(beg - 1) ) )
+            --beg;
+
+        // 判断是否是一个合格的 beg 的条件
+        // 1. :// 前面必须有字母
+        // 2. :// 后面必须有 url 字符
+        if( beg != i && i + sep.size() != e && url_char( *(i + sep.size()) ) )
+            return beg;
+        else
+            i += sep.size();
+    }
+    return e;
+}
+
+iter url_end( iter b, iter e )
+{
+    return find_if( b, e, not_url_char );
+}
+
+// 查找出字符串里所有的 http: 链接，返回 vec
+vector<string> find_urls( const string &s )
+{
+    vector<string> ret;
+    auto b = s.begin();
+    auto e = s.end();
+    while( b != e )
+    {
+        b = url_beg( b, e );
+        if( b != e )
+        {
+            iter after = url_end( b, e );
+            ret.push_back( string( b, after ) );
+            b = after;
+        }
+    }
+    return ret;
+}
+```
+
+## 第7章 使用关联容器
+
+关联容器提供高效的方法来让我们查找一个包含有特定值，而且有可能同时包含了附加信息的元素。我们可以用容器的一部分来进行高效的查找，这一部分通常称为**键**。比如我们跟踪学生的信息，学生名字可以作为**键**,学生的信息作为**值**。
+
+最常见的一种关联数据结构存储了**键-值**对，这种结构每个键与一个值联系起来，并且让我们根据键值可以快速地插入和检索元素，这种结构被称为**关联数组**。C++中最常用的一种关联数组是`map`映射表。
+
+单词计数程序：
+
+```c++
+string s;
+map<string, int> counters;
+
+while( cin >> s )
+    ++counters[s];
+
+cout << counters;
+```
+
+`counters[s]`是一个整型的值，当我们循环读取一个`map`时，需要同时读取`键`和`值`。所以，库提供了**数对**`pair`这种数据类型，它保存了`first`与`second`两个元素。`map`的每一个元素都是一个数对，`first`是**键**,而`second`是**值**。上述程序中，对应的`pair`为`pair<const string, int>`。
+
+P144
