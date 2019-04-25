@@ -395,4 +395,197 @@ for( auto x : ret )
 }
 ```
 
-P 148
+其他语言的关联数组可能是根据一个名为**散列表**的数据结构实现的，它很快，但是也有缺点：
+
+- 每一种**键**类型，用户都需要提供一个散列函数，用于计算出一个适当的整数
+- 一个散列表的性能对散列函数的细节要求极度敏感
+- 通常找不到一个简单的方法，来按一个有用的顺序检索散列表的元素
+- 键类型仅仅需要`<`运算符
+- 访问一个关联容器中有特定键的元素所耗费的时间，是容器中元素总数目的对数，而不管**键**是什么
+- 关联容器的元素总是根据键来排序的
+
+C++ 的关联容器使用的是**自平衡调节树**，它比最好的散列表数据结构慢，但是它不依赖于用户设计出良好的散列函数，并且它还是自动排序，比**散列表**更加方便。
+
+## 第8章 编写泛型函数
+
+泛型函数的参数类型是我们事先不知道的，直到我们调用了这个函数，我们才会得知。
+
+泛型函数接受任何**适当类型**作为参数，**适当**表明函数对参数的使用方式约束了这个参数的类型。例如，函数的参数`x`与`y`,在函数中进行了`x + y`计算，那么`x`与`y`的类型就必须支持`+`这种运算。
+
+当某一种类型以某种特定的方式支持一个特定的操作集时，这个类型才会是一个**迭代器类型**。
+
+**迭代器**：C++标准库的一个主要贡献是，它确立了一种算法设计思想：算法能够使用迭代器来作为算法与容器之间的“粘合剂”，从而获得数据结构的独立性。此外，算法所用到的迭代器都要求有某些操作，我们能以这些操作为基础而分解算法，这就意味着我们可以把一个容器 和 能够使用这个容器的算法匹配起来。
+
+```c++
+// 具体函数
+double median( vector<double> vec )
+{
+    auto size = vec.size();
+    if( vec.empty() )
+        throw domain_error( "median of an empty vector" );
+    sort( vec.begin(), vec.end() );
+    auto mid = size / 2;
+    return ( size % 2 == 0 ) ? ( vec[mid] + vec[ mid - 1 ] ) / 2 : vec[ mid ];
+}
+
+// 泛型函数
+template <typename T>
+T median( std::vector<T> v )
+{
+    auto size = v.size();
+    if( v.empty() )
+        throw std::domain_error("median of an empty vector");
+    sort( v.begin(), v.end() );
+
+    auto mid = size / 2;
+    return ( size % 2 == 0 ) ? ( v[mid] + v[mid-1] ) / 2 : v[mid];
+}
+```
+
+### 顺序只读访问
+
+```c++
+template <typename In, typename X>
+In my_find( In begin, In end,const X &x )
+{
+    while( begin != end && *begin != x )
+        ++begin;
+    return begin;
+}
+```
+
+### 顺序只写迭代器
+
+`back_inserter(c)`生成的就是一个只写迭代器。
+
+```c++
+// 测试顺序只写访问
+template <typename In, typename Out>
+Out my_copy( In begin, In end, Out dest )
+{
+    while( begin != end )
+        *dest++ = *begin++;  // 要求 dest 是一个可写的迭代器，才可以进行本操作
+    return dest;
+}
+
+vector<int> vec = { 344, 55, 43, 90, 78, 67 };
+vector<int> vec2 = { 1, 2, 3 };
+
+my_copy( vec.begin(), vec.end(), back_inserter(vec2) );
+```
+
+### 顺序读-写访问迭代器
+
+必须支持：
+
+- `*it` 读写
+- `++it` 和 `it++`，但不用支持`--it`和`it--`
+- `it == j` 和 `it != j`，`it`的类型与`j`一样
+- `it->member`作为`(*it).member`的一个替代名
+
+```c++
+// 测试顺序读写访问, 将[beg,end)区间的所有等于 x 的元素替换成 y
+template <typename For, typename X>
+void my_replace( For beg, For end, const X &x, const X &y )
+{
+    while( beg != end )
+    {
+        if( *beg == x )
+            *beg = y;
+        ++beg;
+    }
+}
+vector<int> vec = { 344, 55, 43, 90, 78, 67, 77, 43, 79 };
+my_replace( vec.begin(), vec.end(), 43, 89 );
+```
+
+### 可逆访问迭代器
+
+有时候函数需要按逆向顺序访问一个容器的元素。也就是迭代器要支持`--`以及`++`运算。
+
+```c++
+// 可逆访问例子
+template <typename Bi>
+void my_reverse( Bi begin, Bi end )
+{
+    while( begin != end )
+    {
+        --end;
+        if( begin != end )
+            swap( *begin++, *end );
+    }
+}
+```
+
+### 随机访问迭代器
+
+如果`p`与`q`是随机访问迭代器，`n`是整数的话，那么要满足以下操作：
+
+- `p + n` `p - n` 以及 `n + p` `p - q`
+- `p[n]` 与 `*(p + n )`等价
+- `p < q`，`p > q` 以及 `p >= q`
+
+```c++
+// 随机访问迭代器
+template <typename Ran, class X>
+bool my_binary_search( Ran begin, Ran end, const X &x )
+{
+    while ( begin < end )
+    {
+        Ran mid = begin + ( end - begin ) / 2;
+        if( *mid > x )
+            end = mid;
+        else if( *mid < x )
+            begin = mid + 1;
+        else
+            return true;
+    }
+    return false;
+}
+```
+
+### 输入输出流迭代器
+
+```c++
+vector<int> v;
+// 从标准输入中读整数值，并把它们添加到 v 中
+copy( istream_iterator<int>(cin), istream_iterator<int>(), back_inserter(v) );
+
+// 将整个向量复制到标准输出，也即是输出 v 的元素的，两个元素间以空格分隔
+copy( v.begin(), v.end(), ostream_iterator<int>(cout, " ") );
+```
+
+### 用迭代器来提高适应性
+
+```c++
+// 使用输出迭代器改造，获得更大的适应性
+template <typename Out>
+void split( const std::string &str, Out out )
+{
+    auto i = str.begin();
+    while( i != str.end() )
+    {
+        i = std::find_if( i, str.end(), not_space );
+        auto j = std::find_if( i, str.end(), space );
+        if( i != str.end() )
+            *out++ = std::string( i, j );
+
+        i = j;
+    }
+}
+
+string str = "you are a nice people";
+list<string> list_str;
+split( str, back_inserter(list_str) );
+vector<string> vec_str;
+split( str, back_inserter(vec_str) );
+
+// 直接链接到输出
+string s;
+while( getline(cin, s) )
+    split(s,ostream_iterator<string>(cout, ", "));
+```
+
+## 第9章 定义新类型
+
+P 176
