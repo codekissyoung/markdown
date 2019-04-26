@@ -588,4 +588,122 @@ while( getline(cin, s) )
 
 ## 第9章 定义新类型
 
-P 176
+从第4章的利用结构体封装数据开始，我们开始进行向能够像**内置类型**一样使用的**自定义类型**的改造。
+
+常量对象不能调用声明为`const`的常量成员函数。一个程序即使未创建或任何常量对象，它还是有可能在函数调用过程中，创建许多对常量对象的引用。对于常量引用来说，也是不可以调用非常量成员函数的。
+
+```c++
+struct Student_info{
+    std::string name;
+    double midterm_score;
+    double final_score;
+    std::vector<double> homework;
+
+    std::istream &read( std::istream& );
+    double grade() const;
+};
+
+istream &Student_info::read( std::istream &is )
+{
+    is >> name >> midterm_score >> final_score;
+    read_hw( is, homework );
+    return is;
+}
+
+double Student_info::grade() const  // 常量成员函数
+{
+    return ::grade( midterm_score, final_score, homework );
+}
+```
+
+至此，`Student_info`类型的用户不再直接操作`name`等内部成员，而是通过`read`等成员函数的方式。但是却没有禁止客户端直接操作。因为`struct`的默认成员缺省都是`public`的。
+
+所以我们使用`class`以及`public:` `private`等标识符，用于访问权限控制。
+
+由于不能直接访问`Student_info`内部成员了，但是又有这种需求，这时候可以提供**存取器函数**，用于对内部部分成员的访问。
+
+```c++
+class Student_info{
+    private:
+        std::string name;
+        double midterm_score;
+        double final_score;
+        std::vector<double> homework;
+
+    public:
+        std::istream &read( std::istream& );
+        double grade() const;
+        std::string get_name() const { return name; } // 存取器函数
+};
+
+bool comp_name(const Student_info &x, const Student_info &y)
+{
+    return x.get_name() < y.get_name();
+}
+```
+
+我们再来考虑初始化的问题，要想像**内置类型**一样使用**自定义类型**声明变量：
+
+```c++
+Student_info stu;           // 一个空的 Student_info 对象
+Student_info stu_2(cin);    // 从 cin 读取数据，初始化 s2
+```
+
+那么我们就需要为类声明**构造函数**，用于对象的初始化。
+
+```c++
+class Student_info{
+    public:
+    Student_info();     // 用于构造一个空的对象
+    Student_info(std::istream &); // 用于从 is 流中构造一个对象
+};
+```
+
+我们希望初始化数据以表示我们还没有读取到记录：`homework`是一个空向量，`name`为空字符串，`midterm_score`和`final_score`为0，那么我们的默认构造函数的实现如下：
+
+```c++
+// name与homework这两个成员的初始化工作，分别由string和vector的缺省构造函数完成，这是隐式的
+Student_info::Student_info() : midterm_info(0), final_score(0) {}
+Student_info::Student_info( istream &is ) { read(is); }
+```
+
+创建一个新的类对象需要的操作：
+
+- 分配内存以保存这个对象
+- 按照构造函数初始化程序列表，对对象进行初始化
+- 执行构造函数的函数体
+
+```c++
+vector<Student_info> students;
+Student_info record;
+
+while ( record.read( cin ) )
+    students.push_back( record );
+
+sort( students.begin(), students.end(), comp_name );
+
+for( auto x : students )
+    cout << x.get_name();
+```
+
+## 第10章 管理内存和低级数据结构
+
+略
+
+## 第11章 定义抽象数据类型
+
+至此，`Student_info`还有许多不足之处，比如如何对`Student_info`对象进行复制、赋值以及销毁该对象？我们通过对`vector`类的一个仿写`Vec`来学习这些操作。
+
+P211
+
+## 第12章 使类对象像一个数值一样工作
+
+## 第13章 使用继承与动态绑定
+
+## 第14章 近乎自动地管理内存
+
+## 第15章 再探字符图形
+
+## 第16章 今后如何学习C++
+
+练习！
