@@ -2,48 +2,157 @@
 
 《C++ Primer 第五版》笔记。
 
-## 第一章 编写一个简单的C++程序
+## 第1章 开始
 
-**类型** ： 类型不仅定义了数据元素的内容，还定义了这类数据上可以进行的运算。如果一个名为v的变量的类型为T,则称：v是一个T类型的变量。
-
-C++支持4种程序设计风格：过程式程序设计、数据抽象、面向对象程序设计、泛型程序设计。
-
-- **过程式程序设计**: 专注于设计恰当的数据结构。
-
-- **数据抽象**: 专注于接口的设计以及一般实现细节的隐藏和特殊的表示方式。
-
-- **面向对象**: 专注于类层次的设计、实现和使用。类层次提供了运行时多态和封装机制。
-
-- **泛型程序设计**: 专注于通用算法的设计、实现和使用。通用的含义是：一个算法可以设计成能处理多种类型，只要这些类型满足算法对其实参的要求即可。C++提供的特性是模板，提供了运行时参数多态。比如要对不同类型(整数 小数 字符 字符串 用户定义的类型)的数据进行排序，通常必须为每种类型创建一个排序函数，然而通过写一个泛型函数，就可以将其用于各种实际类型。
-
-### 类简介
-
-一个类定义了一个类型，以及与其关联的一组操作。C++的设计目标就是让用户自定义的类型（类）能够像内置类型一样使用。
+### 简单的书店程序
 
 ```c++
-class Sales_item { ... } // 定义一个类，就是定义了一个类型
-
-int a;
-Sales_item book_gone_with_wind; // 使用自定义的类型，去定义一个变量
+ISBN 国际标准书号   售出册数        单价
+0-201-70353-X       4           24.99
 ```
+
+为了解决卖书的问题，需要编写一个程序，很显然，这个程序需要：
+
+- 定义变量
+- 进行输入和输出
+- 使用数据结构保存数据
+- 检测两条记录是否为同一个ISBN
+- 循环处理销售档案中的每条记录
 
 类的作者决定了在该类型上可以使用的所有操作。比如对于`Sales_item`类，我们希望有的操作为:
 
-- `book_gone_with_wind.isbn()` 获取一本书的 isbn 编号
+- `Sales_item.isbn()` 获取一本书的 isbn 编号
 - 使用`>>`读取，使用`<<`输出 `Sales_item`类型的对象
 - 使用`=`将一个`Sales_item`类型的对象`a`赋值给另一个`Sales_item`对象`b`
 - 使用`+`将两个`Sales_item`类型的对象相加，运算的内部逻辑是将同一本书的销量加总，返回的结果是一个新的`Sales_item`对象
 - 使用`+=`运算符，将一个`Sales_item`对象加到另一个同类型对象上
 
-成员函数`member function`：类的一部分，用于实现类提供的各种操作。也称方法`method`。通常使用`.`号来调用成员函数，如`book.isbn()`。`.`运算符左侧必须为该类型的对象，右侧为函数名调用。
+`Sales_item.h`头文件：
 
-## 第二章 变量和基本类型
+```c++
+#ifndef CPP_SALES_ITEM_H
+#define CPP_SALES_ITEM_H
 
-![WX20190325-152354.png](https://i.loli.net/2019/03/25/5c988226c546d.png)
+#include <iostream>
+#include <string>
 
-比特 bit：0 或 1
+class Sales_item {
 
-字节 byte ：可寻址的最小内存块，一般为8`bit`，计算机将每一个字节与一个数字（即内存地址 address）对应起来，如下图：
+private:
+    std::string isbn;       // 书编号
+    unsigned    units_sold; // 售出次数
+    double      revenue;    // 售出总额
+
+public:
+    Sales_item() : units_sold(0),revenue(0.0) {}
+    explicit Sales_item(const std::string &book) : isbn(book),units_sold(0),revenue(0.0) {}
+    explicit Sales_item(std::istream &is){ is >> *this; }
+
+    friend std::istream &operator>>(std::istream &, Sales_item &);
+    friend std::ostream &operator<<(std::ostream &, const Sales_item &);
+    friend bool operator==(const Sales_item &lhs, const Sales_item &rhs );
+
+    Sales_item &operator+=(const Sales_item &rhs )
+    {
+        units_sold += rhs.units_sold;
+        revenue += rhs.revenue;
+        return *this;
+    }
+
+    double avg_price() const
+    {
+        if(units_sold)
+            return revenue / units_sold;
+        else
+            return 0.0;
+    }
+
+    bool same_isbn(const Sales_item &rhs) const{
+        return isbn == rhs.isbn;
+    }
+};
+
+Sales_item operator+(const Sales_item &lhs, const Sales_item &rhs );
+bool operator==(const Sales_item &lhs, const Sales_item &rhs );
+bool operator!=(const Sales_item &lhs, const Sales_item &rhs );
+std::istream &operator>>(std::istream &, Sales_item &);
+std::ostream &operator<<(std::ostream &, const Sales_item &);
+
+#endif
+```
+
+`Sales_item.cpp`文件：
+
+```c++
+#include "Sales_item.h"
+
+#include <iostream>
+
+using namespace std;
+
+Sales_item operator+(const Sales_item &lhs, const Sales_item &rhs )
+{
+    Sales_item ret( lhs );
+    ret += rhs;
+    return ret;
+}
+
+bool operator==(const Sales_item &lhs, const Sales_item &rhs )
+{
+    return lhs.same_isbn(rhs) && lhs.units_sold == rhs.units_sold && lhs.revenue == rhs.revenue;
+}
+
+bool operator!=(const Sales_item &lhs, const Sales_item &rhs )
+{
+    return !( lhs == rhs );
+}
+
+istream &operator>>(std::istream &is, Sales_item &s )
+{
+    double price;
+    is >> s.isbn >> s.units_sold >> price;
+    if(is)
+        s.revenue = s.units_sold * price;
+    else
+        s = Sales_item();
+    return is;
+}
+
+ostream &operator<<(std::ostream &os, const Sales_item &s)
+{
+    os << s.isbn << "\t" << s.units_sold << "\t" << s.avg_price() << "\t" << s.revenue << endl;
+    return os;
+}
+```
+
+`main.cpp`文件:
+
+```c++
+#include "Sales_item.h"
+
+#include <iostream>
+
+int main( int argc, char *argv[] )
+{
+    using namespace std;
+
+    Sales_item book;
+
+    cout << "录入书籍信息：";
+
+    while( cin >> book ){
+        cout << "ISBN \t sold \t price \t revenue" << endl;
+        cout << book << endl;
+    }
+    return EXIT_SUCCESS;
+}
+```
+
+## 第2章 变量和基本类型
+
+比特`bit`：0 或 1
+
+字节`byte` ：可寻址的最小内存块，一般为8`bit`，计算机将每一个字节与一个数字（即内存地址 address）对应起来，如下图：
 
 ![WX20190325-152726.png](https://i.loli.net/2019/03/25/5c9882ef045d9.png)
 
@@ -51,7 +160,7 @@ Sales_item book_gone_with_wind; // 使用自定义的类型，去定义一个变
 
 在算术表达式中不要使用`char`或`bool`，只有在存放字符或布尔值时才使用它们。因为类型`char`在一些机器上是有符号的，而在另一些上是无符号的，如果使用`char`进行运算，容易出现不符合我们计算预期的问题。如果你需要使用一个不大的整数，那么明确指定它的类型是`signed char`或者`unsigned char`。
 
-### 类型转换
+### 无符号类型的转换
 
 当我们赋给无符号类型一个超出它表示范围的值时，结果是初始值对 无符号类型表示数值的总数 取模后的余数。例如，8bit大小的`unsigned char`可以表示[0,255]（共256个值）区间的值。那么把`-1`赋值给`unsigned char`的实际结果，即 `-1 % 256 = 255`。最终结果是255。
 
@@ -66,37 +175,29 @@ cout << i + i << endl; // -84
 cout << u + i << endl; // int占32位，4294967246
 ```
 
-> 切勿混用 带符号类型 和 无符号类型
+PS：切勿混用 带符号类型 和 无符号类型
 
-### 何为对象？
+**对象 object**：通常情况下，是指一块能存储数据并具有某种类型的内存空间。我们在使用这个词时，并不严格区分是 自定义类 还是 内置类型，也不区分是否命名或是否只读。
 
-对象 object：通常情况下，是指一块能存储数据并具有某种类型的内存空间。我们在使用这个词时，并不严格区分是 自定义类 还是 内置类型，也不区分是否命名或是否只读。
+**初始化**: C++ 中，初始化 与 赋值是完全不同的操作。初始化不是赋值的一种。初始化的含义是创建变量时，赋予其一个初始值。
 
-### 初始化 与 赋值
+**赋值**: 含义是，把对象的当前值擦除，然后以一个新值来代替。
 
-C++ 中，初始化 与 赋值是完全不同的操作。初始化不是赋值的一种。初始化的含义是创建变量时，赋予其一个初始值。而赋值的含义是，把对象的当前值擦除，然后以一个新值来代替。
+**声明 declaration**：使得对象的名字为程序所知，一个文件如果想使用 在别处定义的对象名字，就必须包含对那个名字的声明。
 
-### 声明 与 定义
+**定义 definition**： 负责创建与对象名字关联的实体，定义会申请存储空间、也可能为变量赋予一个初始值。
 
-声明 declaration：使得对象的名字为程序所知，一个文件如果想使用 在别处定义的对象名字，就必须包含对那个名字的声明。
-
-定义 definition： 负责创建与对象名字关联的实体，定义会申请存储空间、也可能为变量赋予一个初始值。
-
-> 变量能且只能被定义一次，但是可以在多个地方被声明，即声明多次。
+PS：变量能且只能被定义一次，但是可以在多个地方被声明，即声明多次。
 
 声明与定义的存在支持了 C++的 分离式编译机制 separate compilation，该机制将程序划分为多个源文件，每个文件可被独立编译。每个文件的对象名字都 **定义** 在自己的文件中，如果需要使用到别的文件的定义，则在本文件的开头 **声明** 一下即可。
 
-### 标识符 与 关键字
-
-![WX20190325-163651.png](https://i.loli.net/2019/03/25/5c989336abf31.png)
-
 ### 作用域 scope
 
-全局作用域 global scope：一旦声明，在整个程序范围内可用。
+**全局作用域 global scope**：一旦声明，在整个程序范围内可用。
 
-块作用域 block scope：从声明到所在 块 block 结束可用。
+**块作用域 block scope**：从声明到所在 块 block 结束可用。
 
-作用域 是 嵌套在一起的，里层的对象 会 屏蔽 外层的同名对象。
+PS: 作用域 是 嵌套在一起的，里层的对象 会 屏蔽 外层的同名对象。
 
 ### 复合类型
 
@@ -111,7 +212,7 @@ int ival = 1024;
 int &refVal = ival; // refVal 指向 ival，是 ival 的另一个名字
 ```
 
-> 引用并非对象，它只是为一个已经存在的对象所起的另外一个名字。
+PS: 引用并非对象，它只是为一个已经存在的对象所起的另外一个名字。
 
 因为引用本身不是一个对象，所以不能定义引用的引用。
 
@@ -207,7 +308,7 @@ decltype( cj ) z;     // 错误，z 是引用 必须初始化
 
 编译器实际不调用函数 f，而是使用当调用发生时，f的返回类型作为 sum 的类型。
 
-## 第三章 字符串 向量 和 数组
+## 第3章 字符串 向量 和 数组
 
 ### using 声明
 
@@ -395,7 +496,7 @@ off-the-end iterator 尾后迭代器、pointer arithmetic 指针运算
 
 direct initialization 直接初始化、copy initialization 拷贝初始化、、值初始化 value initailization
 
-## 第四章 表达式
+## 第4章 表达式
 
 C++提供了一套丰富的运算符，并且定义了运算符作用于内置类型时所执行的操作。作用于类类型时，由程序员指定上述运算符所要执行的操作，称之为 **重载运算符**。使用重载运算符时，运算对象的类型和返回值的类型，都是由该运算符定义；但是运算对象的个数、运算符的优先级和结合律都是无法改变的。
 
@@ -407,7 +508,7 @@ C++提供了一套丰富的运算符，并且定义了运算符作用于内置�
 cout << *pbeg++ << endl; // 输出当前值，并将pbeg向后移动一位
 ```
 
-## 第五章 语句
+## 第5章 语句
 
 异常是在运行时的反常行为，这些行为超出了函数正常功能的范围。
 
@@ -436,7 +537,7 @@ try{
 
 ![WX20190327-150443.png](https://i.loli.net/2019/03/27/5c9b20ae60d91.png)
 
-## 第六章 函数
+## 第6章 函数
 
 ![WX20190327-153903.png](https://i.loli.net/2019/03/27/5c9b28bfcfd6c.png)
 
@@ -530,3 +631,31 @@ PF f1( int );
 F* f1( int );
 auto f1( int ) -> int(*)(int*, int); // 尾置返回类型
 ```
+
+## 第7章 类
+
+## 第8章 IO库
+
+## 第9章 顺序容器
+
+## 第10章 泛型算法
+
+## 第11章 关联容器
+
+## 第12章 动态内存
+
+## 第13章 拷贝控制
+
+## 第14章 重载运算与类型转换
+
+## 第15章 面向对象程序设计
+
+## 第16章 模板与泛型编程
+
+## 第17章 标准库特殊设施
+
+## 第18章 用于大型程序的工具
+
+## 第19章 特殊工具与技术
+
+## 附录A 标准库
