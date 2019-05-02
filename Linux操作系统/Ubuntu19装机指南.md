@@ -1,5 +1,7 @@
 # Ubuntu 19 装机指南
 
+本文是配置`ubuntu 19.04`作为开发机的装机指南。
+
 ## 下载安装
 
 - 下载`Ubuntu 18.04 .iso`镜像
@@ -33,8 +35,6 @@ sudo apt-get install zhcon
 - 优先选择该系统版本上的默认软件,比如`ubuntu 16.04`的默认PHP版本是7.0,那就不要去用7.1的版本,否则会带来很大的麻烦
 
 ## 下载必备软件
-
-- 软件市场，或者网络下载 `Chrome`，`Chromium`， `Vistual Studio Code`
 
 ```bash
 # apt-get 命令
