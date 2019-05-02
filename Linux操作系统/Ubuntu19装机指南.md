@@ -1,4 +1,4 @@
-# Ubuntu18装机指南
+# Ubuntu 19 装机指南
 
 ## 下载安装
 
@@ -38,13 +38,13 @@ sudo apt-get install zhcon
 
 ```bash
 # apt-get 命令
-sudo apt-get update                      更新软件源
-sudo apt-get upgrade　                   从软件源处更新软件
-sudo apt-get autoremove                  自动卸载系统不需要的软件
-apt-cache search keyword                 搜寻软件
-apt-get install package                  安装软件
-apt-get remove package                   删除软件
-apt-get --purge remove package           彻底删除
+sudo apt-get update             更新软件源
+sudo apt-get upgrade            从软件源处更新软件
+sudo apt-get autoremove         自动卸载系统不需要的软件
+apt-cache search keyword        搜寻软件
+apt-get install package         安装软件
+apt-get remove package          删除软件
+apt-get --purge remove package  彻底删除
 
 # aptitude 更强大的的 apt-get 命令
 sudo apt-get install aptitude           安装aptitude
@@ -71,11 +71,11 @@ sudo update-alternatives --config editor 默认编辑设置为vim
 sudo apt-get install git                 安装git
 sudo apt-get install unrar               安装rar解压工具, unrar x test.rar 解压到当前文件夹
 sudo apt-get install zsh                 安装zsh 配置oh-my-zsh
-sudo apt-get install bash-builtins bash-completion bash-doc bash-static  安装bash自动补全工具
 
 sudo apt-get install tmux                用于保持工作现场 [服务器端]
 sudo apt-get install lnav                安装终端看访问日志的神器 lnav观看 [服务器端]
 sudo apt-get install openssh-server      安装ssh-server 可供远程登录 [服务器端]
+sudo apt-get install bash-builtins bash-completion bash-doc bash-static  安装bash自动补全工具
 ```
 
 ## dpkg 管理 Debian软件包
@@ -140,8 +140,11 @@ sudo checkinstall # 构建debian包并且安装
 
 ## 安装 Monaco 字体
 
-- 进入github下载这个字体，github地址是`https://github.com/cstrap/monaco-font`,查看安装说明
-- 应该是: `sudo ./install-font-ubuntu.sh https://github.com/todylu/monaco.ttf/blob/master/monaco.ttf?raw=true` 这个命令
+ 进入github下载这个字体，github地址是`https://github.com/cstrap/monaco-font`,查看安装说明
+
+```bash
+sudo ./install-font-ubuntu.sh https://github.com/todylu/monaco.ttf/blob/master/monaco.ttf?raw=true
+```
 
 ## 解决软件包版本太高问题
 
