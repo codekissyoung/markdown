@@ -177,60 +177,59 @@ cout << u + i << endl; // int占32位，4294967246
 
 PS：切勿混用 带符号类型 和 无符号类型
 
-**对象 object**：通常情况下，是指一块能存储数据并具有某种类型的内存空间。我们在使用这个词时，并不严格区分是 自定义类 还是 内置类型，也不区分是否命名或是否只读。
+**对象`object`**：通常情况下，是指一块能存储数据并具有某种类型的内存空间。我们在使用这个词时，并不严格区分是 自定义类 还是 内置类型，也不区分是否命名或是否只读。
 
 **初始化**: C++ 中，初始化 与 赋值是完全不同的操作。初始化不是赋值的一种。初始化的含义是创建变量时，赋予其一个初始值。
 
+- 定义于函数体内的内置类型的对象如果没有初始化，则其值未定义。
+- 如果是自定义类型的对象，如果没有显式初始化，则其值由自定义类型调用自身的默认构造函数确定。
+
 **赋值**: 含义是，把对象的当前值擦除，然后以一个新值来代替。
 
-**声明 declaration**：使得对象的名字为程序所知，一个文件如果想使用 在别处定义的对象名字，就必须包含对那个名字的声明。
+**声明`declaration`**：使得对象的名字为程序所知，一个文件如果想使用 在别处定义的对象名字，就必须包含对那个名字的声明。
 
-**定义 definition**： 负责创建与对象名字关联的实体，定义会申请存储空间、也可能为变量赋予一个初始值。
+**定义`definition`**： 负责创建与对象名字关联的实体，定义会申请存储空间、也可能为变量赋予一个初始值。
 
 PS：变量能且只能被定义一次，但是可以在多个地方被声明，即声明多次。
 
-声明与定义的存在支持了 C++的 分离式编译机制 separate compilation，该机制将程序划分为多个源文件，每个文件可被独立编译。每个文件的对象名字都 **定义** 在自己的文件中，如果需要使用到别的文件的定义，则在本文件的开头 **声明** 一下即可。
+声明与定义是C++分离式编译机制（将程序划分为可被独立编译的多个源文件）的基础。每个源文件自身的对象都**定义**自身文件中，需使用到别的源文件中定义的对象时，只需在本文件的开头**声明**一下即可。
 
 ### 作用域 scope
 
-**全局作用域 global scope**：一旦声明，在整个程序范围内可用。
+程序中使用到的名字（标识符）不论在程序的哪个位置，都会指向一个特定的实体：变量、函数以及类型。然而，同一个名字如果出现在不同的位置（作用域），也可能指向的是不同的实体。
 
-**块作用域 block scope**：从声明到所在 块 block 结束可用。
+**全局作用域`global scope`**：全局作用域内声明的名字，在整个程序范围内可用。
 
-PS: 作用域 是 嵌套在一起的，里层的对象 会 屏蔽 外层的同名对象。
+**块作用域`block scope`**：`block scope`声明的变量，从声明到所在块`block`结束可用。
+
+PS: 作用域是嵌套在一起的，里层的名字会屏蔽外层的同名变量。如果函数有可能用到某全局变量，则不宜在函数内再定义一个同名的局部变量。
 
 ### 复合类型
 
 C++ 中的复合类型指的是：引用 和 指针。复合类型的定义以其他类型为基础。
 
-引用 reference：为对象起了另外一个名字，是对象的别名。定义引用时，程序把引用和它指向的值 **绑定 bind** 在一起，一旦初始化完成，引用将和它指向的对象一直绑定在一起。
+**引用`reference`**：为对象起了另外一个名字，是对象的别名，实现了对其他对象的间接访问。定义引用时，程序把引用和它指向的值绑定（bind）在一起。
 
-引用无法重新绑定到另外一个对象，所以引用必须初始化。
+一旦初始化完成，引用将和它指向的对象一直绑定在一起。引用无法重新绑定到另外一个对象，所以引用必须初始化。
 
 ```c++
-int ival = 1024;
-int &refVal = ival; // refVal 指向 ival，是 ival 的另一个名字
+int ival        = 1024;
+int &refVal     = ival;   // 正常用法，refVal 与 ival 指向同一块内存，指向同一个对象
+int &refVal3    = refVal; // refVal3 与 refVal 、ival 互为别名
+int &refVal4    = 10;     // cannot bind non-const lvalue reference of type ‘int&’ to an rvalue of type ‘int’
+double &refVal5 = ival;   // cannot bind non-const lvalue reference of type ‘double&’ to an rvalue of ‘double’
+const int cval  = 10;
+int &refCval    = cval;   // binding reference of type ‘int&’ to ‘const int’ discards qualifiers
 ```
 
 PS: 引用并非对象，它只是为一个已经存在的对象所起的另外一个名字。
 
-因为引用本身不是一个对象，所以不能定义引用的引用。
+**指针`pointer`**：是指向（point to）另外一种类型的复合类型，也实现了对其他对象的间接访问。
 
-指针 pointer：是指向（point to）另外一种类型的复合类型，它实际存储的是它所指向的对象的 内存地址。指针本身就是一个对象，允许对指针赋值 和 拷贝，在指针的生命周期内，它可以先后指向几个不同的对象。指针无须在定义时初始化。未初始化的的指针，拥有一个不确定的值。
+- `pointer`实际存储的是它所指向的对象的内存地址，指针本身就是一个对象，允许对指针赋值和拷贝。
+- 在指针的生命周期内，它可以先后指向几个不同的对象。指针无须在定义时初始化。未初始化的的指针，拥有一个不确定的值。
 
-```c++
-int ival = 42;
-int *p = &ival; // p存放变量 ival 的地址，俗称：p是指向ival的指针
-cout << *p;     // 由解引用符 * 得到所指对象的值
-
-// 空指针
-int *p1 = nullptr;
-```
-
-因为引用不是对象，没有实际地址。所以不能定义指向引用的指针。
-
-> **某些符号有多重含义**
-> 像 & 与 * 这样的符号，既能用作表达式里的运算符，也能作为声明的一部分出现，符号的上下文决定了符号的意义。在不同的上下文中，虽然是同一个符号，但是由于含义截然不同，所以我们完全可以把它当做不同的符号来看待。
+**某些符号有多重含义**：像`&`与`*`这样的符号，既能用作表达式里的运算符，也能作为声明的一部分出现，符号的上下文决定了符号的意义。在不同的上下文中，虽然是同一个符号，但是由于含义截然不同，所以我们完全可以把它当做不同的符号来看待。
 
 ```c++
 int i = 42;
@@ -241,13 +240,53 @@ p = &i;       // & 出现在表达式中，是一个取地址符
 int &r2 = *p; // & 是声明的一部分，r2是引用，*是一个解引用符
 ```
 
-### const 变量
+指针的常用例子:
+
+```c++
+int ival        = 42;       // ival
+int *p          = &ival;    // p is pointer to ival
+int *p2         = p;        // p2 equals p
+int &refIval    = ival;     // refIval is reference to ival
+int *pref       = &refIval; // pref is pointer to ival, because refIval equals ival
+double *dp      = &ival;    // cannot convert ‘int*’ to ‘double*’ in initialization
+int &refp       = p;        // invalid conversion from ‘int*’ to ‘int’
+                            // cannot bind rvalue ‘(int)p’ to ‘int&’
+int *np         = nullptr;  // 空指针
+```
+
+PS：不能定义指针的引用。
+PS2：建议初始化所有指针。
+
+### 指向指针的指针 与 指向指针的引用
+
+```c++
+// 指针的指针
+int ival    = 1024;
+int *pi     = &ival;
+int **ppi   = &pi;
+cout << ival << *pi << **ppi << endl;
+
+// 指针的引用
+int *p;       // int pointer p
+int i   = 42; // variable i
+int *&r = p;  // reference to pointer p
+r       = &i; // 修改 r 的值，即等价于修改指针 p 的值
+*r      = 0;  // 对 r 解引用，即等价于对 p 解引用，结果是修改 i 的值
+```
+
+### 常量对象
 
 一个常量对象必须初始化，一旦初始化其值就不能再改变。
 
-默认情况下，const 对象被设定为仅在本文件内有效。当多个文件出现了同名的const变量时，其实等同于在不同文件中分别定义了独立的变量。
+```c++
+const int i = get_size(); // 正确：运行时初始化
+const int j = 42;         // 正确：编译时初始化
+const int k;              // 错误：未初始化
+```
 
-如果我们不希望编译器为每个文件分别生成独立的变量，那么我们可以只在一个文件中定义const，而在其他多个文件中声明并使用它。
+默认情况下，`const`对象被设定为仅在本文件内有效。当多个文件出现了同名的`const`对象时，其实等同于在不同文件中分别定义了独立的变量。
+
+如果我们不希望编译器为每个文件分别生成独立的变量，那么我们可以只在一个文件中定义`const`对象（必须在定义之前添加`extern`关键字），而在其他文件中将包含该常量对象声明的头文件引入，即可以实现在多个源文件中使用同一份常量对象的目的了。
 
 ```c++
 // file1.cc
@@ -257,25 +296,64 @@ extern const int bufSize = 1024;
 extern const int bufSize;
 ```
 
-> 如果要在多个文件之间共享 const 对象，则必须在变量的定义之前添加 extern 关键字。
-
-如果一个对象的引用被声明为`const`，那么将无法通过该引用去修改对象的值。
+常量引用的使用范例：
 
 ```c++
-int i = 42;
-int &r1 = i;
+int i         = 42;
+double dval   = 3.14;
+
+int &r1       = i; // 正常使用引用
+r1 = 43;
+
 const int &r2 = i;
-r1 = 0;   // 正确
-r2 = 10;  // 错误，r2 是一个常量引用
+r2 = 44;        // error: assignment of read-only reference ‘r2’
+
+// 常量引用可以直接指向字面量，而普通引用却不可以
+const int &r3 = 45;
+const int &r4 = r2 * 2;
+int &r5       = r2 * 2;// error: cannot bind non-const lvalue reference of type ‘int&’ to an rvalue of type ‘int’
+
+// int 的常量引用可以指向 double 类型，为什么？
+const int &r6 = dval;
+int &r7 = dval;// error: cannot bind non-const lvalue reference of type ‘int&’ to an rvalue of type ‘int’
 ```
 
-### constexpr
+**临时变量（temporary**：所谓的临时变量，就是编译器需要一个空间来暂存表达式的求值结果，这个空间是一个未命名的对象，就是临时变量。
 
-C++11新规定，变量声明为`constexpr`，表示由编译器来验证变量的值，是否是一个常量表达式。
+上面的范例中，`r2 * 2`就产生了一个临时变量，常量引用因为可以保证不会改变这个临时变量的值，所以可以用来绑定临时变量，而普通引用`r5`则不能绑定到该临时变量。
+
+`r6`之所以可以绑定，也是因为这个原因，相当于执行了下面两句：
+
+```c++
+const int temp = dval; // 隐式转换 double -> int
+const int &ri = temp;  // 常量引用绑定到临时变量上了
+```
+
+常量与指针的范例:
+
+```c++
+double dval         = 3.14;
+const double pi     = 3.14;
+
+double *ptr         = &pi; // error: invalid conversion from ‘const double*’ to ‘double*’
+
+const double *cptr  = &pi;
+*cptr               = 42; // error: assignment of read-only location ‘* cptr’
+
+cptr                = &dval;
+*cptr               = 42; // error: assignment of read-only location ‘* cptr’
+
+int errNumb         = 0;
+int *const curErr   = &errNumb; // curErr 永远指向 errNumb,并且可以通过 curErr 修改 errNumb
+```
+
+使用更加强力的`constexpr`，让编译器去验证：即将声明的变量一定是一个常量，而且必须用常量表达式初始化，它所修饰的变量一定是编译期可求值的。
 
 ```c++
 constexpr int sz = size(); // 只有当 size() 在编译时能返回一个常量，才编译正确
 ```
+
+`constexpr`是一种强有力的约束，更好的保证程序的正确语义不被破坏。编译器在编译期间对`constexpr`的代码会进行非常大的优化，比如将用到`constexpr`表达式的地方，都替换成最终结果等。
 
 ### 类型别名
 
@@ -287,18 +365,14 @@ using SI = Sales_item; // SI 是 Sales_item类型 的别名
 typedef char *pstring; // pstring 是 char * 的别名
 ```
 
-### auto 关键字
+### 编译器自动推断类型
 
 ```c++
 auto item = val1 + val2; // 编译器自动推断 item 的类型
 ```
 
-### decltype 类型指示符
-
-为了从表达式的类型推断出要定义的变量的类型，但是不想用该表达式的值初始化变量。
-
 ```c++
-decltype(f()) sum = x; // sum 的类型就是函数f的返回类型
+decltype(f()) sum = x; // 函数f的返回类型就是sum的类型
 
 const int ci = 0, &cj = ci;
 decltype( ci ) x = 0; // x 的类型为 const int
@@ -306,7 +380,7 @@ decltype( cj ) y = x; // y 的类型为 const int&，y绑定到变量x
 decltype( cj ) z;     // 错误，z 是引用 必须初始化
 ```
 
-编译器实际不调用函数 f，而是使用当调用发生时，f的返回类型作为 sum 的类型。
+编译器实际不调用函数f，而是取f的返回类型作为 sum 的类型。
 
 ## 第3章 字符串 向量 和 数组
 
@@ -316,7 +390,7 @@ decltype( cj ) z;     // 错误，z 是引用 必须初始化
 using namespace std;
 ```
 
-位于头文件的代码，不应该使用`using`声明。这是因为，头文件中的代码会拷贝内容到所有引用它的文件中，可能不经意间引起名字冲突。
+PS：位于头文件的代码，不应该使用`using`声明。这是因为，头文件中的代码会拷贝内容到所有引用它的文件中，可能不经意间引起名字冲突。
 
 ### 直接初始化 和 拷贝初始化
 
@@ -328,15 +402,7 @@ string s2("hiya");  // 直接初始化
 string s3(10, 'c'); // 直接初始化，s3内容为 ccccccccc
 ```
 
-### 对象
-
 一个类要规定好初始化其对象的方式，还要通过成员方法、运算符重载等方式定义能在对象上执行的操作。
-
-![WX20190326-165723.png](https://i.loli.net/2019/03/26/5c99e98cdc3ee.png)
-
-`cin >> str;`中`string`对象会自动忽略开头的空白字符，并从第一个真正的字符开始读起，直到遇见下一处空白为止。
-
-> str.size() 返回的类型 string::size_type 类型，很明显是`unsigned`类型，假如有一`int`负值 `n`，那么`str.size() < n`的判定可能为`true`,因为`signed`类型与`unsigned`类型进行比较，`signed`类型会转换成`unsigned`类型，即一个较大的正数。
 
 ### 使用C++版本的C标准库头文件
 
@@ -347,18 +413,14 @@ string s3(10, 'c'); // 直接初始化，s3内容为 ccccccccc
 
 `<cctype>`与`<ctype.h>`的内容是一样的，在`<cctype>`中的定义的名字都在`std::`中，而`<ctype.h>`则不是。
 
-![WX20190326-172237.png](https://i.loli.net/2019/03/26/5c99ef7b19f5b.png)
-
 ### Range for语句
 
 ```c++
-for( auto x : 序列 )
-{
+for( auto x : 序列 ){
     // x 为序列中每个元素的副本
 }
 
-for( auto &y : 序列 )
-{
+for( auto &y : 序列 ){
     // y 依次是序列中每个元素的引用，对 y 的操作，就是对序列的操作
 }
 ```
@@ -378,7 +440,7 @@ for ( decltype( s.size() ) index = 0; index != s.size() && !isspace(s[index]); +
 
 `vector`表示对象的集合，集合中所有对象的类型都相同。集合中每个对象都有一个数字索引与之对应。因为`vector`容纳着其他对象，所以也称为容器。
 
-`vector`的本质是一个 **类模板 class template**，程序员可以编写类，编译器也可以生成类，模板可以看成是程序员编写的，给编译器生成类的一份说明。编译器根据模板创建类的过程 称为 **实例化 instantiation**。当使用模板时，程序员需要提供信息，用于指示编译器应把类实例化成何种类型。
+`vector`的本质是一个 **类模板 `class template`**，程序员可以编写类，编译器也可以生成类，模板可以看成是程序员编写的，给编译器生成类的一份说明。编译器根据模板创建类的过程 称为 **实例化`instantiation`**。当使用模板时，程序员需要提供信息，用于指示编译器应把类实例化成何种类型。
 
 ```c++
 vector<int> ivec;              // 指示 实例化成 int 类型
@@ -388,12 +450,11 @@ vector< vector<string> > file; // 该向量的元素 也是 向量
 
 `vector`是模板，不是类型。编译器根据模板`vector`生成了三种类型：`vector<int>`、`vector<Sales_item>` 和 `vector< vector<string> >`类型。
 
-![WX20190326-181822.png](https://i.loli.net/2019/03/26/5c99fc8227ca9.png)
 
 ```c++
 vector<int> ivec { 3, 4, 5, 6, 7}; // 列表初始化
-vector<int> ivec2( ivec ); // 把ivec的元素拷贝给ivec2
-vector<int> ivec3 = ivec;  // 把ivec的元素拷贝给ivec3
+vector<int> ivec2( ivec );         // 使用ivec初始化ivec2
+vector<int> ivec3 = ivec;          // 把ivec的元素拷贝给ivec3
 ```
 
 如果`vector`对象中元素的类型不支持默认初始化，那么`vector`的初始化必须提供初始的元素值。
@@ -403,11 +464,9 @@ vector<int> v1( 10, 1 ); // 10个元素，每个元素都是1
 vector<int> v2{ 10, 1 }; // 两个元素, 10 和 1
 ```
 
-![WX20190326-191607.png](https://i.loli.net/2019/03/26/5c9a0a0db94f0.png)
-
 在循环体内部，如果有向 `vector` 对象添加元素的操作，则要求不能使用`for( auto x : vec )`循环。
 
-`vector`的下标只能用于去访问已经存在的元素，如果用下标的形式去访问一个不存在的元素，这种错误不会被编译器发现，而是在运行时会产生一个不可预知的值，可能会导致 **缓冲区溢出 buffer overflow** 错误。当然，使用下标为`vector`添加新元素也是不可行的。
+`vector`的下标只能用于去访问已经存在的元素，如果用下标的形式去访问一个不存在的元素，这种错误不会被编译器发现，而是在运行时会产生一个不可预知的值，可能会导致 **缓冲区溢出`buffer overflow`** 错误。当然，使用下标为`vector`添加新元素也是不可行的。
 
 ### 迭代器介绍
 
@@ -449,11 +508,11 @@ string::const_iterator it4;
 
 `begin()`与`end()`返回的是迭代器，如果是对象是常量，则返回`const_iterator`，否则返回`iterator`类型的迭代器。
 
-> **某些对vector对象的操作会使迭代器失效**
-> 与`for( auto x : vec )`类似的，在使用迭代器操作容器内元素时，如果容器内元素的个数发生变化（比如调用了`vec.push_back()`），会使容器的的迭代器失效。
-> 谨记：凡是使用了迭代器的循环体，都不要向迭代器所属的容器添加元素。
+**某些对`vector`对象的操作会使迭代器失效**：与`for( auto x : vec )`类似的，在使用迭代器操作容器内元素时，如果容器内元素的个数发生变化（比如调用了`vec.push_back()`），会使容器的的迭代器失效。
 
-所有标准库容器都提供`++`、`==`与`!=`运算，`string`与`vector`提供更多额外的运算。
+PS：凡是使用了迭代器的循环体，都不要向迭代器所属的容器添加元素。
+
+所有标准库容器都提供`++`、`==`与`!=`运算，`string`与`vector`提供更多额外的运算：
 
 ![WX20190326-204340.png](https://i.loli.net/2019/03/26/5c9a1e9aa6315.png)
 
@@ -487,14 +546,6 @@ int *beg = begin( ia ); // 获取指向首元素的指针
 int *end = end( ia );   // 获取指向尾元素下一个位置的指针
 vector<int> ivec( begin( ia ), end( ia ) );  // 使用数组初始化 vecotr
 ```
-
-缓冲区溢出 buffer overflow、C-style string、class template、compiler extension 编译器拓展、container 容器、
-
-index 索引、instantiation 实例化、iterator 迭代器、迭代器运算 iterator arithmetic
-
-off-the-end iterator 尾后迭代器、pointer arithmetic 指针运算
-
-direct initialization 直接初始化、copy initialization 拷贝初始化、、值初始化 value initailization
 
 ## 第4章 表达式
 
@@ -530,10 +581,7 @@ try{
 }
 ```
 
-> **异常安全**
-> 异常中断了程序的正常流程。异常发生时，调用者请求的一部分计算可能已经完成了，另一部分尚未完成。
-> 这就有可能导致部分资源未能够正常释放。
-> 那些在异常发生期间正确执行了“清理”工作的代码，被称为是 **异常安全** 的代码。这就要求我们必须时刻清楚异常何时会发生，异常发生后程序应如何确保对象有效、资源无泄漏、程序处于合理的状态。
+**异常安全**：异常中断了程序的正常流程。异常发生时，调用者请求的一部分计算可能已经完成了，另一部分尚未完成。这就有可能导致部分资源未能够正常释放。那些在异常发生期间正确执行了“清理”工作的代码，被称为是 **异常安全** 的代码。这就要求我们必须时刻清楚异常何时会发生，异常发生后程序应如何确保对象有效、资源无泄漏、程序处于合理的状态。
 
 ![WX20190327-150443.png](https://i.loli.net/2019/03/27/5c9b20ae60d91.png)
 

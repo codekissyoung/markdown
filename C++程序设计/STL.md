@@ -63,6 +63,12 @@ string adc( 100, '*' ); // 初始化字符串为 100 个 * 号
 string::size_type cols = abc.size() + 2; // 保存字符串的长度
 ```
 
+![WX20190326-165723.png](https://i.loli.net/2019/03/26/5c99e98cdc3ee.png)
+
+`cin >> str;`中`string`对象会自动忽略开头的空白字符，并从第一个真正的字符开始读起，直到遇见下一处空白为止。
+
+`str.size()`返回的类型`string::size_type`类型，很明显是`unsigned`类型，假如有一`int`负值 `n`，那么`str.size() < n`的判定可能为`true`,因为`signed`类型与`unsigned`类型进行比较，`signed`类型会转换成`unsigned`类型，即一个较大的正数。
+
 ## vector
 
 `vector`不仅存储数据元素，还存储元素的个数。第一个数据元素的索引号是`0`、第二个是`1`,依次类推。所有的数据元素要求为同一种数据类型。
@@ -76,6 +82,11 @@ vec.push_back( 4.5 );   // 添加新元素到`vector`中
 for(int i = 0; i < vec.size(); ++i)
     cout << vec[i] << endl;
 ```
+
+![WX20190326-181822.png](https://i.loli.net/2019/03/26/5c99fc8227ca9.png)
+
+![WX20190326-191607.png](https://i.loli.net/2019/03/26/5c9a0a0db94f0.png)
+
 
 ## vector、list、string
 
@@ -120,3 +131,7 @@ list 类型是为了高效地在容器中任何位置插入和删除元素而被
 l.sort();
 l.sort(cmp); 使用 cmp 来排序 list 中的元素
 ```
+
+## cctype
+
+![WX20190326-172237.png](https://i.loli.net/2019/03/26/5c99ef7b19f5b.png)

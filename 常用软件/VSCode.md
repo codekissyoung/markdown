@@ -1,5 +1,19 @@
 # Vistual Studio Code 编辑器使用
 
+`Vistual Studio Code`编辑器常用设置和插件。
+
+## 常用设置
+
+```json
+{
+    "editor.fontFamily": "ubuntu mono",
+    "markdown.preview.fontFamily": "'Ubuntu mono', 'Droid Sans', sans-serif",
+    "editor.detectIndentation": false,
+    "editor.fontSize": 16,  // 调整编辑器字体大小
+    "window.zoomLevel": 1   // 调整系统界面大小
+}
+```
+
 ## SFTP 插件
 
 - 作者: `liximomo`

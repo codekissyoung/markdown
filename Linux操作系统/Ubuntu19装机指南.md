@@ -72,6 +72,7 @@ sudo apt-get install git                 安装git
 sudo apt-get install unrar               安装rar解压工具, unrar x test.rar 解压到当前文件夹
 sudo apt-get install zsh                 安装zsh 配置oh-my-zsh
 
+sudo apt-get install bless               安装二进制查看与编辑器
 sudo apt-get install tmux                用于保持工作现场 [服务器端]
 sudo apt-get install lnav                安装终端看访问日志的神器 lnav观看 [服务器端]
 sudo apt-get install openssh-server      安装ssh-server 可供远程登录 [服务器端]
