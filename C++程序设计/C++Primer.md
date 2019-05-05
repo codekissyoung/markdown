@@ -318,7 +318,7 @@ const int &r6 = dval;
 int &r7 = dval;// error: cannot bind non-const lvalue reference of type ‘int&’ to an rvalue of type ‘int’
 ```
 
-**临时变量（temporary**：所谓的临时变量，就是编译器需要一个空间来暂存表达式的求值结果，这个空间是一个未命名的对象，就是临时变量。
+**临时变量`temporary`**：所谓的临时变量，就是编译器需要一个空间来暂存表达式的求值结果，这个空间是一个未命名的对象，就是临时变量。
 
 上面的范例中，`r2 * 2`就产生了一个临时变量，常量引用因为可以保证不会改变这个临时变量的值，所以可以用来绑定临时变量，而普通引用`r5`则不能绑定到该临时变量。
 
@@ -384,10 +384,11 @@ decltype( cj ) z;     // 错误，z 是引用 必须初始化
 
 ## 第3章 字符串 向量 和 数组
 
-### using 声明
+### 命名空间
 
 ```c++
 using namespace std;
+using namespace::name;
 ```
 
 PS：位于头文件的代码，不应该使用`using`声明。这是因为，头文件中的代码会拷贝内容到所有引用它的文件中，可能不经意间引起名字冲突。
@@ -397,9 +398,11 @@ PS：位于头文件的代码，不应该使用`using`声明。这是因为，�
 如果使用`=`初始化一个变量，执行的就是 **拷贝初始化**，编译器将右侧的初始值拷贝到新创建的对象中。
 
 ```c++
-string s1 = "hiya"; // 拷贝初始化
+string s;           // 默认初始化，s是一个空字符串
+string s1 = "hiya"; // 拷贝初始化，s1是字符串字面量的一个副本
 string s2("hiya");  // 直接初始化
 string s3(10, 'c'); // 直接初始化，s3内容为 ccccccccc
+string s4 = string(10, 'd'); // 拷贝初始化，会创建一个临时对象用于拷贝
 ```
 
 一个类要规定好初始化其对象的方式，还要通过成员方法、运算符重载等方式定义能在对象上执行的操作。
@@ -428,6 +431,7 @@ for( auto &y : 序列 ){
 ### 使用下标处理序列
 
 ```c++
+string s = "some thing";
 for ( decltype( s.size() ) index = 0; index != s.size() && !isspace(s[index]); ++index )
 {
     s[index] = toupper( s[index] ); // 将当前字符改写成大写形式
@@ -472,10 +476,14 @@ vector<int> v2{ 10, 1 }; // 两个元素, 10 和 1
 
 迭代器用于访问容器中的元素。标准库中定义的容器都支持使用迭代器。类似于指针，迭代器提供了对对象（容器中的元素）的间接访问。
 
+对迭代器的理解：我们认定某个类型是迭代器，是因为这个类型支持一组操作，这组操作能够访问到容器里的元素，并且能够递增、递减遍历每一个元素。每个容器都定义了一个迭代器类型，名为`iterator`，该类型支持迭代器概念规定的一组操作。
+
 ```c++
-auto b = vec.begin(); // begin() 返回指向第一个元素的迭代器
-auto e = vec.end();   // end() 返回最后一个元素的"下一个位置"的迭代器
+auto b = vec.begin(); // 返回指向第一个元素的迭代器
+auto e = vec.end();   // 返回指向尾后元素(最后一个元素的"下一个位置")的迭代器
 ```
+
+PS：如果容器为空的话，begin与end返回的是同一个迭代器，即尾后迭代器。
 
 ![WX20190326-194958.png](https://i.loli.net/2019/03/26/5c9a11f884bb4.png)
 
@@ -495,26 +503,16 @@ for( auto it = s.begin(); it != s.end() && !isspace(*it); ++it )
 
 因为在标准库的容器中，所有的容器都定义了`==`与`!=`运算符的操作，而大多数都没有定义`<`操作。所以，使用`!=`能够在标准库提供的所有容器上都有效。建议养成使用迭代器和`!=`的习惯，这样就不用太在意用的到底是哪种容器。
 
-对迭代器的理解：我们认定某个类型是迭代器，是因为这个类型支持一组操作，这组操作能够访问到容器里的元素，并且能够递增、递减遍历每一个元素。每个容器都定义了一个迭代器类型，名为`iterator`，该类型支持迭代器概念规定的一组操作。
-
-```c++
-vector<int>::iterator it; // it 能读写 vector<int> 的元素
-string::iterator it2;     // it2 能读写 string 对象中的字符
-
-// 还有一个 const_iterator，表示只能读元素，不能写元素
-vector<int>::const_iterator it3;
-string::const_iterator it4;
-```
-
 `begin()`与`end()`返回的是迭代器，如果是对象是常量，则返回`const_iterator`，否则返回`iterator`类型的迭代器。
 
-**某些对`vector`对象的操作会使迭代器失效**：与`for( auto x : vec )`类似的，在使用迭代器操作容器内元素时，如果容器内元素的个数发生变化（比如调用了`vec.push_back()`），会使容器的的迭代器失效。
+```c++
+vector<int>::iterator it = vec.begin();         // it 能读写 vector<int> 的元素
+vector<int>::const_iterator it2 = vec.cbegin(); // 只能使用it2读取元素，不能写元素
+```
 
-PS：凡是使用了迭代器的循环体，都不要向迭代器所属的容器添加元素。
+与`for( auto x : vec )`类似的，在使用迭代器操作容器内元素时，如果容器内元素的个数发生变化（比如调用了`vec.push_back()`），会使容器的的迭代器失效。
 
-所有标准库容器都提供`++`、`==`与`!=`运算，`string`与`vector`提供更多额外的运算：
-
-![WX20190326-204340.png](https://i.loli.net/2019/03/26/5c9a1e9aa6315.png)
+PS：凡是使用了迭代器的循环体，都不要向迭代器所属的容器添加或删除元素。
 
 使用迭代器完成的二分搜索：
 
@@ -534,7 +532,7 @@ while( mid != end && *mid != target ) // 当还有元素未检查到，并且中
 }
 ```
 
-### 指针也是迭代器
+### 数组
 
 `vector`与`string`迭代器支持的运算，数组的指针全都支持。例如`++`、`--`改变指针指向的元素，遍历数组中的元素。当然，这需要先获得指向数组第一个元素的指针，类似于`vec.begin()`操作。而`vec.end()`操作，则可以用`int *e = &arr[ sizeof(arr) ]` 代替，即获得最后一个元素的下一个位置。
 
@@ -549,95 +547,116 @@ vector<int> ivec( begin( ia ), end( ia ) );  // 使用数组初始化 vecotr
 
 ## 第4章 表达式
 
-C++提供了一套丰富的运算符，并且定义了运算符作用于内置类型时所执行的操作。作用于类类型时，由程序员指定上述运算符所要执行的操作，称之为 **重载运算符**。使用重载运算符时，运算对象的类型和返回值的类型，都是由该运算符定义；但是运算对象的个数、运算符的优先级和结合律都是无法改变的。
+C++提供了一套丰富的运算符，并且定义了运算符作用于内置类型时所执行的操作。
 
-**一元运算符**、**二元运算符**、**三元运算符**、函数调用可以看做特殊的运算符，它对运算对象的个数没有限制。
+### 运算符重载
 
-下面这种混合使用解引用和递增运算符的做法，在C++与C中是非常广泛的，要习惯这种写法。
+运算符作用于类类型时，由程序员指定上述运算符所要执行的操作，称之为 **重载运算符**。使用重载运算符时，运算对象的类型和返回值的类型，都是由该运算符定义；但是运算对象的个数、运算符的优先级和结合律都是无法改变的。
+
+### 类型转换
+
+一般情况下，二元运算符要求两个运算对象的类型相同。当两个运算对象的类型不同时，编译器会尝试将它们转换成同一种类型。比如，整型转换为浮点数型。
 
 ```c++
-cout << *pbeg++ << endl; // 输出当前值，并将pbeg向后移动一位
+double slope = static_cast<double>(j) / i;  // 强制转换为 double 类型
+const char *pc;
+char *p = const_cast<char*>(pc);            // 去掉 pc 的const 属性
 ```
+
+PS：强制类型转换干扰了正常的类型检查，强烈建议避免使用强制类型转换。
+
+### 左值与右值
+
+当对象用作右值时，用的是对象的值（内容）；当对象用作左值时，用的是对象在内存中的位置，这个位置要求是可以写入的。
+
+### 结合律与优先级
+
+括号无视优先级和结合律。
 
 ## 第5章 语句
 
-异常是在运行时的反常行为，这些行为超出了函数正常功能的范围。
+### try语句块和异常处理
 
-典型的异常包括失去数据库连接、意外的的输入等。
+异常是在运行时的反常行为，这些行为超出了函数正常功能的范围。典型的异常包括失去数据库连接、意外的的输入等。
 
 检测出异常的代码，无须知道如何处理异常、只需发出某种信号以表明程序遇到了故障。通常也会设计专门的异常处理代码。
 
-`throw`语句用于检测出异常的代码，用来通知发生异常。`try-catch` 语句块则用来捕获并处理异常。一套异常类，用于在`throw`和`catch`之间传递异常信息。
+C++的异常处理包括：
+
+- `throw`语句用于检测出异常的代码，用来通知发生异常。
+- `try-catch` 语句块则用来捕获并处理异常。
+- 一套异常类，用于在`throw`和`catch`之间传递异常信息。
 
 ```c++
 try{
     // 正常代码
-}catch( 异常声明1 )
-{
+}catch( 异常声明1 ){
     // 处理异常
-}catch( 异常声明2 )
-{
+}catch( runtime_error err ){
     // 处理异常
 }
 ```
 
-**异常安全**：异常中断了程序的正常流程。异常发生时，调用者请求的一部分计算可能已经完成了，另一部分尚未完成。这就有可能导致部分资源未能够正常释放。那些在异常发生期间正确执行了“清理”工作的代码，被称为是 **异常安全** 的代码。这就要求我们必须时刻清楚异常何时会发生，异常发生后程序应如何确保对象有效、资源无泄漏、程序处于合理的状态。
-
-![WX20190327-150443.png](https://i.loli.net/2019/03/27/5c9b20ae60d91.png)
+**异常安全**：异常中断了程序的正常流程。异常发生时，调用者请求的一部分计算可能已经完成了，另一部分尚未完成。这就有可能导致部分资源未能够正常释放。那些在异常发生期间正确执行了清理工作的代码，被称为是**异常安全**的代码。这就要求我们必须时刻清楚异常何时会发生，异常发生后程序应如何确保对象有效、资源无泄漏、程序处于合理的状态。
 
 ## 第6章 函数
 
-![WX20190327-153903.png](https://i.loli.net/2019/03/27/5c9b28bfcfd6c.png)
+函数是一个命名了的代码块，我们通过调用函数执行相应代码。函数可以有0个或多个参数，并且通常只返回一个结果。可以重载函数，也就是说，同一个函数名字可以对应几个不同的函数。
 
-切记，不要返回局部对象的引用或指针。
+### 函数传值与函数返回
 
-### inline 内联函数
+- **按值传递** ：调用处，初始值拷贝到函数变量中使用，函数内对变量的改动不会影响到初始值。
+- **按指针传递** ：本质也是按值传递，拷贝的是指针的值，拷贝后两个指针是不同的指针。两个指针都可以间接地访问它所指的对象。
+- **按引用传递** ：初始值的名字与引用的名字绑定到同一个对象，对引用的操作，即是对初始值对象的操作。
+
+PS：将函数内不会改变其值的形参，定义成常量引用，而不是普通引用。
+
+### 返回数组的函数
+
+由于数组不能被拷贝，所以函数只能返回数组的指针或引用。定义一个返回数组的指针或引用的函数，是比较繁琐的：
+
+```c++
+int arr[10];   // arr 是含有10个整型元素的数组
+int *p1[10];   // p1 是一个含有10个整型指针元素的数组
+int (*p2)[10]; // p2 是一个指针，它指向含有10个整型元素的数组
+```
+
+根据上述分析，函数定义一般为`返回类型 函数名( 函数参数 )`, 所以一个返回10个整型元素的数组的指针的函数定义为：
+
+```c++
+int (*)[10] func( int a ) { }      // 想当然的 错误写法
+
+int (*func(int a))[10] { }         // 正确的函数定义，却非常怪异的写法
+
+
+typedef int (*pArr)[10];           // 使用 typedef 或 using 简化后，可以更加清晰的定义这个函数
+// 或 using pArr = int (*)[10];
+pArr func(int a) { }               // 清晰而正确的定义
+
+auto func1( int a ) -> int(*)[10] { } // 使用后置返回类型，也可以比较清晰的定义这个函数
+```
+
+PS：函数内不要返回局部对象的引用或指针。
+
+### 内联函数 与 constexpr函数
+
+`constexpr`是指能用于常量表达式的函数。它表明函数遵守几项约定：函数的返回类型及所有形参的类型都是字面值类型，并且函数体中必须有且仅有一条`return`语句。
 
 ```c++
 inline const string& shorterString( const string &s1, const string &s2 )
 {
     return s1.size() <= s2.size() ? s1 : s2;
 }
-```
 
-### constexpr 函数
-
-constexpr 是指能用于常量表达式的函数。它表明函数遵守几项约定：函数的返回类型及所有形参的类型都是字面值类型，并且函数体中必须有且仅有一条`return`语句。
-
-```c++
-constexpr int new_sz
-{
-    return 42;
-}
+constexpr int new_sz() { return 42; }
 constexpr int foo = new_sz();
 ```
 
-> 内联函数 与 constexpr 函数需要定义在`.h`文件中。
-
-### 调试手段assert 和 NDEBUG 预处理变量
-
-```c++
-assert( expr ); // 如果 expr 为假，则输出出错信息，并停止程序运行；为真，则忽略
-```
-
-如果`#define NDEBUG`，则`assert`什么也不做。默认状态下没有定义`NDEBUG`，此时`assert`将执行运行时检查。
-
-```bash
-$CC -D NDEBUG main.c -o main      # 编译时，指定关闭运行时检查
-```
-
-条件编译
-
-```c++
-void print( const int ia[], size_t size )
-{
-    #ifndef NDEBUG
-        cerr << __func__ << ": array size is " << size << endl;
-    #endif
-}
-```
+PS：内联函数与`constexpr`函数需要定义在`.h`文件中。
 
 ### 重载函数匹配
+
+当几个重载函数的形参数量相等，以及某些形参的类型可以由其他类型转换得来时，调用哪个重载函数的规则如下：
 
 1. 先确定候选函数集合，要求是：函数名一样，函数声明在调用处可见。
 2. 函数的参数个数相等，参数的类型要相同，至少要能转换成声明中参数的类型
@@ -681,6 +700,130 @@ auto f1( int ) -> int(*)(int*, int); // 尾置返回类型
 ```
 
 ## 第7章 类
+
+类基本思想是**数据抽象**和**封装**。**数据抽象**是依赖于**接口**和**实现**的分离编程技术。**接口**指的是用户在该类上能执行的操作；**实现**则包括类的数据成员、负责接口实现的函数体以及定义类所需的各种私有函数。
+
+对于类来说，使用它的人称为用户，构建它的人称为设计者。当我们设计类的接口时，应该考虑如何才能使得类更易于使用；当我们使用类时，不应该顾及类的实现原理。
+
+### 常量成员函数
+
+```c++
+std::string isbn() const { return this->bookNo; }
+```
+
+PS：常量对象，以及常量对象的引用和指针都只能调用常量成员函数。
+
+### 构造函数
+
+只有当类没有声明任何构造函数时，编译器才会自动地生成**默认构造函数**。默认构造函数按照以下规则初始化类的数据成员：
+
+- 如果类内的成员有初始值，用它来初始化成员
+- 如果未提供初始值，则使用该数据类型的默认初始化，比如`string`的默认初始化就是空字符串。
+
+`Sales_data() = default;`的含义是：我们希望这个构造函数的行为，完全等同于编译器为类生成的默认构造函数。
+
+### 拷贝、赋值和析构
+
+除了定义类的对象如何初始化之外，类还需要控制拷贝、赋值和销毁对象时发生的行为。
+
+- 拷贝：初始化变量、以值的方式传递或返回一个对象。
+- 赋值：当使用赋值运算符时，将一个对象赋值给另一个同类型对象时。
+- 析构：当对象不再存在时，执行析构函数。比如一个局部对象会在创建它的块结束时被销毁。
+
+### 访问控制与封装
+
+- `public` 整个程序内可访问
+- `private` 只在本类内可访问
+- `protected` 
+
+`class`与`struct`定义类的唯一区别就是，默认访问权限不同：`struct`默认是`public`,`class`默认是`private`。
+
+### 友元声明
+
+在类内，将外部函数声明为友元，则在该函数内部能直接使用类的`private`数据成员。
+
+```c++
+class Sales_data
+{
+    friend Sales_data add( const Sales_data &, const Sales_data & );
+}
+```
+
+`Sales_data`类例子：
+
+```c++
+// Sales_data.h
+// ------------------------------------- Sales_data class ------------------------------------- //
+class Sales_data
+{
+    friend Sales_data add( const Sales_data &, const Sales_data & );
+    friend std::ostream &print( std::ostream &, const Sales_data & );
+    friend std::istream &read( std::istream &, Sales_data & );
+
+public:
+    Sales_data() = default;
+    explicit Sales_data( const std::string &s ) : bookNo(s) { }
+    explicit Sales_data( std::istream &is ) { read( is, *this); }
+    Sales_data( const std::string &s, unsigned n, double p ) : bookNo(s), units_sold(n), revenue(p*n) { }
+
+    std::string isbn() const { return bookNo; }
+
+    Sales_data &combine( const Sales_data & );
+
+    double avg_price() const;
+
+private:
+    std::string bookNo;         // 书名
+    unsigned units_sold = 0;    // 售出数量
+    double revenue = 0.0;       // 总收入
+};
+
+Sales_data add( const Sales_data &, const Sales_data & );
+std::ostream &print( std::ostream &, const Sales_data & );
+std::istream &read( std::istream &, Sales_data & );
+
+// Sales_data.cpp
+using namespace std;
+
+double Sales_data::avg_price() const 
+{
+    if( units_sold )
+        return revenue / units_sold;
+    else
+        return 0;
+}
+
+Sales_data &Sales_data::combine( const Sales_data &rhs )
+{
+    units_sold += rhs.units_sold;
+    revenue += rhs.revenue;
+    return *this;
+}
+
+istream &read( istream &is, Sales_data &item )
+{
+    double price = 0;
+    is >> item.bookNo >> item.units_sold >> price;
+    item.revenue = price * item.units_sold;
+    return is;
+}
+
+ostream &print( ostream &os, const Sales_data &item )
+{
+    os << "isbn: " << item.isbn()
+       << " sold: " << item.units_sold
+       << " revenue: " << item.revenue
+       << " avg_price: " << item.avg_price();
+    return os;
+}
+
+Sales_data add( const Sales_data &lhs, const Sales_data &rhs )
+{
+    Sales_data sum = lhs;// 默认情况下，拷贝对象的数据成员
+    sum.combine( rhs );
+    return sum;
+}
+```
 
 ## 第8章 IO库
 

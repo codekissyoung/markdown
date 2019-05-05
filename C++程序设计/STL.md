@@ -17,20 +17,24 @@ STL库笔记。包括`iostrem` `string` `vector`。
 右侧的运算对象如果是`C++`内置类型，`<<` 与 `>>` 运算符已经处理好了输入与输出逻辑，如果是用户自定义的类型，那么需要自定义好（使用运算符重载）`<<`与`>>`的处理逻辑。
 
 ```c++
-int value;
-while( cin >> value ){
-    // ...
+string word;
+
+// 反复读取单词，直至文件结尾
+while( cin >> word )
+    cout << word << endl;
+
+// 反复读取一行，直至文件结尾
+string line;
+while( getline(cin,line) ) // getline会读取换行符，但不会将换行符存入到string对象中
+{
+    if( !line.empty() ) // 输出非空行
+        cout << line << endl;
 }
 ```
 
-对于上述代码，当遇到`istream`对象作为判断条件时，其效果是检测流的状态。当流取到了整数时，状态是成功；当遇到不是整数的字符时（文件结束符，字母等），流的状态变为无效。处于无效状态的`istream`对象会使条件判定为`false`。
-
 `istream`的读取模式是，读取用户输入，直到遇到第一个空白字符（空格，换行符，制表符），作为一次读取。多个空白字符连续的情况，只视作一个空白字符。
 
-```c++
-cin.getline( name, 20 ); // 读取一行 通过换行符来确定结尾，从输入流里读取换行符，但结果不保存换行符
-cin.get( name, 20 ); // 读取一行，通过换行符来确定结尾，但是不读取换行符，而是将其留在输入缓冲中 
-```
+当遇到`istream`对象作为判断条件时，其效果是检测流的状态。当流取到了相应类型时，状态是成功；当遇到不是相应类型的字符时，流的状态变为无效。处于无效状态的`istream`对象会使条件判定为`false`。
 
 ## string
 
@@ -87,6 +91,9 @@ for(int i = 0; i < vec.size(); ++i)
 
 ![WX20190326-191607.png](https://i.loli.net/2019/03/26/5c9a0a0db94f0.png)
 
+所有标准库容器都提供`++`、`==`与`!=`运算，`string`与`vector`提供更多额外的运算：
+
+![WX20190326-204340.png](https://i.loli.net/2019/03/26/5c9a1e9aa6315.png)
 
 ## vector、list、string
 
@@ -135,3 +142,35 @@ l.sort(cmp); 使用 cmp 来排序 list 中的元素
 ## cctype
 
 ![WX20190326-172237.png](https://i.loli.net/2019/03/26/5c99ef7b19f5b.png)
+
+## stdexcept 异常类
+
+![WX20190327-150443.png](https://i.loli.net/2019/03/27/5c9b20ae60d91.png)
+
+## initializer_list 用于参数个数不确定的情况
+
+```c++
+// 初始化列表用于传值
+typedef unsigned int ErrCode;
+void error_msg( ErrCode e, std::initializer_list<std::string> il )
+{
+    std::cout << e << ": ";
+    for(const auto &elem : il )
+        std::cout << elem << " ";
+    std::cout << std::endl;
+}
+error_msg( ErrCode(42), {"function xxx", "okay", "xxxxxxx"});
+
+// 初始化列表用于函数返回
+vector<string> process()
+{
+    if( expected.empty() )
+        return {};
+    else if( expected == actual )
+        return {"functionX" , "okay"};
+    else
+        return {"functionX", expected, actual};
+}
+```
+
+![WX20190327-153903.png](https://i.loli.net/2019/03/27/5c9b28bfcfd6c.png)
