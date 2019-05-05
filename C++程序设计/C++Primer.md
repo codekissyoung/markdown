@@ -825,6 +825,75 @@ Sales_data add( const Sales_data &lhs, const Sales_data &rhs )
 }
 ```
 
+### 构造函数初始化
+
+```c++
+// 直接初始化成员
+ConstRef::ConstRef( int a, int b) : height(a), width(b) { }
+
+// 先初始化再赋值
+ConstRef::ConstRef( int a, int b)
+{
+    height = a;
+    width  = b;
+}
+```
+
+前者直接初始化数据成员，效率高; 后者先初始化（height与width的值是未定义的），然后再赋值。推荐养成使用前者的习惯。
+
+### 委托构造函数（C++11）
+
+```c++
+class Sales_data{
+public:
+    Sales_data( std::string s, unsigned cnt, double price ):
+        bookNo(s), units_sold(cnt), revenue( cnt * price) { }
+
+    // 以下所有构造函数都委托给其他构造函数完成初始化
+    Sales_data() : Sales_data("", 0, 0) { }
+    Sales_data(std::string s) : Sales_data(s, 0, 0) { }
+    Sales_data(std::istream &is) : Sales_data() { read(is, *this); }
+};
+```
+
+### 转换构造函数
+
+内置类型之间存在了几种自动转换规则，那么内置类型与类类型之间也存在了自动转换规则。
+
+```c++
+// 内置类型自动在赋值时转换成类类型
+class Sales_data{
+public:
+    Sales_data( const std::string &s ) : bookNo(s) { }
+};
+
+Sales_data s1 = "my_book";
+```
+
+对于参数只有一个的构造函数，这种转换是隐式的、自动的，通过在构造函数前加上`explict`声明，则可以要求这种转换必须进行显式强制转换，才会调用该转换构造函数。
+
+### 类的静态成员
+
+有的时候类需要它的一些成员与类本身直接相关，而不是与类的各个对象保持关联。比如银行账户类需要一个数据成员来表示当前利率，利率与类关联，而不是与每个银行账户对象关联，一旦利率浮动，我们希望所有的对象都能立即使用新值。
+
+```c++
+class Account{
+public:
+    void calculate(){ amount += amount * interestRate; }
+    static double rate() { return interestRate; }
+    static void rate(double);
+private:
+    std::string owner;
+    double amount;
+    static double interestRate;
+    static double initRate();
+};
+
+void Account::rate(double newRate) {
+    interestRate = newRate;
+}
+```
+
 ## 第8章 IO库
 
 ## 第9章 顺序容器
