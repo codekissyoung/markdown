@@ -877,6 +877,7 @@ Sales_data s1 = "my_book";
 有的时候类需要它的一些成员与类本身直接相关，而不是与类的各个对象保持关联。比如银行账户类需要一个数据成员来表示当前利率，利率与类关联，而不是与每个银行账户对象关联，一旦利率浮动，我们希望所有的对象都能立即使用新值。
 
 ```c++
+// account.h
 class Account{
 public:
     void calculate(){ amount += amount * interestRate; }
@@ -885,12 +886,21 @@ public:
 private:
     std::string owner;
     double amount;
-    static double interestRate;
+    static double interestRate; // 静态成员声明
     static double initRate();
 };
 
+// account.cpp
+// 没有下句的话，报错 undefined reference to `Account::interestRate'
+double Account::interestRate = 0.034; // 这句是必须要的，静态成员必须在类外定义（新手常见错误）
+
 void Account::rate(double newRate) {
     interestRate = newRate;
+}
+
+double Account::initRate() {
+    interestRate = 0.0;
+    return interestRate;
 }
 ```
 
