@@ -454,7 +454,6 @@ vector< vector<string> > file; // 该向量的元素 也是 向量
 
 `vector`是模板，不是类型。编译器根据模板`vector`生成了三种类型：`vector<int>`、`vector<Sales_item>` 和 `vector< vector<string> >`类型。
 
-
 ```c++
 vector<int> ivec { 3, 4, 5, 6, 7}; // 列表初始化
 vector<int> ivec2( ivec );         // 使用ivec初始化ivec2
@@ -734,7 +733,7 @@ PS：常量对象，以及常量对象的引用和指针都只能调用常量成
 
 - `public` 整个程序内可访问
 - `private` 只在本类内可访问
-- `protected` 
+- `protected`
 
 `class`与`struct`定义类的唯一区别就是，默认访问权限不同：`struct`默认是`public`,`class`默认是`private`。
 
@@ -785,7 +784,7 @@ std::istream &read( std::istream &, Sales_data & );
 // Sales_data.cpp
 using namespace std;
 
-double Sales_data::avg_price() const 
+double Sales_data::avg_price() const
 {
     if( units_sold )
         return revenue / units_sold;
