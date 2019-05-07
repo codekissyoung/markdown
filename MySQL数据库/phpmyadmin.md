@@ -1,8 +1,10 @@
 # phpMyAdmin 教程
 
+平时使用`phpMyAdmin`的一些技巧积累。
+
 ## config.inc.php 配置
 
-- 把`config.inc.php.sample`改为`config.inc.php`,然后修改下列选项
+把`config.inc.php.sample`改为`config.inc.php`,然后修改下列选项
 
 ```php
 $cfg['AllowArbitraryServer'] = true; // 允许在界面上 选择服务器
@@ -13,19 +15,22 @@ $cfg['blowfish_secret'] = 'abcdefghijklmnopqrstuvwxyz111111';
 $cfg['LoginCookieValidity'] = 86400; // 保持session一天
 ```
 
+## themes 主题安装
+
+首先到官网去下载主题: [phpmyadmin主题](https://www.phpmyadmin.net/themes/)，下载主题后解压压缩包，会得到一个文件夹，将它复制到phpmyadmin程序目录中的themes/文件夹里即可。
+
 ## 允许 MySQL 远程连接
 
-- 默认情况下，mysql 只允许本地登录，如果要开启远程连接，则需要修改 `/etc/mysql/my.conf` 文件
+默认情况下，mysql 只允许本地登录，如果要开启远程连接，则需要修改 `/etc/mysql/my.conf` 文件
 
 ```mysql
 bind-address = 127.0.0.1 修改为
 bind-address = 0.0.0.0
 ```
 
-- 为需要远程登录的用户赋予权限
+为需要远程登录的用户赋予权限
 
 ```sql
-
 1. 新建用户远程连接mysql数据库
 允许任何ip地址的电脑用 admin 和 123456 来访问这个 mysql server,注意admin账户不一定要存在。
 mysql> grant all on *.* to admin@'%' identified by '123456' with grant option;
@@ -36,7 +41,7 @@ mysql> grant all privileges on *.* to 'root'@'%' identified by '123456' with gra
 mysql> flush privileges;
 ```
 
-- 查看系统用户
+查看系统用户
 
 ```sql
 mysql> use mysql;
@@ -54,7 +59,7 @@ mysql> select user,host from user;
 +------------------+--------------+
 ```
 
-- 重启Mysql服务器, `sudo service mysql restart`
+重启Mysql服务器, `sudo service mysql restart`
 
 ## mysqlshow 客户端
 
