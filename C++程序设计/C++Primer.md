@@ -995,7 +995,7 @@ c.clear()           删除 c 中所有元素，返回void
 // 关系运算符
 ==                  所有容器都支持
 !=                  所有元素都支持
-< <= > >=           关系运算符（无序关联容器不支持）
+< <= > >=           关系运算符（无序关联容器不支持）,左右两边运算容器必须是同类型
 
 // 获取迭代器
 c.begin() c.cbegin()    获取指向 c 的首元素的迭代器
@@ -1023,9 +1023,87 @@ c.rend() c.crend()      获取指向 c 的首元素之前的位置
 - 如果 begin 与 end 不等，则至少有一个元素，且 begin 指向该范围中的第一个元素
 - 对 begin 自增 若干次，最终一定使得  begin == end， 即遍历范围结束
 
-![WX20190507-173117.png](https://i.loli.net/2019/05/07/5cd150b4db678.png)
+### 关系运算符
 
-![WX20190507-173615.png](https://i.loli.net/2019/05/07/5cd151a475014.png)
+判断两个容器是否想等，比较大小关系，实际是进行元素的逐个比较：
+
+- 容器size相同，且元素两两对应相等，则两个容器相等
+- 容器size不同，容器开头元素两两对应相等，元素个数较少的那个容器较小
+- 容器size不同，元素也不相同，比较结果取决于第一个不相等的元素的比较结果
+
+PS: 只有当容器内的元素也定义了相应的比较运算符时，我们才可以使用关系运算符来比较两个容器
+
+### 顺序容器特有的操作
+
+除`array`外，所有的标准库容器都提供灵活的内存管理，在运行时可以动态添加或删除元素来改变容器大小。
+
+`forword_list`有自己专有版本的`insert`和`emplace`，不支持`push_back`和`emplace_back`
+
+`vector`与`string`不支持`push_front`和`emplace_front`
+
+```c++
+c.push_back( t );               在 c 的尾部添加一个 t 元素
+c.emplace_back( args );         在 c 的尾部添加一个 由 args 创建的元素
+
+c.push_front( t );              在 c 的头部创建一个值为 t 的元素
+c.emplace_front( args );        在 c 的头部添加一个 由 args 创建的元素
+
+c.insert( p, t );               在迭代器 p 指向的元素前，添加一个值为 t 的元素,返回新添加元素的迭代器
+c.emplace( p, args );           在迭代器 p 指向的元素前，添加由 args 创建的元素,返回新添加元素的迭代器
+
+c.insert( p, n, t );            迭代器 p 指向的元素前，添加 n 个值为 t 的元素，返回新添加的第一个元素的迭代器
+
+c.insert( p, b, e );            将迭代器 b 与 e 之间的元素，插入到 p 指向的元素之前
+
+c.insert( p, init_list );       将初始化列表里的元素值，插入到 p 指向的元素之前
+```
+
+PS: 向 `vector` `string` `deque` 中插入元素，会让所有指向容器的迭代器、引用和指针失效
+
+使用`push_front`、`insert`、`push_back`时，入参元素都是拷贝到容器中。而使用`emplace_front`、`emplace`和`emplace_back`时，则是将参数传递给元素的构造函数，`emplace`使用这些参数在容器管理的内存空间中直接构造元素。
+
+```c++
+c.emplace_back("my_book", 25, 15.99); // 使用这三个参数，直接在 c 的末尾构造一个`Sales_data`对象。
+c.push_back(Sales_data("my_book", 25, 15.99)); // 对比 emplace_back,这里会多创建一个局部临时对象，并将其压入容器中
+```
+
+### 访问容器中的元素
+
+```c++
+c.back();       返回 c 中尾元素的引用，若 c 为空，函数行为未定义
+c.front();      返回 c 中首元素的引用，若 c 为空，函数行为未定义
+c[n];           返回 c 中下标为 n 元素的引用
+c.at(n)         返回 c 中下标为 n 元素的引用
+
+if( !c.empty() )
+{
+    c.front() = 42;         // 第一个元素改为 42
+    auto v = c.back();      // v 只是尾元素的一个拷贝
+    v = 100;                // 未改变 c 中尾元素
+    auto &rv = c.back();    // 获得最后一个元素的引用
+    rv = 100;               // 改变 c 中最后一个元素
+}
+```
+
+### 删除容器中元素
+
+删除操作会改变容器大小，所以`array`没有删除操作。
+
+`forward_list` 有特殊版本的 `erase`，不支持`pop_back`。
+
+`vector`与`string`不支持`pop_front`。
+
+```c++
+c.pop_back();       删除 c 中尾元素
+c.pop_front();      删除 c 中首元素
+c.erase(p);         删除 c 中迭代器 p 所指定的元素，返回删除元素后面位置的迭代器
+c.erase( b, e );    删除 c 中指定范围内的元素
+c.clear();          删除 c 中所有元素
+```
+
+### 特殊的 forward_list 操作
+
+![2019-05-09 02-05-39 的屏幕截图.png](https://i.loli.net/2019/05/09/5cd31a8a16fca.png)
 
 ### 容器适配器
 
