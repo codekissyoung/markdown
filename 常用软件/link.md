@@ -96,6 +96,11 @@
 - [云风的博客](http://blog.codingnow.com/)
 - [韩天峰博客](http://rango.swoole.com)
 - [孟岩博客](http://blog.csdn.net/myan)
+- [html-js社区](http://www.html-js.com)
+- [w3c plus 大漠](http://www.w3cplus.com)
+- [MDN 开发文档](https://developer.mozilla.org/zh-CN/docs/Web)
+- [前端代码收集](http://snippets.barretlee.com)
+- [H-ui](http://www.h-ui.net)
 
 ### [PHP 鸟哥](http://www.laruence.com/)
 
