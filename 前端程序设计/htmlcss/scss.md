@@ -22,6 +22,14 @@ ruby --version                  # 查看已经在使用的 ruby 的版本
 
 参考: [RVM 官网](http://www.rvm.io/)
 
+## ubuntu 与 ruby
+
+如果不想使用`RVM`,那么也可以直接在`ubuntu`里安装默认版本的`ruby`。
+
+```bash
+sudo apt-get install ruby ruby-dev
+```
+
 ## GEM
 
 安装好`ruby`后，它自带`gem`命令，所谓`GEM`就是`ruby`的软件包。因为在国内对`GEM`源的访问不太友好，所以一般都要换下国内源。
@@ -64,9 +72,11 @@ div {
 }
 .rounded {
 　　　　border-#{$side}-radius: 5px; //变量写在#{}之中
+}
 ```
 
-# 数据类型
+## 数据类型
+
 数字: 如，1、 2、 13、 10px；
 
 字符串：有引号字符串或无引号字符串，如，"foo"、 'bar'、 baz；
@@ -83,26 +93,36 @@ div {
 
 `1px 2px, 5px 6px` 是包含 1px 2px 与 5px 6px 两个值列表的值列表,等价于`(1px 2px) (5px 6px)`
 
-
 ## 算数运算
+
 减法|加法|乘法|除法：数字之间,颜色之间
 
 除法：`(100px / 2)` 括号是必须的,不加会当做css处理 如`font: 10px/8px;`
 
 字符串： + 链接
 
-# 程序控制
-`@for $i from <start> through <end> ` 包含end
+## 程序控制
+
+`@for $i from <start> through <end>` 包含end
+
 `@for $i from <start> to <end>` 不包含end
+
 `@for $i from 1 through 3 {  .item-#{$i} { width: 2em * $i; } }`
-`@if 条件判断 { ... }  @else { ... } `
+
+`@if 条件判断 { ... }  @else { ... }`
+
 `@while $types > 0 { ... }`
+
 `@each $var in <list>` 遍历列表的值
+
 `$list: adam john wynn mason kuroir;@each $author in $list { ... }`
+
 `if($condition,$if-true,$if-false)` 三目运算符
 
 ## @extend
+
 继承类.class或者占位符`%`的样式
+
 ```scss
 .class1{
     margin-bottom: 10px;
@@ -115,7 +135,8 @@ div {
 ```
 
 ## 插值
-```
+
+```scss
 $properties: (margin, padding);
 @mixin set-value($side, $value) {
     @each $prop in $properties {
@@ -175,7 +196,8 @@ $flag: "status";
 }
 ```
 
-# 函数
+## 函数
+
 字符串函数
 `unquote($string)` 删除字符串中的引号；
 `quote($string)` 给字符串添加引号。
@@ -201,7 +223,8 @@ $flag: "status";
 `unitless($number)` 判断一个值是否带有单位
 `comparable($number-1, $number-2)` 判断两个值是否可以做加、减和合并
 map 的使用
-```
+
+```scss
 $map: (
     	key1: value1,
     	 key2: (
@@ -211,6 +234,7 @@ $map: (
     	 key3: value3
 );
 ```
+
 `map-get($map,$key)`根据给定的 key 值，返回 map 中相关的值。
 `map-merge($map1,$map2)`将两个 map 合并成一个新的 map。
 `map-remove($map,$key)`从 map 中删除一个 key，返回一个新 map。
@@ -220,6 +244,7 @@ $map: (
 `keywords($args)`返回一个函数的参数，这个参数可以动态的设置 key 和 value。
 
 颜色函数
+
 `rgb($red,$green,$blue)` 根据红、绿、蓝三个值创建一个颜色
 `rgba($red,$green,$blue,$alpha)` 根据红、绿、蓝和透明度值创建一个颜色
 `red($color)` 从一个颜色中获取其中红色值
@@ -227,11 +252,13 @@ $map: (
 `blue($color)` 从一个颜色中获取其中蓝色值
 `mix($color-1,$color-2,[$weight])` 把两种颜色混合在一起
 
-# @ 规则
+## @ 规则
+
 `@import "colors";` 引入 _colors.scss 文件,但不会被编译为colors.css文件,因为有下划线
 `@media` 媒体查询,暂时不了解
 `@extend` 继承类或占位符
-```
+
+```scss
 .a {
     color: red;
     	.b {
@@ -250,11 +277,12 @@ $map: (
 .a .b .c {  color: yellow; }
 .d {  color: green; }
 ```
+
 @debug @warn @error 调试用的
 
+## 组件化开发
 
-# 组件化开发
-```
+```scss
 $baseLineHeight: 2; //会覆盖掉默认的
 $baseLineHeight: 1.5 !default;     // 设置默认的
 body{
