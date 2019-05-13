@@ -1101,17 +1101,139 @@ c.erase( b, e );    删除 c 中指定范围内的元素
 c.clear();          删除 c 中所有元素
 ```
 
-### 特殊的 forward_list 操作
+PS: 由于向迭代器添加元素和从迭代器删除元素的代码，都可能会使迭代器失效，因此必须保证每次改变容器的操作之后，都正确地重新定位迭代器。
+PS2: 不要保存`end()`返回的迭代器
 
-![2019-05-09 02-05-39 的屏幕截图.png](https://i.loli.net/2019/05/09/5cd31a8a16fca.png)
+### forward_list 操作
+
+单向链表中，无法获取当前元素的前一个元素。
+
+```c++
+lst.before_begin();         获取首前迭代器
+lst.cbefore_begin();
+
+lst.insert_after( p, t );   迭代器 p 之后插入元素 t
+lst.insert_after( p, init_list );
+
+emplace_after( p, args );
+
+lst.erase_after( p );       删除 p 之后的所有元素
+lst.erase_after( b, e );
+```
+
+### 改变容器大小
+
+```c++
+c.resize(n);            调整 c 的大小为 n 个元素，新增的位置使用默认初始化
+c.resize(n, t);         调整 c 的大小为 n 个元素，新增的位置使用 t 初始化
+
+// 只适用于 string 与 string
+c.capacity();           不重新分配内存空间，c 可以保存多少元素
+c.shrink_fit();         将 capacity() 减小到与 size() 相同大小
+c.reserve(n)            分配至少能容纳 n 个元素的内存空间
+```
+
+### string 的额外接口
+
+```c++
+string s( cp, n );          s 是 cp 指向的数组中前 n 个字符的拷贝。
+string s( s2, pos2 );       s 是 string s2 从下标 pos2 开始，到最后的字符的拷贝
+string s( s2, pos2, len2 ); s 是 string s2 从下标 pos2开始，长度为 len2 的字符的拷贝
+s.substr( pos, n );         返回一个 string, 从 s 的 pos位置开始，长度为 n
+s.insert( pos, args );      在pos之前插入 args 指定的字符
+s.erase( pos, len );        删除从 pos 开始的 len 个字符
+a.assign( args );           将 s 中的字符替换为 args 指定的字符
+s.replace( range, args );   删除 s 中范围 range 内的字符，替换为 args 指定的字符，返回一个指向 s 引用
+```
+
+### string 搜索操作
+
+```c++
+s.find( args );                 查找 s 中 args 第一次出现的位置
+s.rfind( args );                查找 s 中 args 最后一次出现的位置
+s.find_first_of( args );        查找 s 中 args 中任何一个字符 第一次出现的位置
+s.find_last_of( args );         查找 s 中 args 中任何一个字符 最后一次出现的位置
+s.find_first_not_of( args );    查找 s 中第一个不在 args 中的字符
+s.find_last_not_of( args );     查找 s 中最后一个不在 args 中的字符
+
+// args 的格式
+c, pos      从 s 中位置 pos 开始查找字符 c。pos 默认为 0
+s2, pos     从 s 中位置 pos 开始查找字符串 s2。 pos 默认为 0
+cp, pos     从 s 中位置 pos 开始查找指针 cp 指向的字符串，pos 默认为 0
+cp, pos, n  从 s 中位置 pos 开始查找指针 cp 指向的数组的前 n 个字符。pos 与 n 无默认值
+```
+
+### string 与数值之间的转换
+
+```c++
+to_string( val );   返回数值 val 的 string 表示
+stoi( s, p, b );    返回 s 的起始子串的数值, b 是基数 默认是10, p 是 size_t指针 用来保存
+                    s 中第一个非数值字符的下标 默认为 0
+stol( s, p, b);
+stoul( s, p, b );
+stoll( s, p, b );
+```
 
 ### 容器适配器
 
-**适配器**：一个适配器是一种机制，能使某种事物的行为看起来像另外一种事物一样，一个容器适配器接受一种已有的容器类型，使其行为看起来像一种不同的类型。比如`stack`适配器接受一个顺序容器，并使其操作起来像是一个`stack`一样。
+**适配器**：一个适配器是一种机制，能使某种事物的行为看起来像另外一种事物一样，一个容器适配器接受一种已有的容器类型，使其行为看起来像一种不同的类型。比如`stack`适配器接受一个顺序容器，并使其操作起来像是一个`stack`一样。容器、迭代器和函数都有适配器。
 
-![WX20190507-174238.png](https://i.loli.net/2019/05/07/5cd153272f55e.png)
+### 所有容器适配器都支持的操作和类型
+
+```c++
+size_type       一种类型，足以保存当前类型的最大对象的大小
+value_type      元素类型
+container_type  实现适配器的底层容器类型
+A a;            创建一个名为 a 的空适配器
+A a( c );       创建一个名为 a 的适配器，带有容器 c 的一个拷贝
+关系运算符        == != < <= > >=
+
+a.empty();
+a.size();
+swap( a, b );   交换 a 和 b 的内容，a b 类型必须相同，底层容器也必须相同
+a.swap( b );
+```
+
+使用栈的例子：
+
+```c++
+stack<int> intStack;
+
+for (size_t ix = 0; ix != 10; ++ix)
+    intStack.push(ix);
+
+while (!intStack.empty())
+{
+    int value = intStack.top();
+    cout << value << endl;
+    intStack.pop();
+}
+```
+
+### stack 与 queue
+
+```c++
+// stack
+s.pop();                删除栈顶元素，不防滑
+s.push( item );         创建一个新元素压入栈顶，新元素的值由 item 拷贝/移动而来
+s.emplace( args );      创建一个新元素压入栈顶，新元素由 args 构造
+s.top();                返回栈顶元素，但不将元素弹出栈
+
+// queue 或 priority_queue
+// queue 默认基于deque实现，priority_queue默认基于 vector 实现
+q.pop();                返回 queue 的首元素 或 priority_queue 的最高优先级的元素
+q.front();              返回首元素
+q.back();               返回尾元素，只适用于 queue
+q.top();                返回最高优先级元素
+q.push( item );         在queue末尾，或 priority_queue 中恰当位置新增一个元素
+q.emplace( args );      同上，新增的元素由 args 构造
+```
 
 ## 第10章 泛型算法
+
+标准库容器只定义了对容器的基本操作(添加、删除、访问首尾元素)，并未给每个容器添加大量功能，而是提供了一组泛型算法(查找、替换、排序)，这些算法适用于大多数不同类型的容器。
+
+算法并不直接操作容器，而是遍历由两个迭代器指定的一个元素范围来进行操作。
 
 ## 第11章 关联容器
 
