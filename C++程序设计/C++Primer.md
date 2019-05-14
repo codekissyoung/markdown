@@ -1233,11 +1233,246 @@ q.emplace( args );      同上，新增的元素由 args 构造
 
 标准库容器只定义了对容器的基本操作(添加、删除、访问首尾元素)，并未给每个容器添加大量功能，而是提供了一组泛型算法(查找、替换、排序)，这些算法适用于大多数不同类型的容器。
 
-算法并不直接操作容器，而是遍历由两个迭代器指定的一个元素范围来进行操作。
+算法并不直接操作容器，而是遍历由两个迭代器指定的一个元素范围来进行操作。泛型算法本身不会执行容器的操作，它们只会运行于迭代器之上，执行迭代器的操作。所以，算法可能改变容器中保存的值，也可能在容器内移动元素，但永远不会直接添加或删除元素。
+
+标准库提供了一类特殊的迭代器：插入器 inserter。给这类迭代器赋值时，它们会在底层的容器上执行插入操作。因此当一个算法操作这样一个迭代器时，迭代器可以完成向容器添加元素的操作，但标准库算法自身永远不会做这样的操作。
+
+除少数例外，标准算法都对一个范围内的元素进行操作。称为“输入范围”。使用 第一个元素 与 最后一个元素之后的位置 的迭代器来表示这个范围。了解算法在这个范围内，是否读取元素、改变元素或是重排元素顺序。
+
+```c++
+int sum    = accumulate( vec.cbegin(), vec.cend(), 0 );         // 求和 int 类型
+string sum = accumulate( v.cbegin(), vec.cend(), string("") );  // 将字符串链接起来，因为 string 的 + 是链接操作
+
+// 假定 vec 与 list 元素个数一样，判断两个容器内元素是否一一相等
+equal( vec.cbegin(), vec.end(), list.begin() );
+
+fill( vec.begin(), vec.end(), 0 ); // 将每个元素重置为 0
+fill_n( vec.begin(), vec.size(), 0 );
+```
+
+PS：类似于`equal`这样只接受一个单一迭代器来表示第二个序列的算法，都假定第二个序列至少与第一个序列一样长。确保算法不会访问第二个序列中不存在的元素是程序员的责任。
+PS: 算法不会检查写操作，由程序员保证容器内有元素位置可写。向容器越界写入是违法的。
+
+### back_inserter
+
+通常情况，当我们通过一个迭代器向容器元素赋值时，值被赋予迭代器指向的元素。而当我们通过插入迭代器赋值时，容器内会新增一个元素赋予该值。
+
+```c++
+vector<int> vec;
+auto it = back_inserter( vec );
+*it = 42; // vec 中现在多了一个 42 元素
+
+fill_n( back_inserter(vec), 10, 0 ); // 添加 10 个元素到 vec
+```
+
+### 拷贝算法
+
+```c++
+int a1[] = {0,1,2,3,4,5,6,7,8,9};
+int a2[sizeof(a1)/sizeof(*a1)];
+auto ret = copy( begin(a1), end(a1), a2 );
+
+replace( list.begin(), list.end(), 0, 42 ); // 将序列中的 0 都替换成 42
+
+// list 保持不变，将 0 替换 为 42 后的序列存储在 ivec 中
+replace_copy( list.cbegin(), list.cend(), back_inserter(ivec), 0, 42 );
+```
+
+### 重排元素的算法
+
+该类算法需要元素支持`<`运算符，用以比较大小。
+
+消除重复单词：
+
+```c++
+void elimDups( vector<string> &words )
+{
+    // 排序 序列，重复的元素相邻
+    sort( words.begin(), words.end() );
+
+    // unique将单词不重复地排列在范围的前部，返回指向不重复区域之后一个位置的迭代器
+    auto end_unique = unique( words.begin(), words.end() );
+
+    // 使用erase删除后面的重复单词
+    words.erase( end_unique, words.end() );
+}
+```
+
+PS: 标准算法库对迭代器而不是容器进行操作，因此，算法不能（直接）添加或删除元素，为了真正的删除无用元素，我们还是必须使用容器的`erase`操作。
+
+### 定制操作
+
+默认情况下，元素使用`<` `==` 运算符完成比较。标准库还为这些算法定义了额外的版本，允许我们提供自己定义的操作来代替默认运算符。
+
+**谓词**：谓词是一个可调用的表达式，其返回结果是一个能用作条件的值。接受 谓词 的算法，在内部对序列中的元素使用 该谓词。因此，元素类型必须能转换为谓词能处理的数据类型。
+
+```c++
+// 定义谓词
+bool isShorter( const string &s1, const string &s2 ){
+    return s1.size() < s2.size();
+}
+
+elimDups( words ); // 按字典序重排，并消除重复单词
+
+// stable_sort 使用稳定排序算法，维持相等元素的原有顺序
+// 所以根据长度重排后，同一长度内部，还是保持元素间的字典序的
+stable_sort( words.begin(), words.end(), isShorter );
+```
+
+### lambda 表达式
+
+就是匿名函数。属于函数式语言的范畴。所有主流语言都对函数式编程有支持。C++11中新增的`lambda`表达式就是对匿名函数的丑陋实现。
+
+使用匿名函数的作用有：
+
+- 简洁
+- 捕获外部变量，比如下例中的`sz`(值捕获)
+
+```c++
+void biggies( std::vector<std::string> &words, std::vector<std::string>::size_type sz )
+{
+    elimDups( words );
+
+    // 使用 lambda 作为谓词，按字符串长度排序，长度相同的单词维持字典序
+    stable_sort( words.begin(), words.end(), [](const string &a, const string &b){
+        return a.size() < b.size();
+    });
+
+    // 获取 满足 size() >= sz 的元素的迭代器
+    auto wc = find_if( words.begin(), words.end(), [sz]( const string &a ){
+        return a.size() >= sz;
+    });
+
+    auto count = words.end() - wc;
+
+    for_each( wc, words.end(), []( const string &s ){
+        cout << s << " ";
+    });
+}
+```
+
+引用捕获:
+
+```c++
+void biggies( vector<string> &words, vector<string>::size_type sz, ostream &os = cout, char c = ' ' )
+{
+    for_each( words.begin(), words.end(), [ &os, c ]( const string &s ){
+        os << s << c;
+    });
+}
+```
+
+PS: 当以引用方式捕获一个变量时，必须保证在`lambda`执行时，变量是存在的。
+PS2: 函数返回一个`lambda`时，与函数不能返回一个局部变量类似地，`lambda`中也不能包含局部变量的引用捕获。
+
+当我们需要为`lambda`定义返回类型时，必须使用尾置返回类型:
+
+```c++
+transform( vi.begin(), vi.end(), vi.begin(), [](int i ) -> int {
+    if( i < 0 )
+        return -i;
+    else
+        return i;
+});
+```
+
+### 参数绑定
+
+标准库提供了参数绑定`bind()`函数，感觉没啥作用。略过吧。
+
+### 再探迭代器
+
+标准库除了为每个容器定义的迭代器外，还提供了以下几种：
+
+- **插入迭代器** ：绑定到一个容器上，可用来向容器插入元素。
+  - `back_inserter` 创建一个使用 `push_back` 的迭代器
+  - `front_inserter` 创建一个使用 `push_front` 的迭代器
+  - `inserter` 创建一个使用 `insert`的迭代器，函数接受第2个参数（元素），新增元素插入到该元素之前
+- **流迭代器** ：这些迭代器绑定到输入或输出流上，可用来遍历所关联的IO流。
+- **反向迭代器** ：这些迭代器的`++`不是向后一个元素移动，而是向前移动。
+- **移动迭代器** ：专用的迭代器，用于移动元素，而不是拷贝它们。
+
+先略过，讲的有点复杂。
+
+### 泛型算法结构
+
+略过！
 
 ## 第11章 关联容器
 
+关联容器与顺序容器有着本质的不同：关联容器是按关键字来保存和访问的。
+
+### 关联容器类型
+
+按关键字有序保存元素：
+
+- `map`: 关联数组，保存`key-value`对
+- `multimap`: `key`可以重复
+- `set`:  保存`value`集合
+- `multiset`: `value`可以重复
+
+无序容器:
+
+- `unordered_map`: 用哈希函数组织的 `map`
+- `unordered_multimap`: 关键字可以重复
+- `unordered_set`: 用哈希函数组织的 `set`
+- `unordered_multiset`: 关键字可以重复
+
+### pair 上的操作
+
+```c++
+pair<T1, T2> p;              使用默认初始化的 pair p
+pair<T1, T2> p( v1, v2 );    使用 v1, v2 初始化的 pair p
+pair<T1, T2> p = { v1, v2 }; 等价上句
+make_pair( v1, v2 );         返回一个 v1, v2 初始化的 pair
+
+p.first                      返回 p 名为 first 的数据成员
+p.second                     返回 p 名为 second 的数据成员
+
+p1 op p2                     op 为 < > >= <= 等运算符
+
+p1 == p2                     当 first 与 second 成员分别相等时，两个pair相等
+p1 != p2
+```
+
+PS: 通常我们不对关联容器使用泛型算法。
+
+略过，学完 STL 源码时，再回头看看。
+
 ## 第12章 动态内存
+
+C++支持动态分配对象。动态分配的对象的生存期与它们在哪里创建是无关的，只有当显式释放时，这些对象才会销毁。
+
+动态对象的正确释放是编程中及其容易出错的地方。为了更安全地使用动态对象，标准库定义了两个智能指针类型来管理动态分配的对象。当一个对象应该被释放时，指向它的智能指针可以确保自动地释放它。
+
+确保在正确的时间释放内存是及其困难的:
+
+- 忘记释放内存，会产生内存泄漏
+- 在内存还有指针指向的情况下，我们释放了它，则会产生引用非法内存的指针
+
+### shared_ptr 类
+
+```c++
+// shared_ptr 与 unique_ptr 都支持的操作
+shared_ptr<T> sp;       空智能指针，可以指向类型为 T 的对象
+unique_ptr<T> up;
+
+p                       将 p 用作一个条件判断，如果 p 指向一个对象，则为 true
+*p                      解引用 p, 获得它指向的对象
+p->mem                  等价于 (*p).mem
+p.get()                 返回 p 中保存的实际指针。
+
+swap( p, q );           交换 p 和 q 中的指针
+p.swap( q );
+
+// shared_ptr 独有的操作
+make_shared<T>( args );  返回一个 shared_ptr，指向一个动态分配的类型为 T 的对象。使用 args 初始化该对象
+shared_ptr<T>p(q);       p 是 q 的拷贝，此操作会递增 q 中的计数器。q 中的指针必须能转换为 T*
+p = q;
+
+p.unique();              若 p.use_count() 为1 返回 true, 否则返回 false
+p.use_count();           返回 与 p共享对象的智能指针数量；可能很慢，主要用于调试
+```
 
 ## 第13章 拷贝控制
 
