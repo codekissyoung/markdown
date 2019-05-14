@@ -37,12 +37,10 @@ ISBN 国际标准书号   售出册数        单价
 #include <string>
 
 class Sales_item {
-
 private:
     std::string isbn;       // 书编号
     unsigned    units_sold; // 售出次数
     double      revenue;    // 售出总额
-
 public:
     Sales_item() : units_sold(0),revenue(0.0) {}
     explicit Sales_item(const std::string &book) : isbn(book),units_sold(0),revenue(0.0) {}
@@ -85,9 +83,7 @@ std::ostream &operator<<(std::ostream &, const Sales_item &);
 
 ```c++
 #include "Sales_item.h"
-
 #include <iostream>
-
 using namespace std;
 
 Sales_item operator+(const Sales_item &lhs, const Sales_item &rhs )
@@ -129,17 +125,12 @@ ostream &operator<<(std::ostream &os, const Sales_item &s)
 
 ```c++
 #include "Sales_item.h"
-
 #include <iostream>
-
+using namespace std;
 int main( int argc, char *argv[] )
 {
-    using namespace std;
-
     Sales_item book;
-
     cout << "录入书籍信息：";
-
     while( cin >> book ){
         cout << "ISBN \t sold \t price \t revenue" << endl;
         cout << book << endl;
