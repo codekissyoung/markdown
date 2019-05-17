@@ -4,14 +4,12 @@
 
 ## 第1章 基础知识
 
-本章介绍C++的符号系统、存储与计算模型 以及 如何将代码组织成程序。
-
 ISO 的 C++标准定义了两种实体:
 
 - 核心语言特性，比如内置类型以及循环等
 - 标准库，比如容器(如 `vector` 和 `map`) 以及 `I/O`操作(如`<<`和 `getline ()` )。
 
-每个 C++ 实现都提供标准库组件 . 它们其实也是非常普通的 C++ 代码 。 换句话说， C++标准库可以用 C++语言本身实现(仅在实现线程上下文切换这样的功能时才使用少量机器代 码)。 这就确保 C++ 在面对绝大多数要求较高的系统编程任务时既有丰富的表达力，同时也足够高效 。
+每个C++实现都提供标准库组件，C++标准库用C++语言本身实现(仅在实现线程上下文切换这样的功能时才使用少量机器代码)。
 
 C++是一种静态类型语言，意味着在使用任何实体(如对象 、 值、名称和表达式)时， 编译器都必须清楚该实体的类型。对象的类型决定了能在该对象上执行的操作 。每个名字和每个表达式都有自己的类型，类型决定了名字和表达式所能执行的操作。
 
@@ -500,7 +498,8 @@ Vector read( istream &is )
 用于定义初始值列表构造函数的`std::initializer_list`是一种标准库类型，编译器可以辨识它:当我们使用列表时，如`{1,2,3,4}`，编译器会创建一个 `initializer_list`类型的对象并将其提供给程序。
 
 ```c++
-Vector::Vector( std::initializer_list<double> lst ) : elem{ new double[lst.size()]}, sz{ static_cast<int>(lst.size()) }
+Vector::Vector( std::initializer_list<double> lst )
+    : elem{ new double[lst.size()]}, sz{ static_cast<int>(lst.size()) }
 {
     copy( lst.begin(), lst.end(), elem ); // 从 lst 复制内容到 e1em 中
 }
@@ -510,6 +509,62 @@ Vector v1 ={1,2,3,4,5}; // v1 包含 5 个元素
 
 ### 抽象类
 
-### 类层次结构中的类
+**抽象类型**`abstract type`将使用者与类的实现细节完全隔离开来。为此，我们分离接口与实现，并且放弃了纯局部变量（因为我们对抽象类型的实现一无所知），必须从堆内存为对象分配空间，然后通过引用或指针的方式使用。
 
-// P48
+```c++
+class Container{
+    public:
+        virtual double& operator[](int) = 0;    // 纯虚函数
+        virtual int size() const = 0;           // 常量成员函数
+        virtual ~Container(){};                 // 析构函数
+};
+```
+
+上述类，纯粹是个接口。`virtual`表明函数可能在随后的派生类中被重新定义，称为**虚函数**。`Container`类的派生类负责为这个接口提供具体实现。`= 0`标明是**纯虚函数**，意味着派生类必须重新定义这个函数。含有**纯虚函数**的类称为**抽象类**`abstract class`。
+
+```c++
+void use( Container &c )
+{
+    const int sz = c.size();
+
+    for( int i = 0; i != sz; ++i )
+        cout << c[i] << '\n';
+}
+```
+
+上述代码，`use`是在完全不知道`Container`的实现细节（不知道是哪个派生类实现了它们）的情况下使用`Container`提供的`size()`与`[]`接口的。一个常用来为其他类型提供接口的类，我们把它称为**多态类型**。
+
+在`Container`中没有构造函数，毕竟它不需要初始化数据。另一方面，`Container`含有一个析构函数，而且该析构函数是`virtual`的，这是因为抽象类需要通过引用或指针来操纵，而当我们试图通过一个指针销毁`Container`时，我们并不清楚它的实现部分到底拥有哪些资源。
+
+构造派生类来实现抽象类，注意派生类里面使用了具体类`Vector`:
+
+```c++
+class Vector_container : public Container
+{
+private:
+    Vector v;
+public:
+    Vector_container(int s) : v(s){}  // 含有 s 个元素的 Vector
+    Vector_container( std::initializer_list<double> lst ) : v{ lst } {}
+    ~Vector_container(){}
+
+    double &operator[](int i){ return v[i]; }
+    int size() const { return v.size(); }
+};
+
+class List_container : public Container{
+    // code ...
+};
+```
+
+`use( Constainer &)`并不清楚它的实参是`Vector_container`还是`List_container`，它可以使用任何`Container`派生类的对象，它只需要知道`Container`类定义好的接口就可以了。
+
+```c++
+Vector_container vec { 1,2,3,4,5 };
+List_container list { 6, 7, 8, 9 };
+
+use( vec );     // 输出 1 2 3 4 5
+use( list );    // 输出 6 7 8 9
+```
+
+### 类层次结构中的类
