@@ -653,7 +653,6 @@ void Smiley::draw(){
 
 ```c++
 enum class Kind{ circle, triangle, smiley };
-
 Shape *read_shape( istream& is ){
     switch( k )
     {
@@ -670,14 +669,253 @@ Shape *read_shape( istream& is ){
             return ps;
     }
 }
-
 Shape *ps {read_shape(cin)};
-
 if( Smiley *p = dynamic_cast<Smiley*>(ps)){
     // 使用 dynamic_cast 运算符询问这个 Shape 是一种 Smiley 吗? "
 }
 ```
 
-如果`dynamic_cast`的参数(此处是 ps)所指对象的类型与期望的类型(此处是`Smiley`)或者期望类型的派生类不符,则`dynamic_cast`返回的结果是`nullptr`。
+如果`dynamic_cast`的参数(此处是`ps`)所指对象的类型与期望的类型(此处是`Smiley`)或者期望类型的派生类不符,则`dynamic_cast`返回的结果是`nullptr`。
 
-// P55
+### 资源泄漏
+
+上述代码存在**资源泄漏**的问题:
+
+- 使用者可能忘记用`delete`释放`read_shape()`返回的指针
+- `Shape`指针容器的拥有者可能无法用`delete`释放指针所指的对象
+
+函数返回一个指向堆内存的**裸指针**是非常危险的,推荐使用`unique_ptr`代替。
+
+```c++
+unique_ptr<Shape> read_shape( istream &is ){
+    switch(k){
+        case Kind::circle:
+            return unique_ptr<Shape> { new Circle{p,r} };
+    }
+}
+```
+
+将`Shape`对象的指针给到`unique_ptr`，函数返回的是`unique_ptr`。客户端代码用的也是`unique_ptr`对象，当`unique_ptr`离开作用域时，它会自动释放掉`Shape`指针指向的对象。
+
+### 拷贝与移动
+
+对象之间拷贝的默认含义是逐成员地复制。
+
+```c++
+void bad_copy( Vector v1 ){
+    Vector v2 = v1;
+    v1[0] = 2;      // v2[0] 现在也是 2 了
+    v2[1] = 3;      // v1[1] 现在也是 3 了
+}
+```
+
+上述代码执行后:
+
+![2019-05-20 00-16-38 的屏幕截图.png](https://img.codekissyoung.com/2019/05/20/8637cb844bba31218fdda4e53c2e798e.png)
+
+上述代码明显不符合我们对`Vector`拷贝操作的期望。我们需要通过自定义**拷贝构造函数**与**拷贝赋值运算符**来自定义对象的拷贝操作：
+
+```c++
+class Vector{
+private:
+    double *elem;
+    int sz;
+public:
+    // ...
+    Vector( const Vector &s );            // 拷贝构造函数
+    Vector &operator=( const Vector &a ); // 拷贝赋值运算符
+};
+
+Vector::Vector(const Vector& a ) : elem{ new double{a.sz} }, sz{ a.sz }
+{
+    for( int i = 0; i != sz; ++ i ) // 一个一个复制元素到新容器
+        elem[i] = a.elem[i];
+}
+
+Vector &Vector::operator=( const Vector &a )
+{
+    double *p = new double[a.sz];
+    for( int i = 0; i != a.sz; ++i )
+        p[i] = al.elem[i];
+    double[] elem;
+    elem = p;
+    sz = a.sz;
+    return *this;
+}
+```
+
+![拷贝构造函数 拷贝赋值运算符](https://img.codekissyoung.com/2019/05/20/f7fe9139fd0e6851bf687851e0be536e.png)
+
+### 移动容器
+
+对于大容量的容器来说，拷贝过程有可能性能内存耗费巨大。
+
+```c++
+Vector operator+( const Vector& a, const Vector &b )
+{
+    Vector res( a.size() );
+    for( int i  = 0; i != a.size(); ++i )
+        res[i] = a[i] + b[i];
+    return res;
+}
+```
+
+上述代码中，`return res;`将函数结果返回给调用者，如果`size()`非常大，这样拷贝的性能会很差，比如执行`Vector r = x + y + z;`时，就拷贝了两次内存。对于这样情况，我们希望不拷贝，而是移动`move`这块内存，供调用者使用。移动构造函数允许对象从一个作用域简单便捷地移动到另一个作用域 。
+
+```c++
+class Vector{
+    Vector( Vector &&a );            // 移动构造函数
+    Vector &operator=( Vector &&a ); // 移动赋值运算符
+}
+
+Vector::Vector( Vector && a )
+    : elem{ a.elem },   // 从 a 中 夺取元素
+      sz{ a.sz }{
+    a.elem = nullptr;   // 现在 a 中已经没有元素了
+    a.sze = 0;
+}
+```
+
+基于上述定义，编译器将选择**移动构造函数**来执行从函数中移出返回值的任务。这意味着`r=x+y+z`不需要再拷贝`Vector`，只是移动它就足够了。
+
+`&&`的意思是"右值引用"，我们可以给该引用绑定一个右值。右值大致上就是我们无法为其赋值的值，比如函数调用返回的一个整数就是右值。 进一步，右值引用的含义就是引用了一个别人无法赋值的内容，所以我们可以安全地"窃取"它的值。`Vector`的`operator+()`运算符的局部变量`res`就是一个例子。
+
+当右值引用被用作初始值或者赋值操作的右侧运算对象时，程序将使用移动操作。
+
+`C++11`提供了`std::move`函数来将`左值`转换为`右值`,`move`不会真的移动什么，而是负责返回我们能移动的函数实参的`右值引用`。从而让我们的客户端的赋值调用能够使用`移动构造函数`或者`移动赋值运算符`，而不是`拷贝构造函数`或`拷贝赋值运算符`,从而提高性能。
+
+```c++
+Vector f(){
+    Vector x(1000);
+    Vector y(1000);
+    Vector z(1000);
+
+    z = x;              // 使用 拷贝赋值运算符, 性能低
+    Y = std::move(x);   // 使用 移动赋值运算符，性能高，x 使用后，内容就变为空了
+    return z;           // 由于 Vector 有提供移动赋值运算符，所以这里还是使用它
+}
+```
+
+`x`使用后，内容就变为空了:
+
+![2019-05-20 00-55-33 的屏幕截图.png](https://img.codekissyoung.com/2019/05/20/edaa5922688c732d2eae26f78de66753.png)
+
+### 构建一个类的基本操作
+
+如果类的析构函数执行了某些特定的任务，比如释放堆内存或者释放锁，则该类也应该实现所有的构造函数:
+
+```c++
+class X{
+public:
+    X( Sometype );              // 普通的构造函数：创建一个对象
+    X();                        // 默认构造函数
+    X( const X & );             // 拷贝构造函数
+    X( X && );                  // 移动构造函数
+    X &operator=( const X & );  // 拷贝赋值运算符: 清空目标对象并拷贝
+    X &operator=( X && );       // 移动赋值运算符: 清空目标对象并移动
+    ~X();                       // 析构函数: 清空资源
+};
+```
+
+在下面 5 种情况下，对象会被移动或拷贝 :
+
+- 被赋值给其他对象
+- 作为对象初始值
+- 作为函数的实参
+- 作为函数的返回值
+- 作为异常
+
+以上所述构造函数，除`普通构造函数`外，都有默认实现，如果希望显示地使用编译器提供的默认实现，可以使用`= default`标记。
+
+只使用显式"类型转换"，使用`explicit`声明:
+
+```c++
+class Vector{
+public:
+    explicit Vector( int s ); // 禁止 int 到 Vector 的隐式类型转换
+};
+
+Vector v1(7);   // OK : v1 含 有 7 个元 素
+Vector v2 = 7;  // 错误: 禁止 ìnt 到 Vector 的 隐式类型转换
+```
+
+### 资源管理
+
+```c++
+std::vector<thread> my_threads;
+Vector inlt(int n)
+{
+    thread t{ heartbeat };          // 同时运行 heartbeat ( 在 它 自 己 的 线程上 )
+    my_threads.push_back(move(t));  // 把 t 移动到 my_threads
+
+    // ... 初始化其他部分
+
+    Vector vec(n);
+    for(int i=O; i < vec.size(); ++i )
+        vec[i] = 777;
+
+    return vec;                     // 把 vec 移动到 init() 之外
+}
+
+auto v = init( 10000 );             // 启动 heartbeat, 初始化 v
+```
+
+在很多情况下，用`Vector`和`thread`这样的资源句柄比用指针效果要好。事实上，以`unique_ptr`为代表的"智能指针"本身就是资源句柄。
+
+我们使用标准库`vector`存放`thread`，我们替换掉程序中的`new` 和`delete`一样，将指针转化为资源句柄。将得到更简单也更易维护的代码，而且没什么额外的开销。特别是我们能实现**强资源安全**，换句话说，对于一般概念上的资源，这种方法都可以消除资源泄漏的风险。比如存放内存的`vector`、存放系统线程的`thread` 和 存放文件句柄的`fstream`。
+
+资源是指任何具有`获取→使用→(显式或隐式)释放`模式的东西，比如`内存`、`锁` 、`套接字`、 `文件句柄`和`线程句柄`等。一个好的资源管理系统应该能够处理全部资惊类型。
+
+PS: 让所有资源都在某个作用域内有所归属，并且在作用域结束的地方默认地释放资源。在`C++`中，这被称为`RAlI( Resource Acquisition ls Initialization` **资源获取即初始化**， 它与错误处理一道组成了异常机制。 我们使用**移动构造函数**或者"智能指针"把资源从一个作用域移动到另一个作用域，使用"共享指针"分享资源的所有权。
+
+### 删除类的默认操作
+
+对于处在层次结构中的类来说，使用默认的拷贝或移动操作常常意味着风险 : 因为只给出一个基类的指针 . 我们无法了解派生类有什么样的成员，当然也就不知道该如何操作它们。因此，最好的做法是删除默认的拷贝和移动操作。
+
+```c++
+class Shape{
+public:
+    Shape( const Shape& ) = delete;             // 没有拷贝操作
+    Shape &operator=( const Shape& ) = delete;  // 没有拷贝操作
+
+    Shape( Shape && ) = delete;                 // 没有移动操作
+    Shape &operator=( Shape && ) = delete;      // 没有移动操作
+    ~Shape();
+}
+```
+
+建议：
+
+- 具体类是最简单的类。与复杂类或者普通数据结构相比，请优先选择使用具体类。使用具体类表示简单的概念以及性能要求较高的组件
+- 定义一个构造函数来处理对象的初始化操作
+- 只有当函数确实需要直接访问类的成员变量部分时，才把它作为成员函数
+- 定义运算符的目的主要是模仿和借鉴它的经典用法
+- 把对称的运算符( `<` `>` `>=` `<=`)定义成非成员函数
+- 如果成员函数不会改变对象的状态，则应该把它声明成`const`的
+- 如果类的构造函数获取了资源.那么需要使用析构函数释放这些资源
+- 避免 `裸new` 和 `裸delete` 操作
+- 使用资源句柄和`RAII`管理资源
+- 如果类是一个容器，给它一个初始值列表构造函数
+- 如果需要把接口和实现完全分离开来，则使用抽象类作为接口
+- 使用指针和引用访问多态对象
+- 抽象类通常元需构造函数,含有虚函数的类应该同时包含一个虚的析构函数
+- 使用类的层次结构表示具有继承层次结构的一组概念
+- 在规模较大的类层次结构中使用`override`显式地指明函数覆盖
+- 当设计类的层次结构时，注意区分实现继承和接口继承
+- 当类层次结构漫游不可避免时记得使用`dynamic_cast`
+- 如果想在无法转换到目标类时报错，则令`dynamic_cast`作用于引用类型
+- 如果认为即使无法转换到目标类也可以接受，则令`dynamic_cast`作用于指针类型
+- 为了 防止忘掉用`delete`销毁用`new`创建的对象，建议使用`unique_ptr`或者`shared_ptr`
+- 如果默认的拷贝操作不适合当前类，记得重新定义一个或者干脆禁止使用它
+- 用传值的方式返回容器，**移动**而非拷贝容器以提高效率
+- 函数参数中，对于容量较大的操作对象，使用`const`引用参数类型
+- 如果类含有析构函数，则该类很可能需要自定义或者删除移动和拷贝操作，尽量让对象的构造、拷贝、移动和析构操作在掌控之中
+- 设计构造函数 、 赋值运算符和析构函数时应该全盘考虑，使之成为一体
+- 如果默认的构造函数、赋值运算符和析构函数符合要求，则让编译器负责生成它们，用户没必要再定义一遍
+- 默认情况下，把接受单参数的构造函数声明成`explicit`的
+- 如果类含有指针或引用类型的成员，则它需要一个`析构函数`以及非默认的拷贝操作
+- 如果一个类被用作资源句柄，则需要为它提供构造函数、析构函数和非默认的拷贝操作
+
+## 第5章 模板
+
+// P65
