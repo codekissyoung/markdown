@@ -557,7 +557,7 @@ class List_container : public Container{
 };
 ```
 
-`use( Constainer &)`并不清楚它的实参是`Vector_container`还是`List_container`，它可以使用任何`Container`派生类的对象，它只需要知道`Container`类定义好的接口就可以了。
+`use( Constainer &)`并不清楚它的实参是`Vector_container`还是`List_container`，它可以使用任何`Container`派生类的对象，它只需要知道`Container`类定义好的接口就可以了。所以，无论`List_container`的实现发生变化，或者替换成了别的派生类，`use(Container &)`这句代码都不需要重新编译。
 
 ```c++
 Vector_container vec { 1,2,3,4,5 };
@@ -567,4 +567,117 @@ use( vec );     // 输出 1 2 3 4 5
 use( list );    // 输出 6 7 8 9
 ```
 
+### 虚函数
+
+`use(vec)`里使用`Vector_container::operator[]`,而`use(list)`里则使用`List_container`。这是如何做到的呢？
+
+要想达到这种效果，`Container`的派生对象就必须包含一些有助于它在运行时选择正确函数的信息。常见的做法是编译器将虚函数的名字转换成函数指针表中对应的索引值，这张表就是所谓的**虚函数表**`vtbl`。每个含有虚函数的类都有它自己的`vtbl`用于辨识虚函数。
+
+![2019-05-19 11-45-02 的屏幕截图.png](https://img.codekissyoung.com/2019/05/19/d7416228a1fa1e531a7c0731e61af0b6.png)
+
+调用函数的实现只需要知道`Container`中`vtbl`指针的位置以及每个虚函数对应的索引就可以了。这种虚调用机制的效率非常接近普通函数调用机制，而它的空间开销包括两部分: 
+
+- 如果类包含虚函数，则该类的每个对象需要一个额外的指针
+- 另外每个这样的类需要一个`vtbl`
+
 ### 类层次结构中的类
+
+所谓**类层次结构**是指通过派生(如`: public`)创建的一组在框架中有序排列的类。
+
+![2019-05-19 11-51-48 的屏幕截图.png](https://img.codekissyoung.com/2019/05/19/498a11c679de0b34e80bb8699a3319d1.png)
+
+`Shape`类:
+
+```c++
+class Shape{
+public:
+    virtual Point center() const = 0;
+    virtual void move(Point to) = 0;
+    virtual void draw() const = 0;
+    virtual void rotate(int angle) = 0;
+    // ...
+    virtual ~Shape() {}
+};
+```
+
+`Circle`类：
+
+```c++
+class Circle : public Shape{
+public:
+    Circle(Point p, int rr);
+    Point center() const { return x; }
+    void move(Point to){ x = to; }
+private:
+    Point x;    // 圆心
+    int r;      // 半径
+};
+```
+
+`Smiley`笑脸类：
+
+```c++
+class Smiley : public Circle{
+public:
+    Smiley(Point p, int r) : Circle{p,r}, mouth(nullptr){}
+    ~Smiley(){
+        delete mouth;
+        for(auto p : eyes)
+            delete p;
+    }
+    void move(Point to) override;
+    void draw() const override;
+    void add_eye(Shape *s){
+        eyes.push_back(s);
+    }
+    void set_mouth(Shape *s);
+private:
+    vector<Shape> eyes;
+    Shape* mouth;
+};
+
+void Smiley::draw(){
+    Circle::draw();     // 复用基类的 draw 代码
+    for( auto p : eyes )
+        p -> draw();
+    mouth -> draw();
+}
+```
+
+层次结构的益处：
+
+- **结构继承**: 派生类对象可以用在任何需要基类对象的地方。也就是说，基类看起来像是派生类的接口一样。`Container`和`Shape`就是很好的例子，这样的类通常是抽象类。
+- **实现继承**: 基类负责提供可以简化派生类实现的函数或数据。`Smiley`使用`Circle`的构造函数和`Circle::draw()`就是例子,这样的基类通常含有数据成员和构造函数 。
+
+使用:
+
+```c++
+enum class Kind{ circle, triangle, smiley };
+
+Shape *read_shape( istream& is ){
+    switch( k )
+    {
+        case Kind::circle:
+            return new Circle(p, r);
+        case Kind::triangle:
+            return new Triangle{p1,p2,p3}
+        case Kind::smiley:
+            // read p, r, e1, e2 from istream
+            Smiley *ps = new Smiley{p,r};
+            ps -> add_eyes(e1);
+            ps -> add_eyes(e2);
+            ps -> set_mouth(m);
+            return ps;
+    }
+}
+
+Shape *ps {read_shape(cin)};
+
+if( Smiley *p = dynamic_cast<Smiley*>(ps)){
+    // 使用 dynamic_cast 运算符询问这个 Shape 是一种 Smiley 吗? "
+}
+```
+
+如果`dynamic_cast`的参数(此处是 ps)所指对象的类型与期望的类型(此处是`Smiley`)或者期望类型的派生类不符,则`dynamic_cast`返回的结果是`nullptr`。
+
+// P55
