@@ -918,4 +918,247 @@ public:
 
 ## 第5章 模板
 
-// P65
+### 参数化类型
+
+模板是一种编译时的机制，因此与"手工编码"相比，并不会产生任何额外的运行时开销。对于我们之前使用的`double`类型的向量，只要将其改为`template`并且用一个形参替换掉特定类型`double`，就能泛化为任意类型的向量。
+
+模板提供了以下功能:
+
+- 把类型（以及数值和模板）作为实参传递而不损失任何信息的能力。这为内联提供了很多便利，而现有的实现可以很好地利用这一点
+- 延迟的类型检查(在模板实例化时执行)。这意味着程序可以把多个上下文的有用信息捏合在一起。
+- 把常量值作为实参传递的能力，也就是在编译时计算的能力。
+
+```c++
+template<typename T>
+class Vector{
+private:
+    T *elem;        // 指向含有 sz 个 T 类型元素的数组
+    int sz;
+public:
+    explicit Vector( int s );
+    ~Vector() { delete[] elem; }
+
+    T &operator[]( int i );
+    const T &operator[]( int i ) const;
+};
+
+template<typename T>
+Vector<T>::Vector( int s )
+{
+    elem = new T[s];
+    sz = s;
+}
+
+template<typename T>
+const T &Vector<T>::operator[]( int i ) const
+{
+    return elem[i];
+}
+
+Vector<char> vc(200);      // 含有 200 个字符的向量
+Vector<string> vs(17);     // 含有 17 个字符串的向量
+Vector<list<int>> vli(45); // 含有 45 个 整 数 列 表的向量
+```
+
+使`Vector`支持循环:
+
+```c++
+// 普通 for 循环
+for( int i = 0; i != vs.size(); ++i )
+    cout << v[i] << endl;
+
+// for : 循环 需要为之重载适当的 begin() 与 end() 函数
+template<typename T>
+T *begin( Vector<T> &x )
+{
+    return x.size() ? &x[0] : nullptr;      // 指向首元素 或 nullptr
+}
+
+template<typename T>
+T *end( Vector<T> &x )
+{
+    return begin(x) + x.size();             // 指向尾后元素
+}
+
+// 所以我们可以如下使用 for : 循环
+for( auto &x : vs )
+    cout << s << "\n";
+```
+
+除了类型参数外，模板也可以接受普通的值参数,但只有常量表达式能用于模板的值参数:
+
+```c++
+template<typename T, int N>
+struct Buffer{
+    using value_type = T;
+    constexpr int size() { return N; }
+    T[N];
+};
+
+Buffer<char,1024> glob; // 全局的字符缓冲区(静态分配)
+
+void fct(){
+    Buffer<int,10> buf; // 局部的整数缓冲区 (在栈上)
+}
+```
+
+### 函数模板
+
+模板很重要的用途是参数化标准库中的类型和算法。
+
+```c++
+// 这里的 sum() 可以看作是标准库 accumulate() 的简化版本
+template<typename Container, typename Value>
+Value sum( const Container &c, Value v ){
+    for( auto x : c )
+        v += x;
+    return v;
+}
+```
+
+任意`Container`只要支持`range for`所需的`begin()`和`end()`，我们就能调用`sum()`，唯一要求是：容器内元素必须能被加到实参`Value`上。显然标准库`vector`、`list`和`map`都满足条件。我们认为`sum()`的泛化能力包含两个维度:存储元素的数据结构(容器)以及容器中元素的类型。
+
+**规范**`regular`的类型: 如果某种类型的特点和使用方式与`int`或`vector`非常像，我们就说这种类型是规范的。规范类型的对象应该:
+
+- 能以默认的方式构造
+- 能以构造函数或赋值运算符的方式拷贝,当然要确保拷贝之后源对象和目标对象相互独立且等价
+- 能用`==`和`!=`进行比较
+- 即使用在复杂的程序结构中也不会出错
+
+`string`是一种典型的规范类型，并且它和`int`一样是有序的`ordered`，这意味着两个字符串可以用 `<` `<=` `>` `>=` 等运算符进行合适的语义比较。
+
+### 函数对象
+
+**函数对象**`functor`: 可以像调用函数一样使用对象,`operator()`的函数实现了这一调用方式。
+
+**谓词**`predicate`: 是调用时返回`true`或`false`的对象。
+
+函数对象常用作谓词，精妙之处在于它们附带着准备与之进行比较的值，我们无需为每个值(或者每种类型)单独编写函数，更不必把值保存在让人厌倦的全局变量中。可携带数据和高效这两个特性使得我们经常使用函数对象作为算法的参数。
+
+```c++
+template<typename T>
+class Less_than{
+const T val;
+public:
+    Less_than( const T &v ) : val(v) {}
+    bool operator()(const T &x) const { return x < val; }
+}
+
+template<typename C, typename P>
+int count( const C &c, P pred )  // 统计容器C中 符合 pred 条件的元素个数
+{
+    int cnt = 0;
+    for( const auto &x : c )
+        if( pred(x) )
+            ++cnt;
+    return cnt;
+}
+
+Less_than<int> lti {42};
+Less_than<string> lts {"codekissyoung"};
+Vector<int> vec { 12, 33, 54, 56, 78 };
+Vector<string> lst { "hello", "nice", "to", "meet", "you" };
+
+cout << "number of values less than 42 : " << count( vec, lti ) << endl;
+cout << "number of values less than codekissyoung : " << count( lst, lts ) << endl;
+```
+
+### lambda 表达式
+
+上述`Less_than`的定义与使用是分离的，明明是简单的操作，写起来却有些罗嗦。`lambda`表达式能够现场生成一个**函数对象**,能够将上述代码变得更简单便捷。
+
+```c++
+cout << "number of values less than 42 : "
+     << count( vec, []( int a ){ return a < 42; } ) << endl;
+
+cout << "number of values less than codekissyoung : "
+     << count( lst, []( const string &s ){ return s < string("codekissyoung");} ) << endl;
+```
+
+表达式`[]( int a ){ return a < 42; }`就是`lambda`。
+
+在来看一个例子，`for_all`用于将某个操作应用于容器的每个元素:
+
+```c++
+template<typename C, typename Oper>
+void for_all( C &c, Oper op )
+{
+    for( auto &x : c )
+        op( *x );
+}
+
+vector<unique_ptr<Shape>> v;
+while( cin )
+    v.push_back( read_shape(cin) );
+for_all( v, []( Shape &s ){ s.draw(); } );
+for_all( v, []( Shaep &s ){ s.rotate(45); } );
+```
+
+### 可变参数模板
+
+定义模板时可以令其接受任意数量、任意类型的实参，这样的模板称为**可变参数模板**。
+
+```c++
+void func(){ }; // do nothing
+template<typename T, typename ... Tail>
+void func( T head, Tail ... tail )
+{
+    g( head );      // 对 head 进行操作
+    func( tail ... );  // 再次处理 tail
+}
+
+template<typename T>
+void g( T x ){
+    cout << x << " ";
+}
+
+func( 1, 2, 3, "hello" ); // 输出 1 2 3 hello
+```
+
+### 别名
+
+有时候,我们应该为类型或模板引人一个同义词,比如标准库中的`using size_t = unsigned int;`。`size_t`的实际类型依赖于具体实现.在另外一个实现中`size_t`可能变成`unsigned long`, 而使用别名`size_t`，程序员就能写出易于移植的代码。
+
+```c++
+template<typename T>
+class Vector{
+public:
+    using value_type = T;
+};
+```
+
+事实上 ，每个标准库容器都提供了`value_type`作为其值类型的名字，这样我们编写的代码就能在任何一个服从这种规范的容器上工作了。
+
+绑定某些或全部模板实参， 我们就能使用别名机制定义新的模板:
+
+```c++
+template<typename Key, typename Value>
+class Map{ //... }
+
+template<typename Value>
+using String_map = Map<string,Value>;
+
+String_map<int> m;    // m 实际是一个 Map<string,int>
+```
+
+建议:
+
+- 用模板来表达那些些可以作用于多种数据类型的算法
+- 用模板实现容器
+- 用模板提升代码的抽象水平
+- 定义模板时，最好先设计和调试出 一个非模板版本，然后再通过添加参数进行泛化
+- 模板是类型安全的，但是对类型的检查很晚才开始
+- 模板可以无损地传递参数类型
+- 用函数模板推断类模板参数类型
+- 把函数对象作为算法的参数
+- 如果只在某处需要一个简单的函数对象，不妨使用`lambda`表达式
+- 不能把虚成员函数定义成模板成员函数
+- 利用模板别名来简化表示方式并隐藏细节
+- 当函数参数的类型和数量都无法确定时，使用可变参数模板
+- 不要用可变参数模板处理同类型的参数,而应该使用初始值列表
+- 使用模板时要确保它的定义(不仅是声明)位于作用域内，所以模板的定义通常放`.h`文件
+- 模板不存在分离式编译:用到模板的地方都应该用`#include`包含模板的定义
+
+## 第6章 标准库 概览
+
+// P75
