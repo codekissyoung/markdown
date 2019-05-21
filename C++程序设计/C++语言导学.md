@@ -1161,4 +1161,89 @@ String_map<int> m;    // m 实际是一个 Map<string,int>
 
 ## 第6章 标准库 概览
 
-// P75
+所有的C++实现都提供标准库接口。当然，除了标准库组件外，大多数C++实现还提供图形接口、Web接口、数据库接口等。类似地，大多数应用程序开发环境还会提供"基础库"，以提供企业级或工业级的"标准"开发和运行环境。
+
+标准库提供的工具和方法可以分为如下几类:
+
+- 运行时语言支持(例如，对资源分配和运行时类型信息的支持)
+- C标准库(进行了非常小的修改，以便尽量减少与类型系统的冲突)
+- 字符串(包括对国际字符和本地化的支持)
+- 对正则表达式匹配的支持
+- `I/O`流，这是一个可扩展的输入输出框架，用户可向其中添加自己设计的类型、流、缓冲策略、区域设定和字符集
+- 容器(如 `vector` 和 `map`) 和算法(如`find()`、`sort()` 和 `merge()`), 习惯上称这个框架为标准模板库`STL`，用户可向其中添加自己定义的容器和算法。
+- 对数值计算的支持(例如标准数学函数 、复数、支持算术运算的向量以及随机数发生器)
+- 对并发程序设计的支持，包括`thread`和锁机制,在此基础上，用户就能够以库的形式添加新的并发模型。
+- 支持模极元程序设计的工具(如**类型特性**)、 `STL`风格的泛型程序设计(如`pair`) 和通用程序设计(如`clock`)
+- 用于资源管理的**智能指针** (如`unlque_ptr`和`shared_ptr`) 和 垃圾回收器接口
+- 特殊用途容器，例如`array` `bitset` 和`tuple`
+
+`using namespace std;`将命名空间`std`中的所有名字都暴露到了全局命名空间中，一般来说这并不是一个好的编程习惯。
+
+建议:
+
+- 不要重新发明轮子，应该使用库
+- 当有多种选择时，优先选择标准库而不是其他库
+- 不要认为标准库在任何情况下都是理想之选
+- 当使用标准库工具和方法时，记得用`#include`包含相应的头文件
+- 记住，标准库工具和方法都定义在命名空间`std`中
+
+## 第7章 字符串和正则表达式
+
+`string`和`regex` 都支持`Unicode`。
+
+`string`的`+`操作符: 可以将一个`string`、一个字符串字面值常量、 一个`C`风格字符串或是一个字符连接到一个`string`上。由于标准库`string`定义了一个移动构造函数，因此，即使是以传值方式而不是传引用方式返回一个很长的`string`也会很高效。
+
+```c++
+string compose( const string &name, const string &domain )
+{
+    return name + '@' + domain;     // + 操作符
+}
+auto addr = compose("1162097842", "qq.com");
+
+auto addr += '\n'; // 追加换行      // += 操作符
+
+string name = "codekissyoung";
+
+string s = name.substr( 8, 5 );     // 截取操作，s = young
+name.replace( 8, 5, "me" );         // 替换操作，name = codekissme
+name[0] = toupper(name[0]);         // 下标操作, name = Codekissme
+if( name == name2 )                 // 字符串比较
+if( name == "zhangjian" )           // 和字符串字面值常量比较
+name.c_str();                       // 返回只读的 C 风格的字符串
+```
+
+### 标准库 string 的实现
+
+在当前的`string`实现版本中，通常会使用**短字符串优化技术**。即短字符串会直接保存在`string`对象内部，而长字符串则保存在堆内存中。
+
+```c++
+string s1 {"Annemarie"};
+string s2 {"Annemarie Stroustrup"}
+```
+
+上述代码的内存布局:
+
+![内存布局](https://img.codekissyoung.com/2019/05/22/aba90838b000f55493f2bdb9ddcbf2a3.png)
+
+当一个`string`由短变长(或相反)时，它的表示(存储)形式会相应地调整。
+
+**短字符串优化技术**被采用的一个原因是，在多线程实现中，内存分配操作的代价相对较高; 而且，当程序中使用大量长度不一的字符串时， 会产生内存碎片问题。
+
+为了处理多字符集，标准库定义了一个通用的字符串模板`basic_string`,`string` 实际上是此模板用字符类型`char`实例化的一个别名。
+
+```c++
+template<typename Char>
+class basic_string{
+    // ... Char 类型的字符串
+};
+
+// 标准库string也不过是使用下句代码生成的
+using string = basic_string<char>;
+
+// 假定我们有一个日文字符类型, 则可以使用这句生成 Jstring 模板类
+using Jstring = basic_string<Jchar>;
+```
+
+### 正则表达式
+
+// P82
