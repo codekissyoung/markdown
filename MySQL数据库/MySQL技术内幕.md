@@ -77,5 +77,4 @@ mysql> delete from president where state = 'OH';
 
 -- 更新语句
 mysql> update member set email='aab@cc.com',street='York St',city='Anytown' where last_name = 'York';
-
 ```

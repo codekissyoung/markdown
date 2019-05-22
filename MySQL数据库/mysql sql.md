@@ -1,5 +1,7 @@
 # MySQL 中的SQL语句
 
+本文是常见的一些`SQL`语句的笔记。
+
 ## 语句顺序
 
 ```sql
@@ -436,4 +438,88 @@ time1 between '2011-03-03 17:39:05' and '2011-03-03 17:39:52';
 -- %i 分钟, 数字(00……59)
 -- %s 秒(00……59)
 DATE_FORMA T(date, format);
+```
+
+## multi query 将多条SQL语句批量执行
+
+```php
+$mysqli = new MySQLi( "ip", "username", "password", "db_name" );
+
+function msectime()
+{
+    list($msec, $sec) = explode(' ', microtime());
+    return $msectime =  (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+}
+/*
+$sqls = "select title from qy_route limit 10;";
+$sqls.= "select name from qy_user where name != '' limit 10;";
+$sqls.= "select sname from qy_scenic_location order by id desc limit 10;";
+*/
+
+$test_num = 3000;
+
+$start_time = msectime();
+$size = 1;
+$multi_sql = '';
+for( $page = 0; $page <= $test_num; $page++)
+{
+    $offset = $page * $size;
+    $multi_sql .= "select sname from qy_scenic_location limit $offset,$size;";
+}
+if( $mysqli -> multi_query( $multi_sql ) )
+{/*{{{*/
+    while( TRUE )
+    {
+        // 检查中间某条sql是否执行错误
+        if( $mysqli -> errno !== 0 )
+        {
+            echo "errno : $mysqli->errno , error: $mysqli->error \n";
+        }
+
+        $result = $mysqli -> store_result();
+
+        // select 语句执行后的结果集
+        if( $result instanceof mysqli_result )
+        {
+            $row = $result -> fetch_all( MYSQLI_ASSOC );
+        }
+        // 对于insert update delete 这样的查询, store_result 返回的永远是false, 而不管是否查询成功
+        else
+        {
+            // do nothing
+        }
+
+        // 如果没有结果集了，就退出while
+        if( !$mysqli -> more_results() )
+            break;
+
+        // 继续取下一个结果集
+        $mysqli -> next_result();
+    }
+}/*}}}*/
+else
+    echo "ERROR".$mysqli->errno."---".$mysqli->error;
+
+$end_time = msectime();
+$multi_query_time = $end_time - $start_time;
+
+echo "// ===================== query ==================================== //\n";
+
+$start_time = msectime();
+$size = 1;
+for( $page = 0; $page <= $test_num; $page++)
+{
+    $offset = $page * $size;
+    $sql = "select sname from qy_scenic_location limit $offset,$size;";
+    $result = $mysqli -> query( $sql );
+    $row = $result -> fetch_all( MYSQLI_ASSOC );
+    $result -> close();
+    // var_dump($row);
+}
+$end_time = msectime();
+$query_time = $end_time - $start_time;
+
+echo "query执行时间 $query_time / multi_query执行时间 $multi_query_time =  ". $query_time / $multi_query_time . "\n";
+
+$mysqli -> close();
 ```
