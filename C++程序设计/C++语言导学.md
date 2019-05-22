@@ -1446,6 +1446,80 @@ vector<unique_ptr<Shape>> vups; // 正确
 
 ![WX20190522-151718.png](https://img.codekissyoung.com/2019/05/22/8fb707422f1c5f21e077ec441aeb4091.png)
 
+```c++
+sort( vec.begin(), vec.end() );                     // vector 内部进行排序
+uniqu_copy( vec.begin(), vec.end(), lst.begin() );  // 从 vec 拷贝数据到 list, 不拷贝相邻的重复元素
+```
+
+### 使用迭代器
+
+```c++
+// s 包含字符 c?
+bool has_c( const string &s, char c ){
+    return find( s.begin(), s.end(), c ) != s.end();
+}
+
+// 在 s 中查找字符 c 出现的所有位置
+vector<string::iterator> find_all( string &s, char c ){
+    vector<string::iterator> res;
+    for( auto p = s.begin(); p != s.end(); ++p )
+        if( *p == c )
+            res.push_back( p );
+    return res;
+}
+
+// 使用模板函数实现 find_all
+// 函数中的typename是有必要的，用来通知编译器，C的iterator是一个类型，而非值
+template<typename C, typename V>
+vector<typename C::iterator> find_all( C &c, V v ){
+    vector<typename C::iterator> res;
+    for( auto p = c.begin(); p != c.end(); ++p )
+        if( *p == v )
+            res.push_back(p);
+    return res;
+}
+
+// 同上，另一种写法
+template<typename T>
+using Iterator = typename T::iterator;
+
+template<typename C, typename V>
+vector<Iterator<C>> find_all( C &c, V v ){
+    vector<Iterator<C>> res;
+    for( auto p = c.begin(); p != c.end(); ++p )
+        if( *p == v )
+            res.push_back(p);
+    return res;
+}
+```
+
+迭代器的重要作用是分离算法和容器(数据结构)。算法通过迭代器来处理数据， 但它对存储元素的容器一无所知。反之亦然，容器也对处理其元素的算法一无所知，它所做的全部事情就是按需求提供迭代器(如`begin()`和`end()`)。这种数据存储和算法分离的模型催生出非常通用和灵活的软件。
+
+### 迭代器类型
+
+迭代器本质上是什么?当然，任何一种特定的迭代器都是某种类型的对象。不过，迭代器的类型非常多，因为每个迭代器都是与某个特定容器类型相关联的，它需要保存一些必要信息，以便对容器完成某些任务。因此，有多少种容器就有多少种迭代器，有多少种特殊要求就有多少种迭代器。例如，一个`vector`迭代器可能就是一个普通指针，因为指针是一种引用`vector`中元素的非常合理的方式:
+
+指针作为迭代器:
+
+![指针作为迭代器](https://img.codekissyoung.com/2019/05/23/fa8c77120a35c85b15bf27f178bf531c.png)
+
+一个`vector`迭代器也可以实现为 一个指向起始位置的指针 + 一个偏移量:
+
+![一个指向起始位置的指针 + 一个偏移量](https://img.codekissyoung.com/2019/05/23/6c513b9c23a4f383f937c7653b1e6d85.png)
+
+一个`list`迭代器必须是某种比简单指针更复杂的东西，因为一个`list`元素通常不知道它的下一个元素在哪里。因此，一个`list`迭代器可能是指向一个链接(链表指针)的指针:
+
+![list迭代器](https://img.codekissyoung.com/2019/05/23/e1b14ddf9971f3b3cae2a2c778053086.png)
+
+所有迭代器类型的语义及其操作的命名都是相似的:
+
+- 对任何迭代器使用`++`运算符都会得到一个指向下一个元素的迭代器
+- 类似地，`*`运算符会得到迭代器所指向的元素实际上
+
+任何符合这些简单规则的对象都是一个迭代器,迭代器是一个概念。而且,用户很少需要知道一个特定迭代器的类型，每个容器都"知道"自己对应的迭代器的类型，并以规范的名字`iterator`和`const_iterator`供用户使用。例如，`list<Entry>::iterator`是`list<Entry>`的迭代器类型，我们很少需要担心"这个类型是如何被定义的" 。
+
+### 流迭代器
+
 ## 第11章 实用工具
 
 ## 第12章 数值计算
