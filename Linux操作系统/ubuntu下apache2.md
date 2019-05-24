@@ -37,10 +37,3 @@ apache2 7476 www-data    4u  IPv6  69058      0t0  TCP *:http (LISTEN)
 ├── sites-available # 所有的虚拟主机
 └── sites-enabled # 启用的虚拟主机
 ```
-
-
-
-
-
-
-

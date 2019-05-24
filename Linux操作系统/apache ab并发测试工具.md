@@ -1,4 +1,5 @@
 # 命令格式
+
 `ab -n 10 -c 10 http://www.baidu.com/`
 
 -V              查看ab版本
