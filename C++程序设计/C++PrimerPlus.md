@@ -796,14 +796,16 @@ class Stonewt
 {
 private:
     enum{ Lbs_per_stn = 14 };
-    int stone;
-    double pds_left;
-    double pounds;
+    int stone = 0;
+    double pds_left = 0.0;
+    double pounds = 0.0;
 
 public:
-    Stonewt( double lbs );
-    operator int() const;
-    explicit operator double() const;  // 只有显式的 double(对象) 时才会调用
+    Stonewt() = default;
+    explicit Stonewt( double lbs );
+    ~Stonewt() = default;
+    explicit operator int() const;
+    explicit operator double() const;
 };
 
 // 当 对象 = double类型; 时，自动调用
@@ -817,7 +819,7 @@ Stonewt::Stonewt( double lbs )
 // 当对象作为 int 时，自动调用本函数
 Stonewt::operator int() const
 {
-    return int ( pounds + 0.5 );
+    return lround( pounds );
 }
 
 // 当对象作为 double 时，自动调用本函数
@@ -835,17 +837,21 @@ C++允许指定在类和内置类型之间进行转换:
 
 ## 第12章 类和动态内存分配
 
+为了让程序在运行时决定内存分配，而不是在编译时确定，我们需要在类中使用`new`与`delete`控制内存分配。遗憾的是，这将会带来一些新的编程问题，现在就看看如何处理这些问题。
+
 C++自动为类提供以下成员函数：
 
 - 默认构造函数
 - 默认析构函数
 - 复制构造函数，用于初始化过程中，原型为`Class_name(const Class_name &)`
 - 赋值运算符，将一个对象赋值给另一个对象时，自动调用
-- 地址运算符，默认返回this指针的地址
+- 取地址运算符`&`，默认返回this指针的地址
 - 移动构造函数(C++11)
 - 移动赋值运算符(C++11)
 
-### 复制构造函数
+默认的复制构造函数的作用是：逐个复制非静态成员的值到新对象，也称为浅拷贝。浅拷贝带来的问题是，对于在类内使用`new`申请的动态内存，浅拷贝只复制了该内存的指针，而没有开辟新的动态内存空间，所有两个对象的指针成员指向的是同一块内存。
+
+默认赋值运算符也是同样的问题。
 
 复制构造函数的调用时机，一般来说，在涉及到按值传递的时候，都会调用：
 
@@ -857,28 +863,67 @@ StringBad also = StringBad(motto);
 StringBad *pStringBad = new StringBad( motto );
 ```
 
-默认的复制构造函数的作用是：逐个复制非静态成员的值到新对象，也称为浅拷贝。
+赋值运算符 与 复制构造函数类似，但是有一些区别:
 
-浅拷贝带来的问题：
+- 复制构造函数是使用旧对象**新生成**对象时调用，所以不需要清理新对象中的动态内存，而赋值运算符是两个已经生成的对象之间的赋值，所以被赋值的对象应该先清理`delete`它里面的动态内存，再申请新内存去存储拷贝过来的值。
 
-- 指针成员的问题，如果只是复制指针，那么两个对象的该指针成员将会指向同一块内存。
+- 第二，赋值运算符应该避免给对象自身赋值，这非常重要，因为上述原因，很可能清除对象的动态内存，所以我们应该先判断此次赋值操作是否为自身赋值，如果是，直接返回对象本身，不要做任何多余操作。
 
-### StringBad 类实例
+- 复制构造函数不需要返回任何数据，而赋值运算符需要返回对象的引用`return *this;`。
+
+多个构造函数只对应一个析构函数，所以使用`new`声明，与使用`new[]`申请的内存，在析构函数中必须使用对应的`delete`与`delete[]`，对于同一个变量，在不同的构造函数中，不允许即使用`new`声明，又使用`new[]`声明。
+
+函数或方法返回对象的方式:
+
+```c++
+// 拷贝方式返回 s1 或 s2, 这将调用 复制构造函数
+StringBad Max( const StringBad &s1, const StringBad &s2 );
+
+// 返回 s1 或 s2 的常量引用(因为入参是const), 不需要调用 复制构造函数，效率更高
+const StringBad &Max( const StringBad &s1, const StringBad &s2 );
+
+// 返回非常量引用
+ostream &operator<<( ostream &os, const StringBad &st );
+
+// 返回常量对象, 为了避免出现 if( str1 + str2 = "something" ) 能编译成功
+const StringBad StringBad::operator+( const StringBad &s1, const StringBad &s2 );
+
+```
+
+使用指向对象的指针:
+
+```c++
+Class_name *p_class = new Class_name(value); // 调用构造函数 Class_name(Type_name value);
+Class_name *ptr     = new Class_name;        // 调用默认构造函数
+
+delete p_class; // 使用delete后，才调用 Class_name 的析构函数
+delete ptr;
+```
+
+如果`Class_new`内部也使用了`new`与`delete`申请动态内存的话，那么上述代码就在两个层次上使用了动态内存。以`StringBad`举例:
+
+- `StringBad`内部使用了`new`为存储`str`字符串申请了堆内存
+- 在调用端`new StringBad`操作，为存储`StringBad`本身申请了堆内存，存储了`str`指针、`len`成员，`num_strings`则是独立存储在静态变量区的。
+
+当不需要对象时，在调用处也必须使用`delete`去释放`Class_name`对象本身，`Class_name`本身释放时，也会调用自身的析构函数去释放`str`指针指向的内存。
+
+`StringBad`例子:
 
 ```c++
 // StringBad.h
 class StringBad
 {
     private:
-        char *str;
-        int len;
-        static int num_strings;
+        char *str;                  // 指向string实际存储的char数组
+        int len = 0;                // char数组长度
+        static int num_strings;     // StringBad 类构造的对象的个数
 
     public:
-        StringBad( const char *s );       // 构造函数
-        StringBad();                      // 默认构造函数
-        StringBad( const StringBad &st ); // 复制构造函数
-        ~StringBad();                     // 析构函数
+        StringBad();                         // 默认构造函数
+        ~StringBad();                        // 析构函数
+        StringBad( const char *s );          // 构造函数,不使用 explicit,因为这个隐式转换很常见和方便
+        StringBad( const StringBad &st );    // 复制构造函数
+        int length() const { return len; }
 
         StringBad &operator=( const StringBad &st );
         StringBad &operator=( const char * );
@@ -887,6 +932,7 @@ class StringBad
 
         friend bool operator<( const StringBad &st, const StringBad &st2 );
         friend bool operator>( const StringBad &st, const StringBad &st2 );
+        friend bool operator==( const StringBad &st, const StringBad &st2 );
         friend std::ostream &operator<<(std::ostream &os, const StringBad &st );
         friend std::istream &operator>>(std::istream &is, StringBad &st);
 
@@ -894,23 +940,28 @@ class StringBad
 };
 
 std::ostream &operator<<( std::ostream &os, const StringBad &st );
-std::istream &operator>>(std::istream &is, StringBad &st);
+std::istream &operator>>( std::istream &is, StringBad &st );
+
 bool operator<( const StringBad &st, const StringBad &st2 );
 bool operator>( const StringBad &st, const StringBad &st2 );
+bool operator==( const StringBad &st, const StringBad &st2 );
+```
 
+```c++
 // StringBad.cpp
+int StringBad::num_strings = 0; // 必须在此处初始化，而不是在声明处
 
-using namespace std;
-
-int StringBad::num_strings = 0;
-
-StringBad::StringBad()
+StringBad::StringBad() : len{0}
 {
-    len = 0;
     str = new char[1];
     str[0] = '\0';
     ++num_strings;
-    cout << num_strings << " : " << str << " object created" << endl;
+}
+
+StringBad::~StringBad()
+{
+    cout << --num_strings << " StringBad object left" << endl;
+    delete[] str;
 }
 
 StringBad::StringBad( const char *s )
@@ -919,8 +970,6 @@ StringBad::StringBad( const char *s )
     str = new char[len + 1];
     strcpy( str, s );
     ++num_strings;
-
-    cout << num_strings << " : " << str << " object created" << endl;
 }
 
 StringBad::StringBad( const StringBad &st ){
@@ -928,12 +977,10 @@ StringBad::StringBad( const StringBad &st ){
     len = st.len;
     str = new char[len + 1];
     strcpy( str, st.str );
-    cout << num_strings << " object copyed" << endl;
 }
 
 // assign StringBad to StringBad
 StringBad &StringBad::operator=( const StringBad &st ){
-    cout << "= operator run" << endl;
     if( this == &st )
         return *this;
     delete[] str;
@@ -958,8 +1005,8 @@ char &StringBad::operator[](int i) {
     return str[i];
 }
 
-// read-only char access for const StringBad
-const char& StringBad::operator[](int i) const {
+// 在重载时，C++区分const与non-const特征标，所以这里提供一个仅供 const StringBad 对象使用的版本
+const char &StringBad::operator[](int i) const {
     return str[i];
 }
 
@@ -969,6 +1016,10 @@ bool operator<( const StringBad &st1, const StringBad &st2 ) {
 
 bool operator>( const StringBad &st1, const StringBad &st2 ){
     return st2 < st1;
+}
+
+bool operator==( const StringBad &st1, const StringBad &st2 ){
+    return 0 == strcmp( st1.str, st2.str );
 }
 
 istream &operator>>( istream &is, StringBad &st ){
@@ -988,23 +1039,58 @@ ostream &operator<<( ostream &os, const StringBad &st )
 }
 ```
 
-### 在构造函数中动态申请内存注意事项
 
-- 多个构造函数只对应一个析构函数，所以使用`new`声明，与使用`new[]`申请的内存，在析构函数中必须使用对应的`delete`与`delete[]`，对于同一个变量，在不同的构造函数中，不允许即使用`new`声明，又使用`new[]`声明。
 
-- 必须定义复制构造函数，通过深度复制将一个对象初始化为另一个对象
-
-- 还需要重载`=`运算符，通过深度复制将一个对象复制给另一个对象
-
-### 使用指向对象的指针
+### 定位new技术
 
 ```c++
-Class_name *p_class = new Class_name(value); // 调用构造函数 Class_name(Type_name value);
-Class_name *ptr     = new Class_name;        // 调用默认构造函数
+const int BUF = 1024;
 
-delete p_class; // 使用delete后，才调用 Class_name 的析构函数
-delete ptr;
+class JustTesting{
+private:
+    string words;
+    int number;
+public:
+    JustTesting( const string &s = "Just Testing", int n = 0 ) : words{s}, number{n} {
+        cout << "constructed" << endl;
+    }
+    ~JustTesting() { cout << words << " ~JustTesting" << endl; }
+
+    void show() const{
+        cout << words << ", " << number << endl;
+    }
+};
+
+int main( int argc, char *argv[] )
+{
+    char *Buffer = new char[BUFSIZ];
+
+    JustTesting *pc1 = new (Buffer) JustTesting;
+    JustTesting *pc2 = new JustTesting( "Heap1", 20 );
+    JustTesting *pc3 = new (Buffer + sizeof(JustTesting)) JustTesting( "Bad Idea", 6 );
+    JustTesting *pc4 = new JustTesting( "Heap2", 10 );
+
+    cout << (void *)Buffer << endl;
+    cout << pc1 << endl;
+    cout << pc3 << endl;
+    cout << pc2 << endl;
+    cout << pc4 << endl;
+
+    delete pc2;
+    delete pc4;
+
+    delete[] Buffer;
+
+    return EXIT_SUCCESS;
+}
 ```
+
+上述代码中，使用定位`new`从`Buffer`中为对象分配内存，需要注意的点:
+
+- `pc3` 如果从`Buffer`开始申请，会覆盖掉`pc1`
+- 定位`new`申请的内存，不能使用`delete`去删除，否则会发生运行时错误
+
+该技术能用到的地方有:写内存池、垃圾收集、以及调试。
 
 ## 第13章 类继承
 

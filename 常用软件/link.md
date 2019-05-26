@@ -18,12 +18,9 @@
 - [精品电子书 免费下载](https://bookset.me/)
 - [书语者](https://book.shuyuzhe.com/)
 
-### 图片上传
-
-- [sm.ms图床](https://sm.ms/)
-
 ### 代码工具
 
+- [自测代码练习平台](https://exercism.io/)
 - [Mikutools工具集合](https://miku.tools)
 - [代码在线运行工具](https://tool.lu/)
 - [Json格式化工具](http://json.awesomes.cn/)
