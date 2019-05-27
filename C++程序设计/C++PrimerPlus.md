@@ -1094,17 +1094,276 @@ int main( int argc, char *argv[] )
 
 ## 第13章 类继承
 
-```c++
-// 公有继承
-class A : public B { }
+继承是一种很好的代码重用的技术。
 
-// 派生类的构造函数 需要使用 成员初始化列表来调用 基类构造函数
-A::A( type a, type b ) : B( a, b ) { }
+公有`public`派生：
+
+- 基类的公有成员将成为派生类的公有成员
+- 基类的私有部分也将成为派生类的一部分，但是**只能通过基类的public和protect方法访问**
+- 派生类对象存储了基类的数据成员
+- 派生类对象可以使用基类的方法
+
+创建派生类对象之前，一定会先创建基类对象，派生类的构造函数必须调用基类的构造函数，如果未能显式调用，则编译器会使用基类的默认构造函数。
+
+派生类构造函数要点：
+
+- 首先创建基类对象
+- 派生类构造函数必须调用一个基类构造函数，可以通过成员初始化列表指定要使用的基类构造函数，并将数据传递给基类构造函数
+- 派生类构造函数应该初始化派生类新增的数据成员
+- 派生类对象过期时，首先会调用派生类的析构函数，然后再调用基类的析构函数
+
+```c++
+class TableTennisPlayer{
+private:
+    string firstname;   //
+    string lastname;    //
+    bool hasTable;      // 是否有球桌?
+public:
+    TableTennisPlayer(const string &fn, const string &ln, bool ht = false ) :
+        firstname{fn},lastname{ln},hasTable{ht} { }
+    void name() const{
+        cout << lastname << "," << firstname << endl;
+    };
+    bool HasTable() {return hasTable;}
+    void ResetTable(bool v ) {hasTable = v;};
+};
+
+class RatePlayer : public TableTennisPlayer{
+private:
+    unsigned int rating; // 参与比赛次数
+public:
+    explicit RatePlayer(unsigned int, const string &fn = "none", const string &ln = "none", bool ht = false ) :
+        TableTennisPlayer(fn, ln, ht), rating{r} { }
+
+    RatePlayer(unsigned int r, const TableTennisPlayer &tp ) :
+        TableTennisPlayer(tp), rating{r} { }
+
+    unsigned int Rating() const { return rating; }
+
+    void ResetRating(unsigned int r ){ rating = r; }
+};
 ```
 
-派生类对象可以使用基类对象的`public`方法。
+派生类与基类之间的关系：
 
-基类的指针和引用可以直接指向或引用派生类对象，但是该指针和引用只能使用在 基类 中有声明的方法。
+- 派生类对象可以使用基类的非`private`方法
+- 基类指针可以在 **不进行显式类型转换** 的情况下，指向派生类对象，但是该指针只能调用基类方法
+- 基类引用可以在 **不进行显式类型转换** 的情况下，引用派生类对象，但是该引用只能调用基类方法
+- 不可以将基类对象以及指针，赋值给派生类的引用 或者 指针
+
+```c++
+void show( const TableTennisPlayer &tp )
+{
+    tp.name();
+    if( tp.HasTable() )
+        cout << "has table" << endl;
+    else
+        cout << "no table" << endl;
+}
+
+TableTennisPlayer cao { "kaiyan", "cao", false };
+RatePlayer zhan { 123, "jian", "zhang", true };
+
+show( cao );
+show( zhan );
+```
+
+派生类与基类之间的特殊关系是基于C++继承的底层模型的。
+
+对于同一个方法，如果我们希望它在基类与派生类中的行为是不同的。即方法的行为取决于调用该方法的对象。这称为**多态**。实现多态:
+
+- 在派生类中重新定义基类中的方法
+- 使用虚方法
+
+```c++
+class Brass{
+private:
+    std::string fullName;   // 客户姓名
+    long acctNum;           // 账号
+    double balance;         // 资金结余
+public:
+    Brass( string s, long an, double bal ) : fullName{std::move(s)}, acctNum{an}, balance{bal} { }
+    virtual ~Brass() = default;
+
+    // 存款
+    void Deposit( double amt ){
+        balance += amt;
+        cout << fullName << " 存入 " << amt << " 余额：" << balance << endl;
+    }
+
+    // 提现
+    virtual void Withdraw( double amt ){
+        if( amt <= balance )
+        {
+            balance -= amt;
+            cout << fullName << " 取出 " << amt << " 余额：" << balance << endl;
+        }else{
+            cout << "您的余额不足" << endl;
+        }
+    }
+
+    virtual void ViewAcct() const{
+        cout << "姓名: " << fullName << endl;
+        cout << "账号: " << acctNum << endl;
+        cout << "余额: " << balance << endl;
+    }
+
+    double Balance() const{
+        return balance;
+    }
+};
+
+class BrassPlus : public Brass{
+private:
+    double maxLoan;     // 贷款上限
+    double rate;        // 贷款费率
+    double owesBank;    // 欠款金额
+public:
+    BrassPlus(const string &s, long an, double bal, double ml, double r ) :
+        Brass{s,an,bal}, maxLoan{ml}, rate{r}, owesBank{0.0} { }
+
+    BrassPlus(const Brass &ba, double ml, double r ) :
+        Brass{ba}, maxLoan{ml}, rate{r}, owesBank{0.0} { }
+
+    void ViewAcct() const override{
+        Brass::ViewAcct();
+        cout << "贷款上限：" << maxLoan << endl;
+        cout << "贷款费率: " << rate << endl;
+        cout << "欠款金额: " << owesBank << endl;
+    }
+
+    void Withdraw( double amt ) override{
+        if( amt <= Balance() )
+        {
+            Brass::Withdraw( amt );
+        }
+        else if( amt <= Balance() + maxLoan - owesBank )
+        {
+            double advance = amt - Balance();
+
+            owesBank += advance * (1.0 + rate);
+
+            Deposit( advance );
+
+            Brass::Withdraw( amt );
+        }
+        else
+        {
+            cout << "贷款金额超额" << endl;
+        }
+    }
+
+    void ResetMax( double m ) { maxLoan = m; }
+    void ResetRate( double r ) { rate = r; }
+    void ResetOwes() { owesBank = 0; }
+};
+```
+
+多态的体现:
+
+```c++
+Brass cao ("codekissyoung", 38123, 4000.0 );
+BrassPlus zhan ("zhangjian", 38124, 5000.0, 10000.0, 0.04 );
+
+Brass* accout_list[2];
+
+accout_list[0] = &cao;
+accout_list[1] = &zhan;
+
+for( int i = 0; i < 2; ++i ){
+    accout_list[i]->ViewAcct(); // 这句就是 多态的 体现，Brass基类的指针，能够根据情况分别调用 基类 与 派生类的实现
+    cout << endl;
+}
+```
+
+### 动态绑定 虚函数的实现
+
+通常情况下，C++不允许 A 类型的指针 指向 B 类型的对象，也允许 A 类型的引用 与 B 类型的对象绑定在一起。
+
+但是对于 A 与 B 是继承关系的 类 来说, 基类的指针与引用是可以指向或绑定到派生类的:
+
+```c++
+BrassPlus zhan ("zhangjian", 38124, 5000.0, 10000.0, 0.04 );
+
+Brass *pb = &zhan;
+Brass &rb = zhan;
+```
+
+考虑下面代码：
+
+```c++
+BrassPlus zhan ("zhangjian", 38124, 5000.0, 10000.0, 0.04 );
+
+Brass *pz = &zhan;
+
+pz -> ViewAcct(); // 调用 Brass 的实现，还是调用 BrassPlus 的实现？
+```
+
+指针`pz`在编译时类型 已知 且 固定，若`ViewAcct()`未声明为`virtual`则 编译器 采用**静态编译**，与`Brass`指针绑定的方法就是`Brass::ViewAcct()`,所以这种情况，即便原始对象为`BrassPlus`,但使用`Brass`类型指针调用，实际执行的代码也是`Brass`的实现。
+
+如果`ViewAcct()`被声明为`virtual`虚函数呢？我们先来看看虚函数的原理与实现：
+
+编译器在处理虚函数：
+
+- 给每个对象添加一个隐藏成员`*vtpl`，它指向了一个数组，数组的成员是 函数地址（称为**虚函数表**）
+- 只有 虚函数 的函数地址才会 存入该虚函数表
+- 如果派生类中，重新实现了该虚函数，则新实现函数的地址 会 存入 派生类对象的 虚函数表中，如果派生类未实现，则存入基类的 虚函数实现 地址
+- 注意，无论类中包含几个虚函数，对象都只有一个隐藏成员，只是不同 对象 的该隐藏成员指向的 虚函数表 的大小不同而已
+
+原理图示如下：
+
+```c++
+class Scientist{
+    char name[40];
+public:
+    virtual void show_name();
+    virtual void show_all();
+};
+
+class Physicist : public Scientist{
+    char field[40];
+public:
+    void show_all(); // redefined
+    virtual void show_field();
+};
+```
+
+![虚函数的原理](https://img.codekissyoung.com/2019/05/27/96bd6555c0b9fd246b3112e69111e76b.png)
+
+PS: 基类中使用`virtual`声明方法，则该方法在所有派生类中的都是`virtual`的
+PS: 如果要在派生类中重新定义基类的方法，通常应将基类方法声明为虚的。这样，程序将根据实际的对象类型，而不是 引用 或 指针的类型来选择方法版本
+
+虚函数还需要注意的点：
+
+- 构造函数不能是虚函数。创建派生类对象，使用的是派生类的构造函数，然后由它使用基类的一个构造函数。这是不同于虚函数的一套继承机制。
+
+- 基类的析构函数应当声明为`virtual`
+
+- 如果基类声明`virtual`的方法有多个重载版本，则应该在派生类中重新定义该方法所有的重载版本
+
+`protected`访问控制：
+
+- 对于数据成员，派生类能直接访问基类的`protected`数据成员
+- 对于成员方法，派生类能通过基类名字调用其`protected`成员方法。它能够声明让派生类能够访问，而公众不能访问的基类的内部函数。
+
+### 纯抽象类 ABC
+
+假设现在要构造一个`Ellipse`（椭圆）类和一个`Circle`（圆）类，如果两者是`is-a`的关系，则派生会显得笨拙：
+
+- 圆 只需要 一个半径 就可以描述大小，而椭圆需要 长半轴 和 短半轴
+- 其他问题...等等
+
+但是圆与椭圆又有非常多的共性。所以，我们提出一种方案，将它们的共性抽象出来，放到一个纯抽象类`BaseEllipse`中，然后从该类派生出`Circle`与`Ellipse`类。这样就可以使用`BaseEllipse`的指针，同时管理`Circle`与`Ellipse`对象。
+
+```c++
+class BaseEllipse{
+public:
+    void move( int nx, int ny ) { x = nx; y = ny; }
+    virtual double Area() const = 0; // 纯虚函数
+};
+```
+
+要成为`ABC`,必须至少包含一个纯虚函数（`= 0`声明），纯抽象类不能用来创建对象。
 
 ## 第14章 C++的代码重用
 
