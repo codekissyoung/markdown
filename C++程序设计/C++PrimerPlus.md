@@ -1450,13 +1450,230 @@ Child &Child::operator=( const Child &cd ){
 
 ## 第14章 C++的代码重用
 
-### 包含对象成员的类
+### 包含对象成员的类 实现 has-a 关系
 
-### 私有继承
+代码中使用了`string`类 以及 `valarray` 类的对象，作为数据成员。
 
-### 从多个基类继承
+```c++
+class Student{
+private:
+    typedef std::valarray<double> ArrayDb;
+    std::string name; // 姓名
+    ArrayDb scores;   // 分数
+public:
+    Student() : name{"Null student"}, scores{} {}
+    explicit Student( string s ) : name(std::move(s)), scores{} { }
+    ~Student() = default;
+    double average() const{
+        if( scores.size() > 0 )
+            return scores.sum() / scores.size();
+        else
+            return 0;
+    }
+    const string &Name() const{ return name; };
+};
+```
+
+### 私有继承 + 多重继承 实现 has-a 关系
+
+私有继承中，基类的`public`与`protected`成员都将成为派生类的`private`成员。即获得基类的实现，当不获得接口。
+
+```c++
+class Student : private std::string, private std::valarray<double>{
+private:
+    typedef std::valarray<double> ArrayDb;
+public:
+    Student( const char *str, const double *pd, int n ) :
+        std::string(str), ArrayDb( pd, n ) {}
+    double average () const{
+        if( ArrayDb::size() > 0  )
+            return ArrayDb::sum() / ArrayDb::size();
+        else
+            return 0;
+    }
+    const string &Name() const{
+        return (const string &)*this;
+    }
+};
+```
+
+PS: 通常应该使用对象作为数据成员的方式来实现`has-a`关系，私有继承 + 多重继承 不易于理解，且代码怪异！
+
+`public` `protected` 与 `private`继承：
+
+![WX20190528-145747.png](https://img.codekissyoung.com/2019/05/28/06b36768cc48886f8f5a069492ab827c.png)
+
+### 多继承 MI
+
+个人觉得，因为多继承会使代码变得隐晦，并且很容易引入错误，所以最好的办法就是重新考虑自己的代码设计，不要使用多继承。
+
+- [C++多重继承](https://www.cnblogs.com/xingchenfeng/p/3773890.html)
+- [说说C++多重继承](https://www.cnblogs.com/mengwang024/p/4375357.html)
 
 ### 类模板
+
+一个栈的类模板示例（只含有一个类型参数）：
+
+```c++
+#ifndef _STACK_H_
+#define _STACK_H_
+
+#include <iostream>
+
+template <typename Item>
+class My_stack
+{
+private:
+    enum { SIZE = 10 };  // 默认栈的大小
+    int top;            // 栈顶
+    int size;           // 栈大小
+    Item *items;        // 内部数据结构,使用堆内数组实现
+
+public:
+    My_stack() : top{0}, size{SIZE}, items{ new Item[SIZE] } { };
+    explicit My_stack( int ss ) : size{ ss }, top{0}, items{ new Item[ss]} { }
+    My_stack( const My_stack &st );
+
+    ~My_stack() { std::cout << "~My_stack called" << std::endl; }
+
+    bool isempty() const{ return top == 0; }
+
+    bool isfull() const{ return top == size; }
+
+    bool push( const Item &item );
+
+    bool pop( Item &item );
+
+    My_stack<Item> &operator=( const My_stack &st );
+};
+
+template<typename Item>
+My_stack<Item> &My_stack<Item>::operator=(const My_stack &st) {
+    if( this == &st )
+        return *this;
+
+    top = st.top;
+    size = st.size;
+
+    delete[] items;
+    items = new Item[size];
+    for( int i = 0; i < size; ++i )
+        items[i] = st.items[i];
+
+    return *this;
+}
+
+template <typename Item>
+bool My_stack<Item>::push( const Item &item )
+{
+    if( isfull() )
+    {
+        return false;
+    }else{
+        items[top++] = item;
+        return true;
+    }
+}
+
+template <typename Item>
+bool My_stack<Item>::pop( Item &item )
+{
+    if ( isempty() ){
+        return false;
+    } else {
+        item = items[--top];
+        return true;
+    }
+}
+
+template<typename Item>
+My_stack<Item>::My_stack(const My_stack &st) {
+    size = st.size;
+    top = st.top;
+    items = new Item[size];
+    for( int i = 0; i < size; ++i )
+    {
+        items[i] = st.items[i];
+    }
+}
+
+#endif
+```
+
+定长数组示例（包含类型参数 与 非类型参数）：
+
+```c++
+#ifndef CPP_MY_ARRAY_H
+#define CPP_MY_ARRAY_H
+
+#include <iostream>
+#include <cstdlib>
+
+template <typename T, int n>
+class My_array {
+private:
+    T ar[n];
+public:
+    explicit My_array( const T &v );
+    My_array() : My_array(0) { }
+    virtual T &operator[]( int i );
+    virtual T operator[]( int i ) const;
+    ~My_array(){ std::cout << "~My_array called!" << std::endl;}
+};
+
+template<typename T, int n>
+My_array<T, n>::My_array(const T &v) {
+    for( int i = 0; i < n; ++i )
+        ar[i] = v;
+}
+
+template<typename T, int n>
+T &My_array<T, n>::operator[](int i) {
+    return ar[i];
+}
+
+template<typename T, int n>
+T My_array<T, n>::operator[](int i) const {
+    return ar[i];
+}
+
+#endif //CPP_MY_ARRAY_H
+
+```
+
+`Pair`类模板示例（使用两个类型参数）：
+
+```c++
+#ifndef CPP_MY_PAIR_H
+#define CPP_MY_PAIR_H
+
+template <typename T1, typename T2>
+class My_pair {
+private:
+    T1 a;
+    T2 b;
+public:
+    My_pair() = default;
+    My_pair( const T1 &av, const T2 &bv );
+
+    T1 &first() { return a; }
+    T2 &second() { return b; }
+
+    T1 first() const;
+    T2 second() const;
+};
+
+template<typename T1, typename T2>
+My_pair<T1, T2>::My_pair(const T1 &av, const T2 &bv) : a{av}, b{bv}{ }
+
+template<typename T1, typename T2>
+T1 My_pair<T1, T2>::first() const { return a; }
+
+template<typename T1, typename T2>
+T2 My_pair<T1, T2>::second() const { return b; }
+
+#endif //CPP_MY_PAIR_H
+```
 
 ## 第15章 友元、异常和其他
 
@@ -1483,3 +1700,5 @@ Child &Child::operator=( const Child &cd ){
 ## 第17章 输入 输出和文件
 
 ## 第18章 探讨C++新标准
+
+// P599
