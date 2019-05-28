@@ -1675,13 +1675,157 @@ T2 My_pair<T1, T2>::second() const { return b; }
 #endif //CPP_MY_PAIR_H
 ```
 
+模板类的类型参数默认值:
+
+```c++
+template<typename T1, typename T2 = int>
+```
+
+**具体化版本的模板类**:用于某些特殊类型不适用于定义好的模板类的情况,比如模板使用`>`运算符比较大小，对于数字类型或者是定义了`operator>()`运算符的类型都适用，但是对于`const char *`字符串来说，没有`>`运算符，只有`strcmp`函数，这个时候，我们就需要为这么一种特殊情况，定义该模板类的具体化版本。
+
+```c++
+template<> class SortedArray<const char*>
+{
+    // ...
+}
+```
+
 ## 第15章 友元、异常和其他
 
 ### 友元类与友元成员函数
 
+友元: 绕过`private`访问控制，直接访问类内私有数据。
+
+```c++
+class Tv{
+public:
+    friend class Remote;                          // 友元类，Remote中可以任意访问Tv中私有数据
+    friend void Remote::set_chan( Tv &t, int c ); // 友元成员方法
+};
+```
+
+嵌套类作用域:
+
+![嵌套类作用域](https://img.codekissyoung.com/2019/05/28/26004897aecc93ff566531246a081638.png)
+
+```c++
+class Queue{
+private:
+    enum { SIZE = 10 };
+    class Node{
+        Item item;
+        Node *next;
+        Node( const Item &i ) : item(i), next(0) { }
+    };
+    Node *front;
+    Node *rear;
+};
+```
+
 ### 异常
 
+C++异常是对程序运行过程中发生的异常情况的一种响应。异常提供了将控制权从程序的一个部分传递到另一个部分的途径。
+
+```c++
+while( cin >> x >> y )
+{
+    try{
+        z = hmean( x, y );
+    }catch( const char *s ){
+        cout << s << endl;
+        cout << "Enter a new pair of numbers: ";
+        continue;
+    }
+
+    cout << "answer : " << z << endl;
+}
+
+double hmean( double a, double b )
+{
+    if( a == -b )
+        throw "bad hmean() arguments: a = -b not allowed";
+    return 2.0 * a * b / (a + b);
+}
+```
+
+上述代码:
+
+1. 程序在`try`块中调用`hmean()`
+1. `hmean()`引发异常（类型为`char *`），从而执行`catch( const char *s)` 块，将异常字符串赋给s
+1. `catch`块返回到`while`循环开始位置，即处理了异常
+
+引发异常的函数通常要`throw`一个对象，这样我们就可以根据该对象的类型，来区分不同的函数在不同的情况下引发的异常。对象还可以携带信息，根据这些信息来确定引发异常的原因，并采取相应措施。
+
+`throw`和`return`之间的区别何在?
+
+- 假设`f1()`调用函数`f2()`，`f2()`返回后，执行`f1()`中调用`f2()`处后面一句代码。如果是`throw`的话，将先返回`f1()`处找`try catch`块，如果找不到继续往上层调用处找，找到后，执行匹配的`catch`块，而不是`f1()`调用`f2()`处后面一句代码。
+
+假设有一个从异常基类派生来的异常类层次结构，则应该按什么顺序放置`catch`块?
+
+- 应按从子孙到祖先的顺序排列`catch`语句块
+
 ### RTTI 运行时类型识别
+
+C++有3个支持`RTTI`的元素:
+
+- `dynamic_cast`试图将一个指向基类的指针，转化为指向派生类的指针，否则返回`nullptr`
+- `typeid`返回一个指出对象的类型的值
+- `type_info`结构存储了有关特定类型的信息
+
+只能将`RTTI`运用于包含虚函数的类层次结构，因为只有这里才会将派生对象的地址赋值给基类指针。
+
+```c++
+class Grand{ };
+class Superb : public Grand{ };
+class Magnificent : public Superb{ };
+
+Grand *pg = new Grand;
+Grand *ps = new Superb;
+Grand *pm = new Magnificent;
+
+// 强制类型转换
+Magnificent *p1 = (Magnificent *)pm;    // 安全，同类型指针
+Magnificent *p2 = (Magnificent *)pg;    // 不安全，基类到派生的转换
+Superb *p3      = (Magnificent *)pm;    // 安全，派生类到基类的转换
+
+// RTTI
+Superb *p4 = dynamic_cast<Superb *>( pg ); // pg 能否安全地转为 Superb * 类型？ 不能 返回 nullptr
+
+if( ps = dynamic_cast<Superb *>(pm) )
+    ps -> speak();
+```
+
+![Screenshot from 2019-05-29 00-01-09.png](https://img.codekissyoung.com/2019/05/29/6183fa4fd5976159441203fe5a2675e2.png)
+
+```c++
+if( typeid(*pg) == typeid(Magnificent) )
+    cout << "pg为真正的 magnificent 指针";
+```
+
+类型转换运算符:
+
+```c++
+// dynamic_cast
+if( ps = dynamic_cast<Superb *>(pm) )
+    ps -> speak();
+
+// const_cast
+void change( const int *pt, int n ){
+    int *pc = const_cast<int *>(pt);  // 去除了 const 属性
+    *pc += n;
+}
+
+// static_cast
+// High 是基类，Low是High的派生类，Pond 是一个无关的类
+High bar;
+Low blow;
+
+High *ph = static_cast<High *>(&blow);  // 正确 向上转换
+Low  *pl = static_cast<Low *>(&bar);    // 正确，向下转换，pl指针的使用要小心，不安全
+Pond *pp = static_cast<Pond *>(&blow);  // 错误
+
+// reinterpret_cast
+```
 
 ## 第16章 string类与标准模板库
 
@@ -1695,10 +1839,10 @@ T2 My_pair<T1, T2>::second() const { return b; }
 
 ### 函数对象
 
-### 算法
+### STL算法
 
 ## 第17章 输入 输出和文件
 
 ## 第18章 探讨C++新标准
 
-// P599
+// P672
