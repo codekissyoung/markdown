@@ -1831,11 +1831,230 @@ Pond *pp = static_cast<Pond *>(&blow);  // 错误
 
 ### string类
 
+`string`类的构造函数：
+
+![WX20190529-115342.png](https://img.codekissyoung.com/2019/05/29/2442c8de4b0ced1829f82cdd0f4a7a21.png)
+
+知道有哪些输入方式可用，对于`C-style`字符串:
+
+```c++
+char info[100];
+cin >> info;
+cin.getline( info , 100 );
+cin.get( into, 100 );
+```
+
+对于`string`类:
+
+```c++
+string stuff;
+cin >> stuff;
+getline( cin, stuff ); // string 版本的
+```
+
+PS: `getline`还可以传第三个参数，一个确定输入边界的字符
+
+`string`库实际上是基于`basic_string`类的，有4个具体化:
+
+```c++
+typedef basic_string<char>      string;
+typedef basic_string<wchar_t>   wstring;
+typedef basic_string<char16_t>  u16string; // C++11
+typedef basic_string<char32_t>  u32string; // C++11
+```
+
 ### 智能指针模板类
 
-### 标准模板库
+**智能指针**是行为类似于指针的类对象，它模仿了指针的使用，并且还实现了其他有用的功能。
+
+```c++
+void remodel( string &str )
+{
+    string *ps = new string( str );
+    // ...
+    str = *ps;
+}
+```
+
+上述代码中，每次该函数调用时，都从堆内存分配内存，但是从不回收，从而导致内存泄漏。
+
+当`remodel()`函数终止，所有函数内的局部变量都从栈内存中删除，包括`ps`指针，如果此时`ps`指向的内存也被释放，那就完美了。如果`ps`有一个析构函数，该函数在指针`ps`被删除时清理指针指向的内存，但是`ps`只是一个常规指针，不是有析构函数的类对象。假如我们构造一个可以模拟`ps`操作的对象呢？在对象过期时，它的析构函数自动执行清理堆内存。这正是`auto_ptr`、`unique_ptr`和`shared_ptr`背后的思想。
+
+`auto_ptr`是`C++98`提供的解决方案，`C++11`中已废弃，推荐使用`unique_ptr`与`shared_ptr`。
+
+
+```c++
+void remodel( string &str )
+{
+    auto_ptr<string> ps { new string( str ) };
+    // ...
+    str = *ps;
+}
+```
+
+![WX20190529-140855.png](https://img.codekissyoung.com/2019/05/29/3e024f4c80abdaca13a65973962ffc1c.png)
+
+使用`shared_ptr`与`unique_ptr`:
+
+```c++
+class Report{
+private:
+    string str;
+public:
+    Report( const string &s ) : str{s} { cout << "object created!" << endl; }
+    ~Report(){ cout << "~Report called!" << endl; }
+    void comment() const { cout << str << endl; }
+};
+int main( int argc, char *argv[] )
+{
+    {
+        shared_ptr<Report> ps {new Report("using shared_ptr")};
+        ps -> comment();
+    }
+    {
+        unique_ptr<Report> ps { new Report("using unique_ptr") };
+        ps->comment();
+    }
+    return EXIT_SUCCESS;
+}
+```
+
+`unique_ptr`为何优于`auto_ptr`:
+
+```c++
+auto_ptr<string> p1 ( new string("auto") );
+auto_ptr<string> p2;
+p2 = p1;
+```
+
+上述代码中，`p2`将接管`string`对象的所有权，`p1`的所有权将被剥夺（这防止了`p1`与`p2`的析构函数`delete`同一块堆内存），但是如果程序员再之后的代码中，继续使用`p1`，会带来不可预测问题，因为`p1`不再指向任何有效的数据。
+
+```c++
+unique_ptr<string> p3 ( new string("auto") );
+unique_ptr<string> p4;
+p4 = p3;
+```
+
+改为`unique_ptr`后，编译器在编译期直接在`p4 = p3;`处报编译错误，从而在机制上避免了`auto_ptr`的问题。但是当`unique_ptr`作为一个临时的右值时，是可以赋值给其他变量的：
+
+```c++
+unique_ptr<string> demo( const char *s ){
+    unique_ptr<string> temp( new string(s) );
+    return temp;
+}
+
+unique_ptr<string> p1;
+p1 = unique_ptr<string>( new string("hello") );
+```
 
 ### 泛型编程
+
+模板使得算法独立于存储的数据类型，而迭代器使算法独立于使用的容器。
+
+```c++
+double *find_ar( double *ar, int n, const double &val )
+{
+    for( int i = 0; i < n; ++i ){
+        if( ar[i] == val )
+            return &ar[i];
+    }
+    return nullptr;
+}
+```
+
+上述代码中，使用下标来遍历数组。可以使用模板将这种算法推广到所有包含`==`运算符的任意类型的数组。尽管如此，这种算法仍然与**数组**这种特定的数据结构绑定在一起。
+
+```c++
+struct Node{
+    double item;
+    Node *p_next;
+};
+Node *find_ll( Node *head, const double &val ){
+    Node *start;
+    for( start = head; start != nullptr; start = start->p_next )
+    {
+        if( start->item == val )
+            return start;
+    }
+    return nullptr;
+}
+```
+
+上述代码中，使用模板可以将这种算法推广到支持`==`的任何数据类型的链表。然而，这种算法也是与**链表**这种特定的数据结构绑定在一起。
+
+泛型编程的目的，在于使用同一个`find`函数来处理数组、链表或其他任何容器类型。函数不与容器的类型、容器内元素的类型绑定。模板能够解决容器内元素的绑定，而**迭代器**正是为了解决遍历容器内元素的通用方法。
+
+迭代器应该具备的特征：
+
+- 能够对迭代器进行`*`解引用操作，用于访问它引用的值
+- 能够相互赋值，`=` 操作
+- 能够将一个迭代器与另一个迭代器比较，`==` `!=`操作
+- 能够使用迭代器遍历容器中所有元素，`++`操作
+
+对上述代码进行改造:
+
+```c++
+// 第一遍
+typedef double* iterator;
+iterator find_ar( iterator ar, int n, const double &val )
+{
+    for( int i = 0; i < n; i++, ++ar ){
+        if( *ar == val )
+            return ar;
+    }
+}
+
+// 第二遍
+iterator find_ar( iterator begin, iterator end, const double &val )
+{
+    iterator ar;
+    for( ar = begin; ar != end; ++ar ){
+        if( *ar == val )
+            return ar;
+    }
+    return end;
+}
+```
+
+对于`find_ll()`函数，则必须要实现这么一个迭代器器，其中必须定义`*`和`++`操作，这样才能和`find_ar`函数的实现靠近
+
+```c++
+class iterator{
+private:
+    Node *pt;
+public:
+    iterator() : pt(0) { }
+    iterator( Node *pn ) : pt( pn ) { }
+    double operator*() { return pt->item; }
+    // for ++it
+    iterator &operator++(){
+        pt = pt->p_next;
+        return *this;
+    }
+    // for it++
+    iterator operator++(int){   // int 是区分后缀版本用的，不会使用到，所以写个 int 就行了
+        iterator tmp = *this;
+        pt = pt->p_next;
+        return tmp;
+    }
+}
+
+iterator find_ll( iterator head, iterator end, const double &val ){
+    iterator it;
+    for( it = head; it != end; ++it )
+    {
+        if( *it == val )
+            return it;
+    }
+    return end;
+}
+```
+
+有了迭代器后，算法的设计应该基于迭代器的特征以及容器特征。
+
+五种迭代器的类型以及能执行的操作：
+
+![WX20190529-162231.png](https://img.codekissyoung.com/2019/05/29/73431874bc80311bc8eb62069bddecfd.png)
 
 ### 函数对象
 
@@ -1844,5 +2063,3 @@ Pond *pp = static_cast<Pond *>(&blow);  // 错误
 ## 第17章 输入 输出和文件
 
 ## 第18章 探讨C++新标准
-
-// P672
