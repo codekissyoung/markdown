@@ -391,3 +391,43 @@ char* mode_to_letters( int mode ){
 ```
 
 ## 第4章 文件系统:编写pwd
+
+一块磁盘被划分成多个分区，分区再切成`512Byte`大小的扇区，扇区从 0 开始编号，然后将这些扇区分为三个部分（如下图）。
+
+![文件系统](https://img.codekissyoung.com/2019/06/05/2f92f4319bd4f07a6b7b092133824cbc.png)
+
+如果创建了一个新文件，文件系统该如何存储:
+
+1. 存储属性，找到一个空`i-node`节点
+1. 存储实际数据
+1. 在`i-node`节点记录上述实际存储数据的块序列编号
+1. 添加`i-node`节点序号，以及新文件名到 目录文件
+
+![创建一个新文件](https://img.codekissyoung.com/2019/06/05/4d29857bebcee145268018e97cd0ede3.png)
+
+读取一个文件的过程:
+
+1. 在目录中寻找文件名，然后找到对应的`i-node`节点号
+1. 定位到`i-node`节点，然后找到文件实际内容存储所在的块序号
+1. 访问实际的数据块
+
+![读取文件](https://img.codekissyoung.com/2019/06/05/d3d89bf8fa0ee7321c07fe2ba9e52ac2.png)
+
+固定长度的`i-node`节点，如何跟踪大文件？答案是，使用`i-node`最后空间存储一个数据块的序号，该序号对应的数据存储区域里存的不是数据，而是文件接下来的存储序号，这个块称为间接块。
+
+如果间接块也饱和了，那就继续使用这种方式构造下一个间接块，称为二级间接块。
+
+![利用间接块存储大文件](https://img.codekissyoung.com/2019/06/05/958321519181a1c2b4d94246a4196caf.png)
+
+目录树的两种视图:
+
+![目录树的两种视图](https://img.codekissyoung.com/2019/06/05/43a3f1b6d04dbd346b6dbac886a62afa.png)
+
+```c++
+int result = mkdir( char *pathname, mode_t mode );        // 创建新目录
+int result = rmdir( const char *path );                   // 删除目录
+int result = unlink( const char *path );                  // 删除一个文件，i-node链接数减一
+int result = link( const char *origin, const char *new ); // 创建一个硬链接,i-node链接数加一
+int result = rename( const char *from, const char *to );  // 重命名一个链接，或移动到新目录
+int result = chdir( const char *path );                   // 改变所调用进程的当前目录
+```
