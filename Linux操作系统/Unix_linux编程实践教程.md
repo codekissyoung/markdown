@@ -423,6 +423,8 @@ char* mode_to_letters( int mode ){
 
 ![目录树的两种视图](https://img.codekissyoung.com/2019/06/05/43a3f1b6d04dbd346b6dbac886a62afa.png)
 
+常用API:
+
 ```c++
 int result = mkdir( char *pathname, mode_t mode );        // 创建新目录
 int result = rmdir( const char *path );                   // 删除目录
@@ -431,3 +433,98 @@ int result = link( const char *origin, const char *new ); // 创建一个硬链�
 int result = rename( const char *from, const char *to );  // 重命名一个链接，或移动到新目录
 int result = chdir( const char *path );                   // 改变所调用进程的当前目录
 ```
+
+`Linux`的每个分区有自己的文件系统树，`Linux`提供一种方法将这些树整合成一棵更大的树。
+
+其中一个文件系统被命名为根文件系统，这棵树的顶端是整个树真正的根。其他的文件系统都是附加到根文件系统的某个子目录上，这个过程称为**挂载**。在内部，内核将根文件系统的一个目录作为指针，指向另一个文件系统的根，这样两个文件系统就联系起来了。
+
+![树的嫁接](https://img.codekissyoung.com/2019/06/06/4069a55725ec3b10d4a3d1c4326daf36.png)
+
+不同文件系统的`i-node`节点号会重复。所以，无法在不同文件系统使用`link`与`rename`，即不允许跨设备创建硬链接
+
+![i-node节点号](https://img.codekissyoung.com/2019/06/06/be65f228fdabee4ed2ae7a7b218389ed.png)
+
+只能向上回溯到当前文件系统的根（不能跨文件系统）的`pwd`命令:
+
+```c++
+ino_t get_inode( const char * );
+void printpathto( ino_t );
+void inum_to_name( ino_t , char *, int );
+
+int main( int argc, char *argv[] )
+{
+    printpathto( get_inode(".") );
+    cout << endl;
+}
+
+void printpathto( ino_t this_inode ){
+
+    ino_t my_inode;
+    char its_name[BUFSIZ];
+
+    if( get_inode("..") != this_inode ){
+        chdir( ".." );
+        inum_to_name( this_inode, its_name, BUFSIZ );
+        my_inode = get_inode( "." );
+        printpathto( my_inode );
+        cout << "/" << its_name;
+    }
+}
+
+ino_t get_inode( const char *fname ){
+    struct stat info;
+    stat( fname, &info );
+    return info.st_ino;
+}
+
+void inum_to_name( ino_t inode_to_find, char *namebuf, int buflen ){
+    DIR *dir_ptr;
+    struct dirent *direntp;
+    dir_ptr = opendir( "." );
+
+    while ( ( direntp = readdir( dir_ptr ) ) != NULL ){
+        if( direntp->d_ino == inode_to_find ){
+            strncpy( namebuf, direntp->d_name, buflen );
+            namebuf[buflen - 1] = '\0';
+            closedir( dir_ptr );
+            return ;
+        }
+    }
+    return;
+}
+```
+
+## 第5章 链接控制: 学习stty
+
+### 设备如同文件
+
+对`Linux`来说，声卡、终端、鼠标、磁盘文件是同一种对象。每个设备都被当作一个文件，拥有文件名、节点号、文件所有者、权限位以及最近修改时间。通常表示设备的文件，位于`/dev`目录下。
+
+从磁带中读取数据:
+
+```c++
+int fd = open( "/dev/tape", O_RDONLY );
+lseek( fd, (long)4096, SEEK_SET );
+n = read( fd, buf, buflen );
+close( fd );
+```
+
+终端就像文件。传统定义的终端是“键盘和显示单元”，实际包含的设备包括了打印机、键盘、一个串行接口的显示器或是一个调制解调器。而现在`telnet`和`ssh`窗口也被认为是一个终端。终端最重要的功能就是接受来自用户的输入，以及输出信息给用户。
+
+```c++
+➜  ~ git:(master) ✗ tty         // 查看当前终端对应的文件
+/dev/pts/2
+➜  ~ git:(master) ✗ who > /dev/pts/2
+work     pts/2        2019-06-06 08:19 (61.141.250.115)
+```
+
+磁盘文件与终端文件的区别:
+
+![磁盘文件与终端文件的区别](https://img.codekissyoung.com/2019/06/06/a528e51f3a95656ee57b162f095f68f2.png)
+
+磁盘链接的属性:
+
+- 缓冲
+- 自动添加模式
+
+终端链接的属性:
