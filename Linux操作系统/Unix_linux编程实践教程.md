@@ -405,11 +405,13 @@ char* mode_to_letters( int mode ){
 
 ![创建一个新文件](https://img.codekissyoung.com/2019/06/05/4d29857bebcee145268018e97cd0ede3.png)
 
+`硬连接`的存储秘密 : `i-节点号`才是文件的唯一标识，在`目录`表中，出现同一`i-节点号`对应两个以上不同名字的，这些文件名互为`硬链接`，也就是同一个文件的多个名字。文件是一个 `i-节点` 和一些数据块的结合，链接是对`i-节点`的引用。文件没有文件名，链接有名字，对一个文件可以 创建任意多的链接。内核记录了一个文件的链接数。
+
 读取一个文件的过程:
 
 1. 在目录中寻找文件名，然后找到对应的`i-node`节点号
 1. 定位到`i-node`节点，然后找到文件实际内容存储所在的块序号
-1. 访问实际的数据块
+1. 访问实际的数据块，通过系统调用`read()`依次读取数据块上内容，不断的将字节从磁盘复制到内核缓冲区，进而到达用户空间
 
 ![读取文件](https://img.codekissyoung.com/2019/06/05/d3d89bf8fa0ee7321c07fe2ba9e52ac2.png)
 
@@ -440,7 +442,7 @@ int result = chdir( const char *path );                   // 改变所调用进�
 
 ![树的嫁接](https://img.codekissyoung.com/2019/06/06/4069a55725ec3b10d4a3d1c4326daf36.png)
 
-不同文件系统的`i-node`节点号会重复。所以，无法在不同文件系统使用`link`与`rename`，即不允许跨设备创建硬链接
+不同文件系统的`i-node`节点号会重复。所以，无法在不同文件系统使用`link`与`rename`，即不允许跨设备创建硬链接。软链接 `符号链接` : 通过名字引用文件，而不是`i-节点号`。
 
 ![i-node节点号](https://img.codekissyoung.com/2019/06/06/be65f228fdabee4ed2ae7a7b218389ed.png)
 
@@ -494,7 +496,7 @@ void inum_to_name( ino_t inode_to_find, char *namebuf, int buflen ){
 }
 ```
 
-## 第5章 链接控制: 学习stty
+## 第5章 链接控制:学习stty
 
 ### 设备如同文件
 
@@ -522,9 +524,261 @@ work     pts/2        2019-06-06 08:19 (61.141.250.115)
 
 ![磁盘文件与终端文件的区别](https://img.codekissyoung.com/2019/06/06/a528e51f3a95656ee57b162f095f68f2.png)
 
-磁盘链接的属性:
+### 磁盘链接的属性
 
-- 缓冲
-- 自动添加模式
+- 缓冲，默认是写入是带缓冲的，通过`O_SYNC`位，去关闭缓冲，使得立即写入到磁盘
+- 自动添加模式,若干进程，写入同一个文件时，文件指针自动移动到 末尾，`O_APPEND`, 原子操作
 
-终端链接的属性:
+![磁盘链接的属性](https://img.codekissyoung.com/2019/06/07/14ecda9e0ceddfc4ab01f4be212c8667.png)
+
+```c++
+int s  = fcntl( fd, F_GETFL ); // get flags
+result = fcntl( fd, F_SETFL, s | O_SYNC ); // set SYNC bit set flags
+```
+
+```c++
+int result = fcntl( int fd, int cmd );
+int result = fcntl( int fd, int cmd, long arg );
+int result = fcntl( int fd, int cmd, struct flock *lockp );
+
+// open 第二个参数，用于设定 读写磁盘 属性
+open( filepath, O_WRONLY | O_APPEND | O_SYNC );
+O_CREAT 如果文件不存在，则创建它
+O_TRUNC 如果文件存在，则长度清零
+O_EXCL 防止两个进程创建 同名 文件
+```
+
+### 终端链接的属性
+
+终端输入:
+
+- 进程在用户输入`return`后，才接收数据，说明终端输入被 缓存了
+- 用户输入在到达程序时，被终端转换过
+- 程序输出到达屏幕时，被终端转换过
+
+![终端链接的属性](https://img.codekissyoung.com/2019/06/07/5091fecfe57f6a62e64e28ebf95fce23.png)
+
+查看终端链接属性:
+
+```bash
+➜  ~ stty --all
+speed 38400 baud; rows 63; columns 116; line = 0;
+intr = ^C; quit = ^\; erase = ^?; kill = ^U; eof = ^D; eol = <undef>; eol2 = <undef>; swtch = <undef>; start = ^Q;
+stop = ^S; susp = ^Z; rprnt = ^R; werase = ^W; lnext = ^V; discard = ^O; min = 1; time = 0;
+-parenb -parodd -cmspar cs8 -hupcl -cstopb cread -clocal -crtscts
+-ignbrk -brkint -ignpar -parmrk -inpck -istrip -inlcr -igncr icrnl ixon -ixoff -iuclc -ixany -imaxbel iutf8
+opost -olcuc -ocrnl onlcr -onocr -onlret -ofill -ofdel nl0 cr0 tab0 bs0 vt0 ff0
+isig icanon iexten echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echoctl echoke -flusho -extproc
+```
+
+终端链接设置:
+
+- 输入: 处理从 终端 到 程序 的字符
+- 输出: 处理从 程序 到 终端 的字符
+- 控制: 字符如何被表示--位的个数、奇偶性、停止位
+- 本地: 如何处理来自驱动程序内部的字符
+
+如何设置:
+
+```c++
+struct termios attribs;
+tcgetattr( fd, &settings );             // 获取设置
+settings.c_lflag |= ECHO;               // 修改设置
+tcsetattr( fd, TCSANOW, &settings );    // 写回设置
+```
+
+![设置操作](https://img.codekissyoung.com/2019/06/07/b385951ff83b5cd136baba943b1b3a95.png)
+
+### 其他设备链接编程: ioctl
+
+比如CD刻录机，可擦写的 CD，不同的刻录速度等。
+
+```c++
+int result = ioctl( int fd, int operation [, arg ...] );
+```
+
+## 第6章 为用户编程:终端控制与信号
+
+用户程序:
+
+- 立即响应键盘事件
+- 有限的输入集
+- 输入的超时
+- 屏蔽`Ctrl + C`
+
+终端模式小结:
+
+- 规范模式:字符有缓冲，按下`return`键才将数据发送给程序，中间有转换，有基本的编辑功能: 删除字符、终止命令
+- 非规范模式: 有转换，但是不再缓冲数据，所以没有编辑功能
+- `raw`模式，所有处理都被关闭，驱动程序将输入直接传递给程序。
+
+进程如何处理信号:
+
+- 默认处理
+
+```c++
+signal( SIGINT, SIG_DFL );
+```
+
+- 忽略
+
+```c++
+signal( SIGINT, SIG_IGN );
+```
+
+- 调用自定义函数处理
+
+```c++
+signal( signum, func_name );
+```
+
+设置 无缓冲、无回显、非阻塞的示例程序,也包含了信号处理部分:
+
+```c++
+#define QUESTION "Do you want another transaction"
+
+int get_response( const char *question, int try_num = 3 );
+int get_enable_char( const char *str ); // 获得指定的字符之一
+void set_crmode();                      // 无缓冲，一次输入一个字符，就发送到程序
+void set_noecho_mode();                 // 无回显
+void set_nodelay_mode();                // 非阻塞
+void ctrl_c_handler( int );             // 处理 Ctrl + C 信号
+void init_terminal();                   // 初始化 终端程序
+void restore_terminal();                // 恢复终端程序
+
+// 原始属性
+termios original_mode = {};
+int original_flags = 0;
+
+int main( int argc, char *argv[] )
+{
+    init_terminal();
+
+    signal( SIGINT, ctrl_c_handler );
+    signal( SIGQUIT, SIG_IGN );
+
+    set_crmode();
+    set_noecho_mode();
+    set_nodelay_mode();
+
+    int response = get_response( QUESTION );
+
+    restore_terminal();
+
+    return response;
+}
+
+void init_terminal(){
+    tcgetattr( STDIN_FILENO, &original_mode );
+    original_flags = fcntl( STDIN_FILENO, F_GETFL );
+}
+
+void restore_terminal(){
+    tcsetattr( STDIN_FILENO, TCSANOW, &original_mode );
+    fcntl( STDIN_FILENO, F_SETFL, original_flags );
+}
+
+void ctrl_c_handler( int sig_num ){
+    cout << "\n" << sig_num << " signal called " << endl;
+    restore_terminal();
+    exit( EXIT_FAILURE );
+}
+
+int get_response( const char *question, int try_num ){
+    cout << question << "?(Y/N)";
+    fflush( stdout );
+
+    char input;
+    while ( true ){
+        sleep( 2 );
+        switch( input = tolower( get_enable_char( "YyNn" ) ) )
+        {
+            case 'y':
+                return 0;
+
+            case 'n':
+                return 2;
+
+            case EOF:
+                if( --try_num > 0 ){
+                    cout << "\n try num left " << try_num << " : ";
+                    break;
+                }else{
+                    cout << endl;
+                    return 1;
+                }
+        }
+    }
+}
+
+int get_enable_char( const char *str ){
+    int c;
+    // 跳过无用的 输入字符
+    while ( ( c = getchar() ) != EOF && strchr( str, c ) == nullptr )
+    {
+        continue;
+    }
+    return c;
+}
+
+void set_crmode()
+{
+    termios ttystate;
+
+    tcgetattr( STDIN_FILENO, &ttystate );
+
+    ttystate.c_lflag &= ~ICANON; // no buffering
+    ttystate.c_cc[VMIN] = 1;     // get 1 char at a time
+
+    tcsetattr( STDIN_FILENO, TCSANOW, &ttystate );
+}
+
+void set_noecho_mode(){
+    termios ttystate;
+
+    tcgetattr( STDIN_FILENO, &ttystate );
+
+    ttystate.c_lflag &= ~ECHO; // no echo
+
+    tcsetattr( STDIN_FILENO, TCSANOW, &ttystate );
+}
+
+// 非阻塞输入，就是 getchar() 如果没读到数据，就直接返回了，不会等待用户输入了
+void set_nodelay_mode(){
+    int termflags;
+    termflags = fcntl( STDIN_FILENO, F_GETFL );
+    termflags |= O_NDELAY;
+    fcntl( STDIN_FILENO, F_SETFL, termflags );
+}
+```
+
+## 第7章 事件驱动编程:编写一个游戏
+
+一个基于字符终端的单人弹球游戏:
+
+- 空间: 游戏必须在计算机屏幕特定位置画像
+- 时间: 影像以不同速度在屏幕移动
+- 中断: 程序在移动影像的同时，用户还可以在任意时刻输入，程序如何响应中断?
+- 同时处理: 程序如何同时做多件事情?
+
+![单人弹球游戏](https://img.codekissyoung.com/2019/06/07/7993560f82766dd0545c95e368d697f0.png)
+
+### 屏幕编程 curses 库
+
+![curses库](https://img.codekissyoung.com/2019/06/07/7e194ebf33489907cc4acfc9ceee41a5.png)
+
+```c++
+initscr();   // 初始化 curses 库 与 tty
+endwin();    // 关闭 curses 并重置 tty
+refresh();   //
+move( r,c ); // 移动光标到 (r, c)位置
+addstr( s ); // 当前位置画 字符串
+addch( c );  // 当前位置画 字符
+clear();     // 清屏
+standout();  // 反色模式
+standend();  // 关闭 反色模式
+```
+
+真实屏幕 与 虚拟屏幕: `move` 与 `addstr` 等函数只在 虚拟屏幕（一个数组） 上工作，`refresh` 比较 两个屏幕的差异，向真实屏幕发送，能让它跟 虚拟屏幕 一致的 控制码 和 字符。
+
+![真实屏幕 与 虚拟屏幕](https://img.codekissyoung.com/2019/06/07/37b850b973e93bebefcf0ad594a84026.png)
