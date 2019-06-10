@@ -782,3 +782,181 @@ standend();  // 关闭 反色模式
 真实屏幕 与 虚拟屏幕: `move` 与 `addstr` 等函数只在 虚拟屏幕（一个数组） 上工作，`refresh` 比较 两个屏幕的差异，向真实屏幕发送，能让它跟 虚拟屏幕 一致的 控制码 和 字符。
 
 ![真实屏幕 与 虚拟屏幕](https://img.codekissyoung.com/2019/06/07/37b850b973e93bebefcf0ad594a84026.png)
+
+### 时钟编程
+
+![时间](https://img.codekissyoung.com/2019/06/10/e7b00f454553271e1d919d78edcc43f2.png)
+
+每个进程都有三个时间，`ITIMER_REAL` 真实世界的时间、`ITIMER_VIRTUAL` 进程在用户态运行的时间、`ITIMER_PROF`。
+
+![三个时钟](https://img.codekissyoung.com/2019/06/10/ad0e1b0c11d23e3b4734601c51cc5676.png)
+
+计时器是内核的一种机制，通过这种机制，内核在一定时间之后向进程发送`SIGALRM`信号，`alarm()`系统调用在特定的实际秒数后，内核发送`SIGALRM`信号。`setitimer`系统调用精度更高，并且还能设置以固定的时间间隔发送信号。
+
+```c++
+void countdown( int a );        // 处理时钟信号
+int set_ticker( int n_msecs );  // 设置间隔调用时钟
+
+int main( int argc, char *argv[] )
+{
+    signal( SIGALRM, countdown ); // 处理时钟信号
+
+    if( set_ticker( 500 ) == -1 ){
+        perror("set_ticker");
+    }else{
+        while ( true ){
+            pause(); // or do something else
+        }
+    }
+    return 0;
+}
+
+void countdown( int a ){
+    static int num = 10;
+    printf( "%d .. ", num-- );
+    fflush( stdout );
+    if( num < 0 ){
+        printf("DONE!\n");
+        exit(0);
+    }
+}
+
+int set_ticker( int n_msecs ){
+
+    long n_sec = n_msecs / 1000;
+    long n_usecs = ( n_msecs % 1000 ) * 100L;
+
+    itimerval new_timeset;
+
+    // time to next timer expiration
+    new_timeset.it_value.tv_sec = n_sec;
+    new_timeset.it_value.tv_usec = n_usecs;
+
+    // 间隔调用时间
+    new_timeset.it_interval.tv_sec = n_sec;
+    new_timeset.it_interval.tv_usec = n_usecs;
+
+    return setitimer( ITIMER_REAL, &new_timeset, NULL );
+}
+```
+
+### 处理多个信号
+
+使用`signal()`函数面临的问题:
+
+- 处理函数每次使用后，需要重新设置么？就像捕鼠器抓到老鼠后，需要被重新设置一样？
+- 如果 `SIGY` 信号在进程处理 `SIGX` 信号时到达，会发生什么？
+- 在进程处理 `SIGX` 信号时, 第二个、第三个 `SIGX` 信号又到达了，会发生什么？
+- 如果信号到来时，程序正在处理`getchar`或`read`之类的输入而阻塞，会发生什么？
+
+```c++
+#define INPUTLEN 100
+
+void inthandler( int s ); // 处理 Ctrl + C 信号
+void quithandler( int s); // 处理 Ctrl + \ 信号
+
+int main( int argc, char *argv[] )
+{
+    char input[INPUTLEN];
+    int nchars;
+
+    signal( SIGINT, inthandler );
+    signal( SIGQUIT, quithandler );
+
+    do{
+        cout << "type a message: ";
+        nchars = read( STDIN_FILENO, input, ( INPUTLEN -1 ) );
+        if( nchars == -1 ){
+            perror("read returned an error");
+        } else {
+            input[nchars] = '\0';
+            printf("you typed: %s", input );
+        }
+    }while( strncmp( input, "quit", 4 ) != 0 );
+
+    return 0;
+}
+
+void inthandler( int s ){
+    printf("Received signal %d .. waiting\n", s );
+    sleep(2);
+    printf("Leaving inthandler\n");
+}
+
+void quithandler( int s){
+    printf("Received signal %d .. waiting\n", s );
+    sleep(2);
+    printf("Leaving quithandler\n");
+}
+```
+
+上述信号处理机制的弱点:
+
+- 不知道信号被发送的原因，只知道 是 某信号
+- 处理函数中不能安全地 阻塞其他 信号，比如想让程序在处理`SIGINT`时，忽略`SIGQUIT`
+
+```c++
+void inthandler( int s ){
+    void ( *prev_qhandler )();
+    prev_qhandler = signal( SIGQUIT, SIG_IGN ); // 忽略 SIGQUIT 信号
+
+    // 处理 SIGINT 信号
+
+    signal( SIGQUIT, prev_qhandler ); // 恢复 SIGQUIT 信号
+}
+```
+
+### sigaction 机制
+
+后面出现了`sigaction`库（POSIX模型）解决了上述问题。
+
+```c++
+int result = sigaction( int signum, const struct sigaction *action, struct sigaction *prevaction );
+struct sigaction{
+    // 二者选其一 使用
+    void (*sa_handler)();       // SIG_DFL, SIG_IGN, or function
+    void (*sa_sigaction)( int, siginfo_t *, void *); // sigaction handler
+
+    sigset_t sa_mask; // 指定哪些信号要被阻塞
+    int sa_flags;     // 如下图
+}
+```
+
+![sa_flags](https://img.codekissyoung.com/2019/06/10/71c0ed1a325d2ac5652a48b74275befd.png)
+
+使用例子:
+
+```c++
+#define INPUTLEN 100
+
+void inthandler( int s ){
+    printf("Received signal %d .. waiting\n", s );
+    sleep(2);
+    printf("Leaving inthandler\n");
+}
+
+int main( int argc, char *argv[] )
+{
+    struct sigaction newhandler = {};
+    sigset_t blocked;
+    char x[INPUTLEN];
+
+    newhandler.sa_handler = inthandler;
+    newhandler.sa_flags = SA_RESETHAND | SA_RESTART; // 第二个 Ctrl + C 将会杀死进程
+    sigemptyset( &blocked );
+    sigaddset( &blocked, SIGQUIT );
+    newhandler.sa_mask = blocked;
+
+    if( sigaction( SIGINT, &newhandler, NULL ) ==  -1 )
+    {
+        perror("sigaction");
+    }else{
+        while(true){
+            fgets( x, INPUTLEN, stdin );
+            printf("input: %s", x );
+        }
+    }
+
+    return 0;
+}
+```
