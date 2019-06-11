@@ -920,6 +920,7 @@ struct sigaction{
     sigset_t sa_mask; // 指定哪些信号要被阻塞
     int sa_flags;     // 如下图
 }
+int result = sigprocmask( int how, const sigset_t *sigs, sigset_t *prev ); // 修改信号 mask
 ```
 
 ![sa_flags](https://img.codekissyoung.com/2019/06/10/71c0ed1a325d2ac5652a48b74275befd.png)
@@ -959,4 +960,32 @@ int main( int argc, char *argv[] )
 
     return 0;
 }
+```
+
+阻塞信号:
+
+- 在处理一个信号时，通过设置`struct sigaction`中的`sa_mask`成员位
+- 通过`sigprocmask`设置当前进程需要阻塞的信号
+- 通过`sigsetops`来添加和删除信号
+
+```c++
+sigemptyset( sigset_t *setp ); // 清除 setp 列表中所有信号
+sigfillset( sigset_t *setp );  // 添加所有信号，到 setp 指向的列表
+sigaddset( sigset_t *setp, int signum );
+sigdelset( sigset_t *setp, int signum );
+```
+
+暂时阻塞用户信号例子:
+
+```c++
+sigset_t sigs, prevsigs;
+sigemptyset( &sigs );
+sigaddset( &sigs, SIGINT );
+sigaddset( &sigs, SIGQUIT );
+
+sigprocmask( SIG_BLOCK, &sigs, &prevsigs );  // 阻塞 SIGINT 与 SIGQUIT 信号
+
+// ... do something
+
+sigprocmask( SIG_SET, *prevsigs, NULL );     // 恢复 之前的 设置
 ```
