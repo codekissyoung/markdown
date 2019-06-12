@@ -989,3 +989,177 @@ sigprocmask( SIG_BLOCK, &sigs, &prevsigs );  // 阻塞 SIGINT 与 SIGQUIT 信号
 
 sigprocmask( SIG_SET, *prevsigs, NULL );     // 恢复 之前的 设置
 ```
+
+一个利用间隔定时器 以及 信号 产生动画效果的 弹球，还能通过 用户 输入 改变 球的速度:
+
+```c++
+#define MESSAGE "O"
+#define BLANK   " "
+
+void move_msg( int n );
+int set_ticker( int n_msecs );
+
+int row;   // 当前行
+int col;   // 当前列
+int x_dir; // x轴方向
+int y_dir; // y轴方向
+
+int main( int argc, char *argv[] )
+{
+    initscr();
+    crmode();
+    noecho();
+    clear();
+
+    int delay  = 200;
+
+    row = 0, col = 0, x_dir = +1, y_dir = +1;
+
+    move( row, col );
+    addstr( MESSAGE );
+
+    signal( SIGALRM, move_msg );
+
+    set_ticker( delay );
+
+    while ( true )
+    {
+        int ndelay = 0;
+
+        int c = getch();
+
+        if( c == 'q' )
+            break;
+
+        switch ( c )
+        {
+            case ' ':
+                x_dir = -x_dir;
+                break;
+            case 'f':
+                if( delay > 2 )
+                    ndelay = delay / 2;
+                break;
+            case 's':
+                ndelay = delay * 2;
+                break;
+        }
+        if( ndelay > 0 )
+            set_ticker( delay = ndelay );
+    }
+
+    endwin();
+    return 0;
+}
+
+void move_msg( int n ){
+    signal( SIGALRM, move_msg ); // reset, just in case
+
+    move( row, col );
+    addstr( BLANK );
+
+    col += x_dir;
+    row += y_dir;
+
+    move( row, col );
+    addstr( MESSAGE );
+
+    move( LINES - 1, 0 );
+    refresh();
+
+    if( x_dir == -1 && col <= 0 )
+        x_dir = 1;
+    else if( x_dir == 1 && col + strlen(MESSAGE) >= (unsigned int)COLS )
+        x_dir = -1;
+
+    if( y_dir == -1 && row <= 0 )
+        y_dir = 1;
+    else if( y_dir == 1 && row >= LINES - 1 )
+        y_dir = -1;
+}
+
+int set_ticker( int n_msecs ){
+    long n_sec   = n_msecs / 1000;
+    long n_usecs = ( n_msecs % 1000 ) * 100;
+
+    itimerval new_timeset = {};
+
+    // time to next timer expiration
+    new_timeset.it_value.tv_sec = n_sec;
+    new_timeset.it_value.tv_usec = n_usecs;
+
+    // 间隔调用时间
+    new_timeset.it_interval.tv_sec = n_sec;
+    new_timeset.it_interval.tv_usec = n_usecs;
+
+    return setitimer( ITIMER_REAL, &new_timeset, nullptr );
+}
+```
+
+## 第8章 进程和程序: 编写命令解释器sh
+
+一个程序是存储在文件中的机器指令序列，运行一个程序意味着把它装载到内存，然后让CPU逐条执行这些指令。
+
+系统把内存看作由页面构成的数组，将进程分割到不同的页面:
+
+![进程在内存中](https://img.codekissyoung.com/2019/06/12/3f0a8a4b5231492c8e121cc10ae4f32d.png)
+
+查看系统中运行的程序的两个命令:
+
+```bash
+ps auxf
+ps alxf
+pstree -aph
+```
+
+`shell`程序的功能:
+
+- 运行其他程序，`shell`可看作是程序启动器
+- 管理输入与输出，包括`<` `>` `|` 等重定向与管道的功能
+- 可编程，可以编写`shell`脚本，提供变量与控制语句
+
+`shell`的主循环执行下面4步:
+
+- 等待用户输入程序名 `a.out`
+- 建立一个新进程来运行 `a.out`
+- `shell`将`a.out`文件从磁盘加载到新进程
+- `shell`等待程序运行结束
+
+```bash
+while( ! end_of_input ){
+    get command;
+    excute command;
+    wait for command to finish;
+}
+```
+
+![shell时间轴](https://img.codekissyoung.com/2019/06/13/0577449ebe7a9eef653c41cdc3d07816.png)
+
+一个程序如何运行另一个程序？利用`execvp`系统调用:
+
+```c++
+main(){
+    char *arglist[3];
+
+    arglist[0] = "ls";
+    arglist[1] = "-l";
+    arglist[2] = NULL; // 最后一个元素必须是 NULL 
+
+    execvp( "ls", arglist );
+}
+```
+
+## 第9章 可编程的shell、shell变量和环境:编写自己的shell
+
+## 第10章 I/O重定向和管道
+
+## 第11章 链接到近端或远端的进程:服务器与Socket
+
+## 第12章 链接和协议:编写Web服务器
+
+## 第13章 基于数据报(Datagram)的编程:编写许可证服务器
+
+## 第14章 线程机制: 并发函数的使用
+
+## 第15章 进程间通信 IPC
+
