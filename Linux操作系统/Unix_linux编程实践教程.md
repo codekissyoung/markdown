@@ -1149,7 +1149,226 @@ main(){
 }
 ```
 
+### fork 创建新进程
+
+```c++
+pid_t result = fork( void );
+pid_t result = wait( int *statusptr );
+```
+
+进程调用`fork`,然后内核中的`fork`代码执行:
+
+- 分配新内存块 和 内核数据结构
+- 复制原来的进程到新的进程
+- 向运行进程集添加新的进程
+- 将控制返回给两个进程
+
+当一个进程调用`fork`之后，就有两个二进制代码相同的进程。而且它们都运行到相同的地方。但是每个进程都可以开始它们自己的旅程。
+
+![fork](https://img.codekissyoung.com/2019/06/15/8ed98ab56903a0eab107e0d2ee49dc97.png)
+
+最简单的`fork`调用例子:
+
+```c++
+int fork_rv;
+printf("Before: my pid is %d\n", getpid());
+fork_rv = fork();
+if( fork_rv == -1 ){
+    perror("fork");
+    exit(1);
+}else if( fork_rv == 0 ){
+    printf("child process, pid : %d\n", getpid());
+}else{
+    printf("parent process, pid : %d\n", getpid());
+}
+return 0;
+```
+
+父进程可以等待子进程结束吗？
+
+![父进程可以等待子进程结束](https://img.codekissyoung.com/2019/06/15/be42c11edbd68c04110009cb7586f084.png)
+
+父进程调用`wait`,内核挂起父进程直到子进程结束。子进程调用`exit`结束，内核唤醒父进程，并传入子进程的运行数据等信息。
+
+![父子进程执行流程](https://img.codekissyoung.com/2019/06/15/acc95361b1360d43b8fdf2bbaf73c049.png)
+
+父进程在`wait`处阻塞，然后在子进程退出后，继续运行。`wait`还会返回调用`exit`的子进程的`pid`,它的目的之一就是通知父进程：哪个子进程运行结束了，是如何结束的。
+
+最简单的`wait`例子:
+
+```c++
+void child_code( int delay );
+void parent_code( int childpid );
+
+int main( int argc, char *argv[] )
+{
+    printf("Before: my pid is %d\n", getpid());
+    int fork_rv = fork();
+    if( fork_rv == -1 ){
+        perror("fork");
+        exit(1);
+    }
+    else if( fork_rv == 0 )
+        child_code( 30 );
+    else
+        parent_code( fork_rv );
+
+    return 0;
+}
+
+void child_code( int delay ){
+    printf("child %d here, will sleep for %d second\n", getpid(), delay );
+    sleep( delay );
+    printf("child done. about to exit\n");
+    exit( 0 );
+}
+
+void parent_code( int childpid ){
+    int child_status = 0;
+    int high_8, low_7, bit_7 = 0;
+
+    int wait_rv = wait( &child_status );
+    printf("done wating for %d. Wait returned: %d\n", childpid, wait_rv );
+
+    high_8 = child_status >> 8;
+    low_7  = child_status & 0x7F;
+    bit_7  = child_status & 0x80;
+
+    printf("status: exit = %d, sig = %d, core = %d\n", high_8, low_7, bit_7 );
+}
+```
+
+所以，`shell`的实现流程如下:
+
+![shell实现流程](https://img.codekissyoung.com/2019/06/15/752075880b24d4af17f8f55eb57c60ad.png)
+
+```c++
+
+char *makestring( char *buf );
+void excute( char *arglist[] );
+void parent_code( int childpid );
+
+#define MAXARGS 20
+#define ARGLEN 100
+
+int main( int argc, char *argv[] )
+{
+    char *arglist[MAXARGS + 1] = {};
+    int numargs = 0;
+    char argbuff[ARGLEN];
+    while ( numargs < MAXARGS ){
+        printf("Arg[%d] ", numargs);
+        fgets(argbuff, ARGLEN, stdin);
+        if(  *argbuff != '\n' ){
+            arglist[numargs++] = makestring( argbuff );
+        }else{
+            if( numargs > 0 ){
+                arglist[numargs] = nullptr;
+                excute( arglist );
+                numargs = 0;
+            }
+        }
+    }
+    return 0;
+}
+
+char *makestring( char *buf ){
+    char *cp;
+    buf[strlen(buf) - 1] = '\0';
+    cp = (char *)malloc( strlen(buf) + 1 );
+    if( cp == nullptr ){
+        fprintf(stderr, "no memory");
+        exit(1);
+    }
+    strcpy( cp, buf );
+    return cp;
+}
+
+void excute( char *arglist[] ){
+    int pid = fork();
+    if( pid == -1 ){
+        perror("fork failed!");
+        exit(1);
+    }else if( pid == 0 ){
+        execvp( arglist[0], arglist );
+        perror("execvp failed");
+        exit(1);
+    }else{
+        parent_code( pid );
+    }
+}
+
+void parent_code( int childpid ){
+    int child_status = 0;
+    int high_8, low_7, bit_7 = 0;
+
+    int wait_rv = wait( &child_status );
+    printf("done wating for %d. Wait returned: %d\n", childpid, wait_rv );
+
+    high_8 = child_status >> 8;
+    low_7  = child_status & 0x7F;
+    bit_7  = child_status & 0x80;
+
+    printf("status: exit = %d, sig = %d, core = %d\n", high_8, low_7, bit_7 );
+}
+```
+
+上述程序的问题: 按下`Ctrl + C` 会将父进程 与 子进程一起杀死。原因是: 键盘信号发给所有链接的进程，父子进程都链接到终端，当`Ctrl + C`按下时，`ttr`驱动告诉内核向由这个终端控制的所有进程发送`SIGINT`信号。
+
+解决方案是，让父进程忽略`Ctrl + C`信号:
+
+```c++
+signal( SIGINT, SIG_IGN ); // 让父进程 忽略 Ctrl + C 信号
+parent_code( pid );
+```
+
+### 用进程编程
+
+对于函数是`call/return`,而对于父子进程之间是`execvp/exit`。能否将这种通过 参数和返回值 在 拥有私有数据的 函数间 通信的模式，拓展到程序之间？
+
+![函数调用和程序调用](https://img.codekissyoung.com/2019/06/15/f7fd50156c99f436717ba780f1c2f9c3.png)
+
+事实就是: `Unix` 程序常常设计成一组子程序，而不是一个带有很多函数的大程序。
+
+由`exec`传递的参数必须是字符串，所以进程间通信的参数类型必须为字符串，这种基于文本的程序接口类型天然支持跨平台。
+
+`exit`是`fork`的逆操作:
+
+- 刷新所有流
+- 调用由 `atexit` 与 `on_exit` 注册的函数
+- 执行当前系统定义的其他与`exit`相关的操作
+- 调用`_exit`, 它是一个内核操作，处理所有分配给这个进程的内存，关闭所有这个进程打开的文件，释放所有内核用来管理和维护这个进程的数据结构
+  - 关闭所有文件描述符 和 目录描述符
+  - 将该进程的`PID`置为`init`进程的`PID`
+  - 如果父进程调用`wait`或`waitpid`来等待子进程结束，则通知父进程
+  - 向父进程发送`SIGCHLD`
+
 ## 第9章 可编程的shell、shell变量和环境:编写自己的shell
+
+```bash
+#!/bin/bash
+BOOK=$HOME/phonebook.data
+echo "find what name in phonebook";
+read NAME
+
+if grep $NAME $BOOK > /tmp/pb.tmp
+then
+    echo "Entries for " $NAME
+    cat /tmp/pb.tmp
+else
+    echo "No entries for " $NAME
+fi
+rm /tmp/pb.tmp
+```
+
+上述脚本包含:
+
+- 变量
+- 用户输入
+- 控制
+- 环境，比如`$HOME`
+
+![environ环境变量的问题](https://img.codekissyoung.com/2019/06/15/5520ffa6adafe8f092655508fc6b3c00.png)
 
 ## 第10章 I/O重定向和管道
 
@@ -1162,4 +1381,3 @@ main(){
 ## 第14章 线程机制: 并发函数的使用
 
 ## 第15章 进程间通信 IPC
-
