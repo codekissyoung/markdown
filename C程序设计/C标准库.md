@@ -156,9 +156,99 @@ NULL      展开为实现定义的空指针常量
 
 ## 第12章 <stdio.h>
 
-输入输出函数。
+主要讨论:
+
+- C标准库实现的抽象 输入、输出模块
+- 读出和写入原始数据的低级函数
+- 在格式规范控制下，打印和扫描数据的高级函数
+
+进入UNIX时代后，所有的文本流都采用了标准内部格式，每一行以`\n`终止。内核中的外设的驱动程序，负责将外设的原本的输入格式，处理成标准内部格式；输出时，则执行相反操作。
+
+使用`ioctl()`系统调用，还可以用来自定义驱动程序的操作，使用它来设置或者测试一个具体设备的各种参数。
+
+**文件描述符**：打开文件，内核将维护该文件的控制数据维护在自己内部，并且分配给进程一个小整数，用于指明该打开的文件。该小整数称为文件描述符。
+
+为简化多数程序的运行，现代`Unix shell`为每个进程都分配了3个文件描述符:`0`、`1`、`2`。标准库将它们包装成了，标准输入流`stdin`、标准输出流`stdout`、标准错误流`stderr`。
+
+Unix的IO实现隐藏了非常多的繁琐细节，这些细节封装在`ioctl`和设备处理程序中，从而给了进程一个统一而简单的IO输入输出环境。
+
+![流的状态](https://img.codekissyoung.com/2019/06/17/b07733e382f421f4af47eb8b23d318ff.png)
 
 ```c++
+// 类型
+size_t
+FILE // 一个对象类型，记录控制流需要的所有信息，包括它的文件定位符、指向相关缓冲的指针
+     // 记录读写错误的指示符、记录文件是否结束的结束符
+fpos_t // 对象类型，唯一指定文件中的每一个位置所需的所有信息
+
+// 宏定义
+BUFSIZ   // 缓冲大小
+EOF      // 文件结束
+
+POPEN_MAX    // 可以同时打开的文件数目最大值
+FILENAME_MAX // 文件名长度最大值
+
+// fseek 的第三个参数
+SEEK_CUR
+SEEK_END
+SEEK_SET
+
+// FILE* 类型的指针
+stderr
+stdin
+stdout
+
+// 对文件的操作
+int remove( const char *filename );
+int rename( const char *old, const char *new );
+FILE *tmpfile( void );
+char *tmpnam( char *s );
+
+int fclose( FILE *stream );
+int fflush( FILE *stream );
+FILE *fopen( const char *filename, const char *mode ); // mode : r、w、a、r+、w+、a+
+FILE *freopen( const char *filename, const char *mode, FILE *stream );
+
+// 设置缓冲大小
+void setbuf(FILE *stream, char *buf);
+void setvbuf(FILE *stream, char *buf, int mode, size_t size);
+
+fprintf(FILE *stream, const char *format, ...); // 格式化输出
+fscanf(FILE *stream, const char *format, ...);  // 格式化输入
+
+int sprintf(char *s, const char *format, ...);      // 写入字符串 s
+int sscanf(const char *s, const char *format, ...); // 从字符串 s 读取
+
+fgetc(FILE *stream);            // 读取一个字符
+fputc(char c, FILE *stream);    // 输出一个字符
+int ungetc( int c, FILE *stream); // 退回一个字符到 流中
+
+fgets(char *s, int n, FILE *stream); // 从流中读取 n - 1 个字符，存入 s 中
+fputs(const char *s, FILE *stream);  // 从流中将 s 写入 流中
+
+int getchar(void);       // 从 stdin 中读取一个字符
+int putchar(int c);      // 向 stdout 中输出一个字符
+char *gets(char *s);     // 从 stdin 中读取一行
+int puts(const char *s); // 向 stdout 中写入 s,并在结尾加上 \n
+
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+
+int fgetpos(FILE *stream, fpos_t *pos);       // 获取文件定位符
+int fsetpos(FILE *stream, const fpos_t *pos); // 设置文件定位符
+
+int fseek( FILE *stream, long int offset, int whence); // 设置文件定位符
+
+long int ftell(FILE *stream); // 获取流的文件定位符的当前值
+
+void rewind(FILE *stream);    // 将文件定位符设置在文件起始位置
+
+void clearerr(FILE *stream);  // 清空流的文件结束符 和 错误指示符
+
+int feof(FILE *stream);     // 测试 流的文件结束符是否存在，存在则说明到达文件末尾
+int ferror(FILE *stream);   // 测试 流的错误指示符是否存在，存在则说明文件出错
+
+void perror(const char *s); // 向 stderr 中输出一条错误信息
 ```
 
 ## 第13章 <stdlib.h>
