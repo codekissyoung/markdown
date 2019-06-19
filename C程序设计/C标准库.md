@@ -262,6 +262,27 @@ void perror(const char *s); // 向 stderr 中输出一条错误信息
 
 对`C-style`字符串的操作。
 
+```c
+// 将数字字符串转换为整形
+int atoi( char s[] )
+{
+    int i,n;
+    n = 0;
+    for( i = 0; s[i] >= '0' && s[i] <= '9'; ++i )
+        n = 10 * n + ( s[i] - '0' );
+    return n;
+}
+
+// 把字符c转换为小写形式，只对ASCII字符集有效
+int lower( int c )
+{
+    if( c >= 'A' && C <= 'z' )
+        return c + 'a' - 'A';
+    else
+        return c;
+}
+```
+
 ## 第15章 <time.h>
 
 显示时间的相关操作。
