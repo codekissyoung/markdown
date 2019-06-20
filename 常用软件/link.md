@@ -20,6 +20,9 @@
 
 ### 代码工具
 
+- [十大经典排序算法实现仓库](https://github.com/hustcc/JS-Sorting-Algorithm)
+- [非常好的bash处理日常任务脚本例子仓库](https://github.com/dylanaraps/pure-bash-bible)
+- [linux命令查询 非常全面](https://www.linuxcool.com/)
 - [自测代码练习平台](https://exercism.io/)
 - [Mikutools工具集合](https://miku.tools)
 - [代码在线运行工具](https://tool.lu/)
