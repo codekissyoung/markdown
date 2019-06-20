@@ -19,12 +19,10 @@
 - 可以代替宏定义常量使用
 
 ```c
-enum color { black, red = 5, green, yellow }; // 定义
+enum color { black, red = 5　};
 enum color b = black;
 enum color r = red;
-enum color g = green;
-enum color y = yellow;
-printf("black = %d red = %d green = %d yellow = %d", b, r, g, y); // 0 5 6 7
+printf("black = %d red = %d", b, r　); // 0 5
 ```
 
 ### 数组
@@ -32,16 +30,16 @@ printf("black = %d red = %d green = %d yellow = %d", b, r, g, y); // 0 5 6 7
 #### 初始化
 
 ```c
-int a[3]  = {10,9};
-int a[]   = {11, 7, 6};
-int arr[] = { 0, 89, [5] = 212, 11 };      // 指定初始化器 (C99标准) 指定第6个元素的值为212, 元素个数在编译时确定为 7
-int count = sizeof(arr) / sizeof(arr[0]);  // 数组元素个数
-
+int a[3]   = {10,9};
+int a[]    = {11, 7, 6};
+int arr[]  = { 0, 89, [5] = 212, 11 };
 int z[][2] = {
     { 1, 1 },
     { 2, 1 },
     { 3, 1 },
 };
+
+int count = sizeof(arr) / sizeof(arr[0]);
 
 int *p_int = &arr[6];   // 返回 int* 类型指针,指向 标序号元素
 p_int = arr;            // 数组名是指向数组首地址的常量指针 指针之间赋值
@@ -72,7 +70,6 @@ int a[3][4] = {
 // 在函数定义时对形参数组可以指定每一维的长度，也可省去第一维的长度因此，以下写法都是合法的
 int MA(int a[3][10])
 int MA(int a[][10])
-int MA(int a[][10],n)
 
 // pt指向的是一个包含4个int类型的一维数组
 void func(int pt[][4]);
@@ -200,7 +197,7 @@ int main(int argc, char *argv[])
 
 #### 变长数组 VLA
 
-- 变长数组的变不是可以修改已经创建的数组的大小变长数组一旦创建，它的大小是保持不变的变指的是，在创建数组时，可以使用变量指定数组的维度
+变长数组的变不是可以修改已经创建的数组的大小变长数组一旦创建，它的大小是保持不变的变指的是，在创建数组时，可以使用变量指定数组的维度
 
 ```c
 // rows　和　cols 必须在 ar 前面
@@ -244,15 +241,16 @@ struct Books
    char  subject[100];
    int   book_id;
 };
+
 struct Books b1, b2; // 使用结构体类型 声明变量
 
-typedef struct
-{
+typedef struct Simple{
     int a;
     char b;
     double c;
-} Simple2;
-Simple2 u1, u2[20], *u3; // 也可以用typedef创建新类型, 现在可以用 Simple2 作为类型, 声明新的结构体变量
+} Simple;
+
+Simple u1, u2[20], *u3;
 
 // 此结构体的声明包含了指向自己类型的指针
 struct NODE
