@@ -360,7 +360,7 @@ install(FILES mod2.h DESTINATION include/mod2) # 安装到 usr/include/mod2
 
 ### 添加一个Find模块
 
-其实纯粹依靠`cmake`本身提供的基本指令来管理工程是一件非常复杂的事情，所以`cmake`设计成了可扩展的架构，可以通过编写一些通用的模块来扩展`cmake`。这便是`Finder`功能，对于`linux`里一些常用的内置库，`cmake`也预先提供了这样模块，比如`FindCURL`模块。在`CMakeLists.txt`里的使用如下:
+其实纯粹依靠`cmake`本身提供的基本指令来管理工程是一件非常复杂的事情，所以`cmake`设计成了可扩展的架构，可以通过编写一些通用的模块来扩展`cmake`。这便是`Finder`功能，对于`linux`里一些常用的内置库，`cmake`也预先提供了这样模块，比如`FindCURL`、`FindCurses`、`FindImageMagick`模块。在`CMakeLists.txt`里的使用如下:
 
 ```bash
 find_package(CURL)
@@ -492,6 +492,161 @@ install(DIRECTORY doc/ DESTINATION share/PROJECT_ONE)
 install(TARGETS main RUNTIME DESTINATION bin)
 ```
 
+### 传递给源代码一些配置
+
+在`CMakeLists.txt`中配置参数，控制源代码中代码的编译部分，比如可以通过一个参数控制，是用自己写的库还是系统库？
+
+```bash
+.
+├── build
+├── cmake
+│   └── FindHIREDIS.cmake
+├── cmakeconfig.h.in            # 新增
+├── CMakeLists.txt              # 修改
+├── doc
+│   └── release_note.txt
+├── main.c                      # 修改
+└── mod1
+    ├── CMakeLists.txt
+...
+```
+
+在主`CMakeLists.txt`里定义:
+
+```bash
+cmake_minimum_required(VERSION 3.10)
+PROJECT(PROJECT_ONE)
+
+# 通过 cmakeconfig.h 传递参数给源文件
+set(AUTHOR "codekissyoung")
+set(RELEASE_DATE "2019-6-25")
+set(USE_MY_LIB "1")                                  # 使用自己的库
+configure_file(
+    ${PROJECT_SOURCE_DIR}/cmakeconfig.h.in
+    ${PROJECT_BINARY_DIR}/cmakeconfig.h
+)
+include_directories(${PROJECT_BINARY_DIR})
+
+add_subdirectory(mod1 lib)                            # 添加模块，编译后放在 build/lib
+...
+```
+
+再定义`cmakeconfig.h.in`,它会在`Build`目录里生成一个`cmakeconfig.h`，`@@`中间的名字会被替换:
+
+```bash
+#define AUTHOR "@AUTHOR@"
+#define RELEASE_DATE "@RELEASE_DATE@"
+#define USE_MY_LIB "@USE_MY_LIB@"
+```
+
+再看下源代码中如何使用:
+
+```c
+#include <stdio.h>
+#include <hiredis/hiredis.h>
+#include "cmakeconfig.h"                    # 这里引用 cmakeconfig.h
+#include "mod1/mod1.h"
+int main( int argc, char *argv[] )
+{
+    printf("author: %s, release_date: %s\n", AUTHOR, RELEASE_DATE );
+
+    #ifdef USE_MY_LIB
+        printf("使用自己的库的代码\n");
+    #else
+        printf("使用系统库的代码\n");
+    #endif
+
+    mod1_process();
+    ...
+}
+```
+
+### 区分 开发版 与 发布版
+
+上述的代码编译后都是不可调试的，并且没有做编译优化，我们希望能够编译成一个调试版本与一个发布版本。做法如下:
+
+- 我们将`build`目录作为开发版本编译目录，与之相对的新建一个`release`目录作为发布版本
+- 在`build`目录下我们执行`cmake -DMAKE_BUILD_TYPE=Debug ..`,编译命令会使用`-g`
+- 在`release`目录下我们执行`cmake -DMAKE_BUILD_TYPE=Release ..`,编译命令会使用`-O3 -DNDEBUG`
+
+所以，在源代码中，我们可以使用`NDEBUG`宏来控制，在开发版输出调试信息，而在发布版本去掉调试信息。
+
+```c
+#ifndef NDEBUG
+    printf("author: %s, release_date: %s\n", AUTHOR, RELEASE_DATE ); # 只在开发版本编译
+#endif
+```
+
+我自己在写代码的时候，习惯在开发版本打开所有的错误报告，而上述的开发版本只使用了`-g`，这显然是不够的，需要通过在`CMakeLists.txt`里重新设置下开发版本的编译参数:
+
+```bash
+cmake_minimum_required(VERSION 3.10)
+
+PROJECT(PROJECT_ONE)
+
+set(CMAKE_C_FLAGS_DEBUG "-g -Wall -pedantic -DDEBUG")
+message(STATUS "debug flags: ${CMAKE_C_FLAGS_DEBUG}")
+
+message(STATUS "release flags: ${CMAKE_C_FLAGS_RELEASE}")
+...
+```
+
+通常我习惯使用脚本来完成重复的`构建-编译-运行`这一过程，参考如下:
+
+```bash
+# ./make-debug.sh
+#!/bin/bash
+rm -rf build/*                                # 清理上一次的结果
+
+cd build && cmake -DCMAKE_BUILD_TYPE=debug .. # 进入debug目录，执行构建
+
+make && ./main                                # 编译，然后运行
+```
+
+```bash
+./make-release.sh
+#!/bin/bash
+rm -rf release/*                                  # 清理上一次的结果
+
+cd release && cmake -DCMAKE_BUILD_TYPE=release .. # 进入release目录，执行构建
+
+make && ./main                                    # 编译，然后运行
+```
+
+### 总结ONE_PROJECT项目
+
+```bash
+.
+├── build
+├── cmake
+│   └── FindHIREDIS.cmake
+├── doc
+│   └── release_note.txt
+├── mod1
+│   ├── mod2
+│   │   ├── CMakeLists.txt
+│   │   ├── mod2.c
+│   │   └── mod2.h
+│   ├── CMakeLists.txt
+│   ├── mod1.c
+│   ├── mod1_func.c
+│   ├── mod1_func.h
+│   └── mod1.h
+├── release
+├── cmakeconfig.h.in
+├── CMakeLists.txt
+├── main.c
+├── make-debug.sh
+└── make-release.sh
+```
+
+整个项目的目录结构如上,把这个项目作为脚手架，进行开发的话，非常容易就实现下面目标:
+
+- 非常容易划分，添加项目自己实现的`mod`
+- 非常容易通过`Find`功能引入第三方库
+- 非常容易通过传递参数到 源代码 中，实现条件编译，比如选择使用　第三方库　还是 系统库　等
+- 开发版本 与 发布版本 分离
+
 ## 指令参考
 
 ```bash
@@ -566,6 +721,8 @@ INCLUDE(module [OPTIONAL])　　　 # 载入 cmake 模块
 
 ## 变量参考
 
+项目目录相关:
+
 ```bash
 # 构建发生的目录
 CMAKE_BINARY_DIR
@@ -577,7 +734,6 @@ CMAKE_SOURCE_DIR
 PROJECT_SOURCE_DIR
 <projectname>_SOURCE_DIR
 
-
 CMAKE_CURRENT_SOURCE_DIR  # 当前处理的CMakeLists.txt所在的路径
 
 CMAKE_CURRRENT_BINARY_DIR # 内部编译: 跟CMAKE_CURRENT_SOURCE_DIR一致
@@ -586,16 +742,15 @@ CMAKE_CURRRENT_BINARY_DIR # 内部编译: 跟CMAKE_CURRENT_SOURCE_DIR一致
 
 CMAKE_CURRENT_LIST_FILE   # 当前输出所在的CMakeLists.txt的完整路径
 CMAKE_CURRENT_LIST_LINE   # 当前输出所在的行
+```
 
+```bash
 CMAKE_MODULE_PATH         # 模块所在路径
 
 EXECUTABLE_OUTPUT_PATH    # 可执行文件存放目录
 LIBRARY_OUTPUT_PATH       # 库存放目录
 
-
 CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE # 将工程提供的头文件目录始终置于系统头文件目录的前面
-
-CMAKE_INCLUDE_CURRENT_DIR # 自动将每个CMakeLists.txt的所在目录依次加入到 头文件搜索目录
 
 CMAKE_INCLUDE_PATH        # 头文件搜索目录
 
@@ -623,4 +778,29 @@ CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS   # 用来控制IF ELSE语句的书写方式
 BUILD_SHARED_LIBS                   # 这个开关用来控制默认的库编译方式: 动态库 静态库
 CMAKE_C_FLAGS                       # 设置C编译选项
 MAKE_CXX_FLAGS                      # MAKE_CXX_FLAGS
+CMAKE_INCLUDE_CURRENT_DIR           # 自动将每个CMakeLists.txt的所在目录依次加入到 头文件搜索目录
+```
+
+编译参数相关:
+
+```bash
+message(STATUS "CMAKE_C_FLAGS = " ${CMAKE_C_FLAGS})
+message(STATUS "CMAKE_C_FLAGS_DEBUG = " ${CMAKE_C_FLAGS_DEBUG})
+message(STATUS "CMAKE_C_FLAGS_RELEASE = " ${CMAKE_C_FLAGS_RELEASE})
+
+message(STATUS "CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
+message(STATUS "CMAKE_CXX_FLAGS_DEBUG = " ${CMAKE_CXX_FLAGS_DEBUG})
+message(STATUS "CMAKE_CXX_FLAGS_RELEASE = " ${CMAKE_CXX_FLAGS_RELEASE})
+
+message(STATUS "CMAKE_EXE_LINKER_FLAGS = " ${CMAKE_EXE_LINKER_FLAGS})
+message(STATUS "CMAKE_EXE_LINKER_FLAGS_DEBUG = " ${CMAKE_EXE_LINKER_FLAGS_DEBUG})
+message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASE = " ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
+
+message(STATUS "CMAKE_SHARED_LINKER_FLAGS = " ${CMAKE_SHARED_LINKER_FLAGS})
+message(STATUS "CMAKE_SHARED_LINKER_FLAGS_DEBUG = " ${CMAKE_SHARED_LINKER_FLAGS_DEBUG})
+message(STATUS "CMAKE_SHARED_LINKER_FLAGS_RELEASE = " ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
+
+message(STATUS "CMAKE_STATIC_LINKER_FLAGS = " ${CMAKE_STATIC_LINKER_FLAGS})
+message(STATUS "CMAKE_STATIC_LINKER_FLAGS_DEBUG = " ${CMAKE_STATIC_LINKER_FLAGS_DEBUG})
+message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASE = " ${CMAKE_STATIC_LINKER_FLAGS_RELEASE})
 ```
