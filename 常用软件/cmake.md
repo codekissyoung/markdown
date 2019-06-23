@@ -804,3 +804,11 @@ message(STATUS "CMAKE_STATIC_LINKER_FLAGS = " ${CMAKE_STATIC_LINKER_FLAGS})
 message(STATUS "CMAKE_STATIC_LINKER_FLAGS_DEBUG = " ${CMAKE_STATIC_LINKER_FLAGS_DEBUG})
 message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASE = " ${CMAKE_STATIC_LINKER_FLAGS_RELEASE})
 ```
+
+## 其他参考
+
+虽然我觉得他们写的都不如我，但还是可以参考下:
+
+- [CMake 入门实战](http://www.hahack.com/codes/cmake/)
+- [CMake Official Tutorial——教程还是官方的好](https://www.cnblogs.com/Xiaoyan-Li/p/5674747.html)
+- [cmake教程 基本语法](https://blog.csdn.net/luanpeng825485697/article/details/81202136)
