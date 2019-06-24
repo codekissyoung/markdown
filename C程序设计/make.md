@@ -8,9 +8,9 @@
 
 ## 参考
 
-> - [GNU Make Manual](http://www.gnu.org/software/make/manual/make.html#Bugs)
-> - [makefile使用总结](https://www.cnblogs.com/wang_yb/p/3990952.html)
-> - [Make 命令教程-阮一峰的网络日志](http://www.ruanyifeng.com/blog/2015/02/make.html)
+- [GNU Make Manual](http://www.gnu.org/software/make/manual/make.html#Bugs)
+- [makefile使用总结](https://www.cnblogs.com/wang_yb/p/3990952.html)
+- [Make 命令教程-阮一峰的网络日志](http://www.ruanyifeng.com/blog/2015/02/make.html)
 
 ## 基本概念
 
