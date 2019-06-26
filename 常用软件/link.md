@@ -1,6 +1,8 @@
-# 网址收集
+# 友情链接
 
-常用网址收集。
+## 博客推荐
+
+- [椰子皮 Yezipi](https://www.yezipi.net) : `VUE` `WeexPlus` `Web` `Node`
 
 ## 在线工具
 
@@ -101,9 +103,7 @@
 - [MDN 开发文档](https://developer.mozilla.org/zh-CN/docs/Web)
 - [前端代码收集](http://snippets.barretlee.com)
 - [H-ui](http://www.h-ui.net)
-
-### [PHP 鸟哥](http://www.laruence.com/)
-
+- [PHP 鸟哥](http://www.laruence.com/)
 - [php-header函数](http://www.laruence.com/2007/12/16/308.html)
 
 ## 在线API参考
