@@ -6,8 +6,6 @@
 
 ## C版本
 
-![C版本](https://i.loli.net/2018/11/08/5be3b953d5f5a.png)
-
 ## 检查C的开发环境
 
 ```bash

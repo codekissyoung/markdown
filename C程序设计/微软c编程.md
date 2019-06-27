@@ -1,7 +1,11 @@
-# 每条准则都有例外
+# 微软C编程
+
+## 每条准则都有例外
+
 - 准则是用来说明一般情况的，当理由十分充足时，才可以违背准则
 
-# 假想编译程序
+## 假想编译程序
+
 ```c
 -> line 23: while (i<=j)
 off by one error: this should be '<'
@@ -12,6 +16,7 @@ algorithm error: itoa fails when i is -32768
 -> line 318: strCopy = memcpy(malloc(length), str, length);
 Invalid argument: memcpy fails when malloc returns NULL
 ```
+
 - 把自己当作一个假设可以发现任何错误的编译程序，去运行程序，从而发现潜伏的错误
 
 # 使用编译程序所有的可选警告设施
