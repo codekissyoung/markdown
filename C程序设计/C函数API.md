@@ -162,23 +162,3 @@ size_t strlen(const char *s);
 
 strcat(s,t); // 将字符串 t 链接到 s 的后面
 ```
-
-## strings.h
-
-- 从BSD系UNIX系统继承而来，里面定义了一些字符串函数，如bzero等。这些函数曾经是posix标准的一部分，但是在POSIX.1-2001标准里面，这些函数被标记为了遗留函数而不推荐使用。在POSIX.1-2008标准里已经没有这些函数了。如下：
-
-- 这两个头文件都在linux的/usr/include目录下面，后者比前者多了一个s，一般使用以string.h（没有s）的为主，那strings.h（有s）什么时候使用呢？打开这个头文件，可以看见区别如下：所以，一般使用前者就可以了
-
-```c
-/* We don't need and should not read this file if <string.h> was already
-read. The one exception being that if __USE_BSD isn't defined, then
-these aren't defined in string.h, so we need to define them here. */
-int bcmp(const void *, const void *, size_t); /* 用memcmp替代 */
-void bcopy(const void *, void *, size_t); /* 用memcpy, memmove替代 */
-void bzero(void *, size_t); /* 用memset替代 */
-int ffs(int); /* string.h 中有 */
-char *index(const char *, int); /* 用strchr替代 */
-char *rindex(const char *, int); /* 用strrchr替代 */
-int strcasecmp(const char *, const char *); /* string.h 中有 */
-int strncasecmp(const char *, const char *, size_t); /* string.h 中有 */
-```
