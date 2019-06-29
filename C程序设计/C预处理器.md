@@ -54,7 +54,6 @@ tokenpaster(34); // printf ("token34 = %d", token34);
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 ```
 
-
 ## C预处理器
 
 ### 常用指令

@@ -120,7 +120,7 @@ void longjmp( jmp_buf env, int val );
 ```c
 sig_atomic_t // 声明为这种类型的对象，可以作为一个原子实体被访问，即使有异步中断发生的时候也是如此
 SIG_DFL      // 收到信号后，采取默认动作
-SIG_ERR      // 
+SIG_ERR      //
 SIG_IGN      // 忽略该信号
 
 signal( int sig, void (*func)(int) ); // 设置 如何处理 sig 信号
