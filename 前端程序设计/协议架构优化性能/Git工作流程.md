@@ -85,9 +85,8 @@ git(master) ~ git tag -a v16.4.0 -m 'comment detail'
 2. php composer.phar install
 3. 初始化脚本 mcs/table/mcs_db_install.sql
 
-
-
 # 采用此流程的git操作约定
+
 - 所有人只能在自己的分支上进行`git add` `git commit` `git push` `git pull` 等常规操作
 - 所有未上线的分支都需要与`master`分支保持同步，所有已经上线的分支不可再与`master`同步，切不可私自删除
 - `master`只能合并`上线合并分支`,`bug`分支，整个稳定的`dev`分支

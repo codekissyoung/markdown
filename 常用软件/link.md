@@ -167,10 +167,6 @@
 
 - [一个优秀网站的登录验证流程](http://blog.csdn.net/clevercode/article/details/45481409)
 
-### [composer](https://getcomposer.org)
-
-- [composer中文网](http://www.phpcomposer.com)
-
 ### [PHPhub社区](https://phphub.org)
 
 ### [脚本之家](http://jb51.net)
