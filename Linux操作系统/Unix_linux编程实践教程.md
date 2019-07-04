@@ -767,6 +767,10 @@ void set_nodelay_mode(){
 
 ![curses库](https://img.codekissyoung.com/2019/06/07/7e194ebf33489907cc4acfc9ceee41a5.png)
 
+```bash
+sudo apt-get install libncurses5-dev libncursesw5 # 安装 curses 库
+```
+
 ```c++
 initscr();   // 初始化 curses 库 与 tty
 endwin();    // 关闭 curses 并重置 tty
