@@ -4,32 +4,33 @@
 
 ## 检测与安装C开发环境
 
-检查C的开发环境:
-
-```bash
-uname -a                # 检测 linux 内核版本
-lsb_release -a          # 查看发行版本
-gcc -v                  # 检查 gcc 版本
-gdb -v                  # 检查 gdb 版本
-make -v                 # 检查 make 版本
-autoconf --version      # 检查 autoconf 版本
-automake --version      # 检查 automake 版本
-libtoolize --version    # 检查 libtool 版本
-cmake --version         # 检查 cmake 版本
-```
-
 安装开发环境:
 
 ```bash
-sudo apt-get install gcc gdb make autoconf automake libtool build-essential flex bison cmake
+sudo apt-get install gcc gdb make autoconf automake libtool build-essential flex bison cmake git tree
+```
+
+检查C的开发环境:
+
+```bash
+#!/bin/bash
+uname -a; echo;                             # 检测 linux 内核版本
+lsb_release -a; echo;                       # 查看发行版本
+gcc -v  | grep "gcc version"; echo;         # 检查 gcc 版本
+gdb -v  | grep -i "GNU gdb";echo;           # 检查 gdb 版本
+make -v | grep -i make;echo;                # 检查 make 版本
+autoconf --version | grep autoconf;echo;    # 检查 autoconf 版本
+automake --version | grep automake;echo;    # 检查 automake 版本
+libtoolize --version | grep automake;echo;  # 检查 libtool 版本
+cmake --version ;echo;                      # 检查 cmake 版本
 ```
 
 工具介绍:
 
-- `as` 是GNU下的汇编工具
-- `ld` 是GNU下的链接工具
-- `ar` 是GNU下的`.o`文件的归档工具，用于制作静态库`.a`
-- `Lex`是一种生成扫描器的工具。扫描器是一种识别文本中的词汇模式的程序。`flex`是ubuntu中的版本。
+- `as` 是`GNU`下的汇编工具
+- `ld` 是`GNU`下的链接工具
+- `ar` 是`GNU`下的`.o`文件的归档工具，用于制作静态库`.a`
+- `Lex`是一种生成扫描器的工具。扫描器是一种识别文本中的词汇模式的程序。`flex`是`ubuntu`中的版本。
 - `Yacc` 代表 `Yet Another Compiler Compiler`。`Yacc` 的 GNU 版叫做 `Bison`。它是一种工具，将任何一种编程语言的所有语法翻译成针对此种语言的 `Yacc` 语法解析器。
 
 ## 术语
@@ -38,74 +39,32 @@ sudo apt-get install gcc gdb make autoconf automake libtool build-essential flex
 
 **静态库**: `.a`文件,又称为文档文件`Archive file`。是多个`.o`文件的集合。静态库中的各个`.o`文件没有特殊的存在格式，仅仅是一个`.o`文件的集合。使用`ar`工具维护和管理静态库。
 
-**共享目标文件**: `*.so`文件，也是多个`.o`文件的集合。但是这些`.o`文件由编译器按照一种特殊的方式生成。对象(变量引用和函数调用)模块的各个成员的地址都是相对地址。因此在程序运行时，可动态加载库文件和执行`.so`文件。多个程序可以共享使用库中的某一个模块。
+**共享库**: `*.so`文件，也是多个`.o`文件的集合。但是这些`.o`文件由编译器按照一种特殊的方式生成。对象(变量引用和函数调用)模块的各个成员的地址都是相对地址。因此在程序运行时，可动态加载库文件和执行`.so`文件。多个程序可以共享使用库中的某一个模块。
 
-**可执行目标文件**: 已经将所有引用到的符号的所在文件链接起来，每一个符号都已经得到了解析和重定位，每个符号都是已知的，所以可以被机器直接执行
+**可执行文件**: 已经将所有引用到的符号的所在文件链接起来，每一个符号都已经得到了解析和重定位，每个符号都是已知的，所以可以被机器直接执行
 
 ## gcc 概述
 
-### 文件名后缀
-
-源文件后缀名 标识 源文件的语言,但是对编译器来说,后缀名控制着缺省设定:
-
-- `gcc` 认为预处理后文件`.i` 是 `C` 文件,并且设定 `C` 形式的连接
-- `g++` 认为 `.i` 是 `C++` 文件,并且设定 `C++`形式的连接
-- `.c` : `C`源程序;预处理,编译,汇编 
-- `.C` : `.cc` `.cxx`: `C++`源程序;预处理,编译,汇编
-- `.m` : `Objective-C` 源程序;预处理,编译,汇编 
-- `.i` : 预处理后的`C`文件;编译,汇编
-- `.ii`: 预处理后的`C++`文件;编译,汇编
-- `.s` : 汇编语言源程序;汇编
-- `.S` : 汇编语言源程序;预处理,汇编
-- `.h` : 预处理器文件; 通常不出现在命令行上
-- `.o` 目标文件`Object file`与`.a` 归档库文件`Archive file`还有`.so`文件传递给连接器`ld`,在链接阶段中,所有对应于源程序的`.o`文件, `-l`库文件按命令行中的顺序传递给连接器
-
-### 头文件作用
-
-- 头文件可以不需要编译
-- 可以查看具体的声明
-- 头文件加上实现文件的o文件提交给使用者即可 ，不需要知道源代码
-- `.o`文件预先编译，所以整个项目编译时，会大大提高编译的时间 
-- 当一个文件`A.c`依赖于头文件`b.h`时 ，如果`b.c`编译之后形成的`b.o`文件重新编译后，`a.o`文件不需要重新编译 
-- 可以极大降低手工复制，粘贴的错误几率
-
-## 编译链接命令
-
-### 编译成 .o 文件
 
 ```bash
-gcc -E xxx.c -o xxx.i   # 生成预编译文件
-gcc -S xxx.c -o xxx.s   # 生成 汇编源文件，也就是汇编代码
-gcc -c xxx.c -o xxx.o   # 生成 .o 文件
+gcc -E xxx.c -o xxx.i               # 生成预编译文件
+gcc -S xxx.c -o xxx.s               # 生成 汇编源文件，也就是汇编代码
+gcc -c xxx.c -o xxx.o               # 生成 .o 文件
+ar rcsU zzz.a xxx.o yyy.o           # 打包成静态库
+gcc -shared -fPIC xxx.c -o xxx.so   # 打包成动态库
 ```
 
-### 打包 .o 成 .a 静态库
-
-```bash
-ar rcsU zzz.a xxx.o yyy.o
-```
-
-### 编译成 .so 动态库
-
-```bash
-gcc -shared -fPIC xxx.c -o xxx.so
-```
-
-## gcc 参数
-
-选项必须分立给出: `-dr` 完全不同于 `-d -r`。
+`gcc`选项必须分立给出: `-dr` 完全不同于 `-d -r`，后面是详细参数:
 
 ### 通用
 
-- `-E` 预处理后即停止,不进行编译.预处理后的代码送往标准输出.GCC 忽略任何不需要预处理的输入文件.
+- `-E` 只预处理
 
-- `-S` 编译后即停止,不进行汇编.对于每个输入的非汇编语言文件,输出文件是汇编语言文件.
+- `-S` 编译成汇编代码
 
-- `-masm = [ intel | att ]` 选择`intel`或`AT&T`的汇编语法,默认输出的汇编是`AT&T`格式
+- `-c` 编译成目标文件
 
-- `-c` 编译或汇编源文件,但是不作连接.编译器输出对应于源文件的目标文件,缺省情况下, GCC 通过用`.o'替换源文件名后缀`.c', `.i', `.s',等等,产生目标文件名.可以使用`-o`选项选择其他名字,GCC 忽略-c 选项后面任何无法识别的输入文件
-
-- `-pipe` 在编译过程的不同阶段间使用管道而非临时文件进行通信.这个选项在某些系统上无法 工作,因为那些系统的 汇编器不能从管道读取数据. GNU 的汇编器没有这个问题
+- `-o` 指定输出的文件名
 
 - `-std=gnu11` 使用 `gnu11` 标准来编译
 
@@ -113,9 +72,13 @@ gcc -shared -fPIC xxx.c -o xxx.so
 
 - `-Wall` 开启所有警告错误提醒
 
-- `-Werror` 它要求 gcc 将所有的警告当成错误进行处理, gcc 会在所有产生警告的地方停止编译
+- `-Werror` 它要求`gcc`将所有的警告当成错误进行处理, 然后停止编译
 
 - `-Wcast-align` 当源程序中地址不需要对齐的指针指向一个地址需要对齐的变量地址时，则产生一个警告例如`char *`指向一个`int *`地址，而通常在机器中`int`是需要地址能被2或4整除的对齐地址
+
+- `-masm = [ intel | att ]` 选择`intel`或`AT&T`(默认)的汇编语法
+
+- `-pipe` 在编译过程的不同阶段间使用管道而非临时文件进行通信
 
 - `-O2` 启用编译优化,一般上生产环境的代码要使用,为了得到更小的体积，更快的代码执行速度
 
@@ -123,9 +86,11 @@ gcc -shared -fPIC xxx.c -o xxx.so
 
 - `-Q` 显示编译过程的统计数据和每一个函数名
 
-- `-fpack-struct=4` 强制按照`4Byte`对齐内存,`-fpack-struct=2` 强制按照`2Byte`对齐内存,`-fpack-struct`不用对齐内存'
+- `-fpack-struct=4` 强制按照`4Byte`对齐内存,`-fpack-struct=2` 强制按照`2Byte`对齐内存,`-fpack-struct`不用对齐内存
 
 - `-save-temps` 保存编译过程中生成的一些列中间文件,比如 `.i` 和 `.s` 文件
+
+- `-fPIC` 如果支持这种目标机,编译器就输出位置无关目标码.适用于动态库`dynamic linking`
 
 ### 调试相关
 
@@ -141,23 +106,19 @@ gcc -shared -fPIC xxx.c -o xxx.so
 
 - `-UMACRO` 取消对 `MACRO` 宏的定义
 
+- `-rdynamic` 用来通知链接器将所有符号添加到动态符号表中,目的是能够通过使用 `dlopen` 来实现向后跟踪
+
 ### 路径链接相关
 
-- `-I./include` 在`.h`的搜索路径列表中添加 `./include`目录, 顺序: `./include`、`/usr/include` 、`/usr/local/include`
+- `-I./include` 增加头文件搜索路径, 顺序: `./include、/usr/include、/usr/local/include`
 
-- `-lword` : 链接库文件，库文件的真实名字为：`libword.so` 或 `libword.a`,一般说来用这个方法找到的文件是库文件`.a`或`.so`。连接器方法是:扫描归档文件,寻找某些成员,这些成员的符号目前已被引用,不过还没有被定义.但是,如果连接器找到普通的目标文件,而不是库文件,就把这个目标文件按平常方式连接进来.指定 `-l` 选项和指定文件名的唯一区别是: `-l` 选项用 `lib` 和 `.a` 把 `word` 包裹起来,而且搜索一些目录( `-L`可以指定哪些目录)
+- `-lword` : 链接`libword.so` 或 `libword.a`库文件。连接器方法是:扫描归档文件,寻找某些成员,这些成员的符号目前已被引用,不过还没有被定义.但是,如果连接器找到普通的目标文件,而不是库文件,就把这个目标文件按平常方式连接进来
 
-- `-L./lib` 在`-l`选项的搜索路径列表中添加`./lib`目录，顺序: `./lib`、`/lib`、`/usr/lib`、`/usr/local/lib`
+- `-L./lib` 增加库文件搜索路径，顺序: `./lib`、`/lib`、`/usr/lib`、`/usr/local/lib`
 
 - `-static` 使用该选项，之后的`-l`全部强制使用`.a`
 
-- `-rdynamic` 用来通知链接器将所有符号添加到动态符号表中,目的是能够通过使用 `dlopen` 来实现向后跟踪
-
-- `-pthread` 与 `-lpthread` : 手册里则指出应该在编译和链接时都增加 `-pthread` 选项,编译选项中指定`-pthread` 会附加一个宏定义 `-D_REENTRANT`，该宏会导致`libc`头文件选择那些`thread-safe`的实现；链接选项中指定`-pthread` 则同`-lpthread`一样，只表示链接`POSIX thread` 库。由于`libc`用于适应`thread-safe`的宏定义可能变化，因此在编译和链接时都使用`-pthread`选项而不是传统的`-lpthread` 能够保持向后兼容，并提高命令行的一致性。
-
-- `-fpic` 如果支持这种目标机,编译器就生成位置无关目标码.适用于共享库`shared library`
-
-- `-fPIC` 如果支持这种目标机,编译器就输出位置无关目标码.适用于动态连接`dynamic linking`,即使分支需要大范围转移.
+- `-pthread` 与 `-lpthread` :`-pthread` 会附加一个宏定义 `-D_REENTRANT`，让编译器选择那些`thread-safe`的实现；由于`thread-safe`的宏定义可能变化，因此在编译和链接时都使用`-pthread`选项而不是传统的`-lpthread` 能够保持向后兼容
 
 - 预处理器选项 ：`-Aassertion -C -dD -dM -dN -Dmacro[=defn] -E -H -idirafter dir -include file -imacros file -iprefix file -iwithprefix dir -M -MD -MM -MMD -nostdinc -P -Umacro -DMACRO`
 
@@ -165,7 +126,7 @@ gcc -shared -fPIC xxx.c -o xxx.so
 
 - 连接器选项: `-llibrary -nostartfiles -nostdlib -static -shared -symbolic -Xlinker option -Wl,option -u symbol`
 
-- 调试选项 `-a -dletters -fpretend-float -g -glevel -gcoff -gxcoff -gxcoff+ -gdwarf -gdwarf+ -gstabs -gstabs+ -ggdb -p -pg -save-temps -print-file-name=library -print-libgcc-file-name -print-prog-name=program`
+- 调试选项 `-a -dletters -fpretend-float -gcoff -gxcoff -gxcoff+ -gdwarf -gdwarf+ -gstabs -gstabs+ -ggdb -print-file-name=library -print-libgcc-file-name -print-prog-name=program`
 
 
 ## GCC环境变量
