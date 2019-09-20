@@ -7,7 +7,6 @@
 
 ```.vimrc
 set nu            " 设置行号
-set backup        " 设置自动保存备份文件
 set hlsearch      " 高亮查找项
 set incsearch     " 查找跟随
 set ignorecase    " 查找时忽略大小写
