@@ -69,7 +69,8 @@ sudo aptitude update                         再次更新源
 sudo apt-get install vim　               安装vim编辑器
 sudo update-alternatives --config editor 默认编辑设置为vim
 sudo apt-get install git                 安装git
-sudo apt-get install unrar               安装rar解压工具, unrar x test.rar 解压到当前文件夹
+sudo apt-get install rar unrar           安装rar解压工具, unrar x test.rar 解压到当前文件夹
+sudo apt-get install p7zip               .7z 压缩的解压工具
 sudo apt-get install zsh                 安装zsh 配置oh-my-zsh
 
 sudo apt-get install bless               安装二进制查看与编辑器
