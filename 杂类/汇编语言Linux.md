@@ -31,9 +31,22 @@ nasm -g -f elf64 -F dwarf -o hello.o hello.s # 实际案例
 
 ## 寄存器
 
+32位寄存器:
+
 ![寄存器](https://img.codekissyoung.com/2019/09/28/e3590522730d21905506a399d8453998.png)
 
 ![通用寄存器](https://img.codekissyoung.com/2019/09/28/67326c3c637b357a44092e781680c6e4.png)
+
+64位寄存器:
+
+```asm
+1F : eflags
+2I : rdi(字符串操作的 dest index) rsi(字符串操作的 src index)
+3P : rbp(一般指向栈中数据) rip(程序计数器PC) rsp(指向栈顶)
+4X : rax(用于返回值) rbx(用于指向数据段数据) rcx(用于循环计数) rdx(I/O pointer)
+8R : r8, r9, r10, r11, r12, r13, r14, r15
+6S : CS, DS， ES, SS, FS, GS  段寄存器，一般64位下汇编程序，不再操作这几个了
+```
 
 ![段寄存器](https://img.codekissyoung.com/2019/09/28/efb484359503c873e5cccdd13d624112.png)
 
@@ -91,7 +104,144 @@ mov ax,[esp]                    ; 默认 SS
 
 数据定义符号包括: `db`定义字节、 `dw`定义字、 `dd`定义双字、 `dq`定义8个字节
 
+```asm
+counter db 6
+        db 'A','D',0DH,'$'
+msg     db "i am a student"
 
+myword  dw 89H, 1909H, -1
+        dw 0ABCDH, 0
+
+mydword dq 012345678H, 0H, -1234H
+        dq 1238H
+```
+
+
+## C 与 汇编
+
+#### 空函数
+```c
+long empty_func()
+{
+
+}
+```
+
+```asm
+empty_func:
+  push rbp      ; 保护现场，保存调用方的栈基
+  mov rbp, rsp  ; 将 新栈顶 作为本函数的栈基
+  nop           ; 因为是空函数，所以什么也不做
+  pop rbp       ; 恢复现场, 恢复调用方的栈基
+  ret
+```
+
+#### 带有返回值的函数
+
+```c
+long return_func()
+{
+	return 42;
+}
+```
+```asm
+return_func:
+	push rbp
+	mov	rbp, rsp
+	mov	eax, 42		; 函数的返回值放在 eax
+	pop	rbp
+	ret
+```
+
+#### 函数传值
+
+```c
+long return_func( long a , long b )
+{
+	return a;
+}
+
+int main(){
+  return_func( 20, 30 );
+  return 0;
+}
+
+```
+
+```asm
+return_func:
+	push	rbp
+	mov	rbp, rsp
+
+	mov	QWORD PTR -8[rbp], rdi    ; 将局部变量 a 放在 (当前栈基 - 8) 地址处 
+	mov	QWORD PTR -16[rbp], rsi   ; 将局部变量 b 放在 (当前栈基 -16) 地址处
+	mov	rax, QWORD PTR -8[rbp]    ; 再将 a 的值，移入 rax
+
+	pop	rbp
+	ret
+
+main:
+  ...
+	mov	esi, 30
+	mov	edi, 20
+	call	return_func
+  ...
+```
+
+#### 函数传非常多个值
+
+```c
+long multi_parm( long a , long b, long c, long d, long e, long f, long g, long h, long i )
+{
+	return g + h + i;
+}
+```
+
+对于6个以内的传值(包括指针)，依次使用`rdi rsi rdx rcx r8 r9`传值，多于 6 个的话, 则直接使用 调用方 的栈来操作。 
+
+```asm
+multi_parm:
+	push	rbp
+	mov	rbp, rsp
+
+	mov	QWORD PTR -8[rbp], rdi		# a
+	mov	QWORD PTR -16[rbp], rsi		# b
+	mov	QWORD PTR -24[rbp], rdx		# c
+	mov	QWORD PTR -32[rbp], rcx		# d
+	mov	QWORD PTR -40[rbp], r8		# e
+	mov	QWORD PTR -48[rbp], r9		# f
+
+	mov	rdx, QWORD PTR 16[rbp]		# g , 16[rbp] 这个计算后就是调用方的栈地址
+	mov	rax, QWORD PTR 24[rbp]		# h
+	add	rdx, rax
+	mov	rax, QWORD PTR 32[rbp]		# i
+	add	rax, rdx
+
+	pop	rbp
+	ret
+```
+
+总结下函数调用栈的主要功能:
+
+- 保存 调用方(上层函数) 的调用状态(保存现场 + 恢复现场操作)
+- 保存当前函数的局部变量
+- 为下层函数调用做参数准备(当参数多于6个时)
+
+函数调用方式:
+
+- 普通调用
+  - `call` 和 `ret`
+  - `call` 和 `ret` 加 `enter` 和 `leave`
+  - `enter` 和 `leave`可以用来辅助设置和清理调用栈
+
+- 系统调用
+  - 通过 `int 0x80` 中断
+  - `sysenter` 和 `sysexit`
+  - `syscall` 和 `sysret`
+
+**Near Call** : 调用函数在当前代码段,一般一个进程内的函数都在一个代码段内。
+
+**Far Call** : 调用函数在其他代码段，一般用于系统调用 或 调用其他进程内的函数。
 
 ## HelloWorld例子
 
