@@ -8,33 +8,21 @@
 - 下载U盘装机软件`LinuxLive USB Creator`
 - 设置电脑的启动盘顺序，U盘进入，安装
 
-## 查看系统版本和环境
+## 初始化开发环境
 
-```bash
-lsb_release -a
-cat /etc/issue
-uname -a
-```
-
-## 安装中文支持
-
-```bash
-sudo apt-get install language-pack-zh-hans
-sudo apt-get install zhcon
-```
+由于经常装机，所以所有步骤都写成了一个脚本： [ubuntu.sh](https://github.com/codekissyoung/shell/blob/master/ubuntu.sh)
 
 ## 设置软件运行时语言环境
 
-- Locale 是软件在运行时的语言环境, 它包括语言(Language), 地域 (Territory) 和字符集(Codeset)
-- 运行 `sudo vim /etc/enviroment` 添加如下内容 `LANG="zh_CN.UTF-8"`
-- 运行 `sudo locale-gen`
-- 运行 `sudo vim /etc/default/locale`,添加如下内容`LANG=zh_CN.UTF-8`
+`Locale` 是软件在运行时的语言环境, 它包括语言`Language`, 地域`Territory`和字符集`Codeset`:
 
-## 软件安装原则
+- `sudo vim /etc/enviroment` 添加 `LANG="zh_CN.UTF-8"`
+- `sudo locale-gen`
+- `sudo vim /etc/default/locale` 添加 `LANG=zh_CN.UTF-8`
 
-- 优先选择该系统版本上的默认软件,比如`ubuntu 16.04`的默认PHP版本是7.0,那就不要去用7.1的版本,否则会带来很大的麻烦
+## 安装软件
 
-## 下载必备软件
+**软件安装原则**: 优先选择该系统版本上的默认软件,比如`ubuntu 16.04`的默认PHP版本是7.0,那就不要去用7.1的版本,否则会带来很大的麻烦
 
 ```bash
 # apt-get 命令
@@ -45,7 +33,11 @@ apt-cache search keyword        搜寻软件
 apt-get install package         安装软件
 apt-get remove package          删除软件
 apt-get --purge remove package  彻底删除
+```
 
+#### 更强大的 aptitude
+
+```
 # aptitude 更强大的的 apt-get 命令
 sudo apt-get install aptitude           安装aptitude
 sudo aptitude                           打开软件包字符操作界面
@@ -55,8 +47,11 @@ sudo aptitude remove package            删除软件
 sudo aptitude purge package             彻底删除 连配置一起删除
 sudo aptitude update                    更新软件源
 sudo aptitude upgrade                   更新软件
+```
 
-# 使用第三方源 安装软件
+#### 使用第三方源 安装软件
+
+```
 sudo add-apt-repository ppa:ppsspp/stable    添加ppa源, 在source.list里添加 ppa 源了，同时完成导入key
 sudo aptitude update                         更新源
 sudo aptitude search ppsspp                  搜索下刚刚添加的第三方源的软件
@@ -64,23 +59,9 @@ sudo aptitude install ppsspp                 安装它
 sudo aptitude purge ppsspp                   删除它
 sudo add-apt-repository -r ppa:ppsspp/stable 删除ppa源
 sudo aptitude update                         再次更新源
-
-# 常用软件 建议依次安装
-sudo apt-get install vim　               安装vim编辑器
-sudo update-alternatives --config editor 默认编辑设置为vim
-sudo apt-get install git                 安装git
-sudo apt-get install rar unrar           安装rar解压工具, unrar x test.rar 解压到当前文件夹
-sudo apt-get install p7zip               .7z 压缩的解压工具
-sudo apt-get install zsh                 安装zsh 配置oh-my-zsh
-
-sudo apt-get install bless               安装二进制查看与编辑器
-sudo apt-get install tmux                用于保持工作现场 [服务器端]
-sudo apt-get install lnav                安装终端看访问日志的神器 lnav观看 [服务器端]
-sudo apt-get install openssh-server      安装ssh-server 可供远程登录 [服务器端]
-sudo apt-get install bash-builtins bash-completion bash-doc bash-static  安装bash自动补全工具
 ```
 
-## dpkg 管理 Debian软件包
+#### dpkg 管理 Debian软件包
 
 ```bash
 dpkg -l                         列出系统安装的所有debian包
@@ -96,31 +77,7 @@ dpkg –configure package         配置包
 dpkg–reconfigure package        重新配置包
 ```
 
-## 接入GitHub
-
-- 生成密钥 `ssh-keyen`, 将密钥`~/.ssh/id_rsa.pub`上传到Github > Settings > SSH And GPG keys
-
-## 连接到远程开发服务器
-
-- 将密钥`~/.ssh/id_rsa.pub`加入到远程服务器的`~/.ssh/authorized_keys`中
-- 在客户机执行`scp .ssh/id_rsa.pub cky@codekissyoung.com:~/id_rsa.pub`
-- 然后在远程服务器执行 `cat id_rsa.pub >> .ssh/authorized_keys`, 记得修改`authorized_keys`的权限位`600`
-- 登陆远程服务器 `ssh cky@codekissyoung.com`
-
-## 搭建C/C++开发环境
-
-- 安装build-essential这个软件包，安装了这个包会自动安装上g++,libc6-dev,linux-libc-dev,libstdc++6-4.1-dev等一些必须的软件和头文件的库。
-
-```bash
-sudo apt-get install build-essential
-sudo apt-get install linux-headers-$(uname -r)
-sudo aptitude install automake autoconf libtool pkg-config intltool checkinstall
-gcc -v
-gdb -v
-make -v
-```
-
-## 编译安装软件
+#### 编译安装软件
 
 ```bash
 sudo aptitude install libxml2-dev libgtk2.0-dev libnotify-dev libglib2.0-dev libevent-dev
@@ -131,6 +88,43 @@ sudo apt-get build-dep wireshark # 安装编译wireshark工具
 make
 sudo checkinstall # 构建debian包并且安装
 ```
+
+#### snap 安装软件包
+
+`snap`包思路模仿苹果软件包,没有依赖关系，体积大，下载安装包后，将下载的安装文件挂载到`/snap`目录下并自动创建挂载点，然后复制文件到指定位置
+
+```bash
+snap find htop            # 查找软件
+sudo snap install htop    # 安装软件
+sudo snap refresh stop    # 更新软件
+sudo snap remove stop     # 删除一个应用
+snap list                 # 列出安装的应用
+
+➜  htop tree   
+.
+├── 68
+│   ├── bin
+│   │   └── htop
+│   ├── command-htop.wrapper
+│   ├── meta
+│   │   └── snap.yaml
+│   └── share
+└── current -> 68
+
+➜  htop pwd
+/snap/htop
+```
+
+## 接入GitHub
+
+- 生成密钥 `ssh-keyen`, 将密钥`~/.ssh/id_rsa.pub`上传到 `Github > Settings > SSH And GPG keys`
+
+## 连接到远程开发服务器
+
+- 将密钥`~/.ssh/id_rsa.pub`加入到远程服务器的`~/.ssh/authorized_keys`中
+- 在客户机执行`scp .ssh/id_rsa.pub cky@codekissyoung.com:~/id_rsa.pub`
+- 然后在远程服务器执行 `cat id_rsa.pub >> .ssh/authorized_keys`, 记得修改`authorized_keys`的权限位`600`
+- 登陆远程服务器 `ssh cky@codekissyoung.com`
 
 ## 安装QT
 
@@ -170,39 +164,7 @@ If they do not exist, you can enable the module using the a2enmod command
 ```
 
 
-# snap 安装软件包
 
-- snap包思路模仿苹果软件包,没有依赖关系，体积大，下载安装包后，将下载的安装文件挂载到`/snap`目录下并自动创建挂载点，然后复制文件到指定位置
-
-```bash
-snap find htop # 查找软件
-sudo snap install htop # 安装软件
-➜  htop tree   
-.
-├── 68
-│   ├── bin
-│   │   └── htop
-│   ├── command-htop.wrapper
-│   ├── meta
-│   │   └── snap.yaml
-│   └── share
-│       ├── applications
-│       │   └── htop.desktop
-│       ├── man
-│       │   └── man1
-│       │       └── htop.1
-│       └── pixmaps
-│           └── htop.png
-└── current -> 68
-
-9 directories, 6 files
-➜  htop pwd
-/snap/htop
-
-sudo snap refresh stop # 更新软件
-sudo snap remove stop # 删除一个应用
-snap list # 列出安装的应用
-```
 
 ## 安装python开发环境
 

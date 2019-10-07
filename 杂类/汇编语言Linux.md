@@ -201,20 +201,20 @@ long multi_parm( long a , long b, long c, long d, long e, long f, long g, long h
 
 ```asm
 multi_parm:
-	push	rbp
-	mov	rbp, rsp
+	push  rbp
+	mov   rbp, rsp
 
-	mov	QWORD PTR -8[rbp], rdi		# a
-	mov	QWORD PTR -16[rbp], rsi		# b
-	mov	QWORD PTR -24[rbp], rdx		# c
-	mov	QWORD PTR -32[rbp], rcx		# d
-	mov	QWORD PTR -40[rbp], r8		# e
-	mov	QWORD PTR -48[rbp], r9		# f
+	mov	QWORD PTR -8[rbp], rdi    ;a
+	mov	QWORD PTR -16[rbp], rsi   ;b
+	mov	QWORD PTR -24[rbp], rdx   ;c
+	mov	QWORD PTR -32[rbp], rcx   ;d
+	mov	QWORD PTR -40[rbp], r8    ;e
+	mov	QWORD PTR -48[rbp], r9    ;f
 
-	mov	rdx, QWORD PTR 16[rbp]		# g , 16[rbp] 这个计算后就是调用方的栈地址
-	mov	rax, QWORD PTR 24[rbp]		# h
+	mov	rdx, QWORD PTR 16[rbp]    ;g , 16[rbp] 这个计算后就是调用方的栈地址
+	mov	rax, QWORD PTR 24[rbp]    ;h
 	add	rdx, rax
-	mov	rax, QWORD PTR 32[rbp]		# i
+	mov	rax, QWORD PTR 32[rbp]    ;i
 	add	rax, rdx
 
 	pop	rbp
