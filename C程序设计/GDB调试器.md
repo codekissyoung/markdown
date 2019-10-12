@@ -1,13 +1,13 @@
 # 使用gdb调试c程序
 
-调试器是一个程序，可以在一个严密的环境中执行另一个程序。比如，调试器可以单步跟踪和执行程序、查看变量内容、内存位置、以及指向每条语句后CPU寄存器的变化情况。也可以分析 到达程序中某个点之前 的函数调用序列。
+调试器可以单步跟踪和执行程序、查看变量内容、内存位置、以及指向每条语句后CPU寄存器的变化情况。也可以分析 到达程序中某个点之前 的函数调用序列。
 
 `GDB`是 符号式 调试器，必须通过`-g`选项，在程序编译时将源代码到机器指令的信息写入到可执行文件的 符号表 中。在包含多个源代码文件的大型程序中，必须在编译每个模块的时候都使用`-g`选项。
 
 ## 启用gdb调试
 
 ```bash
-$gcc -g main.c -o cky # -g 表示编译支持 gdb 调试, 并且不能带上-O 或者 -O2 优化
+$gcc -Og main.c -o cky # -g 表示编译支持 gdb 调试, 并且不能带上-O 或者 -O2 优化
 $gdb cky              # 调试 cky 程序
 $gdb cky core         # 带上 core 文件一起调试，程序非法执行后 core dump 后产生 core 文件
 $gdb cky <PID>        # 指定这个服务程序运行时的进程ID。gdb会自动attach上去，并调试他
@@ -28,6 +28,8 @@ $gdb --tui cky        # 在终端窗口上部显示一个源代码查看窗
 ```gdb
 (gdb)r -a -b           # 等价于 cky -a -b
 (gdb)start             # 重新执行程序
+(gdb)kill              # 停止程序
+(gdb)quit              # 退出GDB
 ```
 
 ## 断点
@@ -43,7 +45,9 @@ $gdb --tui cky        # 在终端窗口上部显示一个源代码查看窗
 (gdb)b temp:10           # 在temp.c中第10行 设置断点
 (gdb)b temp:func         # 在temp.c中func函数处 打个断点
 (gdb)tb func             # tb 是临时断点，即用完后就会自动删除
-(gdb)d 1                 # 删除编号为 3 的断点
+(gdb)b *0x400540         # 在地址 0x400540 处设置断点
+
+(gdb)d 1                 # 删除 1 号断点
 (gdb)d [Enter]           # d + 回车 清除所有断点
 (gdb)disable 2           # 禁用断点，还可以禁用范围 disable 1-3
 (gdb)enable 2            # 启用断点, 还可以启用范围 enable 1-3
@@ -55,12 +59,23 @@ $gdb --tui cky        # 在终端窗口上部显示一个源代码查看窗
 ```gdb
 (gdb) n                   # 单步执行,不跟踪到函数内部,Step Over
 (gdb) s                   # 单步执行,追踪到函数内部,Step In
-(gdb) finish              # 继续执行，直到当前函数结束并返回,Step Out
+(gdb) s 4                 # 单步执行 4 条指令
+(gdb) finish              # 运行到当前函数返回,Step Out
 (gdb) return value        # 不继续执行函数中的语句，而是直接让函数返回 value
 (gdb) until               # 继续执行，直到当前循环结束
 (gdb) c                   # 程序继续运行, 直到下一个断点
 (gdb) [Enter]             # 直接回车表示，重复执行上一次命令
 (gdb) call func(12,32)    # 直接在调试时调用函数
+```
+
+## 汇编
+
+```gdb
+(gdb) disas                     # 查看当前函数 汇编代码
+(gdb) disas func                # 查看 func 汇编代码
+(gdb) disas 0x400544            # 查看 地址 0x400544 处汇编
+(gdb) disas 0x400540,0x40054d   # 查看汇编指定地址范围内的代码
+(gdb) p /x $rip                 # 查看程序计数器的值
 ```
 
 ## 查看堆栈信息
@@ -74,23 +89,26 @@ $gdb --tui cky        # 在终端窗口上部显示一个源代码查看窗
 (gdb) f 1                # 切换到 #1 号栈下
 (gdb) i locals           # 打印当前栈下，所有的局部变量
 (gdb) i args             # 打印当前栈下，函数传入的参数
-(gdb) i registers        # 显示当前栈下，所有寄存器变量的值
+(gdb) i reg              # 显示当前栈下，所有寄存器变量的值
 ```
 
 ## 查看程序变量
 
 ```gdb
+(gdb) p /x $rax            # 查看 rax 寄存器(十六进制)
+(gdb) p /x $rax            # 查看 rax 寄存器(二进制)
+(gdb) p /x ($rsp + 8)      # 查看 rsp寄存器值 + 8 后的值
+
 (gdb) p var                # 打印变量的值
 (gdb) p arr                # 打印静态数组的值 $3 = {190, 0, 0, 0, 90, 0, 0, 76}
 (gdb) p *array@4           # 打印动态数组的 4 个元素
-(gdb) p &var               # 打印变量的地址
-(gdb) p *address           # 打印地址的数据值
-(gdb) p func(5)            # 设定入参，对程序中函数进行调用，看函数返回什么
-(gdb) p 'f2.c'::x          # 查看f2.c文件中全局变量x的值
-(gdb) p 'f2.c'::sum::x     # 查看f2.c中sum函数中x的值
 
-(gdb) p/x a                # x 十六进制显示，u 无符号整型
-$1 = 0x65                  # f 浮点数格式显示，o 八进制格式，t 二进制格式，c 字符格式
+(gdb) p &var                            # 打印变量的地址
+(gdb) p *(long *)0x7fffffffe818         # 打印地址处的长整型值
+(gdb) p *(long *)($rsp + 8)             # 输出($rsp + 8)地址处的长整型值
+(gdb) p func(5)                         # 设定入参，对程序中函数进行调用，看函数返回什么
+(gdb) p 'f2.c'::x                       # 查看f2.c文件中全局变量x的值
+(gdb) p 'f2.c'::sum::x                  # 查看f2.c中sum函数中x的值
 
 (gdb) set variable a = 100 # 直接修改程序里变量的值
 (gdb) whatis a             # 显示变量的数据类型
