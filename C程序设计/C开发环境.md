@@ -10,20 +10,7 @@
 sudo apt-get install gcc gdb make autoconf automake libtool build-essential flex bison cmake git tree
 ```
 
-检查C的开发环境:
-
-```bash
-#!/bin/bash
-uname -a; echo;                             # 检测 linux 内核版本
-lsb_release -a; echo;                       # 查看发行版本
-gcc -v  | grep "gcc version"; echo;         # 检查 gcc 版本
-gdb -v  | grep -i "GNU gdb";echo;           # 检查 gdb 版本
-make -v | grep -i make;echo;                # 检查 make 版本
-autoconf --version | grep autoconf;echo;    # 检查 autoconf 版本
-automake --version | grep automake;echo;    # 检查 automake 版本
-libtoolize --version | grep automake;echo;  # 检查 libtool 版本
-cmake --version ;echo;                      # 检查 cmake 版本
-```
+检查C的开发环境: [github check-c-dev.sh](https://github.com/codekissyoung/shell/blob/master/check-c-dev.sh)
 
 工具介绍:
 
@@ -33,23 +20,12 @@ cmake --version ;echo;                      # 检查 cmake 版本
 - `Lex`是一种生成扫描器的工具。扫描器是一种识别文本中的词汇模式的程序。`flex`是`ubuntu`中的版本。
 - `Yacc` 代表 `Yet Another Compiler Compiler`。`Yacc` 的 GNU 版叫做 `Bison`。它是一种工具，将任何一种编程语言的所有语法翻译成针对此种语言的 `Yacc` 语法解析器。
 
-## 术语
-
-**链接**：将多个`.o`文件链接成可被操作系统执行的程序。`.o`往往引用了其他`xx.o`中的符号，所以不能单独直接执行。需要将这些引用所在的`.o`文件链接进来，这种操作称为重定向。链接器不检查函数所在源文件，只检查`.o`文件中定义的符号。将`.o`文件中使用的函数和其他`.o`或库文件中的相关符号合并，最后生成一个可执行的程序。
-
-**静态库**: `.a`文件,又称为文档文件`Archive file`。是多个`.o`文件的集合。静态库中的各个`.o`文件没有特殊的存在格式，仅仅是一个`.o`文件的集合。使用`ar`工具维护和管理静态库。
-
-**共享库**: `*.so`文件，也是多个`.o`文件的集合。但是这些`.o`文件由编译器按照一种特殊的方式生成。对象(变量引用和函数调用)模块的各个成员的地址都是相对地址。因此在程序运行时，可动态加载库文件和执行`.so`文件。多个程序可以共享使用库中的某一个模块。
-
-**可执行文件**: 已经将所有引用到的符号的所在文件链接起来，每一个符号都已经得到了解析和重定位，每个符号都是已知的，所以可以被机器直接执行
-
 ## gcc 概述
 
-
 ```bash
-gcc -E xxx.c -o xxx.i               # 生成预编译文件
-gcc -S xxx.c -o xxx.s               # 生成 汇编源文件，也就是汇编代码
-gcc -c xxx.c -o xxx.o               # 生成 .o 文件
+gcc -E xxx.c -o xxx.i               # 生成预编译文件, 内部 cpp 命令
+gcc -S xxx.c -o xxx.s               # 生成汇编源文件, 内部 ccl 命令
+gcc -c xxx.c -o xxx.o               # 生成目标文件, 内部 as 命令
 ar rcsU zzz.a xxx.o yyy.o           # 打包成静态库
 gcc -shared -fPIC xxx.c -o xxx.so   # 打包成动态库
 ```
@@ -57,12 +33,6 @@ gcc -shared -fPIC xxx.c -o xxx.so   # 打包成动态库
 `gcc`选项必须分立给出: `-dr` 完全不同于 `-d -r`，后面是详细参数:
 
 ### 通用
-
-- `-E` 只预处理
-
-- `-S` 编译成汇编代码
-
-- `-c` 编译成目标文件
 
 - `-o` 指定输出的文件名
 
@@ -80,15 +50,15 @@ gcc -shared -fPIC xxx.c -o xxx.so   # 打包成动态库
 
 - `-pipe` 在编译过程的不同阶段间使用管道而非临时文件进行通信
 
-- `-O2` 启用编译优化,一般上生产环境的代码要使用,为了得到更小的体积，更快的代码执行速度
+- `-O2` 启用编译优化(可选`g` `1` `2`)，代码效率更高更快
 
 - `-v` 输出编译详细过程
 
 - `-Q` 显示编译过程的统计数据和每一个函数名
 
-- `-fpack-struct=4` 强制按照`4Byte`对齐内存,`-fpack-struct=2` 强制按照`2Byte`对齐内存,`-fpack-struct`不用对齐内存
+- `-fpack-struct=4` 强制对齐内存(可选 `8` `4` `2`) 
 
-- `-save-temps` 保存编译过程中生成的一些列中间文件,比如 `.i` 和 `.s` 文件
+- `-save-temps` 保存编译过程中的中间文件(`.i` `.s`)
 
 - `-fPIC` 如果支持这种目标机,编译器就输出位置无关目标码.适用于动态库`dynamic linking`
 
