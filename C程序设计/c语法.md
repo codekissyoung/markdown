@@ -1,19 +1,10 @@
-### 变长结构体
+# C语法
+
+C语法。
+
+## 变长结构体
 
 - [零长度数组的妙用](http://elkpi.com/topics/zero-length-arrays.html)
-
-
-#### 静态局部变量
-
-- 在函数内部使用 `static` 关键字声明，只有在定义它的函数内部才能访问到
-
-```c
-void trystat(void){
-    int fade = 1;
-    static int stay = 2; // 静态局部变量
-    printf("fade = %d , stay = %d \n",fade++,stay++);
-}
-```
 
 ### 全局变量
 
@@ -40,33 +31,6 @@ extern int insert(int val);
 extern void print();
 extern void destroy();
 ```
-
-#### 作用域
-
-- 块作用域
-
-```c
-int a = 5;
-{
-    int a = 10;
-    printf("%f\n",a); // 10
-}
-printf("%f \n",a); // 5
-```
-
-- 变量同名屏蔽
-
-```c
-int a = 10; // 全局变量
-int func(){
-    int a = 20 ; // 局部变量，屏蔽全局变量
-}
-int func2(){
-    printf('%d',a); // 函数内部可以直接使用全局变量
-}
-```
-
-- `return` 语句不可返回指向栈内存的指针 , 因为该内存在函数体结束时被自动销毁`return ;`表示函数的结束
 
 ```c
 char *Func ( void )
@@ -95,16 +59,6 @@ extern const int i;      // 引用在另一个文件中  const 只读变量
 void display( const int array[], int limit ); // array 指向的值是不能变的
 void display( const int *array, int limit );  // array 指向的值是不能变的
 char *strcat( char *, const char* ); // 第一个参数在函数内可以被修改，第二个参数只读
-```
-
-### 回调函数
-
-```c
-// 定义
-void populate_array(int *array, size_t arraySize, int (*getNextValue)(void));
-int getNextRandomValue(void);
-// 调用
-populate_array(myarray, 10, getNextRandomValue);
 ```
 
 ### 可变参数
@@ -163,77 +117,6 @@ int main(int argc, char* argv[])
 - [用法参考](https://www.cnblogs.com/edver/p/8419807.html)
 - [可变参数实现](https://blog.csdn.net/smstong/article/details/50751121)
 
-### 函数类型 与 函数指针类型
-
-```c
-void test() { printf("%s\n", __func__); }
-
-typedef void(func_t)(); // 函数类型
-typedef void(*func_ptr_t)(); // 函数指针类型
-
-int main(int argc, char* argv[])
-{
-    func_t* func = test;     // 使用函数类型 声明一个指针变量
-    func_ptr_t func2 = test; // 使用函数指针类型 声明一个指针变量
-    void (*func3)(); // 声明 个包含函数原型的函数指针变量
-    func3 = test;
-
-    func();
-    func2();
-    func3();
-
-    return EXIT_SUCCESS;
-}
-```
-
-### gcc  持嵌套函数扩展
-
-```c
-typedef void(*func_t)();
-func_t test()
-{
-    void func1(){
-        printf("%s\n", __func__);
-    }
-    return func1;
-}
-int main(int argc, char* argv[])
-{
-    test()();
-    return EXIT_SUCCESS;
-}
-```
-
-- 内层函数可以 "读写" 外层函数的参数和变量,外层变量必须在内嵌函数之前定义
-
-```c
-#define pp() ({ \
-    printf("%s: x = %d(%p), y = %d(%p), s = %s(%p);\n", __func__, x, &x, y, &y, s, s); \
-})
-void test2(int x, char *s){
-    int y = 88;
-    pp();
-    void func1()
-    {
-        y++;
-        x++;
-        pp();
-    }
-    func1();
-    x++;
-    func1();
-    pp();
-}
-int main (int argc, char * argv[])
-{
-    test2(1234, "abc");
-    return EXIT_SUCCESS;
-}
-// test2: x = 1234(0xbffff7d4), y = 88(0xbffff7d8), s = abc(0x4ad3);
-// func1: x = 1235(0xbffff7d4), y = 89(0xbffff7d8), s = abc(0x4ad3);
-// func1: x = 1237(0xbffff7d4), y = 90(0xbffff7d8), s = abc(0x4ad3);
-// test2: x = 1237(0xbffff7d4), y = 90(0xbffff7d8), s = abc(0x4ad3);
-```
 
 ### 函数修饰符
 
@@ -243,23 +126,6 @@ int main (int argc, char * argv[])
 - `static inline` 内链接函数,在当前编译单元内内联。不过 -O0 时依然是 call。
 - `inline` 外连接函数,当前单元内联,外部单元为普通外连接函数 (头件中不能添加 inline 关键字)。inline 关键字只能 在函数定义处
 
-
-## typedef 给数据类型取别名
-
-### 给int char float 等取别名
-
-```c
-// 比如定义一个叫 REAL 的浮点类型，在目标平台一上，让它表示最高精度的类型为：
-typedef long double REAL;
-
-// 在不支持 long double 的平台二上，改为：
-typedef double REAL;
-
-// 在连 double 都不支持的平台三上，改为：
-typedef float REAL;
-
-// 当跨平台时，只要改下 typedef 本身就行，不用对其他源码做任何修改甚至可以通过预处理器识别不同平台，自动 typedef
-```
 
 ### 给数组取别名
 
@@ -336,55 +202,3 @@ typedef int * PTR_INT
 PTR_INT p1, p2; // 都是指向int的指针
 ```
 
-## 标准库
-
-### stdio标准输入/输出流
-
-- 各个操作系统底层对文件的操作都是不一样的，如windows 的 ntfs 和linux 的 ext3 ！
-- stdio.h 屏蔽了这种不同，使用了流来管理文件
-- stdin 输入流,默认指向键盘
-- stdout 输出流,默认指向屏幕
-- stderr 错误输出流，默认输入也是屏幕
-- 输入输出重定向：`<` 是输入 `>` 是输出 `>>`是追加输出 `2>`是错误输出重定向 `2>>`错误输出重定向追加输出
-- c程序从流中获取数据，或者将数据输出到流中
-- c程序将输入视为一个外来字节的流，getchar() 函数将每个字节解释为一个字符编码scanf()函数将以同样的方式看待输入，但在其转换 说明符的指导下，该函数可以将字符转换为数值如果scanf 读取失败，它会将数据还给字节流
-- 如果输入的是文件，检测到文件末尾时，scanf 和 getchar 都返回 EOF 值
-- 如果是键盘输入，能用 `Ctrl + D` 或者 `Ctrl + z` 来模拟从键盘模拟文件结束条件
-
-```c
-#define    EOF    （-1）    // 这个判断流到达末尾的标志符
-#include <stdio.h>
-int main(){
-  char ch;
-  while((ch=getchar()) != EOF )  //getchar 是从输入流中读取一个字符
-  putchar(ch);    //输出一个字符
-  return 0;
-}
-```
-
-```c
-/*先用 scanf 读取数字，失败的话，再用 getchar 读取处理*/
-int get_int(void)
-{
-    int input;
-    char ch;
-    while(scanf("%d",&input)!=1){
-        while((ch = getchar())!= '\n'){
-            putchar (ch); //剔除错误的输入
-        }
-        printf("is not an integer .\n please enter an integer value !");
-    }
-    return input ;
-}
-```
-
-### 输入函数/输出函数
-
-- 输入也是先放在缓冲区,代码读取缓冲区内容的条件: 1.遇见换行符 2.缓冲区满了
-- 所有输出的内容都是先存放到缓冲区，再由缓冲区一次性输出到屏幕缓冲区内容刷新发送到屏幕的条件：1.缓冲区满 2.换行符 3.遇见输入命令/代码
-
-```c
-scanf("%s",&name); 读取缓存中的字符串，会在空白 ，\t,\n 处停止读取！
-scanf("%d,%d",&grade,&age); //表示 期望我们以： 3,12 这样的形式输入
-prinf("%d %s %p",10,"caokaiyan",point);//point 是一个指针
-```

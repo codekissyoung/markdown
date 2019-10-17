@@ -548,3 +548,57 @@ char *pch;
 char str[] = "Example string";
 pch = (char*)memchr (str, 'p', strlen(str));
 ```
+
+
+## 标准库
+
+### stdio标准输入/输出流
+
+- 各个操作系统底层对文件的操作都是不一样的，如windows 的 ntfs 和linux 的 ext3 ！
+- stdio.h 屏蔽了这种不同，使用了流来管理文件
+- stdin 输入流,默认指向键盘
+- stdout 输出流,默认指向屏幕
+- stderr 错误输出流，默认输入也是屏幕
+- 输入输出重定向：`<` 是输入 `>` 是输出 `>>`是追加输出 `2>`是错误输出重定向 `2>>`错误输出重定向追加输出
+- c程序从流中获取数据，或者将数据输出到流中
+- c程序将输入视为一个外来字节的流，getchar() 函数将每个字节解释为一个字符编码scanf()函数将以同样的方式看待输入，但在其转换 说明符的指导下，该函数可以将字符转换为数值如果scanf 读取失败，它会将数据还给字节流
+- 如果输入的是文件，检测到文件末尾时，scanf 和 getchar 都返回 EOF 值
+- 如果是键盘输入，能用 `Ctrl + D` 或者 `Ctrl + z` 来模拟从键盘模拟文件结束条件
+
+```c
+#define    EOF    （-1）    // 这个判断流到达末尾的标志符
+#include <stdio.h>
+int main(){
+  char ch;
+  while((ch=getchar()) != EOF )  //getchar 是从输入流中读取一个字符
+  putchar(ch);    //输出一个字符
+  return 0;
+}
+```
+
+```c
+/*先用 scanf 读取数字，失败的话，再用 getchar 读取处理*/
+int get_int(void)
+{
+    int input;
+    char ch;
+    while(scanf("%d",&input)!=1){
+        while((ch = getchar())!= '\n'){
+            putchar (ch); //剔除错误的输入
+        }
+        printf("is not an integer .\n please enter an integer value !");
+    }
+    return input ;
+}
+```
+
+### 输入函数/输出函数
+
+- 输入也是先放在缓冲区,代码读取缓冲区内容的条件: 1.遇见换行符 2.缓冲区满了
+- 所有输出的内容都是先存放到缓冲区，再由缓冲区一次性输出到屏幕缓冲区内容刷新发送到屏幕的条件：1.缓冲区满 2.换行符 3.遇见输入命令/代码
+
+```c
+scanf("%s",&name); 读取缓存中的字符串，会在空白 ，\t,\n 处停止读取！
+scanf("%d,%d",&grade,&age); //表示 期望我们以： 3,12 这样的形式输入
+prinf("%d %s %p",10,"caokaiyan",point);//point 是一个指针
+```
