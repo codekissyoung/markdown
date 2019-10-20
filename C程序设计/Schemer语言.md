@@ -138,6 +138,56 @@ Schemer 支持数字（整数、IEEE浮点数、复数），字符串，列表�
 下面代码中`(car (list + - * /))`的求值结果是`+`，它作为`(produce 2 3)`中的`produce`进行下一步求值，最终结果是`5`。
 ![](https://img.codekissyoung.com/2019/10/20/f9ff71e6c90c0ff30becb9a82742be35.png)
 
+#### 变量
+
+Schemer 中的变量需要通过`let`表达式绑定，然后在后续的表达式（此处称为`body`）中可以使用，（注意，这句话的意思是`let`变量是局部的），格式如下:
+
+```lisp
+(let ( (name value) (name value-expr) ...) body1 body2 ... )
+```
+![](https://img.codekissyoung.com/2019/10/20/ac89cba367973f3707311460ffa651ce.png)
+
+Schemer 中`[]` 等价于 `()`，只要求配对使用，所以可以通过`[]`改善代码可读性。
+
+```lisp
+( let ( [x 2] ) (+ x 3) )
+( let ( [x 2] [y 3] ) (+ x y) )
+```
+
+`let`表达式是可以嵌套的，`body`还可以是另一个`let`表达式，外层定义的变量在内层`let`表达式中可见；但是，当内层`let`表达式定义了同名的变量时，外层变量会被遮蔽，此时可见的只有内层同名变量。（同C语言机制一样）
+![](https://img.codekissyoung.com/2019/10/20/0a7ef4e2021a4ab63a1b0e0a2b4f790d.png)
+
+#### lambda表达式
+
+`lambda` 表达式用于创建一个函数，它的返回值就是一个函数（可以放在表达式`produce`位置），接受一个参数列表，它有与`let`表达式一样的`body`,格式如下:
+
+```lisp
+(lambda (var ...) body1 body2 )
+```
+
+可以直接把`lambda`表达式当作匿名函数使用，也可以绑定到一个变量名（相当于命名函数），然后在`body`中多次调用。
+![](https://img.codekissyoung.com/2019/10/20/4936b7ae0788fe7e2f0ce27c6f2d48ac.png)
+
+再看看`lambda`表达式的闭包性质，`lambda`的`body`内部可以直接使用外部变量，但要注意的是，一旦`lambda`表达式执行完毕，返回函数时，此时外部变量的值已经固定在函数内部了，这时再修改外部变量，是不会影响到`lambda`函数内部值的。
+![](https://img.codekissyoung.com/2019/10/20/0fcaa0602dffa2aec74413feb0e733bf.png)
+
+#### 全局变量
+
+使用`define`表达式可以定义在整个程序可见的变量与函数，但要注意，全局变量也会被同名局部变量遮蔽。（同C语言机制一样）
+
+![](https://img.codekissyoung.com/2019/10/20/f12dde7ed319bece02474f7525b314b8.png)
+
+#### 条件判断
+
+```lisp
+(if (operator arg1 arg2) true-value false-value)        # 格式
+```
+![](https://img.codekissyoung.com/2019/10/20/5017e2625f1e550ee5c85a781ad415cc.png)
+
+#### 递归
+
+
+
 
 ## 参考
 
