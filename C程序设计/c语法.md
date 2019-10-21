@@ -1,13 +1,5 @@
 # C语法
 
-C语法。
-
-## 变长结构体
-
-- [零长度数组的妙用](http://elkpi.com/topics/zero-length-arrays.html)
-
-### 全局变量
-
 #### 程序全局变量
 
 - 在函数外部定义的变量即为`全局变量`，在本文件引用别的文件定义的`全局变量`(为了保持全局变量的唯一性),可以使用`extern`声明它
@@ -30,35 +22,6 @@ void print(){ ... }
 extern int insert(int val);
 extern void print();
 extern void destroy();
-```
-
-```c
-char *Func ( void )
-{
-    char str[30];
-    return str; // 错误
-}
-```
-
-## 常量
-
-- `const` 可以修饰变量、函数的参数、返回值(修饰返回值好像没什么实际用处)表示对应的内存只读
-- `#define` 给出的是立即数，宏是在预编译时进行替换，有若干个拷贝，没有类型
-
-```c
-#define M 3
-const int N       = 5;            // N 只读
-const int    a[5] = {1,2,3,4,5};  // 数组只读
-const int *p;    // 指针指向的对象只读
-int const *p;    // 同上
-int* const p;    // 指针本身的地址不能变，但其指向的对象的值可变
-const int* const p; // 指针本身的地址不能变，其指向的对象只读
-void Fun ( const int i ); // 告诉编译器，i 在函数体中 的值不能改变，从而防止了一些无意的修改
-const int Fun( void );     // 返回值不可 被改变
-extern const int i;      // 引用在另一个文件中  const 只读变量
-void display( const int array[], int limit ); // array 指向的值是不能变的
-void display( const int *array, int limit );  // array 指向的值是不能变的
-char *strcat( char *, const char* ); // 第一个参数在函数内可以被修改，第二个参数只读
 ```
 
 ### 可变参数
@@ -114,7 +77,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-- [用法参考](https://www.cnblogs.com/edver/p/8419807.html)
+- [用法参考](https://www.cnblogs.com/edver/p/8419807.html)
 - [可变参数实现](https://blog.csdn.net/smstong/article/details/50751121)
 
 

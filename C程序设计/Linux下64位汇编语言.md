@@ -24,7 +24,6 @@ int main()
 	.text
 	.globl	main
 	.type	main, @function
-
 main:
 .LFB0:
 	pushq	%rbp
@@ -34,30 +33,21 @@ main:
 	movl	$0, %eax
 	popq	%rbp
 	ret
-.LFE0:
-	.size	main, .-main
-	.ident	"GCC: (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0"
-	.section	.note.GNU-stack,"",@progbits
 ```
 
 将无用的部分去除后，就是我们需要的汇编语言框架模板: 
 
 ```asm
 .section .rodata
-
 OUTPUT:
 	.string "fuck you"
-
 .text
 	.globl	main
-
 main:
 	pushq	%rbp
 	movq	%rsp, %rbp
-	
 	leaq	OUTPUT(%rip), %rdi
 	call	puts@PLT
-
 	movl	$0, %eax
 	popq	%rbp
 	ret
@@ -75,7 +65,7 @@ main:
 .double
 .float
 .int
-.long
+.long		# 4  字节整型
 .octa       # 16 字节整型
 .quad       # 8 字节整型
 .short      # 2 字节整型
@@ -85,13 +75,12 @@ main:
 
 ```asm
 .section .rodata
-
 OUTPUT:
 	.string "fuck you"
 PI:
 	.double 3.1415926			# 定义 double 类型
 SIZES:
-	.long 100, 500, 235			# 定义多个长整型
+	.long 100, 500, 235
 ```
 
 定义常量:
@@ -99,9 +88,7 @@ SIZES:
 ```asm
 .section .rodata
 	.equ LINUX_SYS_CALL, 0x80	        # 定义常量
-
 main:
-    ...
 	movq	$LINUX_SYS_CALL, %rax       # 使用常量
 ```
 
@@ -115,9 +102,7 @@ main:
 ```asm
 .section .bss
 .lcomm buffer, 10000			# 只是声明，不占用硬盘空间
-```
 
-```asm
 .section .data
 MY_BUFFER:
 	.fill 10000                 # 填充 10000 字节，占用了磁盘空间
@@ -140,7 +125,6 @@ value:
     .int 123
 store:
     .int 0
-
 main:
     movl value, %eax    # 内存 => 寄存器
     movl %eax, store    # 寄存器 => 内存
@@ -151,7 +135,6 @@ main:
 ```asm
 values:
     .int 10, 15, 20, 25, 30, 35, 40
-
 main:
 
     movl $3, %edi
