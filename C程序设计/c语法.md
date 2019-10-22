@@ -24,62 +24,6 @@ extern void print();
 extern void destroy();
 ```
 
-### 可变参数
-
-```c
-#include <stdarg.h>
-int func(int a, int b, ... ){
-    va_list arg_ptr;                          // 声明可变参数 arg_ptr
-    void va_start( arg_ptr, b );              // 填入最后一个固定参数 b
-    int    var1 = va_arg( arg_ptr, int );     // 得到第一个可变参数的值 var1
-    double var2 = va_arg( arg_ptr, double );  // 得到第一个可变参数的值 var2
-    void va_end( arg_ptr );                   // 清理 arg_ptr
-}
-/* 指定 变量数量 */
-void test(int count, ...) {
-    va_list args;
-    va_start(args, count);
-    for (int i = 0; i < count; i++)
-    {
-        int value = va_arg(args, int);
-        printf("%d\n", value);
-    }
-    va_end(args);
-}
-/* 以 NULL 为结束标记 */
-void test2(const char* s, ...) {
-    printf("%s\n", s);
-    va_list args;
-    va_start(args, s);
-    char* value;
-    do
-    {
-        value = va_arg(args, char*);
-        if (value) printf("%s\n", value);
-    }
-    while (value != NULL);    va_end(args);
-}
-/* 直接将 va_list 传递个其他可选 变量函数 */
-void test3(const char* format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    vprintf(format, args);
-    va_end(args);
-}
-
-int main(int argc, char* argv[])
-{
-    test(3, 11, 22, 33);
-    test2("hello", "aa", "bb", "cc", "dd", NULL);
-    test3("%s, %d\n", "hello, world!", 1234);
-    return EXIT_SUCCESS;
-}
-```
-
-- [用法参考](https://www.cnblogs.com/edver/p/8419807.html)
-- [可变参数实现](https://blog.csdn.net/smstong/article/details/50751121)
-
 
 ### 函数修饰符
 

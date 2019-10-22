@@ -63,8 +63,6 @@ int main(){
 
 ## 32位实现
 
-#### C 普通函数调用分析
-
 将示例代码按照`32位`CPU模式编译，命令如下：
 
 ```bash
@@ -91,4 +89,22 @@ gcc -Og -m32 -fno-stack-protector -S main.c -o main.s
 
 至此，我们将`num`的也用上，就可以推广到全部可选参数，其实`test_arg`已经就是`sum()`函数了。
 
+下面再看下`my_print`的实现，看看格式化字符串如何使用可选参数:
+
+![](https://img.codekissyoung.com/2019/10/22/092519fae70a894aa0a12a5481af6393.png)
+
 ## 64位实现
+
+将示例代码按照`64位`CPU模式编译，命令如下：
+
+```bash
+gcc -Og -fno-stack-protector -S main.c -o main.s 
+```
+
+![](https://img.codekissyoung.com/2019/10/22/98f640f58ef431d76eb3877e3a03087f.png)
+
+将上图与`32`位的代码对比下，很容易就得出一个结论，`64`位下前6个参数都是通过寄存器直接传递到`callee`中，剩下的再通过栈的形式传递。
+
+通过`命名函数 + 偏移值`根本无法定位到寄存器中的参数，所以无法使用这种方式定义可选参数函数了!
+
+[《揭密X86架构C可变参数函数实现原理》](https://blog.csdn.net/linyt/article/details/79772742) 一文对`64`位下可选参数函数的实现进行了逆向分析，可以参考下，本文想从正向的角度分析如何去实现，只能等学习完Gcc编译后再来填坑了。
