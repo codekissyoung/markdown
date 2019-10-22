@@ -110,7 +110,7 @@ MY_BUFFER:
 
 ## 传送数据元素
 
-![2019-10-14 16-41-58 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/3661422ae4f3c293249d660af463e147.png)
+![](https://img.codekissyoung.com/2019/10/14/3661422ae4f3c293249d660af463e147.png)
 
 内存寻址模式:
 
@@ -170,48 +170,48 @@ movl %ebx, -4( %edi )   # 将 eax 的值传送到 value - 4 内存地址处( sto
 
 对于从较小的源传送到较大的目的地时，有两种类型的指令: 零拓展`MOVZ` 与 符号拓展`MOVS`: 
 
-![2019-10-14 16-44-04 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/e8b170736d50820e4c63de753d3cff95.png)
-![2019-10-14 16-45-02 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/504dcfd045b4a8a257dfc6645a6269fb.png)
-![2019-10-14 17-29-30 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/f325f9e4e1d982a8d516666d7a1f7609.png)
+![](https://img.codekissyoung.com/2019/10/14/e8b170736d50820e4c63de753d3cff95.png)
+![](https://img.codekissyoung.com/2019/10/14/504dcfd045b4a8a257dfc6645a6269fb.png)
+![](https://img.codekissyoung.com/2019/10/14/f325f9e4e1d982a8d516666d7a1f7609.png)
 
 ## 栈操作
 
-![2019-10-14 17-32-00 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/ddea02072b1a368344642bf7de5181f3.png)
+![](https://img.codekissyoung.com/2019/10/14/ddea02072b1a368344642bf7de5181f3.png)
 
 ## 算术和逻辑操作
 
-![2019-10-14 17-34-09 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/4024827d8fe58065bd39797dd083f092.png)
+![](https://img.codekissyoung.com/2019/10/14/4024827d8fe58065bd39797dd083f092.png)
 
 位移例子:
 
-![2019-10-14 18-06-25 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/a4588a0adbdc4eb993d949489749db05.png)
+![](https://img.codekissyoung.com/2019/10/14/a4588a0adbdc4eb993d949489749db05.png)
 
 ps:只有最低位的字节才指示着位移量,所以是`%cl`。
 
 ## 特殊的算术操作
 
-![2019-10-14 18-27-43 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/8a933aacac1283b947d03275950d85ff.png)
+![](https://img.codekissyoung.com/2019/10/14/8a933aacac1283b947d03275950d85ff.png)
 
 对于乘法: 其中一个乘数固定为`rax`,另一个乘数则是`mulq`的操作数 而得到的乘积，低位8字节存于`rax`,高位8字节存于`rdx`,下图为64位乘法实现的汇编代码:
 
-![2019-10-14 20-07-35 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/6a7d70de3c13e0d1f14b50d7b41d97bf.png)
+![](https://img.codekissyoung.com/2019/10/14/6a7d70de3c13e0d1f14b50d7b41d97bf.png)
 
 对于除法: 被除数放在`rdx`(高64位)`rax`（低64位）中，`rax`设置好后，`rdx`不需要人工赋值，而是通过`cqto`指令自动读出`rax`的符号位，然后设置到`rdx`的所有位; 除数则是`idivq`的操作数；除完后，商被保存在`rax`中，余数则保存在`rdx`中。下图是64位有符号数除法的实现:
 
-![101420270708_02019-10-14 20-21-20 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/5111240dcb9a99b2666ff1323edb7d32.png)
+![](https://img.codekissyoung.com/2019/10/14/5111240dcb9a99b2666ff1323edb7d32.png)
 
 对于无符号64位除法，则只需要将`rdx`强制设置为`0`，指令改用`divq` 即可:
 
-![2019-10-14 20-30-38 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/a84584da839a0a1b8f5cdec166b8e9b8.png)
+![](https://img.codekissyoung.com/2019/10/14/a84584da839a0a1b8f5cdec166b8e9b8.png)
 
 ## 条件测试指令
 
-![2019-10-14 22-48-04 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/c37fa86f4cddb275c069d018eae8984d.png)
-![2019-10-14 21-24-54 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/94a2af7fc5f119675ef0d9ab7229f91c.png)
+![](https://img.codekissyoung.com/2019/10/14/c37fa86f4cddb275c069d018eae8984d.png)
+![](https://img.codekissyoung.com/2019/10/14/94a2af7fc5f119675ef0d9ab7229f91c.png)
 
 比较和测试指令只设置标志位，不改变任何寄存器的值。所以常常配合`set`指令使用:
 
-![2019-10-14 21-30-31 的屏幕截图.png](https://img.codekissyoung.com/2019/10/14/f20467d8aa640e897177b555d89ec2a7.png)
+![](https://img.codekissyoung.com/2019/10/14/f20467d8aa640e897177b555d89ec2a7.png)
 
 ```asm
 # 函数 long comp( long a, long b ){ return a < b; }
@@ -231,25 +231,25 @@ test:
 
 ## 条件跳转指令
 
-![条件跳转指令](https://img.codekissyoung.com/2019/10/14/a3ed0518f5774fb30e4f6ddb5f0cfaee.png)
+![](https://img.codekissyoung.com/2019/10/14/a3ed0518f5774fb30e4f6ddb5f0cfaee.png)
 
 条件跳转例子:
 
-![条件跳转例子](https://img.codekissyoung.com/2019/10/15/241b91c73e5ed6ecf1f94fc9c091a6d0.png)
+![](https://img.codekissyoung.com/2019/10/15/241b91c73e5ed6ecf1f94fc9c091a6d0.png)
 
 ## 条件传送指令
 
-![条件传送指令](https://img.codekissyoung.com/2019/10/15/b1908c2a44a63a1bec08d6597e269ca6.png)
+![](https://img.codekissyoung.com/2019/10/15/b1908c2a44a63a1bec08d6597e269ca6.png)
 
 条件跳转指令在现代处理器上，可能会非常低效(30周期)，所以人们开发了一种数据的条件传送指令(1周期)作为替代。基本思想是：计算一个条件操作的两种结果，然后再根据条件是否满足从中选取一个结果传送。
 
 使用`-Og`编译出的代码还在使用条件跳转指令:
 
-![2019-10-15 12-09-31 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/14903aaba51b8e831f98fae6daa728fa.png)
+![](https://img.codekissyoung.com/2019/10/15/14903aaba51b8e831f98fae6daa728fa.png)
 
 而使用`-O1`编译出的代码已经使用了条件传送指令:
 
-![2019-10-15 12-23-25 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/0653cd735a153377149a2a3a41f508f1.png)
+![](https://img.codekissyoung.com/2019/10/15/0653cd735a153377149a2a3a41f508f1.png)
 
 ## C 语言循环
 
@@ -262,75 +262,75 @@ test:
 
 #### do-while循环
 
-![2019-10-15 14-21-36 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/bd1109554c375fc6e3a4e6b71eea63bb.png)
+![](https://img.codekissyoung.com/2019/10/15/bd1109554c375fc6e3a4e6b71eea63bb.png)
 
 #### while循环
 
 第一种编译方法是跳转到中间，使用`-Og`时采用:
 
-![2019-10-15 14-37-05 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/30802977a9f563af2b57482ad04c3912.png)
+![](https://img.codekissyoung.com/2019/10/15/30802977a9f563af2b57482ad04c3912.png)
 
 第二种是首先判断初始条件，不满足就跳过循环，然后当作`do-while`循环去编译,使用`-O1`编译时采用:
 
-![2019-10-15 14-34-04 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/0dd72eb05b95272ce88978e916f7a350.png)
+![](https://img.codekissyoung.com/2019/10/15/0dd72eb05b95272ce88978e916f7a350.png)
 
 #### for循环
 
-![2019-10-15 14-44-02 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/e50bd7cd00e50a70d76a84c9ca0003f1.png)
+![](https://img.codekissyoung.com/2019/10/15/e50bd7cd00e50a70d76a84c9ca0003f1.png)
 
 通过上图可知，`for`循环只是C语言中`while`循环的一种变体写法。
 
 #### switch
 
-![2019-10-15 15-01-32 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/a1d0931bb670ae27a27c7bfc56e1027f.png)
+![](https://img.codekissyoung.com/2019/10/15/a1d0931bb670ae27a27c7bfc56e1027f.png)
 
 `switch` 中，编译器使用了一种跳转表的技术，当`case`的所有值在一个范围内时，会使用这种编译优化。
 
 ## 函数实现 运行时栈
 
-![2019-10-15 15-11-11 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/440a6735779de32ae0214861fa3985b3.png)
+![](https://img.codekissyoung.com/2019/10/15/440a6735779de32ae0214861fa3985b3.png)
 
 函数是很重要的一种抽象，它提供了一种封装代码的方式，用一组指定的参数和一个可选的返回值实现了某种功能。
 
 假设`P`调用函数`Q`,执行完毕后返回到`P`,这个过程需要的机制如下:
 
-![2019-10-15 15-09-09 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/78610944843a22ad7326859bebf6e9b8.png)
+![](https://img.codekissyoung.com/2019/10/15/78610944843a22ad7326859bebf6e9b8.png)
 
 一个通用的运行时栈如下，它的功能有：传递参数、存储返回信息、保存寄存器，以及局部数据的存储：
 
-![2019-10-15 15-26-26 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/3b1dde50785d1848f7da5eb5f75fa2a5.png)
+![](https://img.codekissyoung.com/2019/10/15/3b1dde50785d1848f7da5eb5f75fa2a5.png)
 
 函数调用时，1～6个参数是通过寄存器传递，7个之后就需要借助函数栈了:
 
-![101515165235_02019-10-15 15-16-15 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/7dbe99f0eaa81215abba7f143a9310a5.png)
+![](https://img.codekissyoung.com/2019/10/15/7dbe99f0eaa81215abba7f143a9310a5.png)
 
 #### 栈上的局部存储
 
 函数内局部变量过多，无法都存储于寄存器中，所以需要存在栈内存中，即图中局部变量所示:
 
-![101516560046_02019-10-15 16-55-11 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/e1ff683079b50da8c3199ef0572cfab0.png)
+![](https://img.codekissyoung.com/2019/10/15/e1ff683079b50da8c3199ef0572cfab0.png)
 
 函数要通过引用类型返回多个值:
 
-![101516582188_02019-10-15 16-57-20 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/9e078301c7a3bcdb468a6a50c283567c.png)
+![](https://img.codekissyoung.com/2019/10/15/9e078301c7a3bcdb468a6a50c283567c.png)
 
 寄存器其实是被所有调用的函数共享的资源，`rbp`、`rbx`、`r12~r15`这几个寄存器被划分为 **被调用者保存寄存器**, 当P调用Q时，Q必须保证这些寄存器的值在调用前 与 调用后不变,所以如果本函数中要使用这几个寄存器，就一定要进行入栈`PUSH`和出栈`POP`操作，并且要注意顺序：
 
-![101517103214_02019-10-15 17-09-48 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/fc732eba063e2e3256e8ad6e5f8d9a89.png)
+![](https://img.codekissyoung.com/2019/10/15/fc732eba063e2e3256e8ad6e5f8d9a89.png)
 
 栈提供了一种机制，每次函数调用都有它自己的私有状态信息（保存的返回位置、被调用者保存寄存器的值、局部变量），递归调用一个函数本身，与调用一个别的函数并无不同:
 
-![101517153958_02019-10-15 17-15-09 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/faa0ecb43e6f846e3a45fb79bee83d2b.png)
+![](https://img.codekissyoung.com/2019/10/15/faa0ecb43e6f846e3a45fb79bee83d2b.png)
 
 ## C语言数据存储
 
 #### 数组
 
-![2019-10-15 17-32-15 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/f9702e2a545dc9686101bb9ddd781015.png)
+![](https://img.codekissyoung.com/2019/10/15/f9702e2a545dc9686101bb9ddd781015.png)
 
 #### 结构体
 
-![2019-10-15 17-57-23 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/c91938e28dbfbd56705e33c566d313cf.png)
+![](https://img.codekissyoung.com/2019/10/15/c91938e28dbfbd56705e33c566d313cf.png)
 
 其实数组和结构体最重要的一点都是，数据元素的起始地址，数组的话还有到下一个元素地址的计算。
 
@@ -338,26 +338,26 @@ test:
 
 `leave`指令相当于下面两条指令:
 
-![2019-10-15 23-20-48 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/723d0a38279b0bd284f7a71f9c9f1c29.png)
+![](https://img.codekissyoung.com/2019/10/15/723d0a38279b0bd284f7a71f9c9f1c29.png)
 
 使用变长栈帧实现变长数组的原理例子:
 
-![101523450351_02019-10-15 23-44-06 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/fd2924e2c0ddd9d718af45a034a7ce64.png)
+![](https://img.codekissyoung.com/2019/10/15/fd2924e2c0ddd9d718af45a034a7ce64.png)
 
-![2019-10-15 23-47-49 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/edb51fa9f695d945bf0842bb4ed8fe35.png)
-![2019-10-15 23-51-15 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/0b39f5bbe45aa6baa58c1be30edff733.png)
+![](https://img.codekissyoung.com/2019/10/15/edb51fa9f695d945bf0842bb4ed8fe35.png)
+![](https://img.codekissyoung.com/2019/10/15/0b39f5bbe45aa6baa58c1be30edff733.png)
 
-![2019-10-15 23-50-55 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/20ac89f0fe8114e73451b63bec099c14.png)
+![](https://img.codekissyoung.com/2019/10/15/20ac89f0fe8114e73451b63bec099c14.png)
 
 ## 浮点数指令
 
 浮点数寄存器有: `ymm0` ~ `ymm15` `xmm0` ~ `xmm15` 共32个，其中`xmm0` 用于函数返回值 和 函数第一个参数, `xmm1` ~ `xmm7` 用于第 2 ~ 8 个函数参数，`xmm8` ～ `xmm15` 是调用者保存。
 
-![2019-10-15 23-59-53 的屏幕截图.png](https://img.codekissyoung.com/2019/10/16/9fd1840a6ca090ceeb65632dd9070771.png)
+![](https://img.codekissyoung.com/2019/10/16/9fd1840a6ca090ceeb65632dd9070771.png)
 
-![2019-10-15 23-56-27 的屏幕截图.png](https://img.codekissyoung.com/2019/10/15/bbd8e303eea9502a8110ab2583c15623.png)
-![2019-10-16 00-00-45 的屏幕截图.png](https://img.codekissyoung.com/2019/10/16/52502e6708656d7a81d74cb59ee1bcc2.png)
-![2019-10-16 00-01-14 的屏幕截图.png](https://img.codekissyoung.com/2019/10/16/75cc87c29db6e620c48573d8f7f6e944.png)
-![2019-10-16 00-01-59 的屏幕截图.png](https://img.codekissyoung.com/2019/10/16/fa26666a733e94abef68e4f6fea52f79.png)
-![2019-10-16 00-02-38 的屏幕截图.png](https://img.codekissyoung.com/2019/10/16/96d624919813283fdbc5f3d95aa307d5.png)
-![2019-10-16 00-03-18 的屏幕截图.png](https://img.codekissyoung.com/2019/10/16/44030074fc90c9f678c2972ddd5fbacf.png)
+![](https://img.codekissyoung.com/2019/10/15/bbd8e303eea9502a8110ab2583c15623.png)
+![](https://img.codekissyoung.com/2019/10/16/52502e6708656d7a81d74cb59ee1bcc2.png)
+![](https://img.codekissyoung.com/2019/10/16/75cc87c29db6e620c48573d8f7f6e944.png)
+![](https://img.codekissyoung.com/2019/10/16/fa26666a733e94abef68e4f6fea52f79.png)
+![](https://img.codekissyoung.com/2019/10/16/96d624919813283fdbc5f3d95aa307d5.png)
+![](https://img.codekissyoung.com/2019/10/16/44030074fc90c9f678c2972ddd5fbacf.png)
