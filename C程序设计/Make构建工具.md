@@ -1,78 +1,23 @@
 # GNU Make 项目管理
 
-代码变成可执行文件，叫做编译`compile`；先编译这个，还是先编译那个（即编译的安排），叫做构建`build`。
+`make`的作用是让“将源代码转换为可执行文件”之类的例行性工作自动化，把可执行文件到源代码的依赖关系通过`makefile`告知`make`，然后`make`会根据这些关系以及文件的时间戳判断，应该重新执行哪些步骤，用以编译出可执行文件。
 
-`Make`是最常用的构建工具，诞生于1977年，主要用于C语言的项目。但是实际上 ，任何只要某个文件有变化，就要重新构建的项目，都可以用Make构建。
-
-`make`的作用是让 **将源代码转换为可执行文件** 之类的例行性工作自动化，把可执行文件到源代码的依赖关系通过`makefile`告知`make`，然后`make`会根据这些关系以及文件的时间戳判断，应该重新执行哪些步骤，用以编译出可执行文件。
-
-## 参考
-
-- [GNU Make Manual](http://www.gnu.org/software/make/manual/make.html#Bugs)
-- [makefile使用总结](https://www.cnblogs.com/wang_yb/p/3990952.html)
-- [Make 命令教程-阮一峰的网络日志](http://www.ruanyifeng.com/blog/2015/02/make.html)
-
-## 基本概念
+## 编写makefile
 
 ```makefile
-target : prerequisites ...
-    command;
+target : requires ...
+    commands
+# 注释
 ```
 
-- **`target`** : 目标文件、工作目标、伪目标，可以是`Object File`、也可以是可执行文件
+`target` 是工作目标，`requires` 是生成工作目标需要的 必要文件 或 其他工作目标 ，`commands` 是完成工作目标所执行的命令（子`shell`执行），以`[tab]`开头。
 
-- **`prerequisites`** : 生成 `target` 所需要的文件或者目标
+`Make` 是分两阶段执行：
 
-- **`command`** : 生成 `target`需要执行的`shell`命令,命令必须以`[tab]`开头,每条命令占一行。第一个规则之后的所有以`[Tab]`字符开始的的行，`make`都会将其给`shell`去解释执行
+- 读完所有的`makefile`文件，推倒出所有目标和依赖之间的依赖关系
+- 根据依赖关系，决定更新哪些目标，执行哪些命令
 
-- **伪目标**：那些没有任何依赖，只有执行动作的工作目标。
-
-- **显式规则**：说明如何生成一个或多个目标文件(包括 生成的文件, 文件的依赖文件, 生成的命令)
-
-- **隐含规则**：`make`的自动推导功能所执行的规则，基本都是`模式规则`的实例。比如，`.o`文件可由同名`.c`文件生成。
-
-- **变量定义**：使用一个字符串代表一段文本串，当定义了变量以后，`makefile`后续在需要使用此文本串的地方，通过引用这个变量来实现对文本串的使用。
-
-- **指示符**：`make`的一些操作命令，比如：`include`引入其他`makefile`文件；`define`定义宏等。
-
-- **注释**: 以`#`开头，后面文本都是注释内容,如果`makefile`要使用或者输出`#`字符, 需要进行转义。
-
-- **终极目标**：第一个规则的第一个目标称之为终极目标，有些书也称为默认目标,只有目标文件是 **终极目标** 的必要文件或间接必要文件的规则才会被执行，除非`make`明确指定执行这个规则，比如`make clean`。
-
-`Unix`文件具有三种时间属性：`atime`最近被读取的时间、`ctime`文件模式被修改的时间、`mtime`文件被修改的时间。文件的时间戳指的是`mtime`。
-
-## 工作方式
-
-### 两阶段执行
-
-- 第一阶段：读取所有的`makefile`文件，内建所有变量、明确规则和隐含规则，并建立所有目标和依赖之间的依赖关系结构链表。
-
-- 第二阶段：根据第一阶段已经建立的依赖关系结构链表，决定哪些目标需要更新，并使用对应的规则来重建这些目标。
-
-- **立即展开**: 在执行第一阶段时，变量和函数被展开在需要构建的结构链表的对应规则中。后文中`IMMEDIATE`表示立即展开。
-
-- **延后展开**: 第一阶段不展开，在后续某些规则须要使用时、或者在`make`处理的第二阶段展开。后文`DEFERRED`表示延后展开。
-
-`target`与`prerequisites` 中的函数和变量会立即展开，而命令中的变量是延后展开的。
-
-### `make`的工作步骤：
-
-- 依次读取环境变量`MAKEFILES`定义的`makefile`文件列表
-- 读入工作目录下主`makefile`
-- 读入`include`的其他`makefile`
-- 查找重建所有已读取的`makefile`文件的规则
-- 初始化文件中的变量，并展开需要立即展开的变量与函数，并且根据预设条件确定分支
-- 推导隐含规则, 并分析所有规则，根据 终极目标 以及其他目标的依赖关系，建立依赖关系链表
-- 根据依赖关系, 决定哪些目标要重新生成
-- 执行除 终极目标 以外的所有目标的规则
-- 执行 终极目标 所在的规则
-
-## 环境变量
-
-- `MAKEFILES` : `make`执行时首先将此变量作为需要读入的`makefile`文件
-- `MAKEFILE_LIST` :  所有`make`加载的变量，都会被追加记录到 `MAKEFILE_LIST` 中
-- `.VARIABLES` : `makefile`中所定义的所有全局变量列表、包括：空变量和make内嵌变量
-- `.LIBPATTERNS` : 默认值为`lib%.so lib%.a`,因此`-lNAME`默认加载`libNAME.so`
+`makefile` 中变量和函数在 `target` 和 `requires` 里是立即生效的，而在`commands`中，是要等到执行该命令时，才能明确变量的值和函数的展开。
 
 ## 变量
 
@@ -708,3 +653,17 @@ other makefile end
 make[1]: Leaving directory `/path/to/test/makefile/other'
 主 Makefile end
 ```
+
+## 环境变量
+
+- `MAKEFILES` : `make`执行时首先将此变量作为需要读入的`makefile`文件
+- `MAKEFILE_LIST` :  所有`make`加载的变量，都会被追加记录到 `MAKEFILE_LIST` 中
+- `.VARIABLES` : `makefile`中所定义的所有全局变量列表、包括：空变量和make内嵌变量
+- `.LIBPATTERNS` : 默认值为`lib%.so lib%.a`,因此`-lNAME`默认加载`libNAME.so`
+
+
+## 参考
+
+- [GNU Make Manual](http://www.gnu.org/software/make/manual/make.html#Bugs)
+- [makefile使用总结](https://www.cnblogs.com/wang_yb/p/3990952.html)
+- [Make 命令教程-阮一峰的网络日志](http://www.ruanyifeng.com/blog/2015/02/make.html)

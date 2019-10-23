@@ -104,6 +104,37 @@ void strcpy( char *s, char *t )
 }
 ```
 
+## 错误处理
+
+```c
+// dbg.h
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+
+#ifdef NDEBUG
+    #define debug(M, ...)
+#else
+    #define debug(M, ...) fprintf(stderr, "DEBUG %s:%d: " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+#endif
+
+#define  error_str() (errno == 0 ? "None" : strerror(errno))
+#define log_err(M, ...) \
+fprintf(stderr, "[ERROR] (%s:%d: errno: %s) " M "\n", __FILE__, __LINE__,  error_str(), ##__VA_ARGS__)
+#define log_warn(M, ...) \
+fprintf(stderr, "[WARN] (%s:%d: errno: %s) " M "\n", __FILE__, __LINE__,  error_str(), ##__VA_ARGS__)
+#define log_info(M, ...) \
+fprintf(stderr, "[INFO] (%s:%d) " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+
+#define check(A, M, ...) \
+if(!(A)) { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
+
+#define check_mem(A) check((A), "Out of memory.")
+
+#define check_debug(A, M, ...) if(!(A)) { debug(M, ##__VA_ARGS__); errno=0; goto error; }
+#define sentinel(M, ...)  { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
+```
+
 ## 傻逼代码
 
 以前看到这样的一些代码，我觉得很厉害，能理解它们的人都非常强。现在我觉得，这些代码就是傻逼，花时间去理解这样代码的人都是浪费时间，走了弯路。事实上，你不需要理解下面任何一句代码，但你仍然可以是一个很好的 C 程序员，并且写出很棒的 C 程序。
