@@ -30,6 +30,7 @@ sudo apt-get update             更新软件源
 sudo apt-get upgrade            从软件源处更新软件
 sudo apt-get autoremove         自动卸载系统不需要的软件
 apt-cache search keyword        搜寻软件
+apt-cache show package          软件包信息
 apt-get install package         安装软件
 apt-get remove package          删除软件
 apt-get --purge remove package  彻底删除

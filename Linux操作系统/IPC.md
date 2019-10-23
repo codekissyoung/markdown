@@ -1,4 +1,7 @@
-# 匿名半双工管道
+# Linux IPC
+
+## 匿名半双工管道
+
 ```c
 #define PIPE_BUF 255
 int main( int argc, char *argv[] )
@@ -27,7 +30,8 @@ int main( int argc, char *argv[] )
 - 只能在有公共祖先的进程间通信，比如父子进程，兄弟进程
 - `fd[2]`是一个文件描述符数组，`fd[0]`是读出端，`fd[1]`是写入端
 
-# FIFO 有名管道 (进程通信代码并没有达到预期的效果)
+## FIFO 有名管道 (进程通信代码并没有达到预期的效果)
+
 ```c
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -94,13 +98,15 @@ int main( int argc, char* argv[] )
 - 可以用于不相关的进程之间
 - [参考](https://www.cnblogs.com/fangshenghui/p/4039805.html)
 
-# System V IPC / POSIX IPC
+## System V IPC / POSIX IPC
+
 - 基于系统内核
-- IPC 对象 : 消息队列 , 信号量 , 共享存储器
+- IPC 对象 : 消息队列 , 信号量 , 共享存储器
 - `ipcs -a` 查看系统内IPC的状态
-- 缺陷: 不使用通用的文件系统 , 缺少资源回收机制, IPC 对象创建然后退出时, 没有被自动回收
+- 缺陷: 不使用通用的文件系统 , 缺少资源回收机制, IPC 对象创建然后退出时, 没有被自动回收
 
 ## 共享内存
+
 ```c
 #include <sys/shm.h>
 int shmget( key_t key, size_t size, int flag ); // 创建一块共享内存区

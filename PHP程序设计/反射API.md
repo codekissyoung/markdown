@@ -11,8 +11,6 @@ ReflectionException 错误类
 ```
 - 这些反射类可以在运行时访问对象、函数和脚本中的扩展信息
 
-
-
 ```php
 <?php
 interface Module {
