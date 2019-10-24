@@ -38,7 +38,7 @@ apt-get --purge remove package  彻底删除
 
 #### 更强大的 aptitude
 
-```
+```bash
 # aptitude 更强大的的 apt-get 命令
 sudo apt-get install aptitude           安装aptitude
 sudo aptitude                           打开软件包字符操作界面
@@ -52,7 +52,7 @@ sudo aptitude upgrade                   更新软件
 
 #### 使用第三方源 安装软件
 
-```
+```bash
 sudo add-apt-repository ppa:ppsspp/stable    添加ppa源, 在source.list里添加 ppa 源了，同时完成导入key
 sudo aptitude update                         更新源
 sudo aptitude search ppsspp                  搜索下刚刚添加的第三方源的软件
@@ -163,9 +163,6 @@ In other words, the PHP module is enabled in the Apache Web server when you inst
 Please verify if the files /etc/apache2/mods-enabled/php7.0.conf and /etc/apache2/mods-enabled/php7.0.load exist.
 If they do not exist, you can enable the module using the a2enmod command
 ```
-
-
-
 
 ## 安装python开发环境
 
@@ -301,6 +298,7 @@ memcached -d -m 50 -p 11211 -u root #启动一个memcached服务
 $ telnet localhost 11211 Trying 127.0.0.1...Connected to localhost.
 
 # ubuntu 16.04 搭建Ubuntu(16.04) + Apache(2.4) + Mysql(5.7) + PHP(7.0)环境
+
 ## 搭建目标
 ```bash
 cky@cky-pc:~/worksapce$ apache2 -v
@@ -313,7 +311,9 @@ Copyright (c) 1997-2016 The PHP Group
 Zend Engine v3.0.0, Copyright (c) 1998-2016 Zend Technologies
 with Zend OPcache v7.0.6-dev, Copyright (c) 1999-2016, by Zend Technologies
 ```
+
 ## 安装并配置apache2.4
+
 ```bash
 sudo apt-get install apache2
 ```
@@ -325,10 +325,13 @@ sudo vim /etc/apache2/sites-available/000-default.conf
     // 将 DocumentRoot /var/www/html
     // 改成 DocumentRoot "你的目录"
 ```
+
 ```
 sudo /etc/init.d/apache2 restart
 ```
+
 ## 安装php7.0
+
 ```
 sudo apt-get install php7.0
 sudo apt-get install libapache2-mod-php7.0
@@ -456,78 +459,8 @@ AllowOverride None      不允许 .htaccess 重写这个目录，改为 All �
 </Directory>
 ```
 
-## Set Search Domain
-
-在Ubuntu设置IPv4时，
-ip 地址 : 10.10.10.19
-子网掩码 : 24
-网关: 10.10.10.1
-DNS服务器:119.29.29.29,114.114.114.114
-搜索域:lingyunstrong.com
-```bash
-cky@cky-pc:~$ ping a
-PING a.lingyunstrong.com (183.16.2.95) 56(84) bytes of data.
-64 bytes from 183.16.2.95: icmp_seq=1 ttl=64 time=0.595 ms
-64 bytes from 183.16.2.95: icmp_seq=8 ttl=64 time=0.655 ms
-^C
---- a.lingyunstrong.com ping statistics ---
-8 packets transmitted, 8 received, 0% packet loss, time 6997ms
-rtt min/avg/max/mdev = 0.595/0.657/0.683/0.036 ms
-
-cky@cky-pc:~$ ping cky
-PING cky.lingyunstrong.com (10.10.10.19) 56(84) bytes of data.
-64 bytes from 10.10.10.19: icmp_seq=1 ttl=64 time=0.026 ms
-64 bytes from 10.10.10.19: icmp_seq=2 ttl=64 time=0.025 ms
-^C
---- cky.lingyunstrong.com ping statistics ---
-2 packets transmitted, 2 received, 0% packet loss, time 1001ms
-rtt min/avg/max/mdev = 0.025/0.025/0.026/0.005 ms
-cky@cky-pc:~$ ping cky.linyunstrong.com
-PING cky.linyunstrong.com.lingyunstrong.com (183.16.2.95) 56(84) bytes of data.
-64 bytes from 183.16.2.95: icmp_seq=1 ttl=64 time=0.594 ms
-64 bytes from 183.16.2.95: icmp_seq=4 ttl=64 time=0.648 ms
-^C
---- cky.linyunstrong.com.lingyunstrong.com ping statistics ---
-4 packets transmitted, 4 received, 0% packet loss, time 3002ms
-rtt min/avg/max/mdev = 0.594/0.629/0.662/0.036 ms
-cky@cky-pc:~$ ping a
-PING a.lingyunstrong.com (183.16.2.95) 56(84) bytes of data.
-64 bytes from 183.16.2.95: icmp_seq=1 ttl=64 time=0.587 ms
-64 bytes from 183.16.2.95: icmp_seq=3 ttl=64 time=0.641 ms
-^C
---- a.lingyunstrong.com ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 2000ms
-rtt min/avg/max/mdev = 0.587/0.628/0.658/0.041 ms
-cky@cky-pc:~$ ping baidu.com
-PING baidu.com (180.149.132.47) 56(84) bytes of data.
-64 bytes from 180.149.132.47: icmp_seq=1 ttl=54 time=36.8 ms
-64 bytes from 180.149.132.47: icmp_seq=4 ttl=54 time=39.6 ms
-^C
---- baidu.com ping statistics ---
-4 packets transmitted, 4 received, 0% packet loss, time 3003ms
-rtt min/avg/max/mdev = 36.188/37.903/39.637/1.439 ms
-cky@cky-pc:~$ ping sina.com
-PING sina.com (66.102.251.33) 56(84) bytes of data.
-^C
---- sina.com ping statistics ---
-2 packets transmitted, 0 received, 100% packet loss, time 1007ms
-```
-
 # 追踪路由
+
 ```bash
 ➜  blog git:(master)  sudo traceroute m.dev.yunchongba.com
-traceroute to m.dev.yunchongba.com (120.25.71.101), 30 hops max, 60 byte packets
- 1  10.10.10.1 (10.10.10.1)  0.587 ms  0.584 ms  0.576 ms
- 2  183.15.192.1 (183.15.192.1)  6.095 ms  6.930 ms  6.930 ms
- 3  113.106.44.53 (113.106.44.53)  6.070 ms  7.084 ms  7.552 ms
- 4  119.145.47.185 (119.145.47.185)  7.049 ms  7.318 ms  7.317 ms
- 5  183.56.65.6 (183.56.65.6)  12.428 ms 183.56.65.14 (183.56.65.14)  12.696 ms 183.56.65.18 (183.56.65.18)  11.576 ms
- 6  202.97.85.114 (202.97.85.114)  27.501 ms * *
- 7  220.191.200.14 (220.191.200.14)  32.215 ms 220.191.200.18 (220.191.200.18)  28.028 ms *
- 8  115.236.101.221 (115.236.101.221)  32.115 ms 115.238.21.117 (115.238.21.117)  32.036 ms 115.236.101.213 (115.236.101.213)  34.018 ms
- 9  42.120.247.109 (42.120.247.109)  30.852 ms 42.120.247.53 (42.120.247.53)  33.999 ms 42.120.247.57 (42.120.247.57)  30.814 ms
-10  42.120.239.138 (42.120.239.138)  58.777 ms  58.821 ms 42.120.242.81 (42.120.242.81)  58.187 ms
-11  42.120.239.134 (42.120.239.134)  56.089 ms 42.120.239.158 (42.120.239.158)  52.129 ms 42.120.239.146 (42.120.239.146)  57.078 ms
-12  42.120.253.6 (42.120.253.6)  50.913 ms  51.081 ms 42.120.253.2 (42.120.253.2)  54.589 ms
-13  42.120.253.6 (42.120.253.6)  50.205 ms * *
 ```

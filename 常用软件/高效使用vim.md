@@ -190,31 +190,6 @@ strings A>B
 
 ```vim
 :version
-VIM - Vi IMproved 7.4 (2013 Aug 10, compiled Nov 24 2016 16:44:48)
-Included patches: 1-1689
-Extra patches: 8.0.0056
-Modified by pkg-vim-maintainers@lists.alioth.debian.org
-Compiled by pkg-vim-maintainers@lists.alioth.debian.org
-Huge version without GUI.  Features included (+) or not (-):
-+acl             +cscope          -footer          +mksession       +path_extra      -sun_workshop    +viminfo
-+autocmd         +cursorshape     +gettext         +mouse           +persistent_undo +tag_binary   +wildignore
--browse          +diff            +iconv           +mouse_dec       +printer         -tag_any_white   +windows
-+byte_offset     -dnd             +job             -mouse_jsbterm   -python          +terminfo        -X11
-+channel         -ebcdic          +jumplist        +mouse_netterm   +python3         +termresponse    -xfontset
-+cindent         +emacs_tags      +keymap          +mouse_sgr       +quickfix        +textobjects     -xim
--clientserver    +eval            +langmap         -mouse_sysmouse  +reltime         +timers          -xsmp
-+cmdline_compl   +extra_search    +linebreak       +mouse_xterm     -ruby            -toolbar      -xterm_save
-+cmdline_hist    +farsi           +lispindent      +multi_byte      +scrollbind      +user_commands   -xpm
-+cmdline_info    +file_in_path    +listcmds        +multi_lang      +signs           +vertsplit
-+comments        +find_in_path    +localmap        -mzscheme        +smartindent     +virtualedit
-+conceal         +float           -lua             +netbeans_intg   +startuptime     +visual
-+cryptv          +folding         +menu            +packages        +statusline      +visualextra
-...
-   system vimrc file: "$VIM/vimrc"
-     user vimrc file: "$HOME/.vimrc"
- 2nd user vimrc file: "~/.vim/vimrc"
-      user exrc file: "$HOME/.exrc"
-  fall-back for $VIM: "/usr/share/vim"
 ```
 
 ## 使用 vundle 安装插件

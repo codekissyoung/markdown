@@ -1,6 +1,8 @@
-# Unix环境高级编程
+# Linux系统原理
 
-- `Ctrl + D`输入文件结束符(控制字符)`^D`，模拟文件结束情况，比如`fgets()`等函数收到文件结束符，就返回`NULL`
+单内核设计:内核从整体上作为一个单独的大过程来实现,运行在一个单独的地址空间上,内核以单个二进制文件的形式存放于磁盘中.因为所有内核服务都在这样一个大内核地址空间上运行，所以通信可以直接调用函数来实现。linux就是一个单内核设计。
+
+本文记录的是我学习到的`Linux`本身的一些原理性的知识，它的构成与实现。
 
 ## 内核用于所有I/O的数据结构
 
@@ -97,3 +99,20 @@
   1. 任何时候，只要通过标准IO库从 (a)不带缓冲的流 (b)行缓冲的流 中读取数据时，就会先输出输出流的缓冲数据
 
 - 不带缓冲:标准I/O库不对字符进程缓冲存储，例如`fputs`函数，`stderr`流设置为不带缓冲的
+
+## KVM
+
+KVM 集成在内核中，是内核的一个模块
+
+```bash
+# 查看是否支持 KVM 返回不等于0,则支持
+egrep -c "(svm|vmx)" /proc/cpuinfo
+
+# 安装 KVM
+sudo aptitude install -y qemu-kvm qemu virt-manager virt-viewer libvirt-bin bridge-utils
+# 验证kvm是否安装正确
+➜  ~ lsmod |grep kvm 
+kvm_intel             200704  0
+kvm                   593920  1 kvm_intel
+irqbypass              16384  1 kvm
+```
