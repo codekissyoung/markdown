@@ -2,7 +2,6 @@
 
 本文记录我在 `Linux` 下开发 `C` 程序用到的知识。
 
-
 ## 匿名半双工管道
 
 ```c
@@ -14,7 +13,7 @@ int main( int argc, char *argv[] )
     pid_t pid = fork();
     if( pid > 0 ) 
     {   
-        close( fd[0] ); // 父进程关闭 读出端
+        close( fd[0] ); // 父进程关闭 读出端
         write( fd[1] , "hello my son \n ",14);
         exit(0);
     }   
@@ -106,7 +105,7 @@ int main( int argc, char* argv[] )
 - 基于系统内核
 - IPC 对象 : 消息队列 , 信号量 , 共享存储器
 - `ipcs -a` 查看系统内IPC的状态
-- 缺陷: 不使用通用的文件系统 , 缺少资源回收机制, IPC 对象创建然后退出时, 没有被自动回收
+- 缺陷: 不使用通用的文件系统 , 缺少资源回收机制, IPC 对象创建然后退出时, 没有被自动回收
 
 ## 共享内存
 
@@ -152,7 +151,7 @@ int main( int argc, char* argv[] )
 - 内核通过分页机制，将一段内存同时分配给不同的进程
 - 共享内存只提供数据的传送，进程之间的读写操作互斥的控制还需要其他辅助工具
 
-## 信号量
+## 信号量
 ```c
 #include <sys/shm.h>
 int semget( key_t key, int nsems, int flag ); // 创建一个信号量集ID
@@ -163,16 +162,16 @@ int semctl( int sem_id, int semnu, int cmd [, union semun arg]); // 信号量的
 - 请求一个使用信号量来表示的资源时，信号量的值大于 0 表明可用，等于 0 表明无可用资源
 - 原理：数据操作锁，本身不具有数据交换的功能，而是通过控制其他的通信资源，来实现进程间通信
 
-## 消息队列
+## 消息队列
 - 消息队列：一个消息的链接表，由内核进行维护及存储
-- 在消息队列中，可以随意根据特定的数据类型来检索消息
+- 在消息队列中，可以随意根据特定的数据类型来检索消息
 
 ```c
 #include <sys/msg.h>
 int msgget( key_t key, int flags ); // 创建或者打开一个队列
-int msgctl( int msqid, int cmd, struct msqid_ds* buf ); // 在队列上做多种操作
-int msgsnd( int msqid, const void* prt, size_t nbytes, int flags ); // 将一个新的消息写入消息队列
-ssize_t msgrcv( int msqid ,void* prt, size_t nbytes, long type, int flag ); // 从消息队列中读取消息
+int msgctl( int msqid, int cmd, struct msqid_ds* buf ); // 在队列上做多种操作
+int msgsnd( int msqid, const void* prt, size_t nbytes, int flags ); // 将一个新的消息写入消息队列
+ssize_t msgrcv( int msqid ,void* prt, size_t nbytes, long type, int flag ); // 从消息队列中读取消息
 ```
 
 # SOCK_STREAM
@@ -462,10 +461,6 @@ socketpair  创建一对已联接的无名socket
 ## 用户管理
 
 ```c
-getuid  获取用户标识号
-setuid  设置用户标志号
-getgid  获取组标识号
-setgid  设置组标志号
 getegid     获取有效组标识号
 setegid     设置有效组标识号
 geteuid     获取有效用户标识号
@@ -757,112 +752,6 @@ struct rlimit{
 
 ## 进程ID
 
-- 0 号进程为调度进程，也称为交换进程，是内核的一部分
-- 1 号进程为init进程，在自举过程中由内核调用，读取`/etc/rc*` `/etc/inittab` `/etc/init.d`中的配置，并且将系统引导到一个状态，init进程绝不会终止，它是一个普通的用户进程(与内核中的交换进程不同),但是它以超级用户特权运行
-
-```c
-pid_t getpid(void);  // 获取当前进程 ID
-pid_t getppid(void); // 获取当前进程的 父进程ID
-uid_t getuid(void);  // 当前进程的 用户ID
-uid_t geteuid(void); // 当前进程的 有效用户ID
-gid_t getgid(void);  // 当前进程的 组ID
-gid_t getegid(void); // 当前进程的 有效组ID
-```
-
-## 改变进程所有者
-
-```c
-int setuid(uid_t uid);
-int seteuid(uid_t uid);
-int setgid(gid_t gid);
-int setegid(gid_t gid);
-```
-
-![WX20181217-155417.png](https://i.loli.net/2018/12/17/5c175671be494.png)
-
-## 创建新进程
-
-- 子进程与父进程只共享正文段，两者的数据空间，堆和栈是独立的，子进程拿到的是副本
-- fork后，子进程先执行还是父进程先执行是不确定的，即使父进程使自己休眠 2s,让子进程先执行，但并不能保证 2s 就已经足够
-- 可以使用信号使父进程与子进程同步
-- 子进程与父进程的文件共享: fork时，父进程的所有打开的文件描述符都被复制到子进程中，父进程和子进程每个相同的打开描述符共享一个文件表项
-- 父进程与子进程共享同一个文件偏移量
-
-![WX20181211-193510.png](https://i.loli.net/2018/12/11/5c0fa12438993.png)
-
-- 在网络服务器编程中，fork后，父进程与子进程各种关闭它们不需要使用的文件描述符，这样就避免了干扰对方使用的文件描述符
-
-- 除打开文件之外，父进程的很多其他属性也由子进程继承
-  - 实际用户ID 实际组ID 有效用户ID 有效组ID
-  - 附属组ID 进程组ID 会话ID 控制终端 设置用户ID标志 和 设置组标志
-  - 当前工作目录 根目录 文件模式创建屏蔽字
-  - 信号屏蔽和安排 对任一打开文件描述符的执行时关闭(close-on-exec)标志
-  - 环境 连接的共享存储段 存储映像 资源限制
-
-- 父进程与子进程区别如下
-  - fork的返回值不同
-  - 进程ID不同
-  - 这两个进程的父进程ID不同
-  - 子进程的tms_utime tms_stime tms_cutime tms_ustime 的值设置为0
-  - 子进程不继承父进程设置的文件锁
-  - 子进程的未处理闹钟被清除
-  - 子进程的未处理信号集设置为空集
-
-## 打印内存地址
-
-```c
-int a;
-printf("address : %p \n", &a);
-```
-
-## 普通的创建一个进程
-
-```c
-pid_t pid = fork();
-if(pid < 0){
-    printf("fork 出错");
-} else if ( pid == 0) {
-    printf("-------child porcess %d start ----------\n",getpid());
-    execl("hello","a",NULL);
-    printf("-------child porcess %d end ----------\n",getpid());
-} else {
-    printf(" 父进程 ");
-    sleep(3);
-}
-```
-
-## vfork
-
-- vfork创建新进程，该新进程的目的就是exec一个新程序，vfork不将父进程的地址空间完全复制到子进程中，因此它比fork效率高
-- vfork保证子进程先运行，在它调用exec或exit之后，父进程才可能被调度运行
-
-```c
-int stack = 1;
-int *heap = (int *) malloc(sizeof(int));
-*heap = 100;
-// 进程中数据
-printf("before vfork : global : %d , stack : %d , *heap : %d \n",global ,stack ,*heap);
-pid_t pid = vfork();
-if(pid < 0)
-{
-    printf("vfork error");
-}
-else if(pid == 0)
-{
-    printf("thread process %d start\n",getpid());
-    global ++ ;
-    stack ++;
-    (*heap) ++ ;
-    printf("after vfork in thread : global : %d , stack : %d , *heap : %d \n",global ,stack ,*heap);
-    printf("thread process %d end\n",getpid());
-    exit(0);
-}
-else
-{
-    printf("in process : global : %d , stack : %d , *heap : %d \n",global ,stack ,*heap);
-}
-```
-
 ## 获取子程序结束信息
 
 - 不管进程是如何退出的，我们都希望终止进程能够通知其父进程，它是如何终止的
@@ -875,53 +764,7 @@ else
   - 如果有一个子进程已终止，正等待父进程获取其终止状态，则wait取得该子进程的终止状态立即返回
   - 如果它没有任何子进程，则立即出错返回
 
-```c
-#include <sys/wait.h>
-pid_t wait(int *statloc);
-pid_t waitpid( pid_t pid, int *statloc, int options );
-int waitid( idtype_t idtype, id_t id, siginfo_t *infop, int options );
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/time.h>
-#include <sys/source.h>
-pid_t wait3(int *statloc,int options,struct rusage *rusage);
-pid_t wait4(pid_t pid,int *statloc,int options,struct rusage *rusage);
-```
-
 ![WX20181212-111214.png](https://i.loli.net/2018/12/12/5c107cb8812fb.png)
-
-## 僵尸进程
-
-```c
-pid_t pid = fork();
-if(pid < 0)
-{
-
-}
-else if(pid == 0)
-{
-    printf("the child process %d start \n", getpid());
-    sleep(3);
-    printf("the child process %d end \n", getpid());
-    // 子进程退出了，父进程还在运行，并且没有调用 wait 清理子进程，则子进程就成了zombie
-    exit(0);
-}
-else
-{
-    sleep(30);
-    if(wait(NULL) == -1){
-        perror("fail to wait");
-    }
-    printf("the parent process %d end \n", getpid());
-    exit(0);
-}
-```
-
-- 如果子进程先于父进程退出， 同时父进程又没有调用wait/waitpid，则该子进程将成为僵尸进程。
-
-## 输出进程统计信息
-
-- 进程统计信息都储存在rusage这个统计资源结构体内
 
 ## 调试多进程
 
@@ -971,7 +814,6 @@ int system(const char * cmdstring);
 ##  内核守护进程
 ```bash
 # ps aux
-Init                        系统守护进程，他的进程ID是1，负责启动各运行层次的特定服务
 Keventd                     为在内核中运行计划执行的函数提供上下文
 Kswapd                      页面调出守护进程将脏页面低速写到磁盘上，从而使这写页面在需要时仍可回收使用
 portmap                     端口映射守护进程
@@ -1127,7 +969,7 @@ int creat( const char *path, mode_t mode );
 int openat( int fd, const char *path, int flags, mode_t mode );
 ```
 
-- flags 文件状态标志,掩码参数 取值如下
+- flags 文件状态标志,掩码参数 取值如下
   - O_RDONLY 只读
   - O_WRONLY 只写
   - O_RDWR   可读可写
@@ -1154,8 +996,8 @@ int openat( int fd, const char *path, int flags, mode_t mode );
 
 ```c
 S_IRUSR 用户读权限  / S_IWUSR 用户写权限 / S_IXUSR 用户执行权限
-S_IRGRP 用户组读权限 / S_IWGRP 用户组写权限  / S_IXUSR 用户组执行权限
-S_IROTH 其他人读权限 / S_IWOTH 其他人写权限 / S_IXOTH 其他人执行权限
+S_IRGRP 用户组读权限 / S_IWGRP 用户组写权限  / S_IXUSR 用户组执行权限
+S_IROTH 其他人读权限 / S_IWOTH 其他人写权限 / S_IXOTH 其他人执行权限
 ```
 
 ![WX20181205-164229.png](https://i.loli.net/2018/12/05/5c078f8482a5e.png)
@@ -1181,7 +1023,7 @@ int close( int fd );
   - 若出错返回 -1
   - 成功返回 0
 
-## 如何改变一个文件的当前 读 / 写 位置
+## 如何改变一个文件的当前 读 / 写 位置
 
 ```c
 off_t lseek( int fd, off_t offset, int whence );
@@ -1220,7 +1062,7 @@ cky@cky-pc:~/workspace/C/APUE$ du -alh .
 ## 从文件中读数据
 
 ```c
-ssize_t read( int fd, void *buffer, size_t nbytes );
+ssize_t read( int fd, void *buffer, size_t nbytes );
 ```
 
 - 从终端设备读时，通常一次最多读一行，但这是可以设置选项改变的
@@ -1238,11 +1080,11 @@ ssize_t read( int fd, void *buffer, size_t nbytes );
 ## 往文件中写数据
 
 ```c
-ssize_t write( fd, void *buffer, size_t nbytes );
+ssize_t write( fd, void *buffer, size_t nbytes );
 ```
 
 - buffer : 可以是数组 : `char buffer[20]` 或是结构体变量 `struct utmp buffer`
-- nbytes:  一般就计算出 buffer 的大小 `sizeof(buffer)`
+- nbytes:  一般就计算出 buffer 的大小 `sizeof(buffer)`
 - 返回
   - 成功：返回读到的字节数,0则表示达到文件末尾
   - 失败: -1
@@ -1254,16 +1096,16 @@ ssize_t pread(int fd, void *buf, size_t count, off_t offset);
 ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);  
 ```
 
-- `pread`相当于调用`lseek`后再调用`read`,但是`pread`是原子操作,并且`pread`不更新当前文件偏移量
+- `pread`相当于调用`lseek`后再调用`read`,但是`pread`是原子操作,并且`pread`不更新当前文件偏移量
 
-## 复制一个现有的文件描述符
+## 复制一个现有的文件描述符
 
 ```c
 int dup( int fd );
 int dup2( int fd, int fd2 );
 ```
 
-- dup2可用fd2参数指定新描述符的值
+- dup2可用fd2参数指定新描述符的值
   - 如果fd2已经打开
     - 如果 fd 等于 fd2,则返回 fd2，并且不关闭fd2
     - 如果 fd 不等于 fd2,关闭fd2,清除其 FD_CLOEXEC(执行时关闭) 文件描述符标志
@@ -1273,10 +1115,10 @@ int dup2( int fd, int fd2 );
 ![WX20181204-170526.png](https://i.loli.net/2018/12/04/5c06436909fd1.png)
 
 - 返回值
-  - 成功 dup返回当前可用文件描述符中的最小值,dup2返回fd2指定的值
-  - 出错 -1
+  - 成功 dup返回当前可用文件描述符中的最小值,dup2返回fd2指定的值
+  - 出错 -1
 
-## 缓冲区同步到磁盘
+## 缓冲区同步到磁盘
 
 ```c
 int fsync( int fd );
@@ -1284,9 +1126,9 @@ int fdatasync( int fd );
 void sync( void );
 ```
 
-- sync 将修改过的块缓冲写入队列，然后就返回，并不等待实际写磁盘操作结束,通常`系统守护进程update`周期性调用sync函数(30s)
+- sync 将修改过的块缓冲写入队列，然后就返回，并不等待实际写磁盘操作结束,通常`系统守护进程update`周期性调用sync函数(30s)
 - fsync 函数只对由文件描述符fd指定的一个文件起作用，并且等待磁盘操作结束才返回,一般数据库程序用的比较多
-- fdatasync 类似于 fsync ，但它只同步文件的数据部分，不同步文件属性
+- fdatasync 类似于 fsync ，但它只同步文件的数据部分，不同步文件属性
 - 返回
   - 成功 0
   - 失败 -1
@@ -1299,24 +1141,24 @@ int fcntl( int fd, int cmd, ... )
 fcntl( fd, F_DUPFD, 0 ); // 等效于 dup( fd );
 
 close( fd2 );
-fcntl( fd, F_DUPFD, fd2 ); // 等效于 dup( fd, fd2 ); 但 dup2 是原子操作
+fcntl( fd, F_DUPFD, fd2 ); // 等效于 dup( fd, fd2 ); 但 dup2 是原子操作
 ```
 
-- cmd = F_DUPFD，复制文件描述符fd,返回新文件描述符，该描述符有自己的一套文件描述符标志，其 FD_CLOEXEC 文件描述符标志被清除，表示该描述符在 exec 时仍然有效
-- cmd = F_DUPFD_CLOEXEC 复制文件描述符，设置与新描述符关联的 FD_CLOEXEC 文件描述符的值，返回新文件描述符
+- cmd = F_DUPFD，复制文件描述符fd,返回新文件描述符，该描述符有自己的一套文件描述符标志，其 FD_CLOEXEC 文件描述符标志被清除，表示该描述符在 exec 时仍然有效
+- cmd = F_DUPFD_CLOEXEC 复制文件描述符，设置与新描述符关联的 FD_CLOEXEC 文件描述符的值，返回新文件描述符
 
-- cmd = F_GETFD 获得`文件描述符标志`
-- cmd = F_SETFD 设置`文件描述符标志`，新标志值按第3个参数设置
-- cmd = F_GETFL 返回`文件状态标志`,即 `O_RDONLY` `O_RDWR` 这种，(O_RDONLY O_WRONLY O_RDWR O_EXEC O_SEARCH 由于历史原因并不各占一位,因此需要用屏蔽字 O_ACCMODE 取得方式位，然后再一一去比较)
-- cmd = F_SETFL 设置`文件状态标志`，第3个参数作为新值，可以更改的几个标志位 `O_APPEND` `O_NONBLOCK` `O_SYNC` `O_DSYNC` `O_RSYNC` `O_FSYNC` `O_ASYNC`，一般会将原值取出，与新要设置的值做 `|` 操作，然后再存回去
+- cmd = F_GETFD 获得`文件描述符标志`
+- cmd = F_SETFD 设置`文件描述符标志`，新标志值按第3个参数设置
+- cmd = F_GETFL 返回`文件状态标志`,即 `O_RDONLY` `O_RDWR` 这种，(O_RDONLY O_WRONLY O_RDWR O_EXEC O_SEARCH 由于历史原因并不各占一位,因此需要用屏蔽字 O_ACCMODE 取得方式位，然后再一一去比较)
+- cmd = F_SETFL 设置`文件状态标志`，第3个参数作为新值，可以更改的几个标志位 `O_APPEND` `O_NONBLOCK` `O_SYNC` `O_DSYNC` `O_RSYNC` `O_FSYNC` `O_ASYNC`，一般会将原值取出，与新要设置的值做 `|` 操作，然后再存回去
 
-- cmd = F_GETOWN 获取当前接收 SIGIO 和 SIGURG 信号的进程ID或进程组ID
-- cmd = F_SETOWN 设置接收 SIGIO 和 SIGURG 信号的进程ID或者进程组ID,第3个参数为正值则为进程ID，为负数则为进程组ID
+- cmd = F_GETOWN 获取当前接收 SIGIO 和 SIGURG 信号的进程ID或进程组ID
+- cmd = F_SETOWN 设置接收 SIGIO 和 SIGURG 信号的进程ID或者进程组ID,第3个参数为正值则为进程ID，为负数则为进程组ID
 
 - 获得/设置记录锁 cmd = F_GETLK / F_SETLK / F_SETLKW
 
 - 返回
-  - 正确，与命令参数的使用有关
+  - 正确，与命令参数的使用有关
   - 错误, -1
 
 - 举例
@@ -1378,7 +1220,7 @@ void set_fl( int fd, int flags )
 }
 ```
 
-## IO操作杂物箱
+## IO操作杂物箱
 
 ```c
 #include <unistd.h>
@@ -1386,8 +1228,8 @@ void set_fl( int fd, int flags )
 int ioctl( int fd, int request, ... );
 ```
 
-- 不能用上述其他函数操作的，基本上都通过ioctl支持操作
-- 终端IO是ioctl用的最多的地方,通常还要求另外的设备专用头文件,比如`<termios.h>`
+- 不能用上述其他函数操作的，基本上都通过ioctl支持操作
+- 终端IO是ioctl用的最多的地方,通常还要求另外的设备专用头文件,比如`<termios.h>`
 - request 指定在 fd 上执行控制操作
 - ... 根据 request 的参数来 填入的不定参数
 
@@ -1614,7 +1456,7 @@ int fstatat( int fd, const char *restrict pathname, struct stat *restrict buf, i
 - pathname 路径
 - fd 文件描述符
 - lstat 返回该符号链接本身的有关信息
-- fstatat 为一个相对于当前打开目录(fd指向)的路径名返回文件统计信息。
+- fstatat 为一个相对于当前打开目录(fd指向)的路径名返回文件统计信息。
   - flag 设置为AT_SYMLINK_NOFOLLOW时，返回符号链接本身的信息
   - flag 设置为AT_FDCWD时，如果pathname是一个相对路径，则计算相对于当前目录的pathname参数，如果是一个绝对路径，就使用该路径作为pathname
 - struct stat 结构， 用于接收文件的结构
@@ -1629,7 +1471,7 @@ struct stat{
     uid_t st_uid;             // 用户ID
     gid_t st_gid;             // 用户组ID
     off_t st_size;            // 文件的字节数
-    struct timespec st_atime; // 访问时间
+    struct timespec st_atime; // 访问时间
     struct timespec st_mtime; // 修改时间
     struct timespec st_ctime; // 创建时间
     blksize_t st_blksize;     // best IO block size
@@ -1637,16 +1479,16 @@ struct stat{
 }
 ```
 
-- st_mode 包含文件类型信息，使用宏确定文件类型
+- st_mode 包含文件类型信息，使用宏确定文件类型
 
 ```c
-S_ISREG( st_mode )  // 普通文件
+S_ISREG( st_mode )  // 普通文件
 S_ISDIR( st_mode )  // 目录
 S_ISCHR( st_mode )  // 字符特殊文件
 S_ISBLK( st_mode )  // 块特殊文件
 S_ISFIFO( st_mode ) // 管道
 S_ISLINK( st_mode ) // 符号链接
-S_ISSOCK( st_mode ) // socket
+S_ISSOCK( st_mode ) // socket
 ```
 
 - IPC 对象的类型
@@ -1668,7 +1510,7 @@ int faccessat( int fd, const char *pathname, int mode, int flag );
   - R_OK 测试 pathname 是否可读
   - W_OK 测试可写
   - X_OK 测试可执行
-- flag 设置为 AT_EACCESS,则检查用的是进程的有效用户ID和有效组ID,而不是实际用户ID
+- flag 设置为 AT_EACCESS,则检查用的是进程的有效用户ID和有效组ID,而不是实际用户ID
 - return
   - 错误 -1
   - 成功 0
@@ -1679,14 +1521,14 @@ int faccessat( int fd, const char *pathname, int mode, int flag );
 mode_t umask( mode_t cmask );
 ```
 
-- 文件权限有 `set-user-ID位`,`set-group-ID位`,`sticky位` 加上 9 个权限位，在创建的时候由`int creat(path,0766)`和`umask( 022 )`两者确定
-- `umask( 022 )` 设置`新建文件掩码`,目的为屏蔽新建文件的某些权限，例如：要防止程序创建出能被同组用户和其他用户修改的文件，掩码就是`022`(八进制) 即 `000 010 010`( 二进制 )，取反就是`111 101 101`, 与 `0766` 即 `000 111 110 110` 进行 `&` 运算得到 `000 111 100 100` 即 `--- rwx r-- r--` 就是新建文件的最终权限
-- `chmod( path, mod )` 可以直接修改文件的权限，并且不受`新建文件掩码`影响
+- 文件权限有 `set-user-ID位`,`set-group-ID位`,`sticky位` 加上 9 个权限位，在创建的时候由`int creat(path,0766)`和`umask( 022 )`两者确定
+- `umask( 022 )` 设置`新建文件掩码`,目的为屏蔽新建文件的某些权限，例如：要防止程序创建出能被同组用户和其他用户修改的文件，掩码就是`022`(八进制) 即 `000 010 010`( 二进制 )，取反就是`111 101 101`, 与 `0766` 即 `000 111 110 110` 进行 `&` 运算得到 `000 111 100 100` 即 `--- rwx r-- r--` 就是新建文件的最终权限
+- `chmod( path, mod )` 可以直接修改文件的权限，并且不受`新建文件掩码`影响
 
 ## 更改现有文件的访问权限
 
 ```c
-#include <sys/stat.h>
+#include <sys/stat.h>
 int chmod( const char *pathname, mode_t mode );
 int fchmod( int fd, mode_t mode );
 int fchmodat( int fd, const char *pathname, mode_t mode, int flag );
@@ -1695,14 +1537,14 @@ int fchmodat( int fd, const char *pathname, mode_t mode, int flag );
 - mode
 
 ```c
-S_ISUID 执行时设置用户ID / S_ISGID 执行时设置组ID / S_ISVTX 粘着位
-S_IRUSR 用户读权限  / S_IWUSR 用户写权限 / S_IXUSR 用户执行权限 / S_RWXU 用户可读可写可执行
-S_IRGRP 用户组读权限 / S_IWGRP 用户组写权限  / S_IXUSR 用户组执行权限 / S_IRWXG 组员可读可写可执行
-S_IROTH 其他人读权限 / S_IWOTH 其他人写权限 / S_IXOTH 其他人执行权限 / S_IRWXO 其他人可读可写可执行
+S_ISUID 执行时设置用户ID / S_ISGID 执行时设置组ID / S_ISVTX 粘着位
+S_IRUSR 用户读权限  / S_IWUSR 用户写权限 / S_IXUSR 用户执行权限 / S_RWXU 用户可读可写可执行
+S_IRGRP 用户组读权限 / S_IWGRP 用户组写权限  / S_IXUSR 用户组执行权限 / S_IRWXG 组员可读可写可执行
+S_IROTH 其他人读权限 / S_IWOTH 其他人写权限 / S_IXOTH 其他人执行权限 / S_IRWXO 其他人可读可写可执行
 ```
 
-- flag 取值为 AT_SYMLINK_NOFOLLOW 时，fchmodat 不解析符号链接
-- 只有root可以设置粘着位，目录设置了粘着位后，只有满足三个条件之一的才可以删除目录下的文件，第一，拥有文件权限 第二，拥有此目录权限 第三，是root用户
+- flag 取值为 AT_SYMLINK_NOFOLLOW 时，fchmodat 不解析符号链接
+- 只有root可以设置粘着位，目录设置了粘着位后，只有满足三个条件之一的才可以删除目录下的文件，第一，拥有文件权限 第二，拥有此目录权限 第三，是root用户
 
 ## 更改用户ID和组ID
 
@@ -1720,12 +1562,12 @@ int truncate( const char *pathname, off_t length );
 int ftruncate( int fd, off_t length );
 ```
 
-- 将一个现有文件长度截断为 length 个字节
+- 将一个现有文件长度截断为 length 个字节
 
-## 创建链接
+## 创建链接
 
 ```c
-int link( const char *existpath, const char *newpath );
+int link( const char *existpath, const char *newpath );
 int linkat( int efd, const char *existpath, int nfd, const char *newpath, int flag );
 ```
 
@@ -1738,7 +1580,7 @@ int remove( const char *pathname ); // 解除对一个文件或者目录的链�
 ```
 
 - 当链接计数达到 0 时，该文件的内容才可被删除
-- 当还有进程正在使用该文件时，该文件即使计数为0也不会立刻删除，而是等到所有使用它的进程退出后，才删除。利用这个特性，进程如果需要临时文件，可以creat后立刻unlink,这样进程即使崩溃，这个临时文件也不会遗留下来
+- 当还有进程正在使用该文件时，该文件即使计数为0也不会立刻删除，而是等到所有使用它的进程退出后，才删除。利用这个特性，进程如果需要临时文件，可以creat后立刻unlink,这样进程即使崩溃，这个临时文件也不会遗留下来
 
 ## 对文件重命名
 
@@ -1747,7 +1589,7 @@ int rename( const char *oldname, const char *newname );
 int renameat( int oldfd, const char *oldname, int newfd, const char *newname );
 ```
 
-## 创建符号链接
+## 创建符号链接
 
 ```c
 int symlink( const char *actualpath, const char *sympath );
@@ -1798,20 +1640,20 @@ int fchdir( int fd );
 char *getcwd( char *buf, size_t size ); // 获取当前工作目录
 ```
 
-# 目录系统调用
+# 目录系统调用
 
 `linux`的文件系统繁多，针对文件的系统的目录操作各不相同，所以需要一套标准系统调用来兼容各种文件系统。
 
 ## 概述
 
-- 目录: 特殊的文件，内容是文件和子目录的名字
+- 目录: 特殊的文件，内容是文件和子目录的名字
 - 每个目录包含两个特殊的项目: `.` 和 `..`
-- `open` `read` `close`这些函数，可以把一个目录当做文件来打开，但是这并不是很好的方法，因为 linux目录类型非常多，例如`Apple HFS` `ISO9660` `VFAT` `NFS`等，如果以`read`来读，则需要了解不同类型目录各自的结构细节
+- `open` `read` `close`这些函数，可以把一个目录当做文件来打开，但是这并不是很好的方法，因为 linux目录类型非常多，例如`Apple HFS` `ISO9660` `VFAT` `NFS`等，如果以`read`来读，则需要了解不同类型目录各自的结构细节
 - `int mkdir(const char *path, mode_t mode);` 创建目录，在创建时设置权限需要使用`umask(0)`取消权限掩码限制，否则只能使用系统默认属性创建
-- `DIR* opendir( const char* path )` 打开目录 `path`
+- `DIR* opendir( const char* path )` 打开目录 `path`
 - `struct dirent * readdir( DIR* dir )` 获取一次当前目录中的文件信息
-- `int remove(char * filename);` 删除指定文件或者空目录
-- `int rmdir(const char *pathname);` 删除空目录
+- `int remove(char * filename);` 删除指定文件或者空目录
+- `int rmdir(const char *pathname);` 删除空目录
 - `int unlink(const char *pathname);` 删除文件
 - `int  closedir(DIR * dir);` 关闭之前打开的dir目录
 - `int rename(const char *oldname, const char *newwname) ;` 文件或者目录更换名字
@@ -1867,20 +1709,20 @@ enum
 ```
 
 # 文件类型和许可权限
-- 使用了16位二进制数来存储文件类型和许可权限信息
-- 分别是: 文件类型(四位),`set-user-ID位`,`set-group-ID位`,`sticky位`,所有者权限(3位),所有组权限(3位),其他人权限(3位)
-- 可执行文件的`set-user-ID位`可以设置为1,意思是运行该程序的时候，认为是由文件所有者在运行这个程序,比如`-rwsr-xr-x 1 root root 54256 5月  17  2017 /usr/bin/passwd` 的所有者是root,用户运行`passwd`设置自己密码时，`passwd`的运行用户实际是`root`,所以能修改密码文件`-rw-r--r-- 1 root root 1848 10月 13 11:35 /etc/passwd`
-- `set-group-ID位`设置程序运行时，是否使用程序本身所属的用户组，设置为1 : 意思是用户运行程序时，就像是程序所属组里的某个用户在运行程序一样
-- `sticky位`也称为`粘着位`
-    - 对于可执行文件来说，设置了`sticky位`就意味着该可执行程序即使没在运行，也需要被放置在`交换空间`中；
-    - 对于目录来说，`sticky位`的含义则是：该目录下谁都可以创建文件，但是文件只能被文件的所有者删除
+- 使用了16位二进制数来存储文件类型和许可权限信息
+- 分别是: 文件类型(四位),`set-user-ID位`,`set-group-ID位`,`sticky位`,所有者权限(3位),所有组权限(3位),其他人权限(3位)
+- 可执行文件的`set-user-ID位`可以设置为1,意思是运行该程序的时候，认为是由文件所有者在运行这个程序,比如`-rwsr-xr-x 1 root root 54256 5月  17  2017 /usr/bin/passwd` 的所有者是root,用户运行`passwd`设置自己密码时，`passwd`的运行用户实际是`root`,所以能修改密码文件`-rw-r--r-- 1 root root 1848 10月 13 11:35 /etc/passwd`
+- `set-group-ID位`设置程序运行时，是否使用程序本身所属的用户组，设置为1 : 意思是用户运行程序时，就像是程序所属组里的某个用户在运行程序一样
+- `sticky位`也称为`粘着位`
+    - 对于可执行文件来说，设置了`sticky位`就意味着该可执行程序即使没在运行，也需要被放置在`交换空间`中；
+    - 对于目录来说，`sticky位`的含义则是：该目录下谁都可以创建文件，但是文件只能被文件的所有者删除
 
 # 设置文件类型和许可权限
 
-- 文件类型是在创建文件时就确立的，一经创建，无法修改
-- `set-user-ID位`,`set-group-ID位`,`sticky位` 和9个权限位，在创建的时候由`int creat(path,0766)`和`umask( 022 )`两者确定
-- `umask( 022 )` 设置`新建文件掩码`,目的为屏蔽新建文件的某些权限，例如：要防止程序创建出能同时被同组用户和其他用户修改的文件，掩码就是`022`(八进制) 即 `000 010 010`( 二进制 )，取反就是`111 101 101`, 与 `0766` 即 `000 111 110 110` 进行 `&` 运算得到 `000 111 100 100` 即 `--- rwx r-- r--` 就是新建文件的最终权限
-- `chmod(path,mod)` 可以直接修改文件的权限，并且不受`新建文件掩码`影响
+- 文件类型是在创建文件时就确立的，一经创建，无法修改
+- `set-user-ID位`,`set-group-ID位`,`sticky位` 和9个权限位，在创建的时候由`int creat(path,0766)`和`umask( 022 )`两者确定
+- `umask( 022 )` 设置`新建文件掩码`,目的为屏蔽新建文件的某些权限，例如：要防止程序创建出能同时被同组用户和其他用户修改的文件，掩码就是`022`(八进制) 即 `000 010 010`( 二进制 )，取反就是`111 101 101`, 与 `0766` 即 `000 111 110 110` 进行 `&` 运算得到 `000 111 100 100` 即 `--- rwx r-- r--` 就是新建文件的最终权限
+- `chmod(path,mod)` 可以直接修改文件的权限，并且不受`新建文件掩码`影响
 
 
 ```c
@@ -1949,10 +1791,10 @@ int symlink(const char *oldpath, const char *sympath) ;
 int readlink(const char ＊pathname, char ＊buf, int bufsize) ;
 ```
 
-# 文件时间
-- 文件时间: 最后修改时间 最后访问时间 属性最后修改时间
-- 当文件被操作时，内核会自动地修改这些时间
-- 可以通过系统调用来修改 最后修改时间 和 最后访问时间
+# 文件时间
+- 文件时间: 最后修改时间 最后访问时间 属性最后修改时间
+- 当文件被操作时，内核会自动地修改这些时间
+- 可以通过系统调用来修改 最后修改时间 和 最后访问时间
 ```c
 #include <sys/time.h>
 #include <utime.h>
@@ -1984,7 +1826,7 @@ int utime( char* path, struct utimbuf *new_time );
 - ITIMER_PROF : 这个计时器 在进程 运行于用户态 或者 由于系统调用进入核心态，两种情况都计时
 
 - `int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);` 用来实现延时和定时的功能
-- settimer工作机制是，先对it_value倒计时, 当it_value为零时触发信号，然后重置为it_interval，每间隔 it_interval 触发信号
+- settimer工作机制是，先对it_value倒计时, 当it_value为零时触发信号，然后重置为it_interval，每间隔 it_interval 触发信号
 - 假如it_value为0是不会触发信号的，所以要能触发信号，it_value得大于0；如果it_interval为零，只会延时，不会定时（也就是说只会触发一次信号)。
 - old_value参数，通常用不上，设置为NULL，它是用来存储上一次setitimer调用时设置的new_value值。
 
@@ -2048,7 +1890,7 @@ int set_ticker( int n_msecs )
 }
 ```
 
-# 一个硬件时钟的脉冲是计算机里唯一需要的时钟
+#### 一个硬件时钟的脉冲是计算机里唯一需要的时钟
 
-- 如何使用一个时钟实现 一个进程的私有计时器为 5s 的同时，又设置另一个进程的 私有计时器为 12s呢？
-    - 答案 : 每个进程设置自己的计数时间，比如 5s , 12s, 内核在运行过每一个时间片( 比如 500us )后，为所有的计数器做递减，5s - 500us, 12s - 500us, 当 5s 被减到0时，就发送`SIGALRM`信号给这个进程，然后等到 12s 也被减为 0 时，也相应的发送信号。
+- 如何使用一个时钟实现 一个进程的私有计时器为 5s 的同时，又设置另一个进程的 私有计时器为 12s呢？
+    - 答案 : 每个进程设置自己的计数时间，比如 5s , 12s, 内核在运行过每一个时间片( 比如 500us )后，为所有的计数器做递减，5s - 500us, 12s - 500us, 当 5s 被减到0时，就发送`SIGALRM`信号给这个进程，然后等到 12s 也被减为 0 时，也相应的发送信号。

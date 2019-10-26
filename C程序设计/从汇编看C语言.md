@@ -175,11 +175,11 @@ PS：这种实现机制，要求设置`setjmp()`的函数永远不能`return`，
 
 ![](https://img.codekissyoung.com/2019/10/26/65ed8dad64c3c63c0690f4ab16a3e5de.png)
 ![](https://img.codekissyoung.com/2019/10/26/3b0670cf9f24088a8cec84856b20e67f.png)
-![](https://img.codekissyoung.com/2019/10/26/77b43ce1f50029963fd039dd4d656cd1.png)
+![](https://img.codekissyoung.com/2019/10/26/ee0bb2fe50cc861afc6977ba72e7bf46.png)
 
 可以看到，将`rbx`等寄存器的值保存在`rdi`处，而`rdi`的地址就是`g_buf`内存地址。
 
 ![](https://img.codekissyoung.com/2019/10/26/e7f2bc6dffc389221d60c859886c5e41.png)
 ![](https://img.codekissyoung.com/2019/10/26/cdd540a1842c159af64291be95b48020.png)
 
-可以看到调用`longjmp()`时，恢复各种寄存器的操作，特别注意下`0x38(%rdi)`这个位置，`setjmp`在这个位置存放了最重要的跳回地址`0x8(%esp)`,而`longjmp`正是从这个位置取到跳回`setjmp`的内存地址，然后最后`jmpq *%rdx`的，整个功能实现的调用流程应该很清楚了。
+可以看到调用`longjmp()`时，恢复各种寄存器的操作，特别注意下`0x38(%rdi)`这个位置，`setjmp`在这个位置存放了最重要的跳回地址`mov (%esp),%rax`,而`longjmp`正是从这个位置取到跳回`setjmp`的内存地址，然后最后`jmpq *%rdx`的，整个功能实现的调用流程应该很清楚了。
