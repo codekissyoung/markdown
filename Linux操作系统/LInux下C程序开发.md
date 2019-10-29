@@ -37,7 +37,7 @@ int main( int argc, char *argv[] )
 ```c
 #include <sys/types.h>
 #include <sys/stat.h>
-int mkfifo(const char *filename, mode_t mode); # 创建有名管道
+int mkfifo( char *filename, mode_t mode); # 创建有名管道
 ```
 ```c
 #define BUFES PIPE_BUF
@@ -113,7 +113,7 @@ int main( int argc, char* argv[] )
 #include <sys/shm.h>
 int shmget( key_t key, size_t size, int flag ); // 创建一块共享内存区
 int shmctl( int shm_id, int cmd, struct shmid_ds *buf ); // 对共享内存段进行多种操作
-void *shmat( int shm_id, const void *addr, int flag ); // 将一个存在的共享内存段连接到本进程空间
+void *shmat( int shm_id,  void *addr, int flag ); // 将一个存在的共享内存段连接到本进程空间
 int  shmdt( void *addr ); // 当对共享内存段操作结束时，调用本函数将指定的共享内存段从当前进程空间中脱离出去
 ```
 
@@ -170,7 +170,7 @@ int semctl( int sem_id, int semnu, int cmd [, union semun arg]); // 信号量的
 #include <sys/msg.h>
 int msgget( key_t key, int flags ); // 创建或者打开一个队列
 int msgctl( int msqid, int cmd, struct msqid_ds* buf ); // 在队列上做多种操作
-int msgsnd( int msqid, const void* prt, size_t nbytes, int flags ); // 将一个新的消息写入消息队列
+int msgsnd( int msqid,  void* prt, size_t nbytes, int flags ); // 将一个新的消息写入消息队列
 ssize_t msgrcv( int msqid ,void* prt, size_t nbytes, long type, int flag ); // 从消息队列中读取消息
 ```
 
@@ -533,15 +533,15 @@ time_t time( time_t *calptr );
 
 ```c
 int clock_gettime( clockid_t clock_id, struct timespec *tsp );
-int clock_settime( clockid_t clock_id, const struct timespec *tsp );
+int clock_settime( clockid_t clock_id,  struct timespec *tsp );
 int gettimeofday( struct timeval *restrict tp, void *restrict tzp );
-struct tm *gmtime( const time_t *calptr );
-struct tm *localtime( const time_t *calptr );
+struct tm *gmtime(  time_t *calptr );
+struct tm *localtime(  time_t *calptr );
 time_t mktime( struct tm*tmptr );
 size_t strftime( char *restrict buf, size_t maxsize,
-                const char *restrict format, const struct tm *restrict tmptr );
+                 char *restrict format,  struct tm *restrict tmptr );
 size_t strftime_l( char *restrict buf, size_t maxsize,
-                const char *restrict format, const struct tm *restrict tmptr, locale_t locale );
+                 char *restrict format,  struct tm *restrict tmptr, locale_t locale );
 ```
 
 ![WX20181210-195314.png](https://i.loli.net/2018/12/10/5c0e53e570c5b.png)
@@ -712,10 +712,10 @@ int atexit( void (*func)(void) );
 
 ```c
 extern char **environ; // 全局环境变量
-char *getenv( const char *name );
+char *getenv(  char *name );
 int putenv( char *str );
-int setenv( const char *name, const char *value, int rewrite );
-int unsetenv( const char *name );
+int setenv(  char *name,  char *value, int rewrite );
+int unsetenv(  char *name );
 ```
 
 ![WX20181211-113641.png](https://i.loli.net/2018/12/11/5c0f30e16a177.png)
@@ -743,7 +743,7 @@ void longjmp( jmp_buf env, int val ); // 跳转时使用
 
 ```c
 int getrlimit( int resource, struct rlimit *rlptr );
-int setrlimit( int resource, const struct rlimit *rlptr );
+int setrlimit( int resource,  struct rlimit *rlptr );
 struct rlimit{
     rlim_t rlim_cur;
     rlim_t rlim_max;
@@ -781,7 +781,7 @@ struct rlimit{
 
 ```c
 #include <stdlib.h>
-int system(const char * cmdstring);
+int system( char * cmdstring);
 ```
 
 # 进程
@@ -846,7 +846,7 @@ pid_t tcgetsid(int fd);
 pthread_t pthread_self(void); // 得到一个线程的线程ID
 int pthreat_equal(pthread_t tid1,pthread_t tid2); // 两个线程相等？ 是 则返回 0
 int pthread_create( 
-    pthread_t *restrict tidp, const pthread_attr_t *restrict attr,
+    pthread_t *restrict tidp,  pthread_attr_t *restrict attr,
     void *(*start_rtn)(void *),void *restrict arg); //创建一个线程
 
 void pthread_exit( void *rval_ptr ); // 线程退出
@@ -888,7 +888,7 @@ VTALRM PROF WINCH POLL PWR SYS
 - 重入
 
 # POSIX 使用sigaction代替signal
-- `sigaction(int signum,const struct sigaction *action, struct sigaction *prevaction)`
+- `sigaction(int signum, struct sigaction *action, struct sigaction *prevaction)`
     - signum 要处理的信号
     - action 指针，指向描述操作的结构
     - prevaction 指针，指向描述被替换操作的结构
@@ -910,7 +910,7 @@ struct sigaction{
 
 ## 命令行入参处理
 
-- `int getopt(int argc, char * const argv[], const char * optstring)`
+- `int getopt(int argc, char *  argv[],  char * optstring)`
 - `a:b:cd::e`，这就是一个选项字符串。对应到命令行就是-a ,-b ,-c ,-d, -e 。冒号又是什么呢？
 - 冒号表示参数，一个冒号就表示这个选项后面必须带有参数（没有带参数会报错哦），但是这个参数可以和选项连在一起写，也可以用空格隔开，比如`-a123` 和`-a 123`（中间有空格） 都表示`123`是`-a`的参数；
 - 两个冒号的就表示这个选项的参数是可选的，即可以有参数，也可以没有参数，但要注意有参数时，参数与选项之间 **不能有空格**
@@ -921,7 +921,7 @@ extern char *optarg; // 选项的参数指针
 extern int optind;   // 下一次调用getopt的时，从optind存储的位置处重新开始检查选项。
 extern int opterr;   // 当opterr=0时，getopt不向stderr输出错误信息。  
 extern int optopt;   // 当命令行选项字符不包括在optstring中或者选项缺少必要的参数时，该选项存储在optopt中，getopt返回 ?
-int getopt(int argc,char * const argv[ ],const char * optstring);
+int getopt(int argc,char *  argv[ ], char * optstring);
 ```
 
 ## mmap 系统调用
@@ -942,7 +942,7 @@ int munmap( void *addr, size_t len );
 ## 错误处理
 
 ```c
-void perror(const char *msg);  // 打印错误信息
+void perror( char *msg);  // 打印错误信息
 char *strerror( int errnum);   // 将给定错误号 转换为 错误字符串
 ```
 
@@ -954,10 +954,10 @@ char *strerror( int errnum);   // 将给定错误号 转换为 错误字符串
 ## 打开或创建一个文件
 
 ```c
-int open( const char *path, int flags, mode_t mode);
+int open(  char *path, int flags, mode_t mode);
 
 // 等价于 open( path, O_WRONLY | O_CREAT | O_TRUNC, mode );
-int creat( const char *path, mode_t mode );
+int creat(  char *path, mode_t mode );
 /*
     openat 是POSIX.1新增函数，主要为了解决两个问题
     1. 同一进程中的不同线程共享相同的当前工作目录，要让这些线程在同一时间工作在不同的目录中，
@@ -966,7 +966,7 @@ int creat( const char *path, mode_t mode );
     用依赖第一个调用的结果，那么程序是脆弱的，因为两个调用并不是原子操作，两个函数调用之间文
     件可能变了，这样就导致第一个调用的结果不再有效，使得程序最终的结果是错误的。
 */
-int openat( int fd, const char *path, int flags, mode_t mode );
+int openat( int fd,  char *path, int flags, mode_t mode );
 ```
 
 - flags 文件状态标志,掩码参数 取值如下
@@ -1093,7 +1093,7 @@ ssize_t write( fd, void *buffer, size_t nbytes );
 
 ```c
 ssize_t pread(int fd, void *buf, size_t count, off_t offset);
-ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);  
+ssize_t pwrite(int fd,  void *buf, size_t count, off_t offset);  
 ```
 
 - `pread`相当于调用`lseek`后再调用`read`,但是`pread`是原子操作,并且`pread`不更新当前文件偏移量
@@ -1265,13 +1265,13 @@ int fflush( FILE *fp ); // 1. 出错返回 EOF 2. fp 为NULL会冲洗进程内�
 ## 打开一个标准IO流
 
 ```c
-FILE *fopen( const char *restrict pathname, const char *restrict type );
+FILE *fopen(  char *restrict pathname,  char *restrict type );
 
 // 在指定流上打开指定文件
-FILE *freopen( const char *restrict pathname, const char *restrict type, FILE *restrict fp );
+FILE *freopen(  char *restrict pathname,  char *restrict type, FILE *restrict fp );
 
 // 将文件描述符对应的文件，对应返回一个标准IO流
-FILE *fdopen( int fd, const char *type );
+FILE *fdopen( int fd,  char *type );
 // 出错返回NULL
 ```
 
@@ -1323,15 +1323,15 @@ char *gets( char *buf ); // 从stdin中读取
 ## 输出一行
 
 ```c
-int fputs( const char *restrict str, FILE *restrict fp );
-int puts( const char *str ); // 输出到 stdout
+int fputs(  char *restrict str, FILE *restrict fp );
+int puts(  char *str ); // 输出到 stdout
 ```
 
 ## 二进制IO
 
 ```c
 size_t fread( void *restrict ptr, size_t size, size_t nobi, FILE *restrict fp );
-size_t fwrite( const void *restrict ptr, size_t size, size_t nobj, FILE *restrict fp );
+size_t fwrite(  void *restrict ptr, size_t size, size_t nobj, FILE *restrict fp );
 ```
 
 - 在网络异构系统通信时，两个系统中，对于结构体中的成员的偏移量可能随编译程序和系统的不同而不同
@@ -1348,34 +1348,34 @@ int fseeko( FILE *fp, off_t offset, int whence );
 void rewind( FILE *fp );
 
 int fgetpos( FILE *restrict fp, fpos_t *restrict pos );
-int fsetpos( FILE *fp, const fpos_t *pos );
+int fsetpos( FILE *fp,  fpos_t *pos );
 ```
 
 ## 格式化输出
 
 ```c
-int printf(const char *format, ...); //输出到标准输出
-int fprintf(FILE *stream, const char *format, ...); //输出到文件
-int dprintf( int fd, const char *restrict format, ... );
-int sprintf(char *str, const char *format, ...);    //输出到字符串str中
-int snprintf(char *str, size_t size, const char *format, ...); //按size大小输出到字符串str中
+int printf( char *format, ...); //输出到标准输出
+int fprintf(FILE *stream,  char *format, ...); //输出到文件
+int dprintf( int fd,  char *restrict format, ... );
+int sprintf(char *str,  char *format, ...);    //输出到字符串str中
+int snprintf(char *str, size_t size,  char *format, ...); //按size大小输出到字符串str中
 
 // 以下函数功能与上面的一一对应相同，只是在函数调用时，把上面的 ... 
 // 对应的一个个变量用va_list调用所替代。在函数调用前 ap 要通过va_start()宏来动态获取
 #include <stdarg.h>
-int vprintf(const char *format, va_list ap);
-int vfprintf(FILE *stream, const char *format, va_list ap);
-int vdprintf( int fd, const char *restrict format, va_list arg );
-int vsprintf(char *str, const char *format, va_list ap);
-int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+int vprintf( char *format, va_list ap);
+int vfprintf(FILE *stream,  char *format, va_list ap);
+int vdprintf( int fd,  char *restrict format, va_list arg );
+int vsprintf(char *str,  char *format, va_list ap);
+int vsnprintf(char *str, size_t size,  char *format, va_list ap);
 ```
 
 ## 格式化输入
 
 ```c
-int scanf(const char *restrict format, ... );
-int fscanf( FILE *restrict fp, const char *restrict format, ... );
-int sscanf( const char *restrict buf, const char *restrict format, ...);
+int scanf( char *restrict format, ... );
+int fscanf( FILE *restrict fp,  char *restrict format, ... );
+int sscanf(  char *restrict buf,  char *restrict format, ...);
 ```
 
 ## 从流中获取文件描述符
@@ -1396,7 +1396,7 @@ int mkstemp( char *template ); // 返回文件描述符
 ## 内存流IO
 
 ```c
-FILE *fmemopen( void *restrict buf, size_t size, const char *restrict type );
+FILE *fmemopen( void *restrict buf, size_t size,  char *restrict type );
 FILE *open_memstream( char **bufp, size_t *sizep ); //面向字节流
 FILE *open_wmemstream( wchar_t **bufp, size_t *sizep ); // 面向宽字节
 ```
@@ -1410,20 +1410,20 @@ FILE *open_wmemstream( wchar_t **bufp, size_t *sizep ); // 面向宽字节
 
 ```c
 struct passwd *getpwuid( uid_t uid );
-struct passwd *getpwnam( const char *name );
+struct passwd *getpwnam(  char *name );
 struct passwd *getpwent( void );
 void setpwent( void );
 void endpwent( void );
 
 #include <shadow.h>
-struct spwd *getspnam( const char *name );
+struct spwd *getspnam(  char *name );
 struct spwd *getspent( void );
 void setspent( void );
 void endspent( void );
 
 #include <grp.h>
 struct group *getgrgid( gid_t gid );
-struct group *getgrnam( const char *name );
+struct group *getgrnam(  char *name );
 struct group *getgrent( void );
 void setgrent( void );
 void endgrent( void );
@@ -1441,275 +1441,20 @@ void endgrent( void );
 
 # 文件系统
 
-`linux`文件系统的一些概念和操作。
-
-## 文件的信息结构
-
-```c
-#include <sys/stat.h>
-int stat( const char *restrict pathname, struct stat *restrict buf );
-int fstat( int fd, struct stat *buf );
-int lstat( const char *restrict pathname, struct stat *restrict buf );
-int fstatat( int fd, const char *restrict pathname, struct stat *restrict buf, int flag );
-```
-
-- pathname 路径
-- fd 文件描述符
-- lstat 返回该符号链接本身的有关信息
-- fstatat 为一个相对于当前打开目录(fd指向)的路径名返回文件统计信息。
-  - flag 设置为AT_SYMLINK_NOFOLLOW时，返回符号链接本身的信息
-  - flag 设置为AT_FDCWD时，如果pathname是一个相对路径，则计算相对于当前目录的pathname参数，如果是一个绝对路径，就使用该路径作为pathname
-- struct stat 结构， 用于接收文件的结构
-
-```c
-struct stat{
-    mode_t st_mode;           // 文件类型
-    ino_t  st_ino;            // i-node 节点号
-    dev_t  st_dev;            // 设备号
-    dev_t  st_rdev;           // 特别设备的设备号
-    nlink_t  st_nlink;        // 链接数
-    uid_t st_uid;             // 用户ID
-    gid_t st_gid;             // 用户组ID
-    off_t st_size;            // 文件的字节数
-    struct timespec st_atime; // 访问时间
-    struct timespec st_mtime; // 修改时间
-    struct timespec st_ctime; // 创建时间
-    blksize_t st_blksize;     // best IO block size
-    blkcnt_t st_blocks;       // number of disk blocks allocated
-}
-```
-
-- st_mode 包含文件类型信息，使用宏确定文件类型
-
-```c
-S_ISREG( st_mode )  // 普通文件
-S_ISDIR( st_mode )  // 目录
-S_ISCHR( st_mode )  // 字符特殊文件
-S_ISBLK( st_mode )  // 块特殊文件
-S_ISFIFO( st_mode ) // 管道
-S_ISLINK( st_mode ) // 符号链接
-S_ISSOCK( st_mode ) // socket
-```
-
-- IPC 对象的类型
-
-```c
-S_TYPEISMQ( struct stat * )  // 消息队列
-S_TYPEISSEM( struct stat * ) // 信号量
-S_TYPEISSHM( struct stat * ) // 共享存储对象
-```
-
-## 测试文件的权限
-
-```c
-int access( const char *pathname, int mode );
-int faccessat( int fd, const char *pathname, int mode, int flag );
-```
-
-- mode
-  - R_OK 测试 pathname 是否可读
-  - W_OK 测试可写
-  - X_OK 测试可执行
-- flag 设置为 AT_EACCESS,则检查用的是进程的有效用户ID和有效组ID,而不是实际用户ID
-- return
-  - 错误 -1
-  - 成功 0
-
-## 创建文件时，掩码设置
-
-```c
-mode_t umask( mode_t cmask );
-```
-
-- 文件权限有 `set-user-ID位`,`set-group-ID位`,`sticky位` 加上 9 个权限位，在创建的时候由`int creat(path,0766)`和`umask( 022 )`两者确定
-- `umask( 022 )` 设置`新建文件掩码`,目的为屏蔽新建文件的某些权限，例如：要防止程序创建出能被同组用户和其他用户修改的文件，掩码就是`022`(八进制) 即 `000 010 010`( 二进制 )，取反就是`111 101 101`, 与 `0766` 即 `000 111 110 110` 进行 `&` 运算得到 `000 111 100 100` 即 `--- rwx r-- r--` 就是新建文件的最终权限
-- `chmod( path, mod )` 可以直接修改文件的权限，并且不受`新建文件掩码`影响
-
-## 更改现有文件的访问权限
-
-```c
-#include <sys/stat.h>
-int chmod( const char *pathname, mode_t mode );
-int fchmod( int fd, mode_t mode );
-int fchmodat( int fd, const char *pathname, mode_t mode, int flag );
-```
-
-- mode
-
-```c
-S_ISUID 执行时设置用户ID / S_ISGID 执行时设置组ID / S_ISVTX 粘着位
-S_IRUSR 用户读权限  / S_IWUSR 用户写权限 / S_IXUSR 用户执行权限 / S_RWXU 用户可读可写可执行
-S_IRGRP 用户组读权限 / S_IWGRP 用户组写权限  / S_IXUSR 用户组执行权限 / S_IRWXG 组员可读可写可执行
-S_IROTH 其他人读权限 / S_IWOTH 其他人写权限 / S_IXOTH 其他人执行权限 / S_IRWXO 其他人可读可写可执行
-```
-
-- flag 取值为 AT_SYMLINK_NOFOLLOW 时，fchmodat 不解析符号链接
-- 只有root可以设置粘着位，目录设置了粘着位后，只有满足三个条件之一的才可以删除目录下的文件，第一，拥有文件权限 第二，拥有此目录权限 第三，是root用户
-
-## 更改用户ID和组ID
-
-```c
-int chown( const char *pathname, uid_t owner, gid_t group );
-int fchown( int fd, uid_t owner, git_t group );
-int fchownat( int fd, const char *pathname, uid_t owner, gid_t group, int flag );
-int lchown( const char *pathname, uid_t owner, gid_t group );
-```
-
-## 文件截断
-
-```c
-int truncate( const char *pathname, off_t length );
-int ftruncate( int fd, off_t length );
-```
-
 - 将一个现有文件长度截断为 length 个字节
 
-## 创建链接
-
-```c
-int link( const char *existpath, const char *newpath );
-int linkat( int efd, const char *existpath, int nfd, const char *newpath, int flag );
-```
-
-## 删除链接
-
-```c
-int unlink( const char *pathname );
-int unlinkat( int fd, const char *pathname, int flag );
-int remove( const char *pathname ); // 解除对一个文件或者目录的链接
-```
-
-- 当链接计数达到 0 时，该文件的内容才可被删除
-- 当还有进程正在使用该文件时，该文件即使计数为0也不会立刻删除，而是等到所有使用它的进程退出后，才删除。利用这个特性，进程如果需要临时文件，可以creat后立刻unlink,这样进程即使崩溃，这个临时文件也不会遗留下来
-
-## 对文件重命名
-
-```c
-int rename( const char *oldname, const char *newname );
-int renameat( int oldfd, const char *oldname, int newfd, const char *newname );
-```
-
-## 创建符号链接
-
-```c
-int symlink( const char *actualpath, const char *sympath );
-int symlinkat( const char *actualpah, int fd, const char *sympath );
-```
-
-## 打开符号链接本身，读取它本身的内容
-
-```c
-ssize_t readlink( const char *restrict pathname, char *restrict buf, size_t bufsize );
-ssize_t readlinkat( int fd, const char *restrict pathname, char *restrict buf, size_t bufsize );
-```
 
 ## 修改文件访问时间和修改时间
 
 ```c
-int futimens( int fd, const struct timespec times[2] );
-int utimensat( int fd, const char *path, const struct timespec times[2], int flag );
-int utimes( const char *pathname, const struct timeval times[2] );
+int futimens( int fd,  struct timespec times[2] );
+int utimensat( int fd,  char *path,  struct timespec times[2], int flag );
+int utimes(  char *pathname,  struct timeval times[2] );
 ```
 
-## 创建/删除目录
 
-```c
-int mkdir( const char *pathname, mode_t mode );
-int mkdirat( int fd, const char *pathname, mode_t mode );
-int rmdir( const char *pathname );
-```
+## 文件类型和许可权限
 
-## 读目录
-
-```c
-DIR *opendir( const char *pathname );
-DIR *fdopendir( int fd );
-struct dirent *readdir( DIR *dp );
-void rewinddir( DIR *dp );
-int closedir( DIR *dp );
-long telldir( DIR *dp );
-void seekdir( DIR *dp, long loc );
-```
-
-## 修改进程当前工作目录
-
-```c
-int chdir( const char *pathname );
-int fchdir( int fd );
-
-char *getcwd( char *buf, size_t size ); // 获取当前工作目录
-```
-
-# 目录系统调用
-
-`linux`的文件系统繁多，针对文件的系统的目录操作各不相同，所以需要一套标准系统调用来兼容各种文件系统。
-
-## 概述
-
-- 目录: 特殊的文件，内容是文件和子目录的名字
-- 每个目录包含两个特殊的项目: `.` 和 `..`
-- `open` `read` `close`这些函数，可以把一个目录当做文件来打开，但是这并不是很好的方法，因为 linux目录类型非常多，例如`Apple HFS` `ISO9660` `VFAT` `NFS`等，如果以`read`来读，则需要了解不同类型目录各自的结构细节
-- `int mkdir(const char *path, mode_t mode);` 创建目录，在创建时设置权限需要使用`umask(0)`取消权限掩码限制，否则只能使用系统默认属性创建
-- `DIR* opendir( const char* path )` 打开目录 `path`
-- `struct dirent * readdir( DIR* dir )` 获取一次当前目录中的文件信息
-- `int remove(char * filename);` 删除指定文件或者空目录
-- `int rmdir(const char *pathname);` 删除空目录
-- `int unlink(const char *pathname);` 删除文件
-- `int  closedir(DIR * dir);` 关闭之前打开的dir目录
-- `int rename(const char *oldname, const char *newwname) ;` 文件或者目录更换名字
-- `char *getcwd(char *buf, size_t size);` 得到当前目录的完整路径
-- `int chdir(const char *pathname);` 改变当前目录
-- 由于删除目录比较麻烦需要遍历挨个删除，可以使用`system("rm -rf /dir")`
-
-```c
-struct __dirstream  
-{  
-    void *__fd; /* `struct hurd_fd' pointer for descriptor.   */  
-    char *__data; /* Directory block.   */  
-    int __entry_data; /* Entry number `__data' corresponds to.   */  
-    char *__ptr; /* Current pointer into the block.   */  
-    int __entry_ptr; /* Entry number `__ptr' corresponds to.   */  
-    size_t __allocation; /* Space allocated for the block.   */  
-    size_t __size; /* Total valid data in the block.   */  
-    __libc_lock_define (, __lock) /* Mutex lock for this structure.   */  
-};
-typedef struct __dirstream DIR;
-
-struct dirent  
-{  
-    long d_ino; /* inode number 索引节点号 */  
-    off_t d_off; /* offset to this dirent 在目录文件中的偏移 */  
-    unsigned short d_reclen; /* length of this d_name 文件名长 */  
-    unsigned char d_type; /* the type of d_name 文件类型 */  
-    char d_name [NAME_MAX+1]; /* file name (null-terminated) 文件名，最长255字符 */  
-}
-
-# d_type 定义
-enum  
-{   
-    DT_UNKNOWN = 0,   
-    # define DT_UNKNOWN DT_UNKNOWN //未知文件  
-    DT_FIFO = 1,   
-    # define DT_FIFO DT_FIFO //FIFO有名管道文件  
-    DT_CHR = 2,   
-    # define DT_CHR DT_CHR //字符设备文件  
-    DT_DIR = 4,   
-    # define DT_DIR DT_DIR //目录文件  
-    DT_BLK = 6,   
-    # define DT_BLK DT_BLK //块设备文件  
-    DT_REG = 8,   
-    # define DT_REG DT_REG //普通文件  
-    DT_LNK = 10,   
-    # define DT_LNK DT_LNK //链接文件  
-    DT_SOCK = 12,   
-    # define DT_SOCK DT_SOCK //socket文件  
-    DT_WHT = 14   
-    # define DT_WHT DT_WHT //whiteout-base文件  
-};   
-```
-
-# 文件类型和许可权限
-- 使用了16位二进制数来存储文件类型和许可权限信息
 - 分别是: 文件类型(四位),`set-user-ID位`,`set-group-ID位`,`sticky位`,所有者权限(3位),所有组权限(3位),其他人权限(3位)
 - 可执行文件的`set-user-ID位`可以设置为1,意思是运行该程序的时候，认为是由文件所有者在运行这个程序,比如`-rwsr-xr-x 1 root root 54256 5月  17  2017 /usr/bin/passwd` 的所有者是root,用户运行`passwd`设置自己密码时，`passwd`的运行用户实际是`root`,所以能修改密码文件`-rw-r--r-- 1 root root 1848 10月 13 11:35 /etc/passwd`
 - `set-group-ID位`设置程序运行时，是否使用程序本身所属的用户组，设置为1 : 意思是用户运行程序时，就像是程序所属组里的某个用户在运行程序一样
@@ -1724,46 +1469,28 @@ enum
 - `umask( 022 )` 设置`新建文件掩码`,目的为屏蔽新建文件的某些权限，例如：要防止程序创建出能同时被同组用户和其他用户修改的文件，掩码就是`022`(八进制) 即 `000 010 010`( 二进制 )，取反就是`111 101 101`, 与 `0766` 即 `000 111 110 110` 进行 `&` 运算得到 `000 111 100 100` 即 `--- rwx r-- r--` 就是新建文件的最终权限
 - `chmod(path,mod)` 可以直接修改文件的权限，并且不受`新建文件掩码`影响
 
-
 ```c
 #include <sys/types.h>
 #include <sys/stat.h>
 // 取得文件信息
-int stat(const char *pathname, struct stat *buf);
+int stat( char *pathname, struct stat *buf);
 int fstat (int fd,struct stat *buf);
  // lstat函数类似于stat,但是当命名的文件是一个符号连接时,lstat返回该符号连接的有关信息,而不是由该符号连接引用的文件的信息
-int lstat(const char *pathname, struct stat *buf);
-
-struct stat
-{
-    mode_t    st_mode;    文件类型，文件权限
-    ino_t     st_ino;        i节点号
-    dev_t    st_dev;        
-    dev_t    st_rdev;    设备文件序号
-    nlink_t    st_nlink;    链接
-    uid_t    st_uid;
-    gid_t     st_gid;        用户ID
-    off_t    st_size;    文件大小,此字段只对普通文件、目录文件和符号连接有意义。
-    time_t    st_atime;    最后存取时间
-    time_t    st_mtime;    文件内容的最后修改时间
-    time_t    st_ctime;    文件状态的最后修改时间
-    long    st_blksize;    
-    long     st_blocks;
-};
+int lstat( char *pathname, struct stat *buf);
 ```
 
 # 判断文件权限
 ```c
 #include <unistd.h>
 // mode 说 明 : R_OK 测试读许可权 W_OK 测试写许可权 X_OK 测试执行许可权 F_OK 测试文件是否存在
-int access (const char *name, int mode) ;
+int access ( char *name, int mode) ;
 ```
 
 # 修改文件权限
 ```c
 #include <sys/types.h>
 #include <sys/stat.h>
-int chmod(const char *pathname, mode_t mode);
+int chmod( char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);
 ```
 
@@ -1771,24 +1498,24 @@ int fchmod(int fd, mode_t mode);
 ```c
 #include <sys/types.h>
 #include <unistd.h>
-int chown(const char *pathname,uid_t owner,gid_t group);
+int chown( char *pathname,uid_t owner,gid_t group);
 int fchown(int fd, uid_t owner, gid_t group);
-int lchown(const char *pathname, uid_t owner, gid_t group);
+int lchown( char *pathname, uid_t owner, gid_t group);
 ```
 
 # 创建一个硬连接
 ```c
 #include <unistd.h>
 // 只有超级用户进程可以创建指向一个目录的新连接
-int link(const char＊oldpath, const char *newpath) ;
+int link( char＊oldpath,  char *newpath) ;
 ```
 
 # 创建一个软连接
 ```c
 #include <unistd.h>
-int symlink(const char *oldpath, const char *sympath) ;
+int symlink( char *oldpath,  char *sympath) ;
 // 因为open函数跟随符号连接,所以需要有一种方法打开该连接本身,并读该连接中的名字
-int readlink(const char ＊pathname, char ＊buf, int bufsize) ;
+int readlink( char ＊pathname, char ＊buf, int bufsize) ;
 ```
 
 # 文件时间
@@ -1801,7 +1528,6 @@ int readlink(const char ＊pathname, char ＊buf, int bufsize) ;
 #include <sys/types.h>
 int utime( char* path, struct utimbuf *new_time );
 ```
-
 
 # Linux 时间编程
 
@@ -1825,7 +1551,7 @@ int utime( char* path, struct utimbuf *new_time );
 - ITIMER_VIRTUAL : 只有进程在 用户态 运行时才计时, 计时器用尽，发送 `SIGVTALRM` 信号
 - ITIMER_PROF : 这个计时器 在进程 运行于用户态 或者 由于系统调用进入核心态，两种情况都计时
 
-- `int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);` 用来实现延时和定时的功能
+- `int setitimer(int which,  struct itimerval *new_value, struct itimerval *old_value);` 用来实现延时和定时的功能
 - settimer工作机制是，先对it_value倒计时, 当it_value为零时触发信号，然后重置为it_interval，每间隔 it_interval 触发信号
 - 假如it_value为0是不会触发信号的，所以要能触发信号，it_value得大于0；如果it_interval为零，只会延时，不会定时（也就是说只会触发一次信号)。
 - old_value参数，通常用不上，设置为NULL，它是用来存储上一次setitimer调用时设置的new_value值。

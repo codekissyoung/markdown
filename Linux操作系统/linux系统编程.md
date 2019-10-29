@@ -1,133 +1,754 @@
-# linux 专有的编程特性
+# Linux系统编程
 
-linux 专有的编程特性的笔记。
+`Linux`系统编程笔记。
 
-## linux 专有的编程特性
+## 1. 历史和标准
 
-- epoll 获取文件 I/O 事件通知的一种机制
-- inotify 监控文件和目录变化的一种机制
-- capabilities 为进程赋予root用户的部分权限的一种机制
-- 扩展属性
-- i-node标记
-- clone() 系统调用
-- /proc 文件系统
-- 文件I/O 信号 定时器 线程 共享库 进程间通信 socket 的实现细节
+`POSIX.1`标准、`SUSv1`、`SUSv2`、`SUSv3`、`SUSv4`标准。
 
-## 内存管理
+## 2. 基本概念
 
-物理内存`(RAM)`采用虚拟内存管理机制管理, 进程与进程之间、进程与内核之间的`RAM`是彼此隔离的;每个进程只将一部分需要执行的代码和数据保留在`RAM`中;而其他数据保存在`磁盘`里，这些数据需要被访问到的时候，再替换到`RAM`中
+内核、`shell`、用户、用户组、单根目录层级、目录、硬链接、软链接、文件、文件I/O模型、程序、进程、内存映射、静态库、动态库、进程间通信`IPC`、进程间同步、信号、线程、进程组、`shell`任务控制、会话、控制终端、控制进程、伪终端、日期和时间、`C/S`架构、实时性、`/proc`文件系统。
 
-## 磁盘管理
-内核在磁盘之上提供文件系统,允许对文件的创建、获取、更新、删除
+## 3. 系统编程概念
 
-## 设备管理
-对外设(鼠标、键盘、磁盘、磁盘驱动器)提供了访问它们简化版标准接口，管理多个进程对同一个设备的访问
+系统调用、库函数、标准C语言函数库`glibc`、错误处理、可移植性。
 
-## 联网
-内核以用户进程的名义收发`数据包`，保证该数据包路由至目标系统
+## 4. 通用文件I/O模型
 
-#### 应用程序编程接口
-提供系统调用，用户程序可以通过这些调用去 **请求** 内核执行各种任务
+I/O 通用性, 同一套系统调用(open read write close) 可以用于所有的文件类型，包括设备文件，由内核将这些调用转化为相应的文件系统操作，或者设备驱动操作，就本质而言，内核只提供一种文件类型: 字节流序列，没有文件结束符的概念, 读取文件时，如果无数据返回，便会认为抵达文件末尾。
+文件描述符、`flags`文件访问模式、`mode`新建文件权限。
 
-## 内核态与用户态
+```c
+int open( char *pathname, int flags, [int mode]);
+int fd = open( "/home/cky/testfile", O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR ); // eg.
+```
 
-- CPU 支持运行在不同的状态: **内核态** 与 **用户态** ,与之对应,**虚拟内存区域** 也划分为 **用户空间** 与 **内核空间**  用户态下,CPU只能访问 **用户空间** ，**内核态** 没有限制
+```bash
+flags:
+O_RDONLY    只读    O_WRONLY    只写    O_RDWR      可读可写
+O_CLOEXEC   当exec时，自动关闭文件描述符
+O_CREAT     不存在则新建    O_EXCL  文件存在则报错
+O_DIRECT    关闭缓冲
+O_NOATIME   不修改文件 atime
+O_NOCTTY    阻止成为控制终端
+O_NOFOLLOW  不要解引用软链接
+O_TRUNC     截断为0              
+O_APPEND    追加模式
+O_ASYNC     当I/O操作可用，产生signal通知进程,必须使用fcntl指定
+O_SYNC      同步IO O_DSYNC 保持数据完整性
+O_NONBLOCK  非阻塞
 
-## 进程视角 与 内核视角
-#### 进程视角
-- 对进程来说 许多事情的发生都无法预期
-- 进程不知道 自己 对 CPU 的占用何时 **到期** , 也不知道何时会再次获得 CPU 的使用
-- 信号的的传递 和 进程通信事件的触发都由内核负责协调，对进程来说，随时可能发生
-- 进程不清楚自己的数据与代码哪部分是驻留在 **RAM** ，哪部分又保存在 **SWAP**
-- 进程也不清楚自己访问的文件位于磁盘的什么地方，进程只是通过名称来引用文件而已
-- 进程之间彼此也不能直接通信
-- 进程本身无法创建出新进程
-- 进程也无法 **自行了断**
-- 进程也不能与计算机外接的输入与输出设备直接通信
+mode:
+用户  : S_IRWXU(rwx) S_IRUSR(r)  S_IWUSR(w)  S_IXUSR(x)
+用户组: S_IRWXG(rwx) S_IRGRP(r)  S_IWGRP(w)  S_IXGRP(x)
+其他  : S_IRWXO(rwx) S_IROTH(r)  S_IWOTH(w)  S_IXOTH(x)
+特殊位: 
+S_ISUID  0004000 set-user-ID bit
+S_ISGID  0002000 set-group-ID bit (see inode(7)).
+S_ISVTX  0001000 sticky bit (see inode(7)).
+```
 
-#### 内核视角
-- 内核维护了一个数据结构，包含了所有正在运行的进程的信息,随着进程的创建与消亡，数据结构会更新
-- 内核维护的底层数据结构可以将 **文件名** 转换为磁盘对应的 **物理位置**
-- 内核维护的数据结构，也记录了每个进程的 **虚拟内存** 与 `RAM` 以及 `SWAP` 之间的映射关系
-- 进程间的通信也只能够通过内核提供的通信机制来完成
-- 进程希望创建新的进程，也需要发送请求给内核，由内核来创建新的进程，终止某进程也是请求内核去终结的
-- 内核负责与外设之间的所有直接通信，按需与用户进程交换信息
+```c
+ssize_t read(int fd, void *buf, size_t cnt );   // real read bytes; 0 on EOF; -1 on error
+ssize_t write(int fd, void *buf, size_t cnt );  // real write bytes; -1 on error
+close(int fd);                                  // 0 on success; -1 on error
+```
 
-#### 某些缩略语的真实含义
-- `某进程可创建另一个进程` 等价于 **某进程可以请求内核创建另一个进程**
-- `某进程可创建管道` 等价于 **某进程可以请求内核开辟一条管道**
-- `某进程可将数据写入文件` 等价于 **某进程可以请求内核将内容写入到某文件里去**
-- `某进程调用exit() ` 等价于 **某进程向内核请求销毁自己**
+```c
+off_t lseek(int fd, off_t offset, int whence);  // new file offset; -1 on error
 
-## 用户和组
+whence:
+    SEEK_SET    文件头 0 字节处
+    SEEK_CUR    当前字节处
+    SEEK_END    文件结尾处
+```
 
-- 内核对每一个用户都有一个标识 **UID**
-- 内核出于方便管理的目的，维护了用户组，内核对每一个用户组也有一个标识 **GID**
-- 用户可以属于多个用户组
-- 超级用户 **UID** 为 0 ,登录名为 `root`
+```c
+int ioctl(int fd, int request, .../* argp */); // depends on request; -1 on error
+```
 
-## 单根目录层级 目录 链接 文件
+## 5. 深入探究文件I/O
 
-- 略
+```c
+int fcntl(int fd, int cmd, ...); // depends on cmd; -1 on error
 
-## 文件 I/O 模型
+// eg. add O_APPEND mode
+int flags = fcntl( fd, F_GETFL );
+flags |= O_APPEND;
+fcntl( fd, F_SETFL, flags );
+```
 
-- I/O 通用性, 同一套系统调用(open read write close) 可以用于所有的文件类型，包括设备文件，由内核将这些调用转化为相应的文件系统操作，或者设备驱动操作
-- 就本质而言，内核只提供一种文件类型: 字节流序列
-- 没有文件结束符的概念, 读取文件时，如果无数据返回，便会认为抵达文件末尾
+```c
+int dup(int oldfd);             // new fd; -1 on error
+int dup2(int oldfd, int newfd); // new fd; -1 on error
+int dup3(int oldfd, int newfd, int flags); // new fd; -1 on error
+```
 
-#### 文件描述符
+![](https://img.codekissyoung.com/2019/10/28/272aa9e92430e17189092d3ddf4626e5.png)
 
-- 整数，用于指代打开的文件, `open(文件路径)`调用返回一个文件描述符
-- `shell` 启动的进程会 **继承** 3个已经打开的文件描述符, **标准输入 0 ** **标准输出 1** **标准错误 2** ,这 3 个描述符在交互式shell中，一般都指代的终端
+现象1:进程A中`fd=1`和`fd=20`指向同一个文件打开表记录，这种情况可能是`dup` `dup2` `fcntl`调用后生成的。
 
-## 进程
+现象2: 进程A与进程B的`fd=2`文件描述符指向同一个文件打开表记录，这种情况可能是 `A` 与 `B`为父子进程，继承而来的文件描述符。
 
-- 执行程序时，内核将程序代码载入虚拟内存，建立内核记账 **bookkeeping** 数据结构，记录进程的各种信息，比如进程ID UID GID 终止状态等
+现象3: 文件打开表中`0`与`86`号记录指向同一个`i-node`表记录`1976`，这种情况可能是`A`与`B`进程打开同一个文件产生的。
 
-## 进程内存布局
+#### 指定位置读写
 
-- Text 代码段 ：程序的指令
-- Data 数据段 : 程序内静态变量
-- 堆 : 供程序动态分配额外内存使用
-- 栈 : 随函数调用，返回而增减的一片内存，用于为局部变量和函数调用链接信息分配存储空间
+```c
+// 在指定offset处读入，并且不改变文件偏移量
+ssize_t pread(int fd, void *buf, size_t cnt, off_t offset); // read bytes cnt; 0 on EOF; -1 on error
 
-#### 创建新进程
+ssize_t pwrite(int fd, void *buf, size_t cnt, off_t offset); // write bytes cnt; -1 on error
+```
 
-- 进程通过`fork()`系统调用请求内核创建新进程, 内核收到请求后，复制一份父进程作为子进程的创建基础，所以子进程从父进程处继承了数据段，栈段，以及堆段等内容作为子进程自己的副本，子进程修改这些内容，不会影响到父进程。其中标记为只读的 **Text 代码段** 是父进程与子进程共享的。
-- 子进程可调用 `exec()` 系列函数，去销毁从父进程继承来的 **Text 代码段** **数据段** **堆栈** ，然后重新加载一个新的程序来替换它们，从而达到运行一个新的程序的目的
+#### 分散输入与集中输出
 
-#### 进程 **PID**  和 父进程 **PPID**
-用以表示进程
+```c
+struct iovec{
+    void *iov_base;
+    size_t iov_len;
+};
+// 依次读入到 多个缓冲区
+ssize_t readv(int fd, struct iovec *iov, int iovcnt ); // read bytes cnt; 0 on EOF; -1 on error
+// 依次从多个缓冲区 写入到文件
+ssize_t writev(int fd, struct iovec *iov, int iovcnt );// write bytes cnt; -1 on error
+```
 
-#### 进程终止 和 终止状态
-- 终止一个进程有两种方法 1. 进程调用`_exit()`系统调用，请求退出 2. 向进程传递信号, 将其 杀死
-- 进程退出或者被杀死后，都会生成`终止状态(非负小整数)`，供父进程的`wait()`系统调用检测
+#### 指定位置分散输入与集中输出
 
-#### 进程的用户 和 用户标识符
-- **UID** **GID** : 用来标识进程所属的用户和用户组。新进程会从父进程继承 **UID** 与 **GID**
-- **有效用户EUID** **有效组EGID** : 进程在访问受保护的资源的时候会通过这它们来确定访问权限
-- 补充组ID : 用于标识进程所属的额外组 , 新进程会从父进程继承 ，登录shell则从系统组文件中获取其 补充组ID
+```c
+ssize_t preadv(int fd, struct iovec *iov, int iovcnt, off_t offset);
+ssize_t pwritev(int fd, struct iovec *iov, int iovcnt, off_t offset);
+```
 
-#### 特权进程
-`root` 的进程 ，**UID** 为 0
+#### 截断文件到指定长度
 
-#### Capabilities 能力
-Linux 2.2 之后，将`root`的特权分为了一组相互独立的单元，称为`Capabilities` 能力, 通过赋予进程部分能力，使得它既可以执行某些特权操作，又可以防止它执行其他越权的操作
+```c
+int truncate(char *pathname, off_t length );// 0 on success; -1 on error
+int ftruncate(int fd, off_t length);        // 0 on success; -1 on error
+```
 
-#### init 进程
-- 1 号进程, 进程程序为`/sbin/init`, 所有进程之父，不能被杀死，只有关闭系统才能终止该进程
-- 它的主要任务就是创建并且监控系统运行所需的一系列进程
+#### 创建临时文件
 
-#### 守护进程 Daemon
-- 略
+```c
+int mkstemp(char *template); // return fd on success; -1 on error
+FILE *tmpfile(void);        // return file pointer ; NULL on error
 
-#### 环境列表
-- 每个进程都有一份环境列表，即在进程用户空间中维护的一组环境变量
-- 子进程会继承父进程的环境列表(生成一个副本)，父进程可以通过这个机制，向子进程传递信息
-- `exec()`替换新程序时，可以继承老程序的环境，也可以重新指定
+// eg.
+int fd = mkstemp("/tmp/somestringXXXXXX"); // XXXXXX 为必须的格式
+```
 
-#### 资源限制
+## 6. 进程
+
+```c
+pid_t getpid(void);     // return pid of caller
+pid_t getppid(void);    // get pid of caller's parent
+```
+
+![](https://img.codekissyoung.com/2019/10/28/9f6db6f1d7e327e3a0e987c4c6386c08.png)
+
+#### 进程环境
+
+```c
+char *getenv(char *name);   // return pointer to string; NULL for no such variable
+char *putenv(char *string); // str fmt: name=value; 0 on success; NULL on error
+int setenv(char *name, char *value, int overwrite); // 0 on success;-1 on error
+int unsetenv(char *name);                           // 0 on success;-1 on error
+int clearenv(void);         // clear all env variable; 0 on success; Null for error
+```
+
+#### 非局部跳转
+
+```c
+int setjmp(jmp_buf env);
+void longjmp(jmp_buf env, int val);
+```
+
+## 7. 内存分配
+
+```c
+int brk(void *end_data_segment);    // return 0 on success; -1 on error
+int sbrk(intptr_t increment);       // return previous program break on success; -1 on error
+```
+
+```c
+void *malloc(size_t size);  // return pointer to allocated memory; NULL on error
+void *calloc(size_t item_cnt, size_t size); // same above
+void *realloc(void *ptr, size_t size);      // same above
+void free(void *ptr);
+```
+
+## 8. 用户和组
+
+密码文件`/etc/passwd`、`shadow`密码文件`/etc/shadow`、组文件`/etc/group`。
+
+从`/etc/passwd`中获取信息的函数:
+
+ ```c
+struct passwd{
+    char *pw_name;
+    char *pw_passwd;
+    uid_t pw_uid;
+    gid_t pw_gid;
+    char *pw_gecos; // comment user information
+    char *pw_dir;   // initial working directory
+    char *pw_shell; // login shell
+}
+ struct passwd *getpwnam(char *name);
+ struct passwd *getpwuid(uid_t uid);
+ ```
+
+从`/etc/group`中获取信息的函数:
+
+```c
+struct group{
+    char *gr_name;
+    char *gr_passwd;
+    gid_t gr_gid;
+    char **gr_mem; //group members
+}
+struct group *getgrnam(char *name);
+struct group *getgrgid(gid_t gid);
+```
+
+遍历密码文件和组文件中所有记录:
+
+```c
+struct passwd *getpwent(void); // get one record;NULL on error
+void setpwent(void);    // back to start
+void endpwent(void);    // close pwd file
+
+struct passwd *pwd;
+while((pwd = getpwent()) != NULL)
+    printf("%-8s % 5ld\n", pwd->pw_name, (long)pwd->pw_uid);
+endpwent();
+```
+
+从`/etc/shadow`文件中获取记录:
+
+```c
+struct spwd{
+    char *sp_namp;  // login name
+    char *sp_pwdp;  // encrypt password
+    long sp_lstchg; // Time for last passwd change
+    long sp_min;    // min number of days between password changes
+    long sp_max;    // max number of days before change required
+    long sp_warn;   // number of days .. warn user
+    long sp_inact;  // number of days after expiration that account locked
+    long sp_expire; // Date when account expires
+    unsigned long sp_flag;  // reserved for future use
+}
+struct spwd *getspnam(char *name);  // return pointer on success;NULL on error
+struct spwd *getspent(void);        // return pointer on success;NULL on error
+void setspent(void);
+void endspent(void);
+```
+
+加密和用户认证:
+
+```c
+char *crypt(char *key, char *salt); // return crypted string;NULL on error
+```
+
+要求用户输入密码:
+
+```c
+char *getpass(char *prompt);    // return pointer ;NULL on error
+```
+
+## 9. 进程凭证
+
+一个进程，使用某个用户账号，执行某个程序，进程的`uid gid`就是该用户的。而进程拥有的权限（文件权限、特殊系统调用权限、信号权限等）还需要看`euid egid` `set-user-id` 辅助ID等，结合在一起判断。
+
+通常`euid`就是`uid`，但是如果`exe`文件设置了`suid`位的话，那么`euid`就会使用`exe`文件的所属用户`uid`。`passwd`命令需要超级用户才可执行，但是普通用户执行`passwd`，由于设置了`suid`的缘故，所以`euid`会变成`root`，所以可以执行该命令。
+
+```bash
+7351604 -rwsr-xr-x  1 root root     59K 8月  21 18:25 passwd
+```
+
+```c
+uid_t getuid(void);
+uid_t geteuid(void);
+gid_t getgid(void);
+gid_t getegid(void);
+
+int setuid(uid_t uid);
+int setgid(gid_t gid);
+int seteuid(uid_t euid);
+int setegid(gid_t egid);
+
+int setreuid(uid_t ruid, uid_t euid); // 同时修改 uid 和 euid
+int setregid(gid_t rgid, gid_t egid); // 同时修改 gid 和 egid
+
+int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+
+int setresuid(uid_t ruid, uid_t euid, uid_t suid);
+int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+```
+
+修改和获取文件系统ID：
+```c
+int setfsuid(uid_t fsuid);
+int setfsgid(gid_t fsgid);
+```
+
+获取和修改辅助组ID：
+
+```c
+int getgroups(int gidsetsize, gid_t grouplist[]); // ;-1 on error
+int setgroups(size_t gidsetsize, gid_t *grouplist);
+int initgroups(char *user, gid_t group);
+```
+
+![](https://img.codekissyoung.com/2019/10/28/9b622d885c648577b8d5544b2be1f757.png)
+
+## 10. 时间
+
+### 日历时间
+
+```c
+struct timeval{
+    time_t tv_sec;
+    suseconds_t tv_usec;
+};
+struct tm{
+    int tm_sec;
+    int tm_min;
+    int tm_hour;
+    int tm_mday;
+    int tm_mon;
+    int tm_year;
+    int tm_wday;
+    int tm_yday;
+    int tm_isdst;
+};
+int gettimeofday(struct timeval *tv, struct timezone *tz);
+time_t time(time_t *timep); // 返回时间戳; -1 on error
+char *ctime(time_t *timestamp); // 转化成可打印字符串
+struct tm *gmtime(time_t *timep);
+struct tm *localtime(time_t *timep);
+time_t mktime(struct tm *timeptr);
+char *asctime(struct tm *timptr); // 转化位可打印字符
+size_t strftime(char *outstr, size_t maxsize, char *format); // 精确控制打印格式
+char *strptime(char *str, char *format, struct tm *timeptr); // 字符串 -> 时间
+char *currTime(char *format); // 当前时间
+char *setlocale(int category, char *locale); // 设置地区
+int settimeofday(struct timeval *tv, struct timezone *tz); // 更新系统时钟
+int adjtime(struct timeval *delta, struct timeval *olddelta); // 调整时钟
+```
+
+### 程序时间
+
+```c
+struct tms{ 
+    clock_t tms_utime;
+    clock_t tms_stime;  // system CPU time
+    clock_t tms_cutime;
+    clock_t tms_cstime; // system CPU time
+};
+clock_t times(struct tms *buf);
+clock_t clock(void); // return total CPU time used by calling process measured in
+```
+
+最大的用处就是用来测量程序运行时间。
+
+## 11. 系统限制和选项
+
+一个进程能同时支持多少打开文件？`int`类型变量可存储最大值是多少？
+
+```c
+long sysconf(int name);
+long pathconf(char *pathname, int name);
+long fpathconf(int fd, int name);
+```
+
+![](https://img.codekissyoung.com/2019/10/28/d51dda51f64a7dc611ee6582fcfa6d6f.png)
+![](https://img.codekissyoung.com/2019/10/28/310d1823eaad220c69b0c1d5cadebff3.png)
+
+## 12. 系统和进程信息
+
+`/proc`文件系统的由来,获取与进程有关的信息`/proc/PID`。
+
+```c
+$ cat /proc/1/status
+```
+
+## 13. 文件I/O缓冲
+
+### 标准IO缓冲
+
+```c
+int setvbuf(FILE *stream, char *buf, int mode, size_t size); // 设置标准IO的缓冲区
+mode:
+    _IONBF : 不进行缓冲，立即调用read()和write
+    _IOLBF : 行缓冲，对于output,遇见\n则调用write;对于input,则每次读取一行数据
+    _IOFBF : 全缓冲，调用read()与write()设置的size就是缓冲区的大小
+int setbuf(FILE *stream, char *buf); // 设置标准IO缓冲区
+int setbuffer(FILE *stream, char *buf, size_t size); // 设置标准IO缓冲区
+int fflush(); // 强制刷新 IO 缓冲区
+```
+
+### 内核缓冲
+
+```c
+int fdatasync( int fd ); // 强制将数据从内核缓冲区写到磁盘，不强制更新元数据（文件权限、大小、访问时间等）
+int fsync( int fd ); // 即写入数据，也写入元数据到磁盘
+void sync(void);    // 强制刷新进程中所有内核缓冲区的数据到磁盘
+```
+
+![](https://img.codekissyoung.com/2019/10/29/27830aba0f03d75d60c5018623bc36ea.png)
+
+```c
+int fileno(FILE *stream);           // 给定文件流，返回文件描述符
+FILE *fdopen(int fd, char *mode);   // 将文件描述符 转化成 文件流
+```
+
+## 14. 系统编程概念
+
+### EXT2文件系统
+![](https://img.codekissyoung.com/2019/10/29/4786f2264e08eb70dd97531c1f66ecc5.png)
+![](https://img.codekissyoung.com/2019/10/29/8d134537711bca62c70e3d2c80bfb4c6.png)
+
+### 虚拟文件系统
+
+![](https://img.codekissyoung.com/2019/10/29/b156ab33135408cc6e1764ce3a309baa.png)
+
+`VFS`系统为上层程序定义了一套通用接口（`open()`、`read()`、`write()`等），同时底层文件系统都会提供`VFS`接口的实现。除了个别文件系统，比如`FAT`不支持`symlink()`操作，会告知上层`VFS`，`VFS`再去通知应用程序。
+
+### 挂载文件系统
+
+```c
+int mount(char *source, char *target, char *fstype, long mountflags, void *data);
+int umount(char *target);
+int umount2(char *target, int flags);
+```
+
+## 15. 文件属性
+
+查看一个文件的“元数据”：
+
+```c
+struct stat{
+    mode_t st_mode;           // 文件类型
+    ino_t  st_ino;            // i-node 节点号
+    dev_t  st_dev;            // 设备号
+    dev_t  st_rdev;           // 特别设备的设备号
+    nlink_t  st_nlink;        // 链接数
+    uid_t st_uid;             // 用户ID
+    gid_t st_gid;             // 用户组ID
+    off_t st_size;            // 文件的字节数
+    struct timespec st_atime; // 访问时间
+    struct timespec st_mtime; // 修改时间
+    struct timespec st_ctime; // 创建时间
+    blksize_t st_blksize;     // best IO block size
+    blkcnt_t st_blocks;       // number of disk blocks allocated
+}
+int stat(char *pathname, struct stat *statbuf);
+int lstat(char *pathname, struct stat *statbuf); // 针对符号链接自身
+int fstat(int fd, struct stat *statbuf);
+int fstatat(int fd, char *pathname, struct stat *buf, int flag);
+```
+
+判断文件类型：
+
+```c
+S_ISREG( st_mode )  // 普通文件
+S_ISDIR( st_mode )  // 目录
+S_ISCHR( st_mode )  // 字符特殊文件
+S_ISBLK( st_mode )  // 块特殊文件
+S_ISFIFO( st_mode ) // 管道
+S_ISLINK( st_mode ) // 符号链接
+S_ISSOCK( st_mode ) // socket
+
+S_TYPEISMQ( struct stat * )  // 消息队列
+S_TYPEISSEM( struct stat * ) // 信号量
+S_TYPEISSHM( struct stat * ) // 共享存储对象
+```
+
+改变文件时间戳：
+
+```c
+struct utimbuf{
+    time_t actime;
+    time_t modtime;
+};
+
+struct timespec{
+    time_t tv_sec;
+    long tv_nsec;
+};
+int utime(char *pathname, struct utimbuf *buf);
+int utimes(char *pathname, struct timeval tv[2]);// 微秒级别
+int futimes(int fd, struct timeval tv[2]);
+int lutimes(int char *pathname, struct timeval tv[2]);
+int utimensat(int dirfd,char *pathname, struct timespec times[2], int flags);
+int futimens(int fd, struct timespec times[2]);
+```
+
+改变文件属主：
+
+```c
+int chown(char *pathname, uid_t owner, gid_t group);
+int lchown(char *pathname, uid_t owner, gid_t group);
+int fchown(int fd, uid_t owner, gid_t group);
+```
+
+检查对文件的访问权限：
+
+```c
+int access(char *pathname, int mode);
+int faccessat( int fd,  char *pathname, int mode, int flag );
+```
+
+设置文件创建掩码:
+
+```c
+mode_t umask(mode_t mask);
+```
+
+更改文件权限:
+
+```c
+int chmod(char *pathname, mode_t mode);
+int fchmod(int fd, mode_t mode);
+```
+
+## 16. 拓展属性
+
+操控文件拓展属性的调用：
+
+```c
+int setxattr(char *pathname, char *name, void *value);
+int lsetxattr(char *pathname, char *name, void *value);
+int fsetxattr(int fd, char *name, void *value, size_t size, int flags);
+
+ssize_t getxattr(char *pathname, char *name, void *value, size_t size);
+ssize_t lgetxattr(char *pathname, char *name, void *value, size_t size);
+ssize_t fgetxattr(int fd, char *name, void *value, size_t size);
+
+int removexattr(char *pathname, char *name);
+int lremovexattr(char *pathname, char *name);
+int fremovexattr(int fd, char *name);
+
+size_t listxattr(char *pathname, char *list, size_t size);
+size_t llistxattr(char *pathname, char *list, size_t size);
+size_t flistxattr(int fd, char *list, size_t size);
+```
+
+## 17. 访问控制列表
+
+![](https://img.codekissyoung.com/2019/10/29/635eb935ba9eccb53a9df56ba1549ec7.png)
+
+## 18. 目录和链接
+
+### 硬链接
+
+![](https://img.codekissyoung.com/2019/10/29/9399b45156a3927d75815acbd97ccaad.png)
+
+### 软链接
+
+![](https://img.codekissyoung.com/2019/10/29/83ef53acc4fa12c53c64a6a4e57b0b7a.png)
+
+```c
+int link(char *existpath,  char *newpath );
+int linkat(int efd,  char *existpath, int nfd,  char *newpath, int flag );
+int unlink(char *pathname );
+int unlinkat(int fd,  char *pathname, int flag );
+int remove(char *pathname ); // 解除对一个文件或者目录的链接
+```
+
+对文件重命名
+
+```c
+int rename(char *oldname,  char *newname );
+int renameat(int oldfd,  char *oldname, int newfd,  char *newname );
+```
+
+创建符号链接
+
+```c
+int symlink(char *actualpath,  char *sympath );
+int symlinkat(char *actualpah, int fd,  char *sympath );
+```
+
+打开符号链接本身，读取它本身的内容
+
+```c
+ssize_t readlink(char *restrict pathname, char *restrict buf, size_t bufsize );
+ssize_t readlinkat(int fd,  char *restrict pathname, char *restrict buf, size_t bufsize );
+```
+
+创建/删除目录
+
+```c
+int mkdir(char *pathname, mode_t mode ); // 创建目录
+int mkdirat(int fd,  char *pathname, mode_t mode );
+int rmdir(char *pathname ); // 删除目录
+```
+
+读目录
+
+```c
+DIR *opendir(char *pathname ); // 打开目录
+DIR *fdopendir(int fd );
+struct dirent *readdir(DIR *dp ); // 获取当前目录信息
+void rewinddir( DIR *dp ); // 让readdir读取的目录流回到起点
+int closedir( DIR *dp );    // 关闭目录读取流
+long telldir( DIR *dp );
+void seekdir( DIR *dp, long loc );
+int dirfd(DIR *dirp); // 返回目录流的文件描述符;-1 on error
+```
+
+修改进程当前工作目录
+
+```c
+int chdir(char *pathname ); // 改变当前目录
+int fchdir(int fd );
+char *getcwd( char *buf, size_t size ); // 获取当前工作目录
+```
+
+遍历目录树,并使用自定义函数处理每一个文件:
+
+```c
+int nftw(char *dirpath, 
+        int (*func)(char *pathname, struct stat *statbuf, int typeflag, struct FTW *ftwbuf), 
+        int nopenfd,
+        int flags );
+```
+
+修改进程根目录（运行该进程的目录）：
+
+```c
+int chroot(char *pathname);
+```
+
+从相对路径获取绝对路径:
+
+```c
+char *realpath(char *pathname, char *resolved_path);
+char *dirname(char *pathname);  // 获取目录路径
+char *basename(char *pathname); // 获取路径里最后的文件名
+```
+
+## 19. 监控文件事件
+
+Linux 提供`inotify`机制用于监控文件事件。
+
+![](https://img.codekissyoung.com/2019/10/29/375e644ee54fd9e226c1e180c3f1d29e.png)
+
+```c
+int inotify_init(void);
+int inotify_add_watch(int fd,char *pathname, uint32_t mask);
+int inotify_rm_watch(int fd,uint32_t wd);
+```
+
+![](https://img.codekissyoung.com/2019/10/29/8417c3fb2723c4136cedf6ca8ea9ca40.png)
+![](https://img.codekissyoung.com/2019/10/29/4bd912608b08dcf4830b354289408f05.png)
+
+## 20. 信号: 基本概念
+
+![](https://img.codekissyoung.com/2019/10/29/c12318f057d8a9ca502dca73d33b40c2.png)
+![](https://img.codekissyoung.com/2019/10/29/abd18fc9500b82268abe01b891d7f362.png)
+
+### signal信号机制
+
+现在已经不推荐使用`signal`信号机制了，因为有更好的`sigaction`机制。
+
+```c
+void (*signal(int sig, void ( *handler)(int)))(int);
+void handler(int sig){
+
+}
+
+int kill(pid_t pid, int sig);       // 向进程发送信号
+int raise(int sig);                 // 进程向自身发送信号
+int killpg(pid_t pgrp, int sig);    // 向某一进程组的所有成员发送一个信号
+char *strsignal(int sig);           // 获取信号的字符串说明
+void psignal(int sig, char *msg);   // 向stderr发送错误报告
+```
+
+![](https://img.codekissyoung.com/2019/10/29/590b69d73656fa1bf3e6760109a2825e.png)
+
+信号集,表示一组不同的信号：
+
+```c
+sigset_t; // 信号集
+int sigemptyset(sigset_t *set); // 初始化信号集
+int sigfillset(sigset_t *set);
+int sigaddset(sigset_t *set, int sig); // 添加信号
+int sigdelset(sigset_t *set, int sig); // 删除信号
+int sigismember(sigset_t *set, int sig); // 是否信号集成员
+int sigandset(sigset_t *set, sigset_t *left, sigset_t *right);
+int sigorset(sigset_t *set, sigset_t *left, sigset_t *right);
+int sigisemptyset(sigset_t *set);
+```
+
+信号掩码，阻塞信号传递，直到解除为止：
+
+```c
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+how:
+    SIG_BLOCK       添加到掩码集合中
+    SIG_UNBLOCK     从掩码集合中
+    SIG_SETMASK     设置掩码集合
+```
+
+被屏蔽后的信号，一直处于等待状态，下面函数可以查询到它们：
+
+```c
+int sigpending(sigset_t *set);
+```
+
+使用`signal`处理信号，同一类型的信号在阻塞时到达 `N` 个，但是只通知进程 `1` 次，使用`sigaction`则可以进行更加细致的控制。
+
+### sigaction可靠信号机制
+
+```c
+struct sigaction{
+    void (*sa_handler)(int);
+    sigset_t sa_mask;
+    int sa_flags;
+    void (*sa_restorer)(void);
+};
+int sigaction(int sig, struct sigaction *act, struct sigaction *oldact);
+int pause(void); // 暂停程序的执行,直到接收到信号
+```
+
+## 21. 信号处理器函数
+
+```c
+void abort(void);
+int sigaltstack(stack_t *sigstack, stack_t *old_sigstack);
+```
+
+## 22. 信号：高级特性
+
+`Abort`信号到达时，就会产生核心转储文件`core`，将它调入`gdb`中，就可以查看信号到达时，程序代码和数据的状态。
+
+```c
+$ ulimit -c unlimited       # 开启 core 文件
+```
+
+`SIGKILL`和`SIGSTOP`被设计为默认行为，无法用`signal`和`sigaction`修改，无法阻塞。这样我们可以通过这两个信号来杀死一个失控的进程。
+
+![](https://img.codekissyoung.com/2019/10/29/047bfee3c0db42b8df2bf5e34d7db7c6.png)
+
+## 23. 定时器与休眠
+
+
+## 24. 进程的创建
+
+![](https://img.codekissyoung.com/2019/10/29/f94d854b5835af3771e01b1d7904d504.png)
+
+```c
+pid_t fork(void); // pid of child on parent process; 0 on child on child process; -1 on error
+```
+
+
+## 资源限制
+
 - 每个进程都会消耗打开文件、内存、CPU时间等资源，可以设置消耗这类资源的一个上限
 - soft limit 限制了进程可以消耗的资源总量
 - hard limit 限制了soft limit 调整上线,用户进程的 hard limit 值能调低 ， 不能调高
@@ -169,6 +790,7 @@ Linux 2.2 之后，将`root`的特权分为了一组相互独立的单元，称�
 - 线程可以在多处理器硬件的并行处理中获得支持
 
 ## 进程组 和 shell 任务控制
+
 - `ls -l |sort -ksn |less` shell 执行的每个命令都会新开一个进程处理,这些进程都处于一个进程组中，每个进程都有相同的 **进程组标识符** , 也即是进程组中某个进程(称为进程组长)的进程ID
 
 ## 会话 控制终端 和 控制进程
@@ -180,17 +802,6 @@ Linux 2.2 之后，将`root`的特权分为了一组相互独立的单元，称�
 - 关闭终端，会发送SIGHUP信号给控制进程
 - 前台进程组(前台任务): 一个会话只能有一个进程组处于前台
 - 后台进程组(后台任务): 会话可以有多个后台进程组, 终端输入`ctrl + z`可将前台进程组挂起成为一个后台进程组
-
-## 日期与时间
-
-- 真实时间: UTC 时间戳
-- 进程时间: 进程起来后，占用CPU的时间总量
-
-## B/S 架构
-
-## 实时性
-
-## /proc 文件系统
 
 ## 系统调用
 
