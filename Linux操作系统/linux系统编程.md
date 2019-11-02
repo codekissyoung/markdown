@@ -14,9 +14,23 @@
 
 系统调用、库函数、标准C语言函数库`glibc`、错误处理、可移植性。
 
+### 外壳函数
+
+- `glibc`封装`系统调用`成库函数，称为“外壳函数”，外壳函数通过 栈 接收参数，并且将将这些参数写入内核规定的寄存器
+- 所有系统调用进入内核的方式是相同的，有个特殊的寄存器`%eax`存入系统调用编号，用以区分每个系统调用
+- 外壳函数 执行一条 中断指令 `int 0x80` ，将处理器由用户态切换到核心态，并执行系统中断 `0x80` 的中断矢量所指向的代码
+- 响应中断 `0x80`, 内核调用 `system_call()` 例程 
+  - 内核栈中保存寄存器的值 
+  - 检查系统调用编号的有效性 
+  - 索引服务例程的列表，调用对应例程,检查参数的有效性，执行例程任务，将结果状态返回给 `system_call` 例程
+- 从内核栈中恢复例程的各个寄存器值，将系统调用返回值置于栈中
+- 返回至外壳函数，同时将处理器切换回用户态
+- 如果系统调用出错，会返回一个负值给外壳函数，C 标准库的外壳函数对该负值 取反，并且将结果拷贝至 全局变量 `errno` , 同时 以 `-1` 作为外壳函数的返回值
+
 ## 4. 通用文件I/O模型
 
-I/O 通用性, 同一套系统调用(open read write close) 可以用于所有的文件类型，包括设备文件，由内核将这些调用转化为相应的文件系统操作，或者设备驱动操作，就本质而言，内核只提供一种文件类型: 字节流序列，没有文件结束符的概念, 读取文件时，如果无数据返回，便会认为抵达文件末尾。
+I/O 通用性, 同一套系统调用可以用于所有的文件类型，包括设备文件，由内核将这些调用转化为相应的文件系统操作，或者设备驱动操作，就本质而言，内核只提供一种文件类型: 字节流序列，没有文件结束符的概念, 读取文件时，如果无数据返回，便会认为抵达文件末尾。
+
 文件描述符、`flags`文件访问模式、`mode`新建文件权限。
 
 ```c
@@ -649,6 +663,12 @@ int inotify_rm_watch(int fd,uint32_t wd);
 
 ## 20. 信号: 基本概念
 
+
+- 也称为软件中断
+- 内核、其他进程、进程自身都可以向进程发送信号
+- 发送信号情况: Ctrl + C 、子进程终止、进程设定的定时器到期、进程尝试访问无效的内存地址
+- 收到信号的进程采取: 1. 忽略信号 2. 被信号杀死 3. 挂起，等待新信号唤醒
+
 ![](https://img.codekissyoung.com/2019/10/29/c12318f057d8a9ca502dca73d33b40c2.png)
 ![](https://img.codekissyoung.com/2019/10/29/abd18fc9500b82268abe01b891d7f362.png)
 
@@ -744,17 +764,253 @@ $ ulimit -c unlimited       # 开启 core 文件
 
 ```c
 pid_t fork(void); // pid of child on parent process; 0 on child on child process; -1 on error
+pid_t vfork(void);
 ```
 
+## 25. 进程的终止
 
-## 资源限制
+```c
+void _exit(int status); // 系统调用
+void exit(int status);  // 库函数
+void atexit(void (*func)(void); // 注册退出时自动调用的函数
+int  on_exit(void (*func)(int,void*),void *arg); // 同上
+```
 
-- 每个进程都会消耗打开文件、内存、CPU时间等资源，可以设置消耗这类资源的一个上限
-- soft limit 限制了进程可以消耗的资源总量
-- hard limit 限制了soft limit 调整上线,用户进程的 hard limit 值能调低 ， 不能调高
-- 系统调用 `setrlimit()`调整限制
+## 26. 监控子进程
 
-## 内存映射
+```c
+pid_t wait(int *status); // 阻塞等待任一子进程终止
+pid_t waitpid(pid_t pid, int *status, int options); // 等待指定pid的子进程退出
+pid_t waitid(idtype_t idtype, int_d id, siginfo_t *infop, int options);
+pid_t wait3(int *status, int options, struct rusage *rusage);
+pid_t wait4(pid_t pid,int *status,int options,struct rusage *rusage);
+```
+
+## 27. 新程序的执行
+
+```c
+int execve(char *pathname, char *argv[], char *envp[]);
+int execle(char *pathname, char *arg,);
+int execlp(char *pathname, char *arg, (char *)NULL);
+int execvp(char *pathname, char *argv[]);
+int execv (char *pathname, char *argv[]);
+int execl (char *pathname, char *arg, (char *)NULL);
+int system(char *command);  // 执行 shell 命令
+```
+
+## 28. 程序创建和程序执行
+
+### 程序记账
+
+```c
+int acct(char *acctfile);
+```
+
+### 系统调用clone
+
+`clone()`在子进程创建期间进行精确控制，它主要用于线程库的实现。
+
+```c
+int clone(int (*func)(void*), void *child_stack, int flags, void *func_arg, ...);// -1 on error
+```
+
+### exec和fork对进程属性的影响
+
+![](https://img.codekissyoung.com/2019/10/30/482b26e204ea017c90a3f1e76efa8508.png)
+![](https://img.codekissyoung.com/2019/10/30/19cde51fd7cefed488dc030467982b2d.png)
+![](https://img.codekissyoung.com/2019/10/30/b0c659c7d8430e4e2d8bbcb91254645e.png)
+![](https://img.codekissyoung.com/2019/10/30/0a4f7174df14e8be6b81a7130cdf2587.png)
+
+
+## 29. 线程：介绍
+
+![](https://img.codekissyoung.com/2019/10/30/25cc5ff5d5bda9482594b86707d04c0a.png)
+
+```c
+#include <pthread.h>
+int pthread_create(pthread_t *thread,  pthread_attr_t *attr,void *(*start)(void *),void *arg);
+pthread_t pthread_self(void); // 获取自身线程ID
+void pthread_exit( void *retval ); // 线程退出
+
+int pthreat_equal(pthread_t tid1,pthread_t tid2); // 两个线程相等？ 是 则返回 0
+int pthread_join( pthread_t thread, void **retval );// 获得某线程的退出状态
+int pthread_cancel(pthread_t tid); // 取消同一进程中的其他线程
+
+int pthread_detach(pthread_t thread); // 线程返回后，自己自动清理，不返回数据给join
+```
+
+## 30. 线程同步
+
+互斥量`mutexe`帮助线程同步对共享资源的使用。条件变量`condition variable`允许线程相互通知共享变量的状态发生了变化。
+
+### 互斥量
+
+代码临界区：访问共享资源的代码片段，该片段的执行必须是原子的，不能由其他线程中断。
+
+互斥量有两种状态：锁定 和 未锁定,任何时候，至多只有一个线程可以锁定该互斥量。它采用的是机器语言级别的原子操作来实现的。使用互斥量来保护临界区：
+
+![](https://img.codekissyoung.com/2019/10/30/4fca38f26013ff541be714ea18279722.png)
+
+```c
+pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER; // 初始化一个静态互斥量
+int pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutexattr_t *attr); // 动态互斥量
+int pthread_mutex_lock(pthread_mutex_t *mutex);     // 锁定
+int pthread_mutex_unlock(pthread_mutex_t *mutex);   // 解锁
+int pthread_mutex_destory(pthread_mutex_t *mutex);  // 销毁一个互斥量
+```
+
+### 条件变量
+
+```c
+pthread_cont_t cond = PTHREAD_COND_INITIALIZER; // 初始化一个条件变量
+int pthread_cond_init(pthread_cond_t *cond, pthread_condattr_t *attr); // 动态初始化条件变量
+int pthread_cond_signal(pthread_cond_t *cond); // 只通知一条阻塞的线程
+int pthread_cond_broadcast(pthread_cond_t *cond); // 确保通知所有阻塞的线程
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex); // 阻塞，等待通知
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, struct timespec *abstime);
+```
+
+## 31. 线程安全和每线程存储
+
+线程安全函数：可同时被多个线程并发安全调用，称之为线程安全函数。
+
+可重入函数：避免对全局变量和静态变量的使用，只使用局部栈，保证每个`caller`调用时不会互相产生影响。
+
+```c
+pthread_once_t once_var = PTHREAD_ONCE_INIT;
+int pthread_once(pthread_once_t *once_control, void(*init)(void)); // 一次性初始化
+void init(void) { }
+```
+
+### 线程特有数据API
+
+```c
+int pthread_key_create(pthread_key_t *key, void(*destructor)(void*));
+int pthread_setspecific(pthread_key_t key, void *value);
+void *pthread_getspecific(pthread_key_t key);
+```
+
+![](https://img.codekissyoung.com/2019/10/31/d1c9f53c10764dd2aa05ce6294720909.png)
+
+
+## 32. 线程取消
+
+```c
+int pthread_cancel(pthread_t thread);
+int pthread_setcancelstate(int state, int *oldstate);
+int pthread_setcanceltype(int type, int *oldtype);
+int pthread_testcancel(void);
+
+// 线程可以设置退出时的清理函数 使用宏实现的
+void pthread_cleanup_push(void (*rtn)(void*), void *arg);
+void pthread_cleanup_pop(int execute);
+```
+
+## 33. 线程：更多细节
+
+信号模型时基于进程设计的，比`Pthreads`早几十年，所以两者之间存在一些明显的冲突，最好就是避免同时使用两者。
+
+```c
+int pthread_sigmask(int how, sigset_t *set, sigset_t *oldset);
+int pthread_kill(pthread_t thread, int sig);
+int pthread_sigqueue(pthread_t thread, int sig, union sigval value);
+int sigwait(sigset_t *set, int *sig);
+```
+
+## 34. 进程组、会话和作业控制
+
+进程组和会话是为支持`shell`作业控制而定义的抽象概念。
+
+![](https://img.codekissyoung.com/2019/10/31/e1b23666422d9855f3d6b18409dfc40e.png)
+
+```c
+pid_t getpgrp(void); // 进程组id
+int   setpgid(pid_t pid, pid_t pgid); // 修改某个进程的进程组id
+pid_t getsid(pid_t pid); // 会话id
+pid_t setsid(void); // 新建一个会话
+char *ctermid(char *ttyname); // 返回表示控制终端的路径名
+pid_t tcgetpgrp(int fd);    // 获取前台进程组 id
+int   tcsetpgrp(int fd, pid_t pgid); // 修改一个终端的前台进程组
+```
+
+## 35. 进程优先级和调度
+
+```c
+int getpriority(int which, id_t who);
+int setpriority(int which, id_t who, int prio);
+```
+
+### 实时进程调用API
+
+```c
+#include <sched.h>
+int sched_get_priority_min(int policy);
+int sched_get_priority_max(int policy);
+int sched_setscheduler(pid_t pid, int policy, struct sched_param *param); // 修改调度策略和优先级
+int sched_setparam(); // 只修改调度策略
+int sched_getscheduler(pid_t pid); // 获取调度策略
+int sched_getparam(pid_t pid, struct shced_param *param); // 获取优先级
+int sched_yield(void); // 自愿释放CPU
+int sched_rr_get_interval(pid_t pid, struct timespec *tp); // 时间片
+```
+
+## 36. 进程资源
+
+每个进程都会消耗打开文件、内存、CPU时间等资源，可以设置消耗这类资源的一个上限
+
+```c
+int getrusage(int who, struct rusage *res_usage); // 返回进程用掉的资源的统计信息
+int getrlimit(int resource, struct rlimit *rlim); // 返回进程的资源使用限制
+int setrlimit(int resource, struct rlimit *rlim); // 设置资源使用限制
+```
+
+## 37. DAEMON守护进程
+
+## 38. 编写安全的特权程序
+
+## 39. Linux能力
+
+## 40. 登录记账
+
+## 41. 共享库基础
+
+## 42. 共享库高级特性
+
+## 43. 进程间通信简介
+
+![](https://img.codekissyoung.com/2019/10/31/10c231c3d28b421a92446a04ac1a315c.png)
+![](https://img.codekissyoung.com/2019/10/31/46ff0695cf6b4783484accd04b374a5f.png)
+![](https://img.codekissyoung.com/2019/10/31/130600ff61102c7fe61da523e7111856.png)
+
+
+## 44. 管道和FIFO
+
+管道其实是一个在内核内存中维护的缓冲器。
+
+管道用于在相关进程间通信，而`FIFO`是管道的变种，用于在任意进程之间通信。
+
+```c
+int pipe(int fields[2]);
+```
+
+![](https://img.codekissyoung.com/2019/10/31/c5f645be12774ab9e46c057ccb71339e.png)
+
+
+### 有名管道FIFO
+
+```c
+int mkfifo(char *pathname, mode_t mode);
+```
+
+## 45. System V IPC 介绍
+
+## 46. System V 消息队列
+
+## 47. System V 信号量
+
+## 48. System V 共享内存
+
+## 49. 内存映射
 
 - 系统调用 `mmap()` 创建内存映射
 - 1. 文件映射: 文件部分区域 映射到 进程的虚拟内存 , 这样对该虚拟内存的操作就会转化为对相应文件区域的操作, 映射页面会按需自动从文件中加载
@@ -764,63 +1020,63 @@ pid_t fork(void); // pid of child on parent process; 0 on child on child process
 - 创建映射传入的标志参数: 标志为私有，则进程对映射内容的修改 对于其他进程是不可见的；标志为共享 则是可见的
 - 内存映射用途: 1. 初始化文本段 2. 内存分配(内存内容填充0) 3. 文件I/O(即映射内存I/O) 4. 进程间通信(共享映射通信)
 
+## 50. 虚拟内存操作
 
-## 进程间通信 以及 同步
+## 51. POSIX IPC 介绍
 
-- 信号: 用来表示事件的发生
-- 管道: 在进程间传递数据
-- 套接字: 不同主机上运行的进程之间传递数据
-- 文件锁定: 防止其他进程读取或者更新内容, 允许进程对文件的部分区域加以锁定
-- 消息队列: 用于在进程间交换数据包
-- 信号量: 用于同步进程动作
-- 共享内存: 多个进程共享一块内存
+## 52. POSIX 消息队列
 
-## 信号
+消息队列: 用于在进程间交换数据包
 
-- 也称为软件中断
-- 内核、其他进程、进程自身都可以向进程发送信号
-- 发送信号情况: Ctrl + C 、子进程终止、进程设定的定时器到期、进程尝试访问无效的内存地址
-- 收到信号的进程采取: 1. 忽略信号 2. 被信号杀死 3. 挂起，等待新信号唤醒
+## 53. POSIX 信号量
 
-## 线程
+信号量: 用于同步进程动作
 
-- 线程之间通过全局变量来实现数据共享
-- 线程共享代码段、数据段和堆，但是每个线程都有属于自己的栈
-- 线程API提供条件变量和互斥机制，线程之间也可实现同步 和 互相通信
-- 线程可以在多处理器硬件的并行处理中获得支持
+## 54. POSIX 共享内存
 
-## 进程组 和 shell 任务控制
+共享内存: 多个进程共享一块内存
 
-- `ls -l |sort -ksn |less` shell 执行的每个命令都会新开一个进程处理,这些进程都处于一个进程组中，每个进程都有相同的 **进程组标识符** , 也即是进程组中某个进程(称为进程组长)的进程ID
+## 55. 文件加锁
 
-## 会话 控制终端 和 控制进程
+文件锁定: 防止其他进程读取或者更新内容, 允许进程对文件的部分区域加以锁定
 
-- 会话 Session 是多组进程组的集合，会话内所有进程都具有相同的会话标识符
-- 会话首进程(Session Leader)是指创建会话的进程,它的进程ID就是会话ID
-- 通常登录shell就是会话首进程
-- 一个终端只能被一个会话占用,shell就是该终端的控制进程
-- 关闭终端，会发送SIGHUP信号给控制进程
-- 前台进程组(前台任务): 一个会话只能有一个进程组处于前台
-- 后台进程组(后台任务): 会话可以有多个后台进程组, 终端输入`ctrl + z`可将前台进程组挂起成为一个后台进程组
+## 56. SOCKET 介绍
 
-## 系统调用
+套接字: 不同主机上运行的进程之间传递数据
 
-- 进程请求内核以自己名义执行某些动作(创建新进程、I/O、通信管道)的机制
-- 系统调用将`CPU`由`用户态`切换到`核心态`
-- 系统调用的组成是固定的，每个调用由一个数字来标识
-- 系统调用可以传入一套参数，允许`用户空间`与`内核空间`相互传递信息
-- 用户进程位于用户空间，内核位于系统空间，磁盘只能被内核直接访问。程序要读取磁盘上内容，使用`read()`函数，它的代码在内核中，所以执行权会从用户代码转移到内核代码。
-- 当运行内核代码时，CPU工作在超级用户模式，这对应于一些特殊的堆栈和内存环境,必须在系统调用发生时建好。系统调用结束后，CPU又要切换回用户模式，需要把堆栈和内存环境恢复成用户程序运行时状态，这种切换会消耗很多时间。
+## 57. SOCKET : Unix Domain
 
-## 外壳函数
+## 58. SOCKET : TCP/IP 网络基础
 
-- glibc 封装`系统调用`成 c 函数，称为 wrapper(外壳)函数，外壳函数通过 **栈** 接收参数，并且将将这些参数写入内核规定的寄存器
-- 所有系统调用进入内核的方式是相同的，有个特殊的寄存器`%eax`存入系统调用编号，用以区分每个系统调用
-- 外壳函数 执行一条 中断指令 `int 0x80` ，将处理器由用户态切换到核心态，并执行系统中断 `0x80` 的中断矢量所指向的代码
-- 响应中断 `0x80`, 内核调用 `system_call()` 例程， 
-    1. 内核栈中保存寄存器的值 
-    2. 检查系统调用编号的有效性 
-    3. 索引服务例程的列表，调用对应例程,检查参数的有效性，执行例程任务，将结果状态返回给 system_call() 例程
-- 从内核栈中恢复例程的各个寄存器值，将系统调用返回值置于栈中
-- 返回至外壳函数，同时将处理器切换回用户态
-- 如果系统调用出错，会返回一个负值给外壳函数，C 标准库的外壳函数对该负值 取反，并且将结果拷贝至 全局变量 `errno` , 同时 以 `-1` 作为外壳函数的返回值
+## 59. SOCKET : Internet Domain
+
+## 60. SOCKET : 服务器设计
+
+## 61. SOCKET : 高级主题
+
+## 62. 终端
+
+## 63. 其他备选的I/O模型
+
+都是为了解决一个问题：同时检查多个文件描述符，看它们是否准备好了执行`I/O`操作。
+
+`Libevent`是这样的一个软件层，它提供了检查文件描述符IO事件的抽象，它底层能够识别并应用`select()`、`poll()`、`信号驱动IO`、`epoll`、`Solaris的/dev/pull`和`BSD的kqueue`接口。
+
+#### select系统调用
+
+```c
+#include <sys/select.h>
+// return ready fd; 0 on timeout; -1 on error
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+
+void FD_ZERO(fd_set *fdset);
+void FD_SET(int fd, fd_set *fdset); // 将 fd 添加到 fdset 中
+void FD_CLR(int fd, fd_set *fdset); // 将 fd 从 fdset 中移除
+int  FD_ISSET(int fd, fd_set *fdset);
+```
+
+
+
+
+## 64. 伪终端
+

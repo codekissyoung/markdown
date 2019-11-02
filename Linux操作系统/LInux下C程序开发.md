@@ -833,31 +833,6 @@ int tcsetpgrp(int fd, pid_t pgrpid);
 pid_t tcgetsid(int fd);
 ```
 
-- linux内核中对进程和线程的实现是不加区分的
-- 一个进程中的每个线程都有自己的运行环境上下文，包括线程ID , 一组寄存器 ，堆栈 ，信号屏蔽字
-- 进程的所有资源都被线程共享,包括可执行程序代码，全局变量，堆空间，栈空间，文件描述符
-- 进程只是用来分配资源的实体，而真正负责执行的是线程
-- 单进程可以看作是只有一个线程的进程
-
-## 相关代码
-
-```c
-#include <pthread.h>
-pthread_t pthread_self(void); // 得到一个线程的线程ID
-int pthreat_equal(pthread_t tid1,pthread_t tid2); // 两个线程相等？ 是 则返回 0
-int pthread_create( 
-    pthread_t *restrict tidp,  pthread_attr_t *restrict attr,
-    void *(*start_rtn)(void *),void *restrict arg); //创建一个线程
-
-void pthread_exit( void *rval_ptr ); // 线程退出
-int pthread_join( pthread_t thread, void **rval_ptr );// 获得某线程的退出状态
-int pthread_cancel(pthread_t tid); // 取消同一进程中的其他线程
-
-// 线程可以设置退出时的清理函数 使用宏实现的
-void pthread_cleanup_push(void (*rtn)(void*), void *arg);
-void pthread_cleanup_pop(int execute);
-```
-
 # 信号基础
 - 信号通信是一种典型的异步通信
 - 信号又称为软件中断,一个进程一但收到信号，就会打断原来的执行流程来处理该信号
