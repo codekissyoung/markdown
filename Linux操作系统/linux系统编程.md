@@ -823,52 +823,7 @@ int clone(int (*func)(void*), void *child_stack, int flags, void *func_arg, ...)
 
 
 ## 29. 线程：介绍
-
-![](https://img.codekissyoung.com/2019/10/30/25cc5ff5d5bda9482594b86707d04c0a.png)
-
-```c
-#include <pthread.h>
-int pthread_create(pthread_t *thread,  pthread_attr_t *attr,void *(*start)(void *),void *arg);
-pthread_t pthread_self(void); // 获取自身线程ID
-void pthread_exit( void *retval ); // 线程退出
-
-int pthreat_equal(pthread_t tid1,pthread_t tid2); // 两个线程相等？ 是 则返回 0
-int pthread_join( pthread_t thread, void **retval );// 获得某线程的退出状态
-int pthread_cancel(pthread_t tid); // 取消同一进程中的其他线程
-
-int pthread_detach(pthread_t thread); // 线程返回后，自己自动清理，不返回数据给join
-```
-
 ## 30. 线程同步
-
-互斥量`mutexe`帮助线程同步对共享资源的使用。条件变量`condition variable`允许线程相互通知共享变量的状态发生了变化。
-
-### 互斥量
-
-代码临界区：访问共享资源的代码片段，该片段的执行必须是原子的，不能由其他线程中断。
-
-互斥量有两种状态：锁定 和 未锁定,任何时候，至多只有一个线程可以锁定该互斥量。它采用的是机器语言级别的原子操作来实现的。使用互斥量来保护临界区：
-
-![](https://img.codekissyoung.com/2019/10/30/4fca38f26013ff541be714ea18279722.png)
-
-```c
-pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER; // 初始化一个静态互斥量
-int pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutexattr_t *attr); // 动态互斥量
-int pthread_mutex_lock(pthread_mutex_t *mutex);     // 锁定
-int pthread_mutex_unlock(pthread_mutex_t *mutex);   // 解锁
-int pthread_mutex_destory(pthread_mutex_t *mutex);  // 销毁一个互斥量
-```
-
-### 条件变量
-
-```c
-pthread_cont_t cond = PTHREAD_COND_INITIALIZER; // 初始化一个条件变量
-int pthread_cond_init(pthread_cond_t *cond, pthread_condattr_t *attr); // 动态初始化条件变量
-int pthread_cond_signal(pthread_cond_t *cond); // 只通知一条阻塞的线程
-int pthread_cond_broadcast(pthread_cond_t *cond); // 确保通知所有阻塞的线程
-int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex); // 阻塞，等待通知
-int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, struct timespec *abstime);
-```
 
 ## 31. 线程安全和每线程存储
 
@@ -1074,9 +1029,6 @@ void FD_SET(int fd, fd_set *fdset); // 将 fd 添加到 fdset 中
 void FD_CLR(int fd, fd_set *fdset); // 将 fd 从 fdset 中移除
 int  FD_ISSET(int fd, fd_set *fdset);
 ```
-
-
-
 
 ## 64. 伪终端
 
