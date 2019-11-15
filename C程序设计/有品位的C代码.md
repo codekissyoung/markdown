@@ -240,16 +240,81 @@ HANDLER signal(int, HANDLER);
 
 #### 先取值 再移动
 
-对于`*p++`这种写法的代码在 C 程序里非常常见，几乎都成了一种常识。
+```c
+char ch  = 'a';
+char *cp = &ch;
+```
+
+对于上述两个变量的表达式如下，圆形粗体线代表了表达式执行后的返回值，方框粗体则表示作为左值时，表达式标示的位置。
+
+| 表达式 | 左值 | 右值 |
+| :------: | :----: | :----: |
+| `ch` | ![](https://img.codekissyoung.com/2019/11/15/f42fe19d42234f67fd0cf590fd41d162.png) | ![](https://img.codekissyoung.com/2019/11/15/5a1be89e1c93ad69a52142451ec33abe.png) |
+| `&ch` | 非法 | ![](https://img.codekissyoung.com/2019/11/15/ac209a2cc8cf3701f6c256026f31b007.png) |
+| `cp` |![](https://img.codekissyoung.com/2019/11/15/a9c8e95f121106cb1b999571f21eef57.png)|![](https://img.codekissyoung.com/2019/11/15/70e2a246e30b558b8e5570e5cd9d513c.png)|
+| `&cp`|非法|![](https://img.codekissyoung.com/2019/11/15/02368464b1237071a9d06bc25102e250.png)
+|`*cp + 1`|非法|![](https://img.codekissyoung.com/2019/11/15/4754fa131e4095cdcddbd07dabfc897d.png)|
+|`*(cp+1)`|![](https://img.codekissyoung.com/2019/11/15/76838fae3d52f6200242f2eca7bbbf09.png)|![](https://img.codekissyoung.com/2019/11/15/c56ad0d3ef218bbce5a29845f3359353.png)|
+|`++cp`|非法|![](https://img.codekissyoung.com/2019/11/15/1a3fe2f7f5a6ebc7f94304882893c07f.png)|
+|`cp++`|非法|![](https://img.codekissyoung.com/2019/11/15/84d0abdc65c515a84988705201383d3f.png)|
+|`*++cp`|![](https://img.codekissyoung.com/2019/11/15/e0b5ac02036b45243b02fe55a72653bb.png)|![](https://img.codekissyoung.com/2019/11/15/44969dc83eec3ff76fb88c2f1a13270b.png)|
+|`*cp++`|![](https://img.codekissyoung.com/2019/11/15/a9db6395e3a52e9e56d9bf17020e6dca.png)|![](https://img.codekissyoung.com/2019/11/15/19918762e496f351768aca2d21e6895f.png)|
+|`(*cp)++`|非法|![](https://img.codekissyoung.com/2019/11/15/f3e4bbcc2f7944035b4f619981c5fdc4.png)|
+|`++*cp`|非法|![](https://img.codekissyoung.com/2019/11/15/f3e4bbcc2f7944035b4f619981c5fdc4.png)|
+|`++*++cp`|非法|![](https://img.codekissyoung.com/2019/11/15/a1e61115d649e424efd0de5cf02a6763.png)|
+|`++*cp++`|非法|![](https://img.codekissyoung.com/2019/11/15/6d8436cd2e4e7390be9daa06d1b80e96.png)|
+
+通过上表，对于`*cp++`这样的表达式，首先它作为“左值”和“右值”，都是对`cp`指针的当前指向位置进行操作，操作完毕后，再将指向位置移动一位。所以非常经常被用来编写出简短的代码：
 
 ```c
-// 将指针 t 指向的字符串复制到指针 s 指向的内存区域
+size_t strlen(char *string){
+    int length = 0;
+    while( *string++ != '\0' )
+        length++;
+    return length;
+}
 void strcpy( char *s, char *t )
 {
     while( *s++ = *t++ )
         ;
 }
 ```
+
+## 结构体
+
+```c
+typedef struct{
+    int a;
+    short b[2];
+} Ex2;
+typedef struct EX{
+    int  a;
+    char b[3];
+    Ex2  c;
+    struct EX *d;
+}
+Ex   x = { 10, "Hi", { 5, {-1, 25} }, 0 };
+Ex *px = &x;
+Ex   y;
+x.d    = &y;
+```
+
+![](https://img.codekissyoung.com/2019/11/15/05ccb1c7b2348be391e65aab35d77454.png)
+
+| 表达式 | 左值 | 右值 |
+| :----: | :--: | :--: |
+| `px` | ![](https://img.codekissyoung.com/2019/11/15/96e1910043dc8b48e68619e4a58b1517.png) | ![](https://img.codekissyoung.com/2019/11/15/47ca71d4dc26e50df65c4c45fd784d98.png) |
+|`*px`| x所在空间|![](https://img.codekissyoung.com/2019/11/15/97ecddd63301c9e9f02560a2a4d7e7a0.png)|
+|`px->a`    | `a`所在空间 |![](https://img.codekissyoung.com/2019/11/15/a269271354023dc276f38a15e6e3bcca.png)|
+|`&px->a`|非法|![](https://img.codekissyoung.com/2019/11/15/471a461abb366acef5270c147aab09e7.png)|
+|`px->b`|非法|![](https://img.codekissyoung.com/2019/11/15/f23ad920ed4f7089182513f03f298f06.png)|
+|`px->b[1]`| `i`所在空间 | ![](https://img.codekissyoung.com/2019/11/15/72251174c03d4136ff7292c863f65a59.png) | 
+|`px->c`| `c`所在空间 | ![](https://img.codekissyoung.com/2019/11/15/d919f19666749b2ca4f7a429481b362f.png) |
+|`px->c.a`|`5`所在空间|![](https://img.codekissyoung.com/2019/11/15/f86ff0dc3bd90a3f5b5a4301c2d075b9.png)|
+|`*px->c.b` `px->c.b[0]`|`-1`所在空间|![](https://img.codekissyoung.com/2019/11/15/77984dc8f90da954bba4966a535d8bfd.png)|
+|`px->d`|![](https://img.codekissyoung.com/2019/11/15/39255dc2652186c7710ac35429d79db0.png)| `&y` |
+|`*px->d`| y所在空间 | ![](https://img.codekissyoung.com/2019/11/15/d183581b7e5a4a9857d35c78bd02f318.png) |
+|`px->d->c.b[1]`|空间|![](https://img.codekissyoung.com/2019/11/15/192a56c48bb73f521a9a472102ecdf89.png)|
 
 ## 错误处理
 
