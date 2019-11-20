@@ -1,7 +1,7 @@
-# 曹开彦
+# 简历
 
 状态 ：离职 / 24岁 / 男
-联系 ：18027655013 / 1162097842@qq.com
+联系 ：1802765xxxx / 116209xxxx@qq.com
 学历 ：2016届本科 / 中国地质大学(北京) / 地质学遥感方向
 博客 ：blog.codekissyoung.com
 代码 ：github.com/codekissyoung
