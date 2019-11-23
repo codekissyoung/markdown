@@ -1,18 +1,11 @@
-# php作为命令行脚本
-
-如果对 PHP 命令行脚本感兴趣（例如在离线状态下，根据传递给脚本的参数，自动生成一些图片，或处理一些文本文件），那一定需要命令行可执行程序。如果是这种情况，不需要服务器和浏览器。只需要要一个php cli,在脚本开头标明php cli所在位置就行。
-
-```php
-#!/usr/bin/php
-<?php
-    var_dump($argv);
-```
-
 # php作为服务器端脚本
 
-##直接的模块接口SAPI
+## 直接的模块接口SAPI
+
 对于很多服务器，PHP 均有一个直接的模块接口（也叫做 SAPI）。这些服务器包括 Apache、Microsoft Internet Information Server、Netscape 和 iPlanet 等服务器。其它很多服务器支持 ISAPI，即微软的模块接口（OmniHTTPd 就是个例子）。
-##作为 CGI 或 FastCGI 处理器
+
+## 作为 CGI 或 FastCGI 处理器
+
 如果 PHP 不能作为模块支持 web 服务器，总是可以将其作为 CGI 或 FastCGI 处理器来使用。这意味着可以使用 PHP 的 CGI 可执行程序来处理所有服务器上的 PHP 文件请求。
 官方文档：http://php.net/install.fpm
     首先，CGI是干嘛的？CGI是为了保证web server传递过来的数据是标准格式的，方便CGI程序的编写者。
@@ -30,21 +23,23 @@
 
 `php -S localhost:8080 -t /home/cky/workspace/nodejs/grunt`
 
-#为何需要CGI
+# 为何需要CGI
+
 客户端在访问动态页面时，因为apache和nginx只能提供静态解析，这是他们通过内置的cgi接口去寻找php等脚本语言，当需要用到数据部分时PHP会去调用后台MYSQL数据库中的数据，之后通过解析生成静态页面在返回apache/nginx服务器，再由此交付给客户端。
 
-#CGI 的位置
-浏览器 ---> web服务器　--CGI接口--> php解释器　---> DB数据库
+# CGI 的位置
+
+浏览器 ---> web服务器 ---CGI协议--> php解释器 ---> DB数据库
 
 # CGI技术的性能缺陷
 
 每当服务器收到一个对CGI程序请求时，服务器都将创建一个CGI程序的进程，CGI程序处理完请求后，将输出发给服务器或直接传回客户端，然后终止。
 
-# fastCGI技术
+## fastCGI技术
 
 fastCGI对CGI技术进行了改良，一个fastCGI进程在WEB服务器启动时或在客户端第一次请求时创建，它处理完客户端请求后并不终止，而是等待处理下一个请求。
 
 ## fastCGI与CGI与服务器的交互方式不同
 
-* CGI程序通过环境变量、命令行、标准输入输出进行交互，因此CGI程序进程必须与服务器进程在同一台物理计算机上
-* fastCGI程序与服务器进程通过网络连接交互，因此fastCGI程序可以分布在不同的计算机上，这不但可以提高性能，同时也提高了系统的扩展能力。
+- CGI程序通过环境变量、命令行、标准输入输出进行交互，因此CGI程序进程必须与服务器进程在同一台物理计算机上
+- fastCGI程序与服务器进程通过(网络连接)交互，因此fastCGI程序可以分布在不同的计算机上，这不但可以提高性能，同时也提高了系统的扩展能力。
