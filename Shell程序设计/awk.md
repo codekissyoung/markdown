@@ -3,7 +3,8 @@
 - `awk -F regexp '/pattern/{ action }' files`
 - `awk -F regexp '(expression){ action }' files`
 - `awk -F regexp -f awk脚本 files`
-- `-F`          设置字段分割符,它接受一个正则表达式 `re` 作为值，缺省是 `空格tab换行`
+
+- `-F`          设置字段分割符(默认`空格tab换行`),它接受一个正则表达式`re`作为值
 - `pattern`     行匹配模式，省略的话就是匹配所有行
 - `{ action }`  输出模式，省略的话就是输出整行
 
