@@ -28,7 +28,7 @@ if (!$mysqli->query($sql)) // this query will fail, cause we didn't escape $city
 
 // 转义后再执行
 $city = $mysqli -> real_escape_string($city);
-$sql = "INSERT into myCity (Name) VALUES ('$city')"; // this query with escaped $city will work
+$sql = "INSERT into myCity (Name) VALUES ('$city')";
 if ($mysqli->query($sql))
     printf("%d Row inserted.\n", $mysqli->affected_rows);
 
