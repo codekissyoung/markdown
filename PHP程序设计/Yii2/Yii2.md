@@ -1,4 +1,5 @@
 # database
+
 `$sql = 'select * from user where id =:id';` 使用占位符的sql语句
 
 `User::findBySql($sql,array(":id"=>$id))->all()` 通过sql语句查询 ,访问结果为[对象,对象]
