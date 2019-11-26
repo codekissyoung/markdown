@@ -4,9 +4,11 @@
 
 `FROM -> WHERE -> GROUP BY -> HAVING -> SELECT -> DISTINCT -> UNION -> ORDER BY -> LIMIT`
 
-- FROM 才是 SQL 语句执行的第一步，并非 SELECT 。数据库在执行 SQL 语句的第一步是将数据从硬盘加载到数据缓冲区中，以便对这些数据进行操作
-- SELECT 是在大部分语句执行了之后才执行的，严格的说是在 FROM 和 GROUP BY 之后执行的。理解这一点是非常重要的，这就是你不能在 WHERE 中使用在 SELECT 中设定别名的字段作为判断条件的原因。
-- 无论在语法上还是在执行顺序上， UNION 总是排在在 ORDER BY 之前。也就是说，先进行聚合，再排序。
+FROM 才是 SQL 语句执行的第一步，并非 SELECT 。数据库在执行 SQL 语句的第一步是将数据从硬盘加载到数据缓冲区中，以便对这些数据进行操作
+
+SELECT 是在大部分语句执行了之后才执行的，严格的说是在 FROM 和 GROUP BY 之后执行的。理解这一点是非常重要的，这就是你不能在 WHERE 中使用在 SELECT 中**操作后**产生的字段作为判断条件的原因。
+
+无论在语法上还是在执行顺序上， UNION 总是排在在 ORDER BY 之前。也就是说，先进行聚合，再排序。
 
 ```sql
 SELECT A.x + A.y AS z
@@ -53,4 +55,4 @@ FROM a, b # 两个表的笛卡尔积 组成的新表
 
 - ON 条件用在表的连接，比如　`from A left join B on A.xxx = B.xxx`
 - Where 条件 在表的连接完成后执行，用于筛选记录 `form ... where A.xxx = xxx`
-- Having 条件用在where完成筛选，并且再进行`group by`分组之后，用于对分组进行筛选，`group by xxx having count(*) > 2` 用于筛选出记录数多于２个的分组
+- Having 条件用在where完成筛选，并且再进行`group by`分组之后，用于筛选分组，`group by xxx having count(*) > 2` 用于筛选出记录数多于２个的分组
