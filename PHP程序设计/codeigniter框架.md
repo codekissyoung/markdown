@@ -36,11 +36,14 @@ class DDS_controller extends CI_Controller(){
 $this->load->helper('display');//加载辅助函数
 mainpage();//调用：辅助函数就是一系列函数，是过程式，不是 oo
 ```
- - ​自定义类库
-		自定义类是独立的类，不会自动地包含在CI超级对象中，因此你必须用不同的方法来调用，详见第七章。对于自定义类来说，$this意味着自定义类对象本身，而不是超级对象.但是我们仍然可以在自定义类里使用超级对象．如下：
+自定义类是独立的类，不会自动地包含在CI超级对象中，因此你必须用不同的方法来调用，详见第七章。对于自定义类来说，$this意味着自定义类对象本身，而不是超级对象.但是我们仍然可以在自定义类里使用超级对象．如下：
+
 ```
-$obj =& get_instance(); //在新类里面取得 CI的超级对象
-$obj->config->item('base_url');//现在你能像调用CI超级对象一样地调用它,访问超级对象的资源了（类，方法，属性，以及配置之类的）
+// 在新类里面取得 CI的超级对象
+$obj =& get_instance(); 
+
+// 现在你能像调用CI超级对象一样地调用它,访问超级对象的资源了（类，方法，属性，以及配置之类的）
+$obj->config->item('base_url');
 ```
  - 写好模型model
  - 组织好视图view
@@ -67,7 +70,9 @@ $this->db->get('tabel_name');//查询整张表的数据
 $this->db->get('mytable', 10, 20); //返回 20-29 条记录
 $this->db->select('title, content, date')->get('mytable');//查询某几个字段
 连贯查询
-$this->db->select('id,name')->from('user')->where(array('name'=>'merry','id >'=>2))->limit(3,2)->order_by('id desc')->get();//从第2条后开始，取出3条数据
+$this->db->select('id,name')->from('user')->
+where(array('name'=>'merry','id >'=>2))
+->limit(3,2)->order_by('id desc')->get();//从第2条后开始，取出3条数据
 插入数据
 $this->db->insert('table_name',$assoc_array);
 更新数据
@@ -118,7 +123,10 @@ class Page extends CI_Controller {
 	$this->session->sess_destroy(); // 清除session 
 	/*创建url*/
 	site_url ('welcome/index')；
-	base_url ('控制器/方法')；//创建以网站  '网站域名/控制器/方法' 格式的url，如www.dadishe.com/welcome/index
+
+	//创建以网站 '网站域名/控制器/方法' 格式的url，如www.dadishe.com/welcome/index
+	base_url ('控制器/方法')；
+
 	/*载入视图*/
     $this->load->view('header',$data);//载入多个视图，它们会被合并到一起，只需在第一个视图，添加数据
     $this->load->view('menu');
