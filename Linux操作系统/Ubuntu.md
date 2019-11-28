@@ -222,65 +222,12 @@ drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
 
 
 # 限制用户进程数
+
 - 在`/etc/security/limits.conf` 文件后面添加上下面代码，限制用户进程数为200
 
 ```bash
 *   hard    nproc   200
 ```
-
-# Nginx 
-```bash
-service apache2 stop
-apt-get remove apache2
-apt-get install nginx
-service nginx start
-curl localhost # 验证下安装是否成功
-```
-
-`sudo path/to/nginx` 启动
-
-`sudo nginx -s reload` 重启
-
-`sudo　nginx -s stop` 停止
-
-`curl localhost` 测试是否安装正确
-
-# nginx 403 forbidden
-* 缺少index.html或者index.PHP文件
-* 目录权限:nginx的启动用户默认是nginx的,把web目录的权限改大，或者是把nginx的启动用户改成目录的所属用户，重起一下就能解决
-[http://segmentfault.com/a/1190000003067828#articleHeader1](http://segmentfault.com/a/1190000003067828#articleHeader1) 
-[http://macshuo.com/?p=547](http://macshuo.com/?p=547)  趣谈个人建站 lnmp 架构
-
-# 使用apt-get安装 lnmp 架构
-使用的是root用户
-安装mysql
-```bash
-apt-get install mysql-server mysql-client
-```
-
-#### 安装php-fpm
-```bash
-apt-get install php5-fpm
-apt-get install php5-mysql php5-curl php5-gd php5-intl php-pear php5-imagick php5-imap php5-mcrypt php5-memcache php5-ming php5-ps php5-pspell php5-recode php5-snmp php5-sqlite php5-tidy php5-xmlrpc php5-xsl php-apc
-```
-- 配置文件 `vim  /etc/php5/fpm/php.ini `
-```bash
-cgi.fix_pathinfo=0
-```
-改变php-fpm监听 `vi /etc/php5/fpm/pool.d/www.conf`
-```bash
-;listen = /var/run/php5-fpm.sock 
-listen = 127.0.0.1:9000
-```
-
-重新启动php5-fpm  `service php5-fpm reload`
-重新启动nginx `service nginx reload`
-错误处理 报错 `reload: Unknown instance`
-```
-sudo pkill php5-fpm; sudo service php5-fpm start
-```
-
-浏览器访问下 `localhost/info.php` 查看是否支持php以及相关模块
 
 # 安装 Memcache 
 sudo apt-get install memcached #安装php memcached 扩展
@@ -455,10 +402,4 @@ Alias /down    "/sofТWare /download"   创建名为down的虚拟目录，它
 Options FollowSymLinks  允许符号链接 Options Indexes         允许用户浏览网页目录，（不安全的设置，建议删除）      
 AllowOverride None      不允许 .htaccess 重写这个目录，改为 All 则能重写
 </Directory>
-```
-
-# 追踪路由
-
-```bash
-➜  blog git:(master)  sudo traceroute m.dev.yunchongba.com
 ```

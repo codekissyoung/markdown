@@ -42,125 +42,121 @@ OK
 
 ```bash
 # 增删改查
-DEL KEY                  删除一个键值对，不管它的 VALUE 是什么
+del KEY                  删除一个键值对，不管它的 VALUE 是什么
 del key1 key2 key3       删除多个健
-EXISTS key               检查给定 key 是否存在
-TYPE key                 返回 key 所储存的值的类型。 string hash list set zset none 表示健不存在
+exists key               检查给定 key 是否存在
+type key                 返回 key 所储存的值的类型 string hash list set zset none 表示健不存在
 object encoding key_name 查看该健的内部实现编码，一种redis类型往往有几种内部编码实现
-KEYS pattern             查找所有符合给定模式( pattern)的 key
-RENAME key newkey        修改 key 的名称
-RENAMENX key newkey      仅当 newkey 不存在时，将 key 改名为 newkey
-RANDOMKEY                从当前数据库中随机返回一个 key
+keys pattern             查找所有符合给定模式( pattern)的 key
+renamenx key newkey      仅当 newkey 不存在时，将 key 改名为 newkey
+randomkey                从当前数据库中随机返回一个 key
 dbsize                   健总数
 
 # 过期时间
-EXPIRE key seconds              为给定 key 设置过期时间
-PEXPIRE key milliseconds        设置 key 的过期时间以毫秒计
-EXPIREAT key timestamp          都用于为 key 设置过期时间。EXPIREAT 命令接受的时间参数是UNIX时间戳(unix timestamp)
-PEXPIREAT key m-timestamp       设置 key 过期时间的时间戳(unix timestamp) 以毫秒计
-PERSIST key                     移除 key 的过期时间，key 将持久保持
-PTTL key                        以毫秒为单位返回 key 的剩余的过期时间。
-TTL key                         以秒为单位，返回给定 key 的剩余生存时间(time to live)。-1 表示没设置, -2 健不存在
+expire key seconds              设置 key 过期时间 s
+expireat key timestamp          设置 key 过期时间点 s
+pexpire key milliseconds        设置 key 过期时间 ms
+pexpireat key m-timestamp       设置 key 过期时间点 ms
+persist key                     永不过期
+ttl key                         剩余生存时间, 单位 s, -1 表示没设置, -2 健不存在
+pttl key                        同上，单位 ms                        
 
 # 移动 KEY 的位置
-MOVE KEY DB  将当前数据库的 key 移动到给定的数据库 db 当中
-
-DUMP KEY                序列化给定 key ，并返回被序列化的值
+move key db-name                将当前数据库的 key 移动到给定的数据库 db 当中
+dump key                        序列化给定 key ，并返回被序列化的值
 ```
 
 ## String 字符串相关命令
 
-```shell
+```bash
 # 设置字符串
-SET key value                     设置指定 key 的值
-SETNX key value                   只有在 key 不存在时设置 key 的值
-SETEX key seconds value           将值 value 关联到 key ，并将 key 的过期时间设为 seconds (以秒为单位)
-PSETEX key milliseconds value     这个命令和 SETEX 命令相似，但它以毫秒为单位设置 key 的生存时间，
-MSET key value [key value ...]    同时设置一个或多个 key-value 对
-MSETNX key value [key value ...]  同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在
-SETRANGE key offset value         用 value 参数覆写给定 key 所储存的字符串值，从偏移量 offset 开始。
-APPEND key value                  如果 key 已经存在并且是一个字符串，则将指定的value追加到该 key 原来值的末尾。
-GETSET key value                  将给定 key 的值设为 value ，并返回 key 的旧值(old value)。
+set key str                     设置指定 key 的值
+setnx key str                   只有在 key 不存在时设置 key 的值
+setnx key seconds str           设置 key 的值 和 过期时间 s
+psetnx key milliseconds str     同上 ms
+mset key str [key str ...]      新增多个
+msetnx key str [key str ...]    新增多个
+setrange key offset str         从偏移量 offset 开始，覆盖 string 字符串写入
+append key str                  追加写入到字符串后面
+getset key new-str              给定key, 设置新值，返回旧值
 
 # 获取字符串
-STRLEN key                        返回 key 所储存的字符串值的长度。
-GET key                           获取指定 key 的值
-MGET key1 [key2..]                获取所有(一个或多个)给定 key 的值
-GETRANGE key start end            返回 key 中字符串值的子字符
+strlen key                          给定 key，返回字符串值的长度
+get key                             返回指定 key 的值
+mget key1 key2 ...                  返回多个
+getrange key start end              返回子字符串
 
 # 字符串 Bit 相关
-GETBIT key offset               对 key 所储存的字符串值，获取指定偏移量上的位(bit)。
-SETBIT key offset value         对 key 所储存的字符串值，设置或清除指定偏移量上的位(bit)。
+getbit key offset               获取指定偏移量上的位(bit)
+setbit key offset value         设置或清除指定偏移量上的位(bit)
 
 # Value 为数值
-INCR key                    将 key 中储存的数字值增一
-INCRBY key increment        将 key 所储存的值加上给定的增量值（increment） 。
-INCRBYFLOAT key increment   将 key 所储存的值加上给定的浮点增量值（increment） 。
-DECR key                    将 key 中储存的数字值减一。
-DECRBY key decrement        key所储存的值减去给定的减量值（decrement） 。
+incr key                    将 key 中储存的数字值增一
+incrby key increment        将 key 所储存的值加上给定的增量值（increment） 
+incrbyfloat key increment   将 key 所储存的值加上给定的浮点增量值（increment） 
+decr key                    将 key 中储存的数字值减一
+decrby key decrement        key所储存的值减去给定的减量值（decrement） 
 ```
 
 ## Hash
 
-- hmset 健名 key1 value1 key2 value2 存hash值
-
-```shell
-# 设置
-HMSET           key field1 value1   [field2 value2 ]    同时将多个 field-value (域-值)对设置到哈希表 key 中
-HINCRBY         key field increment                     为哈希表 key 中的指定字段的整数值加上增量 increment
-HINCRBYFLOAT    key field increment                     为哈希表 key 中的指定字段的浮点数值加上增量 increment
-HSET            key field value                         将哈希表 key 中的字段 field 的值设为 value
-HSETNX          key field value                         只有在字段 field 不存在时，设置哈希表字段的值
+```bash
+# 新增 或 修改
+hset            key field value
+hsetnx          key field value
+hmset           key field1 value1 [field2 value2 ]
+hincrby         key field 2                     key.field + 2
+hincrbyfloat    key field 0.8                   key.field + 0.8
 
 # 获取
-HEXISTS     key field                   查看哈希表 key 中，指定的字段是否存在
-HGET        key field                   获取存储在哈希表中指定字段的值
-HGETALL     key                         获取在哈希表中指定 key 的所有字段和值
-HKEYS       key                         获取所有哈希表中的字段
-HLEN        key                         获取哈希表中字段的数量
-HMGET       key field1 [field2]         获取所有给定字段的值
-HVALS       key                         获取哈希表中所有值
+hexists     key field                   
+hget        key field                   单个指定字段的值
+hmget       key field1 [field2]         多个指定字段的值
+hgetall     key                         获取所有健值对
+hkeys       key                         所有字段
+hlen        key                         字段的数量
+hvals       key                         所有值
 
-# 删除某个值
-HDEL key field1 [field2]            删除一个或多个哈希表字段
+# 删除
+hdel key field1 [field2]                
 
-HSCAN key cursor [MATCH pattern] [COUNT count] 迭代哈希表中的键值对
+hscan key cursor [MATCH pattern] [COUNT count] 迭代哈希表中的键值对
 ```
 
 ## List 列表
 
-```shell
+```bash
 # 设置
-LPUSH   key value1 [value2]             将一个或多个值插入到列表头部
-LPUSHX  key value                       将一个值插入到已存在的列表头部
-RPUSH   key value1 [value2]             在列表中添加一个或多个值
-RPUSHX  key value                       为已存在的列表添加值
-LINSERT key BEFORE|AFTER pivot value    在列表的元素前或者后插入元素
-LSET    key index value                    通过索引设置列表元素的值
-LTRIM   key start stop                    对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除
+lpush   key value1 [value2]             左插
+lpushx  key value                       
+rpush   key value1 [value2]             右插
+rpushx  key value                       
+linsert key BEFORE|AFTER pivot value    在列表的元素前或者后插入元素
+lset    key index value                 通过索引设置列表元素的值
+ltrim   key start stop                  只保留指定区间内的元素，区间外的元素都将被删除
 
 # 弹出操作
-LPOP    key                             移出并获取列表的第一个元素，如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止(下同)
-BLPOP   key1 [key2 ] timeout            移出并获取列表的第一个元素
-RPOP    key                             移除并获取列表最后一个元素
-BRPOP   key1 [key2 ] timeout            移出并获取列表的最后一个元素
-BRPOPLPUSH source destination timeout   从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它
-RPOPLPUSH source destination            移除列表的最后一个元素，并将该元素添加到另一个列表并返回
+lpop    key                             左出，若列表为0，则阻塞到超时
+blpop   key1 [key2 ] timeout            同上，指定超时时间
+rpop    key                             右出
+brpop   key1 [key2 ] timeout            右出，指定超时时间
+rpoplpush src-key dest-key              # 从 src-key 左出，然后右入到 dest-key
+brpoplpush src-key dest-key timeout     # 同上
 
 # 正常取值 不弹出
-LRANGE key start stop                   获取列表指定范围内的元素
-LINDEX key index                        通过索引获取列表中的元素
-LLEN key                                获取列表长度
+lrange key start_idx stop_idx           # 获取 指定范围 内的元素
+lindex key idx                          # 通过索引获取列表中的元素
+llen key                                # 获取列表长度
 
 # 删除
-LREM key count value                    移除列表元素
+lrem key count value                    # 移除列表元素
 ```
 
 ## Set 集合
 
 ```bash
 # 添加
-SADD key member1 [member2]      向集合添加一个或多个成员
+sadd key member1 [member2]           # 向集合添加一个或多个成员
 
 # 集合与集合之间的操作
 SDIFF                   key1 [key2]  返回给定所有集合的差集

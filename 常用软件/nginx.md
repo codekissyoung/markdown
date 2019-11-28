@@ -1,22 +1,11 @@
 # Nginx
 
-- 采用的是`多进程` + `异步非阻塞`方式来处理请求
-- `epoll`的做法，把描述符列表的管理交给内核负责，一旦有某种事件(可读事件，可写事件)发生，内核就将发生事件的描述符列表发送给进程，`epoll`
-
 ## ubuntu apt-get 安装
 
 ```bash
 sudo aptitude install -y nginx          # 安装
 sudo systemctl start nginx.service      # 启动
 cky@codekissyoung2:~$ sudo lsof -i:80   # 检测是否启动
-COMMAND     PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
-AliYunDun   957     root   18u  IPv4  14418      0t0  TCP 192.168.1.189:51318->140.205.140.205:http (CLOSE_WAIT)
-AliYunDun   979     root   18u  IPv4  14418      0t0  TCP 192.168.1.189:51318->140.205.140.205:http (CLOSE_WAIT)
-AliYunDun   979     root   20u  IPv4  47862      0t0  TCP 192.168.1.189:53316->106.11.68.13:http (ESTABLISHED)
-nginx     29624     root    6u  IPv4 364742      0t0  TCP *:http (LISTEN)
-nginx     29624     root    7u  IPv6 364743      0t0  TCP *:http (LISTEN)
-nginx     29625 www-data    6u  IPv4 364742      0t0  TCP *:http (LISTEN)
-nginx     29625 www-data    7u  IPv6 364743      0t0  TCP *:http (LISTEN)
 
 # 配置目录
 cky@codekissyoung2:/etc/nginx$ ls -l
@@ -37,9 +26,9 @@ drwxr-xr-x 2 root root 4096 Aug  8 17:39 snippets
 -rw-r--r-- 1 root root 3071 Feb 12  2017 win-utf
 ```
 
-## Ubuntu下彻底删除Nginx，重新安装
+## Ubuntu下彻底删除Nginx，重新安装
 
-- 如果自己手动删除Nginx后，删除`/etc/nginx`目录后，或者其他相关文件后，再次重装，可能会发生安装不上的问题，所以要 **完全清理**,以下是方法
+如果自己手动删除Nginx后，删除`/etc/nginx`目录后，或者其他相关文件后，再次重装，可能会发生安装不上的问题，所以要 **完全清理**,以下是方法
 
 ```bash
 # 1. 关闭Nginx进程
@@ -89,20 +78,21 @@ WINCH 从容关闭工作进程
 
 ```bash
 # 全局块 主要设置一些影响Ngnix整体运行的配置指令
-worker_processes  3;        # 启动的worker进程数为3,启动进程,通常设置成和cpu的数量相等
-user nobody nobody;         # user指令设置哪些用户/组可以启动nginx,nobody是所有用户都可以
-pid /home/caokaiyan/workspace/etc_sh/nginx/nginx.pid; # 设置nginx运行时,pid的存放路径
+worker_processes  3;        # worker 进程数
+user nobody nobody;         # 设置哪些用户/组可以启动nginx,nobody是所有用户都可以
+pid /home/caokaiyan/workspace/etc_sh/nginx/nginx.pid; # pid 路径
 # 错误日志路径,日志级别：debug info notice warn error crit alert emerg
 error_log /home/caokaiyan/workspace/etc_sh/nginx/nginx_error.log warn;
 
 # events 块
 events {
-    worker_connections  1024; # 每个worker进程的最大链接数为1024
-    accept_mutex on;          # 对多个nginx进程接收链接进行序列化,防止惊群
+    worker_connections  1024; # 每个 worker 最大链接数
+    accept_mutex on;          # 进程接收链接进行序列化,防止惊群
     # 惊群问题: 当一个网络连接到来时，多个睡眠进程会被同时唤醒
-    # 但只有一个进程会获得连接，如果每次唤醒的进程数目太多，会影响一部分系统性能,在Nginx多进程下会出现这样的问题
-    multi_accept on;          # 设置每个worker process都能同时接收多个新到达的网络连接，在off情况下只能接收一个
-    use epoll;                # 使用 epoll 事件驱动模型(其余模型有select,poll等)
+    # 但只有一个进程会获得连接，如果每次唤醒的进程数目太多，
+    # 会影响一部分系统性能,在Nginx多进程下会出现这样的问题
+    multi_accept on;          # worker 能同时接收多个新到达的网络连接
+    use epoll;                # 强制使用 epoll
 }
 
 # http 块
