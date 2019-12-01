@@ -18,6 +18,8 @@
 - `sudo locale-gen`
 - `sudo vim /etc/default/locale` 添加 `LANG=zh_CN.UTF-8`
 
+`gnome-session-properties` 设置开机自动运行软件。
+
 ## 安装软件
 
 **软件安装原则** : 优先选择该系统版本上的默认软件,比如`ubuntu 16.04`的默认PHP版本是7.0,那就不要去用7.1的版本,否则会带来很大的麻烦
