@@ -1,14 +1,102 @@
-# Ubuntu 19 装机指南
+# Ubuntu 装机指南
 
-本文是配置`ubuntu 19.04`作为开发机的装机指南。
+`Ubuntu 18.04` 作为示范机，U盘装机软件 `LinuxLive USB Creator`。
 
-## 下载安装
+## 1. 更换软件源
 
-- U盘装机软件`LinuxLive USB Creator`
+修改 `/etc/apt/sources.list` 为如下内容:
 
-## 初始化开发环境
+```bash
+deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+```
 
-由于经常装机，所以所有步骤都写成了一个脚本： [ubuntu.sh](https://github.com/codekissyoung/shell/blob/master/ubuntu.sh)
+## 2. 修改DNS
+
+```bash
+$ sudo vim /etc/systemd/resolved.conf
+
+[Resolve]
+DNS=8.8.8.8
+
+$ sudo systemctl restart systemd-resolved.service
+```
+
+## 3. 安装服务端基础开发软件
+
+```bash
+sudo apt-get install vim git aptitude zsh tree tmux lnav
+sudo apt-get install language-pack-zh-hans zhcon        # 中文支持
+sudo apt-get install bash-builtins bash-completion bash-doc bash-static
+sudo apt-get install rar unrar p7zip                    # 压缩
+
+sudo update-alternatives --config editor                # 默认编辑设置为vim
+git config --global core.quotepath false                # git 中文正确显示
+git config --global core.editor vim                     # 默认编辑器 vim
+git config --global user.name "link"                    # git username
+git config --global user.email "link@muchenglin.com"    # git email
+
+# 安装 c++ 开发环境
+sudo apt-get install gcc gdb make autoconf automake libtool build-essential flex bison cmake
+sudo apt-get install linux-headers-$(uname -r)
+sudo apt-get install automake autoconf libtool pkg-config intltool checkinstall
+```
+
+## 4. 设置 vim 
+
+用户目录 `.vimrc` 修改如下:
+
+```bash
+set nu            " 设置行号
+set hlsearch      " 高亮查找项
+set incsearch     " 查找跟随
+set ignorecase    " 查找时忽略大小写
+set fdm=marker    " 设定标记折叠
+set autoindent    " 设置自动缩进
+set tabstop=4     " 设置tab为4个空格
+set list          " 显示空格和tab
+set listchars=tab:>-,trail:- " 显示空格和tab的格式
+syntax on         " 语法高亮
+set tabpagemax=15 " 设置最大打开的标签页数
+
+" 定义快捷键
+noremap <F6> :set nu
+```
+
+## 5. 安装 lnmp 环境
+
+```bash
+sudo apt-get install nginx
+sudo apt-get install mysql-server mysql-client
+sudo apt-get install redis-server
+sudo apt-get install php 
+```
+
+## 后面待定
+
+```bash
+#!/bin/bash
+
+lsb_release -a
+cat /etc/issue
+uname -a
+
+# 安装调试软件 insight 的依赖 
+sudo apt-get install autoconf autogen texinfo zlib1g-dev tcl-dev tk-dev mesa-common-dev
+sudo apt-get install libjpeg-dev libtogl-dev python-dev
+sudo apt-get install flex bison itcl3 itk3 iwidgets4
+
+sudo apt-get install lnav                       # 安装终端看访问日志的神器 lnav观看 [服务器端]
+sudo apt-get install bless                      # 查看二进制，客户端软件
+```
 
 ## 设置软件运行时语言环境
 
@@ -20,15 +108,29 @@
 
 `gnome-session-properties` 设置开机自动运行软件。
 
-## 安装软件
 
-**软件安装原则** : 优先选择该系统版本上的默认软件,比如`ubuntu 16.04`的默认PHP版本是7.0,那就不要去用7.1的版本,否则会带来很大的麻烦
+
+安装 `Swoole` :
+
+```bash
+sudo apt-get install libmcrypt-dev libiconv-hook-dev libxml2-dev libmysqlclient-dev libcurl4-openssl-dev
+sudo apt-get install libjpeg8-dev libpng-dev libfreetype6-dev
+sudo apt install php-pear
+sudo apt install php7.2-dev     # 这里要确定自己安装的版本号
+sudo pecl install swoole
+```
+
+需要将`extension=swoole.so`添加到`php.ini`文件(通过`phpinfo()`确认路径)中，开启`Swoole`拓展。
+
+然后重启`php-fpm`:
+
+```bash
+sudo systemctl restart php7.2-fpm.service
+sudo systemctl restart nginx.service
+```
 
 ```bash
 # apt-get 命令
-sudo apt-get update             更新软件源
-sudo apt-get upgrade            从软件源处更新软件
-sudo apt-get autoremove         自动卸载系统不需要的软件
 apt-cache search keyword        搜寻软件
 apt-cache show package          软件包信息
 apt-get install package         安装软件
@@ -152,26 +254,6 @@ sudo ./install-font-ubuntu.sh https://github.com/todylu/monaco.ttf/blob/master/m
   - 在展示`1)      build-essential [未安装的]`等保持原样，并且询问 `是否接受该解决方案？[Y/n/q/?]` 时，填入 `n`,表示不接受
   - 在继续展示 `降级 下列软件包：1)     gcc-7-base [7.3.0-21ubuntu1~16.04 (now) -> 7.3.0-16ubuntu3 (bionic)]`, 并询问`是否接受该解决方案？[Y/n/q/?]`时，填入`Y` 表示接受软件包降级，这样问题就解决了
 
-## 安装 PHP + Apache2
-
-- 参考官方文档: [安装PHP语言 使用Apache2作为Web Server](https://help.ubuntu.com/lts/serverguide/php.html.en-GB)
-- 当网站直接显示没有解析的php代码时，很可能的一个原因如下:
-
-```bash
-By default, when libapache2-mod-php is installed, the Apache 2 Web server is configured to run PHP scripts.
-In other words, the PHP module is enabled in the Apache Web server when you install the module.
-Please verify if the files /etc/apache2/mods-enabled/php7.0.conf and /etc/apache2/mods-enabled/php7.0.load exist.
-If they do not exist, you can enable the module using the a2enmod command
-```
-
-## 安装python开发环境
-
-```bash
-sudo aptitude install -y python2.7-dev python3.5-dev libssl-dev libevent-dev libjpeg-dev libxml2-dev libxslt1-dev
-sudo aptitude install python-pip 安装包管理工具
-sudo pip install virtualenv 安装 python 版本的虚拟环境,先不管，学python时候再看
-```
-
 ## NFS(Network File System)文件共享服务
 
 ## FTP(File Transfer Protocol)
@@ -231,7 +313,8 @@ drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
 *   hard    nproc   200
 ```
 
-# 安装 Memcache 
+# 安装 Memcache
+
 sudo apt-get install memcached #安装php memcached 扩展
 memcached -d -m 50 -p 11211 -u root #启动一个memcached服务
 -d 是启动一个守护进程 
@@ -243,21 +326,6 @@ memcached -d -m 50 -p 11211 -u root #启动一个memcached服务
 -P 是保存pid文件 如/tmp/memcached.pid
 使用telnet测试 memcached 服务
 $ telnet localhost 11211 Trying 127.0.0.1...Connected to localhost.
-
-# ubuntu 16.04 搭建Ubuntu(16.04) + Apache(2.4) + Mysql(5.7) + PHP(7.0)环境
-
-## 搭建目标
-```bash
-cky@cky-pc:~/worksapce$ apache2 -v
-Server version: Apache/2.4.18 (Ubuntu)
-Server built: 2016-04-15T18:00:57
-cky@cky-pc:~/worksapce$ mysql --version
-mysql Ver 14.14 Distrib 5.7.12, for Linux (x86_64) using EditLine wrapper
-PHP 7.0.4-7ubuntu2.1 (cli) ( NTS )
-Copyright (c) 1997-2016 The PHP Group
-Zend Engine v3.0.0, Copyright (c) 1998-2016 Zend Technologies
-with Zend OPcache v7.0.6-dev, Copyright (c) 1999-2016, by Zend Technologies
-```
 
 ## 安装并配置apache2.4
 
@@ -276,30 +344,6 @@ sudo vim /etc/apache2/sites-available/000-default.conf
 ```
 sudo /etc/init.d/apache2 restart
 ```
-
-## 安装php7.0
-
-```
-sudo apt-get install php7.0
-sudo apt-get install libapache2-mod-php7.0
-```
-安装更多的模块
-```
-sudo apt-get install php7.0[tab]
-```
-## 安装数据库
-```
-sudo apt-get install mysql-server mysql-client
-sudo apt-get install php7.0-mysql
-```
-## 操作数据库
-```
-/etc/init.d/mysql start｜stop|restart
-```
-
-# 开启 Mcrypt 模块
-sudo php5enmod mcrypt
-sudo service apache2 restart
 
 # apache 相关的
 http://blog.csdn.net/u013178760/article/details/45393183    Apache 2.4 Rewrite 模块
