@@ -397,7 +397,31 @@ func main() {
 }
 ```
 
-[Go看到这里](https://tour.go-zh.org/methods/1)
+#### Go 方法
+
+可以为结构体类型绑定方法，方法可以理解为带 “接收者” 参数的函数。
+
+- 结构体类型定义 和 方法定义 必须在同一个包内
+- 不允许为内置类型绑定方法
+
+```go
+type Vertex struct {
+	X, Y float64
+}                                           // 一个结构体
+
+func (v Vertex) Abs() float64 {             // 结构体 作为 “接收者” 参数
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func (v *Vertex) Scale(f float64) {         // *Vertex
+	v.X = v.X * f
+	v.Y = v.Y * f
+}
+
+v := Vertex{3, 4}
+fmt.Println( v.Abs() )                      // 5 调用结构体中的方法
+```
+
 [Go靠谱书推荐](https://www.zhihu.com/question/30461290)
 
 ```go
