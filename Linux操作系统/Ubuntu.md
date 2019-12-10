@@ -33,6 +33,7 @@ $ sudo systemctl restart systemd-resolved.service
 ## 3. 安装服务端基础开发软件
 
 ```bash
+sudo apt-get install apt-transport-https
 sudo apt-get install vim git aptitude zsh tree tmux lnav
 sudo apt-get install language-pack-zh-hans zhcon        # 中文支持
 sudo apt-get install bash-builtins bash-completion bash-doc bash-static
@@ -62,7 +63,7 @@ set ignorecase    " 查找时忽略大小写
 set fdm=marker    " 设定标记折叠
 set autoindent    " 设置自动缩进
 set tabstop=4     " 设置tab为4个空格
-set list          " 显示空格和tab
+" set list        " 显示空格和tab
 set listchars=tab:>-,trail:- " 显示空格和tab的格式
 syntax on         " 语法高亮
 set tabpagemax=15 " 设置最大打开的标签页数
