@@ -8,6 +8,96 @@ https://kubernetes.io/docs/tutorials/hello-minikube/
 
 ## Docker
 
+![](https://img.codekissyoung.com/2019/12/11/8fc3e024ef6ccd87fecbc06bb6e61683.png)
+
+```bash
+$ sudo systemctl start docker         # 启动docker
+$ sudo systemctl enable docker        # 设置开机启动docker
+$ sudo docker info                    # 查看docker信息
+```
+
+```bash
+$ sudo docker run [--name container_name] -i -t image-name /bin/bash  # 启动一个容器
+-i 保证容器中 STDIN 是开启的
+-t 为创建的容器分配一个伪tty终端　
+centos 是镜像名称
+/bin/bash是伪终端shell
+
+$ docker run --name 取名 -d centos /bin/bash -c "echo hello world"
+-d 放入后台运行;
+-c 在容器里面执行命令;
+
+$ exit                                                    # 在容器里执行, 退出容器
+$ sudo docker ps -a                                       # 查看当前已经建立的容器
+$ sudo docker start [container_name|container_ID]         # 重新启动已经停止的容器
+$ sudo docker attach [container_name|container_ID]        # 附着到一个容器上,连接到容器的shell 
+$ sudo docker logs -ft container_name                     # -f 输出最后几条日志 -t 在每条日志前显示时间
+$ sudo docker top container_name                                # 查看容器内进程
+$ sudo docker exec -d daemon_dave touch /etc/new_config_file    # 直接执行命令
+$ sudo docker exec -t -i daemon_dave /bin/bash                  # 进入容器,再自己去执行命令
+$ sudo docker stop [container_name|container_ID]                # 停止容器
+$ sudo docker inspect container_name                            # 查看容器的详细状态
+$ sudo docker rm container_name                                 # 删除一个容器
+$ sudo docker rm $(docker ps -a -q)                             # 删除所有容器
+$ sudo docker image ls                                          # 列出本地所有镜像
+```
+
+
+## 容器被关闭时自动重启
+docker run --restart=always --name daemon_dave -d centos /bin/sh -c "..."
+--restart=on-failure:5 退出代码非０时才重启,重启次数为５次
+
+## 构建自己的镜像:DockerFile
+### Docker Hub(类似于Git Hub的平台)注册账号
+### 登录Docker Hub
+
+```bash
+[root@iZ252e1zy6zZ ~]# docker login
+Username: codekissyoung
+Password:
+Email: cky951010@163.com
+WARNING: login credentials saved in /root/.docker/config.json
+Login Succeeded
+```
+
+### 通过commit创建自己的镜像
+docker commit container_ID codekissyoung/daemon_dave;
+docker commit -m"提交信息：msg" --author="codekissyoung" container_ID codekissyoung/image_name:image_tag;
+
+### 通过Dockerfile创建镜像
+docker build -t="codekissyoung/static_web:v1" ./
+docker build -t="codekissyoung/static_web:v2" git@github.com:codekissyoung/docker_web
+
+* 假设这个git仓库下有Dockerfile文件
+
+### 单步调试Dockerfile
+docker run -t -i step_return_id /bin/bash;
+* 通过每步返回的step_id进入容器,调试正确后,退出修改Dockerfile
+
+### 取消构建缓存
+docker build --no-cache -t="codekissyoung/static_web"
+
+* build会缓存之前成功的步骤,如果不需要可以去除
+
+### 查看一个镜像的构建历史
+docker history image_id;
+
+### 从一个新创建的镜像构建容器
+docker run -d -p 80 --name=nginx2 codekissyoung/nginx:v1 nginx -g "daemon off;";
+
+### 查看容器的80端口映射到本地哪个端口
+docker port container_name 80;
+```
+[root@iZ252e1zy6zZ static_web]# docker port ddeed87650a3 80;
+0.0.0.0:32773
+```
+### 访问docker容器
+curl localhost:32773
+
+### 将镜像发布到Docker　Hub上
+docker push codekissyoung/nginx:v1;
+
+
 ```bash
 $ sudo apt-get install -y docker.io     # 安装 docker
 ```

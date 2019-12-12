@@ -1,0 +1,8 @@
+{
+    "application":"Home",
+    "module":"Daemon",
+    "className":"LinkDaemon",
+    "port":51234,
+    "worker_num":2,
+    "addressArray":["192.168.0.30"]
+}

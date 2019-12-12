@@ -2,9 +2,24 @@
 
 `Ubuntu 18.04` 作为示范机，U盘装机软件 `LinuxLive USB Creator`。
 
+## 0. 安装设置
+
+用户名: `cky` 或 `link`
+软件源: `http://mirrors.aliyun.com/ubuntu/`
+
+#### 通过复制虚拟机 来获取多个节点
+
+```bash
+$ sudo vim /etc/cloud/cloud.cfg
+
+preserve_hostname: true             # 修改一句
+
+$ hostnamectl set-hostname cky5     # 之后重启系统
+```
+
 ## 1. 更换软件源
 
-修改 `/etc/apt/sources.list` 为如下内容:
+如果安装时，未更换软件源，则可修改 `/etc/apt/sources.list` 为如下内容:
 
 ```bash
 deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
@@ -30,25 +45,33 @@ DNS=8.8.8.8
 $ sudo systemctl restart systemd-resolved.service
 ```
 
+设置时区:
+
+```bash
+sudo tzselect   # 选择亚洲Asia，继续选择中国China，最后选择北京Beijing
+```
+
 ## 3. 安装服务端基础开发软件
 
 ```bash
-sudo apt-get install apt-transport-https
-sudo apt-get install vim git aptitude zsh tree tmux lnav
-sudo apt-get install language-pack-zh-hans zhcon        # 中文支持
-sudo apt-get install bash-builtins bash-completion bash-doc bash-static
-sudo apt-get install rar unrar p7zip                    # 压缩
+sudo apt-get install -y apt-transport-https
+sudo apt-get install -y vim git aptitude zsh tree tmux lnav
+sudo apt-get install -y language-pack-zh-hans zhcon        # 中文支持
+sudo apt-get install -y bash-builtins bash-completion bash-doc bash-static
+sudo apt-get install -y rar unrar p7zip zip unzip          # 压缩
 
+# 安装 c++ 开发环境
+sudo apt-get install -y gcc gdb make autoconf automake libtool build-essential flex bison cmake
+sudo apt-get install -y linux-headers-$(uname -r)
+sudo apt-get install -y automake autoconf libtool pkg-config intltool checkinstall
+```
+
+```bash
 sudo update-alternatives --config editor                # 默认编辑设置为vim
 git config --global core.quotepath false                # git 中文正确显示
 git config --global core.editor vim                     # 默认编辑器 vim
 git config --global user.name "link"                    # git username
 git config --global user.email "link@muchenglin.com"    # git email
-
-# 安装 c++ 开发环境
-sudo apt-get install gcc gdb make autoconf automake libtool build-essential flex bison cmake
-sudo apt-get install linux-headers-$(uname -r)
-sudo apt-get install automake autoconf libtool pkg-config intltool checkinstall
 ```
 
 ## 4. 设置 vim 
