@@ -19,6 +19,7 @@
 - [众里寻书千百度](https://hotbaidu.com/)
 - [精品电子书 免费下载](https://bookset.me/)
 - [书语者](https://book.shuyuzhe.com/)
+- [调试正则表达式工具](http://regexpal.com/)
 
 ### 代码工具
 

@@ -2,7 +2,6 @@
 
 ## 基础
 
-
 ```bash
 $ sudo apt-get install erlang
 $ sudo apt-get install rabbitmq-server
@@ -80,8 +79,6 @@ $ sudo rabbitmqctl list_channels
 $ sudo rabbitmqctl cluster_status                       # 查看集群内节点信息
 $ sudo rabbitmqctl join_cluster 节点@主机名             # 创建集群
 ```
-
-
 
 
 ## 

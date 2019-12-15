@@ -1,6 +1,6 @@
 # is系列
 ```php
-<?php
+
 // 类型符合就返回true
 is_bool();
 is_integer();
@@ -15,18 +15,16 @@ is_callable([$obj,$method]); // 确保传入的字符串是函数，能够被cal
 
 # exists 系列
 ```php
-<?php
+
 // 存在就返回 true
-file_exists($file_name);
-
-class_exists($classname);
-
-method_exists($obj , $method); // 方法是否存在
+file_exists( $file_name );
+class_exists( $classname );
+method_exists( $obj , $method ); // 方法是否存在
 ```
 
 # 类相关
 ```php
-<?php
+
 get_declared_classes(); // 获取脚本运行到当前行时，所有已经定义的类的数组
 
 get_class($obj); // 获取对象的 类名
@@ -49,15 +47,13 @@ call_user_func([$myObj,'method_name'],20); // 调用用户函数 / 方法
 $myObj -> method_name(20);
 
 call_user_func_array([$obj,'method'],$args); // 等价于 $obj -> method($args); $args 为不定个数的数组
-
-
 ```
 
 
 # 写http头
  返回json数据
 ```php
-<?php
+
 header("content-type:application/json ;charset = utf-8;");  // 返回json数据
 header('HTTP/1.1 200 OK'); // 告诉浏览器，请求成功
 header('HTTP/1.1 404 Not Found'); // 无此页面
@@ -74,7 +70,7 @@ header("Access-Control-AllowOrigin:http://dev.kanjiebao.com"); //允许http://de
 
 # 加载所有配置文件
 ```php
-<?php
+
 // glob 是寻找与模式匹配的文件路径，组成数组
 foreach (glob(ROOT_PATH.'config/*') as $file){
     require_once $file;
@@ -83,7 +79,7 @@ foreach (glob(ROOT_PATH.'config/*') as $file){
 
 # 变量方法
 ```php
-<?php
+
 function ($method,$param){
     $this ->input ->$method($param);
 }
@@ -91,14 +87,13 @@ function ($method,$param){
 
 # 使用 or 和 and 截断
 ```php
-<?php
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 isset($page_size) or exit("未设置page_size");
 ```
 
 # 数字处理
 ```php
-<?php
+
 ceil(1243648.43464); // 向上取整 1243649
 round(1243648.43464); // 四舍五入1243648
 intval(1243648.43464); // 强制转换为整型1243648
@@ -106,7 +101,7 @@ intval(1243648.43464); // 强制转换为整型1243648
 
 # 加密函数
 ```php
-<?php
+
 $urlstr = urlencode("我是codekissyoung");
 echo  urldecode($urlstr); // 汉字加密 解密，为了解决传输时，汉字符会丢失的问题
 // 不可逆加密
@@ -125,7 +120,7 @@ convert_uuencode($str);
 ```
 # 时间函数
 ```php
-<?php
+
 $timestamp=time(); // 拿到当前的时间戳
 date_default_timezone_get(); // 得到当前时区
 date_default_timezone_set('PRC'); // 设置默认时区为中国
@@ -136,7 +131,7 @@ strtotime($stringtime); // 时间字符串转时间戳
 ```
 # 测试代码执行时间
 ```php
-<?php
+
 $start_time=microtime();
 //...执行的代码
 $end_time=microtime();
@@ -145,7 +140,7 @@ $execute_time=$end_time-$start_time;
 
 # 字符串函数
 ```php
-<?php
+
 strstr($_POST['email'],'@'); // 判断是否包含子字符串
 strpos($_POST['email'],'@'); // 返回找到的位置
 
@@ -197,7 +192,7 @@ echo $output['arr'][1]; // baz
 
 # 编码转换
 ```php
-<?php
+
 $str="编码转换";
 iconv('UTF-8','GBK',$str); // 将$str内的函数转换为utf-8编码
 
@@ -216,7 +211,7 @@ ucwords("how do you do today?");//How Do You Do Today ?`每个单词首字母大
 
 # 提取子字符串
 ```php
-<?php
+
 substr('abcdefghijklmnopqrstuvwxyz',0,8);//从下标为０开始，开始提取８个 :abcdefgh
 substr('abcdefghijklmnopqrstuvwxyz',20);//从下标为 20 开始，提取到最后 :　vwxyz
 substr('abcdefghijklmnopqrstuvwxyz',-5);//提取倒数５个字符串　：vwxyz
@@ -226,7 +221,7 @@ substr('abcdefghijklmnopqrstuvwxyz',-5,-1);//从倒数　５　个开始，提�
 
 # 替换字符串
 ```php
-<?php
+
 substr_replace('abcdefghijklmnopqrstuvwxyz','***',0,8); // ***ijklmnopqrstuvwxyz 后面的两个数字的参数的使用方法跟substr 一样：
 // 判断数据是合法的json字符串
 function is_json($string) {
@@ -238,7 +233,7 @@ function is_json($string) {
 
 # 数组函数
 ```php
-<?php
+
 // 给数组添加一个元素
 $arr[] = "caokaiyan";//键为数字键
 $arr['xuehao'] = 1001121213;
@@ -356,16 +351,16 @@ print_r($bb); //Array ( [0] => Array ( [0] => 123 [1] => 张三 ) [1] => Array (
 ```
 后端代码
 ```php
-<?php
+
 $filename=$_GET['filename'];
 header('content-disposition:attachment;filename='.basename($filename));
 header('content-length:'.filesize($filename));readfile($filename);
 ```
 
 # 脚本执行完注册函数
+
 ```php
-<?php
-register_shutdown_function(array('core', 'handleShutdown'));
+register_shutdown_function( ['core', 'handleShutdown'] );
 ```
 当我们的脚本执行完成或意外死掉导致PHP执行即将关闭时,我们的这个函数将会 被调用.所以,我们可以使用在脚本开始处设置一个变量为false,然后在脚本末尾将之设置为true的方法,让PHP关闭回调函数检查脚本完成与否. 如果我们的变量仍旧是false,我们就知道脚本的最后一行没有执行,因此它肯定在程序执行到某处死掉了
 http://www.blogdaren.com/post-2030.html
@@ -373,13 +368,13 @@ http://www.blogdaren.com/post-2030.html
 
 # 设置异常处理函数
 ```php
-<?php
+
 set_exception_handler(array('core', 'handleException'));
 ```
 
 # 设置错误处理函数
 ```php
-<?php
+
 set_error_handler(array('core', 'handleError'));
 ```
 
@@ -387,10 +382,10 @@ set_error_handler(array('core', 'handleError'));
 
 ## 防止 SQL 注入 ##
 ```
-﻿mysql_real_escape_string($sql); //转义 sql 字符串中的特殊字符
+mysql_real_escape_string($sql); //转义 sql 字符串中的特殊字符
 ```
 
-## 一些转义函数##
+## 一些转义函数 ##
 
 htmlspecialchars() 使得 HTML 之中的特殊字符被正确的编码，从而不会被使用者在页面注入 HTML 标签或者 Javascript 代码。
 ```
@@ -430,7 +425,7 @@ echo htmlspecialchars_decode($a);
 ## 使用filter 拓展对变量进行过滤##
 地址：http://php.net/manual/zh/filter.examples.validation.php
 ```
-<?php
+
 $email_a = 'joe@example.com';
 $email_b = 'bogus';
 
@@ -445,7 +440,7 @@ if (filter_var($email_b, FILTER_VALIDATE_EMAIL)) {
 ```
 
 ```
-<?php
+
 $ip_a = '127.0.0.1';
 $ip_b = '42.42';
 
@@ -460,7 +455,7 @@ if (filter_var($ip_b, FILTER_VALIDATE_IP)) {
 ```
 
 ```
-<?php
+
 $int_a = '1';
 $int_b = '-1';
 $int_c = '4';
@@ -489,110 +484,6 @@ if (($int_c = filter_var($int_c, FILTER_VALIDATE_INT, $options)) !== FALSE) {
 //This (int_c) integer is considered valid (between 0 and 3) and is 1.
 ```
 
-## RemoveXSS  过滤跨站脚本 ##
-```
-<?php
-function RemoveXSS($val) {
-	// remove all non-printable characters. CR(0a) and LF(0b) and TAB(9) are allowed
-	// this prevents some character re-spacing such as <java\0script>
-	// note that you have to handle splits with \n, \r, and \t later since they *are* allowed in some inputs
-	$val = preg_replace('/([\x00-\x08,\x0b-\x0c,\x0e-\x19])/', '', $val);
-			 
-	// straight replacements, the user should never need these since they're normal characters
-	// this prevents like <IMG SRC=@avascript:alert('XSS')>
-   $search = 'abcdefghijklmnopqrstuvwxyz';
-   $search .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-   $search .= '1234567890!@#$%^&*()';
-   $search .= '~`";:?+/={}[]-_|\'\\';
-   for ($i = 0; $i < strlen($search); $i++) {
-   // ;? matches the ;, which is optional
-		// 0{0,7} matches any padded zeros, which are optional and go up to 8 chars
-		// @ @ search for the hex values
-		$val = preg_replace('/(&#[xX]0{0,8}'.dechex(ord($search[$i])).';?)/i', $search[$i], $val); // with a ;
-		// @ @ 0{0,7} matches '0' zero to seven times
-		$val = preg_replace('/(&#0{0,8}'.ord($search[$i]).';?)/', $search[$i], $val); // with a ;
-	}
-	// now the only remaining whitespace attacks are \t, \n, and \r
-	$ra1 = Array('javascript', 'vbscript', 'expression', 'applet', 'meta', 'xml', 'blink', 'link', 'style', 'script', 'embed', 'object', 'iframe', 'frame', 'frameset', 'ilayer', 'layer', 'bgsound', 'title', 'base');
-	$ra2 = Array('onabort', 'onactivate', 'onafterprint', 'onafterupdate', 'onbeforeactivate', 'onbeforecopy', 'onbeforecut', 'onbeforedeactivate', 'onbeforeeditfocus', 'onbeforepaste', 'onbeforeprint', 'onbeforeunload', 'onbeforeupdate', 'onblur', 'onbounce', 'oncellchange', 'onchange', 'onclick', 'oncontextmenu', 'oncontrolselect', 'oncopy', 'oncut', 'ondataavailable', 'ondatasetchanged', 'ondatasetcomplete', 'ondblclick', 'ondeactivate', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onerrorupdate', 'onfilterchange', 'onfinish', 'onfocus', 'onfocusin', 'onfocusout', 'onhelp', 'onkeydown', 'onkeypress', 'onkeyup', 'onlayoutcomplete', 'onload', 'onlosecapture', 'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onmove', 'onmoveend', 'onmovestart', 'onpaste', 'onpropertychange', 'onreadystatechange', 'onreset', 'onresize', 'onresizeend', 'onresizestart', 'onrowenter', 'onrowexit', 'onrowsdelete', 'onrowsinserted', 'onscroll', 'onselect', 'onselectionchange', 'onselectstart', 'onstart', 'onstop', 'onsubmit', 'onunload');
-   $ra = array_merge($ra1, $ra2);
-   $found = true; // keep replacing as long as the previous round replaced something
-	while ($found == true) {
-	$val_before = $val;
-	for ($i = 0; $i < sizeof($ra); $i++) {
-	$pattern = '/';
-	for ($j = 0; $j < strlen($ra[$i]); $j++) {
-	if ($j > 0) {
-	$pattern .= '(';
-		$pattern .= '(&#[xX]0{0,8}([9ab]);)';
-		$pattern .= '|';
-		$pattern .= '|(&#0{0,8}([9|10|13]);)';
-		$pattern .= ')*';
-		}
-		$pattern .= $ra[$i][$j];
-		}
-		$pattern .= '/i';
-         $replacement = substr($ra[$i], 0, 2).'<x>'.substr($ra[$i], 2); // add in <> to nerf the tag
-         $val = preg_replace($pattern, $replacement, $val); // filter out the hex tags
-         if ($val_before == $val) {
-         // no replacements were made, so exit the loop
-         $found = false;
-	}
-	}
-	}
-	return $val;
-	}
-	?>
-```
-## 验证是否为手机用户访问 ##
-
-```
-﻿
-<?php
-//这个函数用来判断是否为手机访问，调用就可，如果是手机返回true
-function is_mobile_request()
-{
-	$_SERVER['ALL_HTTP'] = isset($_SERVER['ALL_HTTP']) ? $_SERVER['ALL_HTTP'] : '';
-	$mobile_browser = '0';
-	if(preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|iphone|ipad|ipod|android|xoom)/i', strtolower($_SERVER['HTTP_USER_AGENT'])))
-		$mobile_browser++;
-	if((isset($_SERVER['HTTP_ACCEPT'])) and (strpos(strtolower($_SERVER['HTTP_ACCEPT']),'application/vnd.wap.xhtml+xml') !== false))
-		$mobile_browser++;
-	if(isset($_SERVER['HTTP_X_WAP_PROFILE']))
-		$mobile_browser++;
-	if(isset($_SERVER['HTTP_PROFILE']))
-		$mobile_browser++;
-	$mobile_ua = strtolower(substr($_SERVER['HTTP_USER_AGENT'],0,4));
-	$mobile_agents = array(
-			'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
-			'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
-			'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
-			'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
-			'newt','noki','oper','palm','pana','pant','phil','play','port','prox',
-			'qwap','sage','sams','sany','sch-','sec-','send','seri','sgh-','shar',
-			'sie-','siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-',
-			'tosh','tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp',
-			'wapr','webc','winw','winw','xda','xda-'
-	);
-	if(in_array($mobile_ua, $mobile_agents))
-		$mobile_browser++;
-	if(strpos(strtolower($_SERVER['ALL_HTTP']), 'operamini') !== false)
-		$mobile_browser++;
-	// Pre-final check to reset everything if the user is on Windows
-	if(strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'windows') !== false)
-		$mobile_browser=0;
-	// But WP7 is also Windows, with a slightly different characteristic
-	if(strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'windows phone') !== false)
-		$mobile_browser++;
-	if($mobile_browser>0)
-		return true;
-	else
-		return false;
-}
-$a=is_mobile_request();
-var_dump($a);
-```
-
 
 ## 下载 ##
 展示页面
@@ -615,19 +506,17 @@ var_dump($a);
 </html>
 ```
 通过程序下载例程 的 doDownload.php : 主要就是发个头，说明下是附件，然后打开要下载的文件就行，basename(); 是用来去除路径的，只留文件名！
-```
-<?php 
-$filename=$_GET['filename'];
+
+```php
+$filename = $_GET['filename'];
 header('content-disposition:attachment;filename='.basename($filename));
 header('content-length:'.filesize($filename));
 readfile($filename);
 ```
 
-
-
-
 # 分页函数
-```
+
+```php
 /*
  * @分页函数
  * @param		$total		总记录数
@@ -635,9 +524,9 @@ readfile($filename);
  * @param		$page_size	一页的记录条数
  * @param		$pages		显示的最大页码数
  * */
-function paging($total,$page_now,$page_size,$pages){
-	$return['total_pages'] 	= 	ceil($total/$page_size);//总页数
-	$return['pre_page']		=	($page_now>1)?$page_now-1:1;//前一页数
+function paging( $total, $page_now, $page_size, $pages ) {
+	$return['total_pages'] 	= 	ceil($total/$page_size);     //总页数
+	$return['pre_page']		=	($page_now>1)?$page_now-1:1; //前一页数
 	$return['next_page'] 	=	($page_now<$return['total_pages'])?$page_now+1:$return['total_pages'];//下一页
 	$return['page_now']		=	$page_now;//当前页面
 	
@@ -699,8 +588,6 @@ $end_time=microtime();
 $execute_time=$end_time-$start_time;
 ```
 
-
-
 ## 建立自己函数库时，先判断函数是否已经定义了 ##
 ```
 if (!function_exists('is_php')) {
@@ -733,10 +620,9 @@ function expectMyclass(Myclass $obj){
 }
 ```
 ## 使用可变函数作为参数，来决定调用的函数 ##
-```
-/* ci 框架　*/
-function ($method,$param){
-      $this ->input ->$method($param);
+```php
+function ( $method, $param ) {
+      $this ->input -> $method($param);
 }
 ```
 
@@ -762,7 +648,6 @@ base64_decode($string);
 convert_uudecode($str);
 convert_uuencode($str);
 ```
-
 
 ## 格式化数字 ##
 ```
@@ -806,7 +691,7 @@ function is_json($string) {
 "数据１"，"数据２"，"数据３"
 "数据４"，"数据５"，"数据６"
 ```
-## ﻿将二维数组存为　csv  文件fputcsv() ##
+## 将二维数组存为　csv  文件fputcsv() ##
 ```
 $csv_arr = (
     array(1,2,3,4),
@@ -836,7 +721,7 @@ foreach($csv_arr as $csv_arr_line){
 }
 fclose($fh);
 ```
-## ﻿想将　csv 格式的数据存到字符串中 ob buffer  ##
+## 想将　csv 格式的数据存到字符串中 ob buffer  ##
 ```
 $csv_arr = (
     array(1,2,3,4),
@@ -858,11 +743,12 @@ ob_end_clean();
 
 ## 一维数组 ##
 
+```php
+$aa=array("apple","banana","pear","apple","wail","watermalon");
+$bb=array_unique($aa);
+print_r($bb);//Array ( [0] => apple [1] => banana [2] => pear [4] => wail [5] => watermalon
 ```
- $aa=array("apple","banana","pear","apple","wail","watermalon");
- $bb=array_unique($aa);
- print_r($bb);//Array ( [0] => apple [1] => banana [2] => pear [4] => wail [5] => watermalon
-```
+
 ## 二维数组 ##
 1）因为某一键名的值不能重复，删除重复项
 ```
@@ -1008,7 +894,7 @@ $arr[] = "caokaiyan";//键为数字键
 $arr['xuehao'] = 1001121213;
 array_push($array,$var); 
 ```
-- ﻿删除数组中的元素
+- 删除数组中的元素
 ```
 unset($arr['xuehao']);
 $var = array_pop($array);//$var 获取数组最后一个元素,数组减去那个元素
@@ -1083,236 +969,33 @@ join(',',$arr);//返回以 , 分割的字符串
 implode('-',array('a','b','c'));
 ```
 
-## 引用参数的函数 ##
-```
-function test（&$test）{
-//按引用传递值
+```php
+$juices = array("apple", "orange", "koolaid1" => "purple");
+echo "He drank some $juices[0] juice.".PHP_EOL;
+echo "He drank some $juices[koolaid1] juice.".PHP_EOL;
+echo "This works: {$arr['key']}"; // 通过花括号语法才能正确解析带引号的键名
+echo "This works: {$arr[4][3]}"; // 有效
+echo "This is {$great}";
+echo "This is ${great}";
+
+$a = 'aaaa';
+$c['c'] = "ccc";
+$b = "i am '$a' and  '$c[c]' \" 我是双引号！\"";
+echo $b; // i am 'aaaa' and 'ccc' " 我是双引号！"
+
+class beers {
+	const softdrink = 'rootbeer';
+	public static $ale = 'ipa';
 }
+$rootbeer = 'A & W';
+$ipa = 'Alexander Keith\'s';
+// 有效，输出： I'd like an A & W
+echo "I'd like an {${beers::softdrink}}\n";
+// 也有效，输出： I'd like an Alexander Keith's
+echo "I'd like an {${beers::$ale}}\n";
+// 有效
+echo "This square is {$square->width} centimeters broad.";
 ```
-## 默认参数的函数 ##
-```
-function  preson（$name ,$age='20',$sex='男'）
-{
-        echo  “我的名字是{$name}”；
-}
-```
-## ﻿参数个数可以变化的函数 ##
-
-```
-function   more_args()
-{
-        $args=func_get_args();
-        //将所有传递进来的参数封装成一个数组
-        echo $args[0];//输出第一个变量
-}
-```
-## 回调函数 ##
-```
-mixed   funName（callback   arg）
-{
-     //将一个函数当作参数传递进来，这个函数称为回掉函数
-}
-function   filter（$fun）
-{
-        $i=1;
-        return  $fun($i);
-}
-function one($i)
-{
-        retrun  $i*$i;
-}
-filter(one);// 这里将回调函数的名称当作变量，传入里面！
-```
-## 变量函数 ##
-```
-function varfunc($a,$b){
-	return $a + $b;
-}
-$a = 'varfunc';
-echo $a(2,56);
-```
-## 动态创建一个函数 ##
-```
-$func_name=create_function('$message','echo "hello ,{$message}"')；
-echo $func_name;//调用动态创建的函数
-```
-
-## 对函数本身的引用 ##
-```
-<?php
-function &func($a=0){                // 定义一个函数，在前面加上&
-  return $a;                         // 返回参数$a
-}
-$str = &func("PHP对函数的引用！");   // 声明一个函数的引用$str
-echo $str;                           // 输出$str，$str的值实际上就是$a的值。
-?>
-```
-
-## 递归函数 ##
-
-
-## 将配置文件移出文档根目录 ##
-```
-简单的说，互联网上任何不能被用户直接访问的文件都不应该保存在Web站点的文档根目录。
-比如 codekissyoung.com  对应的 web根目录是  /var/www/codekissyoung
-那么所有与 codekissyoung 有关的配置，文档之类的文件，都应该放在/var/www/codekissyoung_etc 下
-在 codekissyoung 的访问接口 index.php 中：
-require "../codekissyoung_etc/etc.php";
-```
-## 严禁将账号密码等明文写于文件中 ##
-
-```
-类似于 数据库配置，网站 常数 KEY 值，管理员账号等敏感信息，应该放于codekissyoung_etc/etc.php 中，严禁明文写在程序中！
-这样做的原因是当一个恶意用户请求一个非php或html文件时可能发生的状况，默认情况下Web服务器会将文件的内容导出到输出流。
-要更好的避免这种情况，还必须确保配置Web服务器为只允许请求php和html文件，而对其他类型的文件请求必须返回错误。
-同样的，任何其他文件，如密码文件、配置文件等，都必须与公众文档根目录隔离。
-还有，不要启用php的allow_url_fopen选项，避免引入其他机器上的文件。
-```
-
-## 文件系统权限 ##
-```
-　　PHP是能够与本地文件系统进行交互的。必须确保在PHP与文件系统交互时的权限问题，保证用户不能看到私密的文件，如php.ini等。
-```
-
-
-```
-<?php
-/*
- * 2014年12月30日自己总结的关于php error 的知识和最佳实践
- * 
- * 先从错误产生流程说起: 
- * php脚本运行--->脚本出错或主动报错---->触发php error 机制
- * ---->机制判断：是否有自定义的错误处理机制？--->(是)使用自定义的机制---->(否)使用php内部的错误机制
- *---->根据错误处理情况，决定脚本是退出还是继续运行
- * 
- * 再说细节：
- * 
- * ----主动报错----
- *trigger_error(‘我的报错信息’,【错误级别】);
- *脚本中，只要执行了这个函数，就会触发上面流程，比如：我传个参数，如果比3大，我就报错！
- *if（$var>3）{
- *	trigger_error(‘数太大了，换一个’,E_USER_WARNING);
- *}
- * 
- * ----自定义错误机制------
- * 我们可以单独写成一个自定义错误处理文件error_handler.php，然后每段脚本都加载它，这样我们就可以用自己的错误机制，而不用php内部的了！
- * 如果这个文件写的好，对开发来说是非常有利的！
- * 
- * 文件推荐写法：
- * error_handler.php
- * 
- * 先根据错误级别，给每个 级别写 上自定义处理函数
- *  function E_ERROR_handler($error_level,$error_message,【$error_file,$error_line,$error_context】){
- *  	函数里面写错误处理代码！
- *  	一般会写的东西：
- *  				错误发生的时间：$time=date("Y-m-d H:i:s");
- *  				错误级别(数值)：$error_level;
- *  				传过来的错误信息：$error_message;
- *  				错误发生的文件名：$error_file;
- *  				错误发生的行数：$error_line;
- *  				错误发生时涉及到的变量数组：$error_context;
- *  	你可以根据$error_level,或者$error_message的值，来决定如何处理错误
- *  				if($error_level==8){....}
- *  				if($error_message=="数据库错误"){...}
- *  	这些东西，你可以选择，将它们打印在屏幕上，然后退出脚本/继续脚本
- *  				echo .....;或者exit(....);
- *  	但是我建议你将它们都分门别类的记录下来;首先，将上面信息链接成字符串 
- *  				$error_log;
- *  	然后，再存到文件中去！
- *  				error_log($error_log;3,'/var/php/error_log/E_ERROR_log.log');
- *  }
- *   function E_WARNING_handler(){....}
- *   function E_NOTICE_handler(){....}
- *   .....
- * 再将每个自定义好的函数，根据错误处理级别，注册到php error 处理机制中去！
- * 	set_error_handler('E_ERROR_handler',E_ERROR);
- * 	set_error_handler('E_NOTICE_handler',E_NOTICE);
- *  .....
- * 
- * ----题后话-----
- * 错误处理的原理和形式是不难的，难点是你如何设计自定义错误处理的handler函数
- * -----附录（错误级别）------
-值		常量						描述
-2		E_WARNING				非致命的 run-time 错误。不暂停脚本执行。
-8		E_NOTICE				Run-time 通知。脚本发现可能有错误发生，但也可能在脚本正常运行时发生。
-256		E_USER_ERROR			致命的用户生成的错误。这类似于程序员使用 PHP 函数 trigger_error() 设置的 E_ERROR。
-512		E_USER_WARNING			非致命的用户生成的警告。这类似于程序员使用 PHP 函数 trigger_error() 设置的 E_WARNING。
-1024	E_USER_NOTICE			用户生成的通知。这类似于程序员使用 PHP 函数 trigger_error() 设置的 E_NOTICE。
-4096	E_RECOVERABLE_ERROR		可捕获的致命错误。类似 E_ERROR，但可被用户定义的处理程序捕获。(参见 set_error_handler())
-8191	E_ALL					所有错误和警告，除级别 E_STRICT 以外。
-（在 PHP 6.0，E_STRICT 是 E_ALL 的一部分）
- * 
- * ----附录(php.ini关于error的设置)-----
- * 开发环境：
- * error_reporting=E_ALL
- * display_errors=On
- * html_errors=On
- * log_errors=Off
- * 上线运营的系统:
- * error_reporting=E_ALL & ~E_NOTICE
- * display_errors=Off
- * html_errors=Off
- * log_errors=On
- * error_log="/var/log/httpd/my-php-error.log"
- * ignore_repeated_errors=on
- * ignore_repeate_source=on
- * 
- * */
-
-
- ```
- echo "This works: {$arr['foo'][3]}";
- echo "This works too: {$obj->values[3]->name}";
- echo "This is the value of the var named $name: {${$name}}";
- echo "value of the var named by the return value of getName(): {${getName()}}";
- echo "value of the var named by the return value of \$object->getName(): {${$object->getName()}}";
- ```
- 解析数组
-
- ```
- $juices = array("apple", "orange", "koolaid1" => "purple");
- echo "He drank some $juices[0] juice.".PHP_EOL;
- echo "He drank some $juices[koolaid1] juice.".PHP_EOL;
- // 有效，只有通过花括号语法才能正确解析带引号的键名
- echo "This works: {$arr['key']}";
- // 有效
- echo "This works: {$arr[4][3]}";
- ```
- 解析变量
-
- ```
- echo "This is {$great}";
- echo "This is ${great}";
-
- ```
- 输出字符串
-
- ```
- $a = 'aaaa';
- $c['c'] = "ccc";
- $b = "i am '$a' and  '$c[c]' \" 我是双引号！\"";
- echo $b; //i am 'aaaa' and 'ccc' " 我是双引号！"
- ```
- {}的解析
-
- ```
- class beers {
-     const softdrink = 'rootbeer';
-     public static $ale = 'ipa';
- }
- $rootbeer = 'A & W';
- $ipa = 'Alexander Keith\'s';
- // 有效，输出： I'd like an A & W
- echo "I'd like an {${beers::softdrink}}\n";
- // 也有效，输出： I'd like an Alexander Keith's
- echo "I'd like an {${beers::$ale}}\n";
- ```
- 解析对象
-
- ```
- // 有效
- echo "This square is {$square->width}00 centimeters broad.";
- ```
 
  判断是否包含子字符串
  ```
@@ -1330,7 +1013,7 @@ require "../codekissyoung_etc/etc.php";
  ```
  将字符串切成数组
  ```
- <?php
+ 
  // 示例 1
  $pizza  = "piece1 piece2 piece3 piece4 piece5 piece6";
  $pieces = explode(" ", $pizza);

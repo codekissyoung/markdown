@@ -64,7 +64,7 @@ composer init
 }
 ```
 
-### 安装依赖 生成vendor/autoload.php自动加载文件
+### 安装依赖 生成 vendor/autoload.php 自动加载文件
 
 ```shell
 composer install
