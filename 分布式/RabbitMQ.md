@@ -184,8 +184,6 @@ $channel->basic_consume('task_queue', '', false, false, false, false, $callback)
 while(count($channel->callbacks)) {
     $channel->wait();
 }
-
-
 */
 
 var_dump($queue_name);

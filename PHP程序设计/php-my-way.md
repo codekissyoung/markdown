@@ -22,10 +22,7 @@
 ```
 class SimpleClass
 {
-    // property declaration
     public $var = 'a default value';
-
-    // method declaration
     public function displayVar() {
         echo $this->var;
     }
@@ -33,8 +30,9 @@ class SimpleClass
 $a = new SimpleClass();
 $b = new SimpleClass();
 ```
-类是对象的模板，实例化一个类就是使用模板生产一个实际对象
+
 #### $this 
+
 指向这个类的当前对象
 ```
 error_reporting(false);

@@ -17,9 +17,9 @@
 
 ## SFTP 插件
 
-- 作者: `liximomo`
-- `Cmd + shift + P` 调出控制台, 执行 `SFTP:config`命令，生成参考配置文件
-- `.vscode/sftp.json` 配置参考
+![](https://img.codekissyoung.com/2019/12/16/209499a3b68058c5b5a5d6212902c222.png)
+
+`Cmd + shift + P` 调出控制台, 执行 `SFTP:config`命令，生成参考配置文件`.vscode/sftp.json`。
 
 ```json
 {
@@ -45,4 +45,10 @@
 }
 ```
 
-## Better Align 对齐插件
+## phpfmt
+
+![](https://img.codekissyoung.com/2019/12/16/922451411336c89dd712aa550aeb5561.png)
+
+安装好后，可以考虑将 `editor.formatOnSave` 设置为`true`。
+
+

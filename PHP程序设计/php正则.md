@@ -21,5 +21,3 @@
 `preg_split($pattern,$subject);`
 
 `preg_quote($str);`
-
-* 
