@@ -1,5 +1,7 @@
 # RabbitMQ
 
+[RabbitMQ PHP版](https://xiaoxiami.gitbook.io/rabbitmq_into_chinese_php/ying-yong-jiao-cheng/php-ban/3-publish_subscribe.md)
+
 ## 基础
 
 ```bash
@@ -184,6 +186,8 @@ $channel->basic_consume('task_queue', '', false, false, false, false, $callback)
 while(count($channel->callbacks)) {
     $channel->wait();
 }
+
+
 */
 
 var_dump($queue_name);

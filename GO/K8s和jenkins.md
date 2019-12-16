@@ -2,10 +2,6 @@
 
 [NordVPN翻墙](https://support.cn-accelerator.site/Restricted-countries/1396307432/Connecting-from-countries-with-internet-restrictions-on-Linux.htm?nsukey=0K8hKmt%2B4dV0Szy7nj4CPuQTEUx2riCzBAso%2FAPCpjLnNXNJQorSeHbivwM2jxTQN9fE2uGNDL5gJFWc4XaQzAiFR7gij7490V9lsnNGlRQiHHEc6TPrxvny7k%2BW21xg3D4CoEcezXOhLkiDN9EjnbZdFhLu4oKsExIVvgcV5IHAf3cOJfsq3xcbQaJh4WFgVy25CHL1hSbok8fEstO6SA%3D%3D)
 
-```bash
-alias start-vpn="echo 'zhangjian0395@163.com zhangjian1';sudo openvpn /etc/openvpn/hk150.nordvpn.com.tcp.ovpn"
-```
-
 [K8s官方文档](https://kubernetes.io/zh/docs/tutorials/kubernetes-basics/)
 
 https://kubernetes.io/docs/tutorials/hello-minikube/

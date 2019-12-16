@@ -177,14 +177,3 @@ echo date("Y-m-d H:i:s",time());
 bool defined(string constants_name);
 ```
 
-```php
-__LINE__            # 文件中的当前行号
-__FILE__            # 文件的完整路径和文件名
-__DIR__             # 文件所在的目录
-__FUNCTION__        # 函数名称
-__CLASS__           # 类的名称
-__TRAIT__           # Trait 的名字
-__METHOD__          # 类的方法名
-__NAMESPACE__       # 当前命名空间的名称
-```
-

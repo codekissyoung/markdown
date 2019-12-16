@@ -6,12 +6,10 @@ class App
     protected $status = '200 Ok';
     protected $type = 'text/html';
     protected $body = 'hello world';
-
     public function addRoute($path, $routeCallback)
     {
         $this->routes[$path] = $routeCallback->bindTo($this, __CLASS__);
     }
-
     public function dispatch($cur_path)
     {
         $this->routes[$cur_path]();
@@ -25,9 +23,10 @@ class App
 
 $app = new App();
 
-$app->addRoute('/users/link', function () {
-    $this->type = 'application/json;charset=utf8';
-    $this->body = '{"name":"link"}';
-});
+var_dump(serialize($app));
 
-$app->dispatch('/users/link');
+// $app->addRoute('/users/link', function () {
+//     $this->type = 'application/json;charset=utf8';
+//     $this->body = '{"name":"link"}';
+// });
+// $app->dispatch('/users/link');

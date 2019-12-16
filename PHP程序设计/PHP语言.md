@@ -2,40 +2,23 @@
 
 PHP与MySQL程序设计(第四版)
 
-安全PHP编程，MVC与Zend框架，MySQL存储引擎和数据类型，存储过程，MySQL触发器，索引和搜索，事务等。
+安全PHP编程
 
 Laravel框架关键技术解析
-
-进入到框架的世界里，从2016年开始说吧，推荐使用Laravel/Thinkphp5.0（Thinkphp5.0，没有书，但是王芳说明很全。）以上支持更多新特性的强大的框架，比如Composer,Artisan,依赖注入，Traits，路由，PSR-4命名规范，组件式的模块扩展，多级缓存使用，分布式等。
 
 [PHP设计模式全集2018](https://learnku.com/docs/php-design-patterns/2018)
 
 PHP应用程序安全编程
 
-本书主要内容包括：去除应用程序安全漏洞，防御PHP攻击，提高运行PHP代码的服务器安全，实施严格的身份验证以及加密应用程序，预防跨站点脚本攻击，系统化测试应用程序安全性，解决第三方应用程序已有漏洞等。
-
 深入PHP面向对象、模式与实践
-
-这本书讲解的知识（对象、高级特性、对象工具、对象与设计、模式等等）不光适用于PHP，它适用于所有支持面向对象技术的语言（如Java,Python,Ruby等），这是这本书最难能可贵之处，它并不是针对某一种语言来讲，而是针对多门语言来讲，书中除了PHP之外还常提及JAVA，如果你曾经接触过JAVA这门强类型语言，那么你在读书过程中能体会到静态语言与动态语言的区别，并且能体会到不管用什么语言来实现需求，最终都能殊途同归---应用面向对象的技术来解决问题。
 
 PHP与Mysql高性能开发
 
-本书以“PHP与MySQL高性能应用开发”为主题，选取了其中为核心的佳实践进行讲解，是一个有十余年PHP开发经验的老程序员的经验总结。首先从语言层面总结了PHP编程中的一些疑点和难点，然后重点讲解了PHP的缓冲、网络编程、缓存技术、命令行、调试、测试、用户验证策略、代码重构等知识；然后重点讲解了MySQL的驱动、存储引擎、性能优化、memcached、sphinx全文搜索引擎等重要主题。
-
 PHP系统核心与最佳实践
-
-由于语言的特性，php语言简单好用导致了编程人员水平以及代码的良莠不齐，工作一到两年的php人员都是模板工人的代名词。此书在一定范围内开阔了开发人员的视野，比如通过面向对象的方式来解决php代码扩展性差的问题，网络编程应用来扩展php的实用范围，并且花费了相当的篇幅进行php源码的剖析，完成一个php的扩展项目，这是深度方面。
 
 高性能PHP应用开发
 
-一本广受好评的php性能优化方面的图书，通过介绍PHP的原理和相关的工具集来实现调优性能的目的。它分析和研究了Web应用程序的前端和后端，并系统地提升了其性能和运行效率。本书还介绍了PHP编码最佳实践的运用以及如何使用工具来应用缓存技术。另外书中也涉及了对web服务器的优化和数据库的优化。
-
-Modern PHP(现代PHP)
-
-介绍了很棒的php新特性。作者还写了 slimphp 微框架，php之道。能潜移默化行程好的php编码风格。
-
-我相信国内很多php开发者对php5.4以后的特征并不了解，国内还有很多公司采用着5.3的版本，这种守旧的思想对国内php开发者的技术成长很不利，虽然本书所讲的新特征在新版手册上都有，但你不一定能看到，本书做了一个很好的归纳。
-
+Modern PHP
 
 ## 变量
 
@@ -214,16 +197,13 @@ $link("give me a book");    // link, give me a book
 class App{
     protected $routes = [];
     protected $status = '200 Ok';
-    protected $type = 'text/html';
-    protected $body = 'hello world';
-
+    protected $type   = 'text/html';
+    protected $body   = 'hello world';
     public function addRoute( $path, $routeCallback ) {
         // 将闭包绑定到 当前 App 实例, 
         $this -> routes[$path] = $routeCallback->bindTo( $this, __CLASS__ );
     }
-
-    public function dispatch( $cur_path )
-    {
+    public function dispatch( $cur_path ){
         // 调用 cur_path 对应的 闭包, 闭包里面是 当时绑定的 app 的实例对象(被闭包操作过)
         $this -> routes[$cur_path] ();
 
@@ -233,14 +213,11 @@ class App{
         echo $this->body;
     }
 }
-
 $app = new App();
-
 $app -> addRoute('/users/link', function(){
     $this -> type = 'application/json;charset=utf8';
     $this -> body = '{"name":"link"}';
 });
-
 $app -> dispatch('/users/link');
 ```
 
