@@ -10,11 +10,11 @@
 #### 通过复制虚拟机 来获取多个节点
 
 ```bash
-$ sudo vim /etc/cloud/cloud.cfg
+sudo vim /etc/cloud/cloud.cfg
 
 preserve_hostname: true             # 修改一句
 
-$ hostnamectl set-hostname cky5     # 之后重启系统
+hostnamectl set-hostname cky5     # 之后重启系统
 ```
 
 ## 1. 更换软件源
@@ -37,12 +37,12 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted unive
 ## 2. 修改DNS
 
 ```bash
-$ sudo vim /etc/systemd/resolved.conf
+sudo vim /etc/systemd/resolved.conf
 
 [Resolve]
 DNS=8.8.8.8
 
-$ sudo systemctl restart systemd-resolved.service
+sudo systemctl restart systemd-resolved.service
 ```
 
 设置时区:
@@ -132,7 +132,13 @@ sudo apt-get install bless                      # 查看二进制，客户端软
 
 `gnome-session-properties` 设置开机自动运行软件。
 
-
+```php
+# 安装 Tab 栏目显示 CPU 和 内存使用率 工具
+sudo add-apt-repository ppa:fossfreedom/indicator-sysmonitor
+sudo apt-get update
+sudo apt-get install indicator-sysmonitor   # 安装好后，Preferences 设置下开机运行就好
+nohup indicator-sysmonitor &                # 手动启动
+```
 
 安装 `Swoole` :
 
