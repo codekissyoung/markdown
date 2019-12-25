@@ -1,66 +1,26 @@
-# Ruby、Gem与Sass
+# Sass
 
-本文是我使用`RVM`、`Ruby`、`Gem`、`Sass`的一些经验笔记。
+使用预编译器`Sass`来生成`CSS`。`Sass`是`ruby`编写的一个工具包，使用`gem`安装。
 
-## RVM 与 Ruby
+## 安装
 
-我在`ubuntu 19.04`上使用`ruby`是使用`RVM`来安装的。
-
-安装以及常用命令:
+[Sass官方文档](https://sass-lang.com/documentation)
 
 ```bash
-sudo apt-get install gpg        # 安装之前需 Install GPG keys:
-gpg --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-curl -sSL https://get.rvm.io | bash -s stable   # 安装命令
-
-rvm get stable                  # rvm 自身升级的命令
-rvm list known                  # 列出 rvm 可以安装的 ruby 版本
-rvm install 2.6.3               # 安装 2.6.3 版本的 ruby
-rvm use 2.6.3                   # 切换到 2.6.3 版本的 ruby
-ruby --version                  # 查看已经在使用的 ruby 的版本
+# ubuntu 18.04 默认是 2.5 版本，能够满足需求了
+$ sudo apt-get install ruby ruby-dev
+# 安装 ruby 后自带 gem 命令，用于管理下载软件包
+# 下面是更新软件源，参考 https://gems.ruby-china.com/
+$ gem sources --remove https://rubygems.org/
+$ gem sources --add https://gems.ruby-china.com/
+$ gem cleanup                     # 清除所有包旧版本，保留最新版本
+$ gem environment                 # 查看gem的环境
+$ gem install sass                # 安装 sass
+$ gem uninstall package-name      # 卸载软件包
+$ sass -v                         # 查看 sass 版本
+$ sass --watch --style expanded scss/:css/   # 监听文件夹,编译风格为可读
+$ sass --watch --style expressed scss/:css/  # 监听文件夹,编译风格为压缩
 ```
-
-参考: [RVM 官网](http://www.rvm.io/)
-
-## ubuntu 与 ruby
-
-如果不想使用`RVM`,那么也可以直接在`ubuntu`里安装默认版本的`ruby`。
-
-```bash
-sudo apt-get install ruby ruby-dev
-```
-
-## GEM
-
-安装好`ruby`后，它自带`gem`命令，所谓`GEM`就是`ruby`的软件包。因为在国内对`GEM`源的访问不太友好，所以一般都要换下国内源。
-
-```bash
-gem --version                                   # 查看gem版本
-gem update --system                             # 更新gem
-gem sources -l                                  # 查看GEM数据源
-gem sources --remove https://rubygems.org       # 删除源
-gem sources --add https://gems.ruby-china.com   # 添加源
-gem install package-name                        # 安装软件包
-gem uninstall package-name                      # 卸载软件包
-gem cleanup                                     # 清除所有包旧版本，保留最新版本
-gem environment                                 # 查看gem的环境
-```
-
-参考: [GEM官网](https://rubygems.org/)
-
-## Sass
-
-我现在不再写纯`CSS`了，而是使用预编译器`Sass`来生成`CSS`。`Sass`是`ruby`编写的一个工具包，使用`gem`安装。
-
-```bash
-gem install sass                # 安装 sass
-sass -v                         # 查看 sass 版本
-sass --watch sass/bootstrap.scss:css/bootstrap.css # 监听编译单个文件
-sass --watch --style expanded scss/:css/           # 监听编译文件夹内所有文件,代码风格为可读
-sass --watch --style expressed scss/:css/          # 监听编译文件夹内所有文件,代码风格为压缩后
-```
-
-参考: [官方使用文档](https://sass-lang.com/documentation)
 
 ## Sass 变量
 

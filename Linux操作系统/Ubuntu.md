@@ -263,17 +263,12 @@ snap list                 # 列出安装的应用
 
 - [QT5.9.5安装包](http://download.qt.io/official_releases/qt/5.9/5.9.5/)
 
-## 截图工具
+### 截图工具
 
-- 自带的截图软件,使用 `shift + printscreen` 截图
+自带的截图软件，使用 `shift + printscreen` 截图，自动保存到指定文件夹，也挺好的！
 
-## 安装 Monaco 字体
-
- 进入github下载这个字体，github地址是`https://github.com/cstrap/monaco-font`,查看安装说明
-
-```bash
-sudo ./install-font-ubuntu.sh https://github.com/todylu/monaco.ttf/blob/master/monaco.ttf?raw=true
-```
+[Linux上好用的截图工具 flameshot](https://blog.csdn.net/qq_34347375/article/details/83589772)，这一款是带画笔工具的，非常好用，唯一就是每次都需要选定保存的文件夹。
+[Flameshot一个简洁但功能丰富的截图工具](https://linux.cn/article-10180-1.html)
 
 ## 解决软件包版本太高问题
 
@@ -479,3 +474,18 @@ Options FollowSymLinks  允许符号链接 Options Indexes         允许�
 AllowOverride None      不允许 .htaccess 重写这个目录，改为 All 则能重写
 </Directory>
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+wget -nc https://dl.winehq.org/wine-builds/winehq.key
+sudo apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'

@@ -1,22 +1,62 @@
-package main						// 当前包
+package main
+
 import (
 	"fmt"
 	"math"
-	"flag"
-)									// 导入包
+)
 
-const 	PI 		= 3.14						// 常量
-var 	name 	= "gopher"					// 全局变量
+// 接口
+type Abser interface {
+	Abs() float64
+}
+type I interface {
+	M()
+}
+type T struct {
+	S string
+}
 
-func init() {
-	flag.StringVar( &name, "name", "jack", "your name: " )
-	fmt.Println( "init..." )
+// 接口实现 Abs()
+type MyFloat float64
+func (f MyFloat) Abs() float64 {
+	if f < 0 {
+		return float64(-f)
+	}
+	return float64(f)
+}
+
+// 接口实现
+type Vertex struct {
+	X, Y float64
+}
+func ( v Vertex ) Abs() float64 {
+	return math.Sqrt( v.X * v.X + v.Y * v.Y)
+}
+
+// T 实现了接口 I
+func (t T) M() {
+	fmt.Println(t.S)
+}
+
+func describe(i I) {
+	fmt.Printf("%v, %T\n", i, i)
 }
 
 func main() {
-	f := "Runoob"
-	flag.Parse()
-	fmt.Printf( "hello %s!\n", name )
-	fmt.Println( math.Exp2(10) )
-	fmt.Println( f )
+	var a Abser
+	// f := MyFloat(-math.Sqrt2)
+	v := Vertex{3, 4}
+
+	a = v
+
+	var i I = T{"hello"}
+	
+	describe( i )
+	
+	fmt.Printf("%v, %T\n", a, a)
+
+	i.M()
 }
+
+
+
