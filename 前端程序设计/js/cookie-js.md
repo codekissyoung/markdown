@@ -74,7 +74,7 @@ return unescape(document.cookie.substring(c_start,c_end))
 
 ## js 管理cookie
 
-```javascript
+```js
 function setCookie(name,value,expires_seconds){
     var cookieString = name + "=" + escape(value);
     //判断是否设置过期时间
