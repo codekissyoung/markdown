@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 class App
 {
@@ -23,10 +22,16 @@ class App
 
 $app = new App();
 
-var_dump(serialize($app));
+// var_dump(serialize($app));
 
 // $app->addRoute('/users/link', function () {
 //     $this->type = 'application/json;charset=utf8';
 //     $this->body = '{"name":"link"}';
 // });
 // $app->dispatch('/users/link');
+?>
+<script>
+console.log(Number(null))       // 0
+console.log(Number(undefined))  // NaN
+
+</script>

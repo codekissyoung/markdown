@@ -78,7 +78,7 @@ git config --global user.email "link@muchenglin.com"    # git email
 
 用户目录 `.vimrc` 修改如下:
 
-```bash
+```vim
 set nu            " 设置行号
 set hlsearch      " 高亮查找项
 set incsearch     " 查找跟随
@@ -86,7 +86,7 @@ set ignorecase    " 查找时忽略大小写
 set fdm=marker    " 设定标记折叠
 set autoindent    " 设置自动缩进
 set tabstop=4     " 设置tab为4个空格
-" set list        " 显示空格和tab
+set list          " 显示空格和tab
 set listchars=tab:>-,trail:- " 显示空格和tab的格式
 syntax on         " 语法高亮
 set tabpagemax=15 " 设置最大打开的标签页数
@@ -120,6 +120,19 @@ sudo apt-get install flex bison itcl3 itk3 iwidgets4
 
 sudo apt-get install lnav                       # 安装终端看访问日志的神器 lnav观看 [服务器端]
 sudo apt-get install bless                      # 查看二进制，客户端软件
+```
+
+## 快捷键
+
+```bash
+alt + F2                # 运行一个命令
+Super + L               # 锁屏,离开工作
+Ctrl + Alt + T          # 开启终端
+Super + tab             # 切换 App
+Shift + Ctrl + Print    # 区域截图到剪贴板
+Shift + Print           # 区域截图到 图片 目录
+Ctrl + shift + A        # 带画笔的截图（Flameshot提供）、
+F5                      # 刷新
 ```
 
 ## 设置软件运行时语言环境
@@ -270,6 +283,10 @@ snap list                 # 列出安装的应用
 [Linux上好用的截图工具 flameshot](https://blog.csdn.net/qq_34347375/article/details/83589772)，这一款是带画笔工具的，非常好用，唯一就是每次都需要选定保存的文件夹。
 [Flameshot一个简洁但功能丰富的截图工具](https://linux.cn/article-10180-1.html)
 
+### 安装企业微信
+
+[Ubuntu16.04/18.04安装企业微信教程](https://blog.svenhetin.com/ubuntu16-04an-zhuang-qi-ye-wei-xin-jiao-cheng/)
+
 ## 解决软件包版本太高问题
 
 - `E:无法修正错误，因为您要求某些软件包保持现状，就是它们破坏了软件包间的依赖关系 解决办法` 就是这个提示
@@ -338,7 +355,7 @@ drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
 *   hard    nproc   200
 ```
 
-# 安装 Memcache
+## 安装 Memcache
 
 sudo apt-get install memcached #安装php memcached 扩展
 memcached -d -m 50 -p 11211 -u root #启动一个memcached服务

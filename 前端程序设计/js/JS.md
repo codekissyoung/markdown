@@ -48,5 +48,120 @@ Node宿主提供：
 
 [到了公司继续学习](https://wangdoc.com/javascript/basic/grammar.html)
 
+## 基本语法
+
+[基本语法](https://wangdoc.com/javascript/basic/grammar.html)
+
+值得注意的是配合`continue`和`break`的`label`标签语法，之前比较少用：
+
+```js
+top:
+for (var i = 0; i < 3; i++){
+    for (var j = 0; j < 3; j++){
+        if (i === 1 && j === 1)
+            break top;
+        console.log('i=' + i + ', j=' + j);
+    }
+} // 跳到这里
+
+foo: {
+  console.log(1);
+  break foo;
+  console.log('本行不会输出');
+} // 跳到这里
+console.log(2);
+
+top:
+for (var i = 0; i < 3; i++){
+    for (var j = 0; j < 3; j++){
+        if (i === 1 && j === 1) // 会跳过当前循环，直接进入下一轮外层循环
+            continue top;
+        console.log('i=' + i + ', j=' + j);
+    }
+}
+```
+
+## 数据类型
+
+**数值**：`1` 和 `3.14`，`JS` 内部，小数与整数都是以`64`位浮点数形式储存。[数值](https://wangdoc.com/javascript/types/number.html) 一文有详细说明，坑爹的设计！
+**字符串**：`'hello world'`
+`Bool`：`true` `false`
+`undefined`：
+`null`：
+
+对象`object`：各种值的合成类型。又分为三个区别很大的子类：
+
+- 狭义的对象
+- 数组
+- 函数 `function`
+
+`Symbol`：
+
+### 区分类型
+
+```js
+typeof 123          // "number"
+typeof '123'        // "string"
+typeof false        // "boolean"
+function f() {}
+typeof f            // "function"
+typeof undefined    // "undefined"
+
+// 要对一个可能不存在的变量进行判断：
+if (v)                        // 错误的写法
+if (typeof v === "undefined") // 正确的写法
+
+typeof window       // "object"
+typeof {}           // "object"
+typeof []           // "object"
+
+typeof null         // "object" 历史原因，坑的一比
+```
+
+[null 和 undefined的区别](https://wangdoc.com/javascript/types/null-undefined-boolean.html) 一文讲的很清楚了，历史的糟粕，不值得研究。
+
+`null`表示“空”对象，`undefined`表示“此处无定义”。
+
+```js
+undefined == null   // true 弱等于
+if( undefined )     // false
+if( null )          // false
+
+console.log(Number(null))       // 0
+console.log(Number(undefined))  // NaN
+5 + undefined                   // NaN
+
+var i;
+console.log(i) // 未赋值变量 undefined
+
+function f(x) {
+    console.log(x);
+    return x;
+}
+f() // 未传参数 undefined
+
+var o = new Object();
+console.log(o.p) // 未定义的成员 undefined
+
+function h() {}
+console.log(h()) // 无返回值的函数 返回undefined
+```
+
+`JS` 预期某个位置应该是布尔值，则该位置的现有的值会自动转换为`bool`值，目前只有`undefined` `null` `false` `0` `NaN` `""` `''` 被视为 `false`，其余所有值为 `true`。
+
+```js
+if ([])     // 空数组为 true
+if ({})     // 空对象为 true
+```
+
+区分数组和对象：
+
+```js
+var o = {};
+var a = [];
+o instanceof Array // false
+a instanceof Array // true
+```
+
 ## 事件驱动和非阻塞式设计
 
