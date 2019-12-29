@@ -83,7 +83,7 @@ for (var i = 0; i < 3; i++){
 
 ## 数据类型
 
-**数值**：`1` 和 `3.14`，`JS` 内部，小数与整数都是以`64`位浮点数形式储存。[数值](https://wangdoc.com/javascript/types/number.html) 一文有详细说明，坑爹的设计！
+**数值**：`1` 和 `3.14`，小数与整数都是以`64`位浮点数形式储存。[数值](https://wangdoc.com/javascript/types/number.html) 一文有详细说明，坑爹的设计！
 **字符串**：`'hello world'`
 `Bool`：`true` `false`
 `undefined`：
@@ -91,11 +91,9 @@ for (var i = 0; i < 3; i++){
 
 对象`object`：各种值的合成类型。又分为三个区别很大的子类：
 
-- 狭义的对象
-- 数组
+- 对象 `Object`
+- 数组 `Array`
 - 函数 `function`
-
-`Symbol`：
 
 ### 区分类型
 
@@ -120,10 +118,10 @@ typeof null         // "object" 历史原因，坑的一比
 
 [null 和 undefined的区别](https://wangdoc.com/javascript/types/null-undefined-boolean.html) 一文讲的很清楚了，历史的糟粕，不值得研究。
 
-`null`表示“空”对象，`undefined`表示“此处无定义”。
+`null`表示“空”对象，`undefined`表示“此处无定义”
 
 ```js
-undefined == null   // true 弱等于
+undefined == null   // true
 if( undefined )     // false
 if( null )          // false
 
@@ -162,6 +160,10 @@ var a = [];
 o instanceof Array // false
 a instanceof Array // true
 ```
+
+### 对象
+
+
 
 ## 事件驱动和非阻塞式设计
 
