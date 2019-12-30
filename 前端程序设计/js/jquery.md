@@ -1,5 +1,7 @@
 # jQuery
 
+一个专业的操作`DOM`的库。
+
 ## 概述
 
 ```js
@@ -25,73 +27,75 @@ $first.css('color', 'red');                             //　给第一个元素�
 ## 选择器
 
 ```js
-$("*");                     // 全选选择器
-$("#my_id");                // id选择器，id是唯一的，每个id值在一个页面中只能使用一次
-$("p");                     // 标签选择器
-$(".class");                // 类选择器
+$("*")                      // 全选
+$("#my_id")                 // 指定 id，id是唯一的，每个id值在一个页面中只能使用一次
+$("p")                      // 指定 标签
+$(".class")                 // 指定 类
 if( $('#box').length > 0 )  // 判断是否选中节点
 ```
 
 ```js
-$("#my_id,p,.class");       // 多选　,符号
-$("ance desc");             // 后代 空格符号
-$("parent>child");          // 子类 > 符号
-$("prev+next");             // 下一个元素 +号
-$("prev~siblings");         // 选择prev之后所有同一层级的元素 ~号
+$("#my_id,p,.class")       // 多选　,符号
+$("ance desc")             // 后代 空格符号
+$("parent>child")          // 子类 > 符号
+$("prev+next")             // 下一个元素 +号
+$("prev~siblings")         // 选择prev之后所有同一层级的元素 ~号
 ```
 
 ```js
-$("li:first");              // 过滤出第一个li
-$("li:last");               // 过滤出最后一个li
-$("li:eq(2)");              // 过滤出第三个li
-$("li:gt(2)");              // 过滤出第三个之后的li
-$("li:lt(2)");              // 过滤出第三个之前的li
-$("li:even")                // 过滤出 偶数项
-$("li:odd")                 // 过滤出 奇数项
-$("li:first-child");        // 第一个子元素，li里如果是文本了,那么就是文本节点 
-$("li:last-child")          // 最后一个子元素
-$(":root")                  // 项目根文档 html
+$("li:first")              // 第一个li
+$("li:last")               // 最后一个li
+$("li:eq(2)")              // 第三个li
+$("li:gt(2)")              // 第三个之后的li
+$("li:lt(2)")              // 第三个之前的li
+$("li:even")               // 偶数项
+$("li:odd")                // 奇数项
+$("li:first-child")        // 第一个子元素，li里如果是文本了,那么就是文本节点 
+$("li:last-child")         // 最后一个子元素
+$("li:only-child")         // 选中唯一子元素
+$(":nth-child")            // 第n个子元素
+$(":nth-last-child")       // 第n个子元素 倒着数
+$(":root")                 // 项目根文档 html
 ```
 
 ```js
-$("li:contains('土豪')");       // 过滤出 包含"土豪"文本的 li
-$("div:parent")                 // 过滤出 拥有子元素或文本节点的 div
-$("div:empty")                  // 过滤出 没有子元素（包含文本节点）的div
-$("li:has('p')");               // 过滤出 含有 p 的 li
+$("li:contains('土豪')")    //  包含"土豪"文本的 li
+$("div:parent")             //  拥有子元素或文本节点的 div
+$("div:empty")              //  没有子元素（包含文本节点）的div
+$("li:has('p')")            //  含有 p 的 li
 ```
 
 ```js
-$("li:hidden");             // 过滤出 不可见元素
-$("li:visble")              // 过滤出 可见
-```
-
-![](https://img.codekissyoung.com/2019/12/30/696a5c951e6ac51460b1510a49c6b799.jpg)
-
-```js
-$("li[title]");             // 过滤出含有某属性的元素
-$("li[title='我最爱']");
-$("li[title!='我最爱']");   // 属性过滤选择器
-$("li[title*='最']");       // 属性值包含选择器
+$("li:hidden")              // 不可见元素
+$("li:visble")              // 可见
 $(":animated")              // 选择所有正在执行动画效果的元素
 ```
 
-![](https://img.codekissyoung.com/2019/12/30/3da8cad316ab56582c6a75a02210ac47.jpg)
 
 ```js
-$("#frmTest :input").addClass("bg_blue");           // 获取 input 表单
-$("#frmTest :text").addClass("bg_blue");            // 获取 type 是 text 的表单
-$("#frmTest :password").addClass("bg_red");         // 获取type是password的表单
-$("#frmTest :radio").attr("disabled","true");       // 获取radio元素
-$("#frmTest :checkbox").attr("disabled","true");    // 获取checkbox元素
-$("#frmTest input:submit").addClass("bg_red");      // 获取submit提交按钮
-$("#frmTest :image").addClass("bg_red");            // 获取图像域的图片 
-$("#frmTest :button").addClass("bg_blue");          // 获取type=button的input和<button>
-$("#frmTest :checked").attr("disabled", true);      // 获取已经checked的元素
-$("#frmTest :selected");                            // 获取下拉框中被选中的元素
+$("li[title]")             // 选择具有 title 属性的 li
+$("li[title='我最爱']")    // 选择 title 为 我最爱的 li
+$("li[title!='我最爱']")   // 上条 取反
+$("li[title*='最']")       // 选择 title 包含 最 的 li
+$("li[title^='crm']")      // 以指定字符串开始
+$("li[title$='crm']")      // 以指定字符串结束
 ```
 
-![](https://img.codekissyoung.com/2019/12/30/95025398e555230fa87ff189cc8a6bd0.jpg)
-![](https://img.codekissyoung.com/2019/12/30/9fabc96cd4db8b634859e5880b09b50b.jpg)
+```js
+$("#frmTest :input")        // 获取所有 input、textarea、select、button 元素
+$("#frmTest :text")         // 获取所有 text 表单
+$("#frmTest :password")     // 获取所有 password 表单
+$("#frmTest :radio")        // 获取所有 radio
+$("#frmTest :checkbox")     // 获取所有 checkbox 
+$("#frmTest :submit")       // 获取所有 submit 按钮
+$("#frmTest :reset")        // 匹配所有 重置按钮
+$("#frmTest :image")        // 获取所有 图像域 
+$("#frmTest :button")       // 获取所有 type=button 的 input 和 <button>
+$("#frmTest :checked")      // 获取所有 checked 的<input>元素
+$("#frmTest :selected")     // 获取所有 下拉框中被选中的<option>
+$("#frmTest :enabled")      // 选取所有 可用的表单元素 
+$("#frmTest :disabled")     // 选取所有 不可用的表单元素 
+```
 
 ### this 在 jQuery 中的含义
 
@@ -109,50 +113,208 @@ $('#test2').click(function () {
 ```
 
 
-## 样式操作
+## 样式篇
+
+`DOM`节点常见的属性有：`src` `title` `id` `class` 
+
+### 属性
 
 ```js
-$(...).attr(传入属性名)：获取属性的值
-$(...).attr(属性名, 属性值)：设置属性的值
-$(...).attr(属性名,函数值)：设置属性的函数值
-$(...).attr(attributes)：给指定元素设置多个属性值
-removeAttr( attributeName ) : 为匹配的元素集合中的每个元素中移除一个属性（attribute）
+$("#client").attr();
+attr(属性名)                // 获取属性的值
+attr(属性名, 属性值)        // 设置属性的值
+attr(属性名, 函数值)        // 设置属性的函数值
+attr(attributes)            // 给指定元素设置多个属性值
+removeAttr( attributeName ) // 为匹配的元素集合中的每个元素中移除一个属性
+
+data(key, value)        // 在标签上的 data- 上存数据
+data(key)               // 从Dom上的 data- 上取数据
 ```
 
-[看到这里 样式](https://www.imooc.com/code/8551)
+### 值、文本、数据
+
+```js
+html()                      // 获取 一个或多个节点内的 innerHTML
+html(htmlString)            // 设置
+html( function(index, oldhtml) ) 
+
+text()                      // 得到匹配元素集合中每个元素的合并文本，包括他们的后代
+text(textString)            // 设置匹配元素内容的文本
+text( function(index, text) )
+
+// 只能使用在表单元素上
+val()                       // 获取匹配的元素集合中第一个元素的当前值
+val( value )                // 设置匹配的元素集合中每个元素的值
+val( function )             // 一个用来返回设置值的函数
+```
+
+### 样式
+
+```js
+addClass("class class2 class3"); // 为每个匹配元素所要增加的一个或多个样式名
+addClass( function(index, currentClass) ) // 这个函数返回一个或更多用空格隔开的要增加的样式名
+removeClass("class1 class2") 　// 每个匹配元素移除的一个或多个用空格隔开的样式名
+removeClass( function(index, class) ) // 一个函数，返回一个或多个将要被移除的样式名
+toggleClass( className ) // 一次执行相当于addClass，再次执行相当于removeClass
+
+css({"background-color":"red","color":"white"}) // 设置css值 (多个)
+css([name1,name2,name3])                        // 获取css值 (返回对象 多个)
+css( propertyName, function ) // 可以传入一个回调函数，返回取到对应的值进行处理
+```
+
+## DOM 节点增删改查
+
+### 创建节点
+
+```js
+$("<div class='right'><div class='aaron'>动态创建DIV元素节点</div></div>");
+```
+
+### 插入节点
+
+大多数方法都可以接收`HTML`字符串，`DOM` 元素，元素数组，或者`jQuery`对象。
+
+```js
+$("body").append("<div>往节点里面追加内容</div>");
+$("body").prepend("<div>往节点里面前边插入内容</div>");
+
+$("<div>追加到后面</div>").appendTo($("body"));
+$("<div>插入到前面</div>").prependTo($("body"));
+
+$("#box").before("<div>插入到#box元素前面</div>"); 
+$("<div>插入到#box元素前面</div>").insertBefore("#box");
+
+$("#box").after("<div>插入到#box元素后面</div>");
+$("<div>插入到#box元素后面</div>").insertAfter("#box");
+```
+
+### 删除节点
+
+```js
+remove();   // 移除本节点(包含后代)，同时销毁绑定的事件，不然会导致内存泄露
+$("p").filter(":contains('3')").remove(); // 还可以前置一个过滤器
+empty();    // 移除了 指定元素中的所有 子 节点
+
+p = $("p").detach(); // 只是页面不可见，但是这个节点还是保存在，数据与事件都不丢失
+$("body").append(p); // 加回到页面中，事件还是存在
+```
+
+### 复制与替换
+
+元素数据`data`内对象和数组不会被复制，将继续被克隆元素和原始元素共享。深复制的所有数据，需要手动复制每一个。
+
+```js
+$("#box").replaceWith("<div>newbox</div>");     // 替换节点
+$("<div>newbox</div>").replaceAll($("#box"));   // 替换节点
+$("p").wrap("<div></div>");                     // <div><p>......</p></div>
+$('p').unwrap();                                // 和 wrap 相反，去掉外层元素
+$("p").wrapInner("<i></i>");                    // <p><i>.....</i></p>
+$("div").clone()                                // 只克隆了结构，事件丢失
+$("div").clone(true)                            // 结构、事件与数据都克隆
+```
+
+### 遍历节点
+
+```js
+// 遍历 index是第几个 this指代当前传入的js的原生dom对象
+each(function(index){
+    if(index == 1){
+        $(this).attr("class",'red');
+    }
+});
+add()
+siblings()
+prev()
+next()
+closet()
+parents()
+parent()
+find()
+children()
+```
+
+## 事件
+
+### 单击事件
+
+```js
+$("#test").click(function() {
+    //this 指向 div元素
+});
+$("#test").click(11111,function(e) {
+    //e.data  => 11111 传递数据
+});
+```
+
+与单击事件同样用法的有：
+
+- `$("#test").mousedown(fn)` 鼠标按下
+- `$("#test").mouseup(fn)` 鼠标弹起
+- `$("#test").mousemove(fn)` 鼠标移动
+- `$("#test").mouseover(fn)` `mouseenter(fn)` 鼠标移入
+- `$("#test").mouseout(fn)` `mouseleave` 鼠标移出
+- `$("#test").focusin()` `focus()` 当一个元素，或者其内部任何一个元素获得焦点的时候，比如表单
+- `$("#test").focusout()` `blur()` 当一个元素，或者其内部任何一个元素失去焦点的时候
+- `$("#test").select(fn)` 当 `textarea` 或文本类型的 `input` 元素中的文本被选择时，会发生 `select` 事件
 
 
-## dom 操作
-```javascript
+### 鼠标悬停事件
+
+```js
+// handlerIn 当鼠标指针进入元素时触发执行的事件函数
+// handlerOut 当鼠标指针离开元素时触发执行的事件函数
+$(selector).hover(handlerIn, handlerOut);
+```
+
+### change 事件
+
+用法与`click`一样，只是要注意：
+
+- **input元素**: 监听value值的变化，当有改变时，失去焦点后触发change事件。对于单选按钮和复选框，当用户用鼠标做出选择时，该事件立即触发。
+- **select元素**: 对于下拉选择框，当用户用鼠标作出选择时，该事件立即触发
+- **textarea元素**: 多行文本输入框，当有改变时，失去焦点后触发change事件
+
+resize,change(元素的value改变时)
+scroll,unload,click,dblclick,mousedown,mouseup,mousemove,mouseout
+mouseenter,mouseleave,,select,submit,keydown,keypress,keyup,error
+
+### 提交表单事件
+
+```js
+<input type="submit">
+<input type="image">
+<button type="submit">
+// 以上三种标签，可以触发提交表单
+<form id="target" action="destination.html">
+  <input type="submit" value="Go" />
+</form>
+$("#target").submit(function(data) {
+    // this指向 from元素 
+   return false; //阻止默认行为，提交表单
+});
+```
+
+### 键盘事件
+
+`keydown` 与 `keyup` `keypress`事件。
+
+```js
+//直接绑定事件
+$elem.keydown( handler(eventObject) )
+//传递参数
+$elem.keydown( [eventData ], handler(eventObject) )
+//手动触发已绑定的事件
+$elem.keydown()
+```
+
+
+## 剩下的
+
+```js
 $("#mydiv")
     |
     |---hide([time,callback]);隐藏一个节点,time是隐藏花费的时间,callback隐藏后需要执行的函数
     |---show([time,callback]); 显示一个节点,(设置display为block)
-    |---html(str); 设置|获取 一个或多个节点内的innerHTML
-    |---text([str]); 设置|获取元素里面的纯文本
-    |---val([str]); 设置|获取表单元素里面的value值
-    |---attr("disabled","true");设置|获取属性
-    |---removeAttr('href'); 移除href属性
-    |---css({"background-color":"red","color":"white"});设置css值
-    |---css([name1,name2,name3]);获取css值
-    |---addClass("class class2 class3"); 添加class
-    |---removeClass("class1 class2"); 移除class
-    |
-    |---each(function(index){if(index == 1){ $(this).attr("class",'red');}});
-    |---遍历,index是第几个,this指代当前传入的js的原生dom对象
-    |
-    |---append("<div>往节点里面后边添加内容</div>");
-    |---prepend("<div>往节点里面前边插入内容</div>");
-    |---$("<div>添加到</div>").appendTo($("body"));
-    |---$("#box").before("<div>插入到#box元素前面</div>");
-    |---$("#box").after("<div>插入到#box元素后面</div>");
-    |---clone() 返回一个复制的该节点
-    |---$("#box").replaceWith("<div>newbox</div>");替换节点
-    |---$("<div>newbox</div>").replaceAll($("#box"));替换节点
-    |---remove(); 移除本节点
-    |---empty(); 清空该节点内的内容
-    |---$("p").wrap("<div></div>"); // <div><p>......</p></div>
-    |---$("p").wrapInner("<i></i>"); // <p><i>.....</i></p>
     |
     |---事件
     |---bind('click mouseout',[data],func);绑定点击,鼠标移出事件
@@ -176,7 +338,7 @@ $("#mydiv")
     |
     |---$.ajax({ url:url ,data:{},dataType:"json",method:'post',
     |            success: function (data, textStatus,xmlHttpRequest) {
-    |          	           //do something...
+    |          	    //do something...
     |            },
     |            complete: function (XHR, TS) { XHR = null }/*释放 ajax 对象内存*/
     |          });
@@ -187,11 +349,6 @@ $("#mydiv")
 
 ## 事件类型
 
-blur(表单失去焦点)
-focus(表单获取焦点)
-resize,change(元素的value改变时)
-scroll,unload,click,dblclick,mousedown,mouseup,mousemove,mouseout
-mouseenter,mouseleave,,select,submit,keydown,keypress,keyup,error
 
 ## 自定义事件
 
@@ -272,55 +429,57 @@ $("input").change(1995,function(c) {
 ```js
 <input id="btntest" type="button" value="点击或移出就不可用了" />
 <script type="text/javascript">
-            $(function () {
-                $("#btntest").bind("click mouseout", function () {
-                    $(this).attr("disabled", "true");
-                })
-            });
+    $(function () {
+        $("#btntest").bind("click mouseout", function () {
+            $(this).attr("disabled", "true");
+        })
+    });
 </script>
 ```
 
 鼠标移入,移出执行函数
 
-```javascript
+```js
 <div>别走！你就是土豪</div>
-        <script type="text/javascript">
-            $(function () {
-                $("div").hover(
-                function () {
-                    $(this).addClass("orange");  //鼠标移入,执行函数
-                },
-                function () {
-                    $(this).removeClass("orange") //鼠标移出,执行寒酸
-                })
-            });
+<script type="text/javascript">
+$(function () {
+    $("div").hover(
+    function () {
+        $(this).addClass("orange");  //鼠标移入,执行函数
+    },
+    function () {
+        $(this).removeClass("orange") //鼠标移出,执行寒酸
+    })
+});
 </script>
 ```
 
 移除绑定的事件
-```javascript
-        <h3>unbind()移除绑定的事件</h3>
-        <input id="btntest" type="button" value="移除事件" />
-        <div>土豪，咱们交个朋友吧</div>
 
-        <script type="text/javascript">
-            $(function () {
-                $("div").bind("click",
-                function () {
-                    $(this).removeClass("backcolor").addClass("color");
-                }).bind("dblclick", function () {
-                    $(this).removeClass("color").addClass("backcolor");
-                })
-                $("#btntest").bind("click", function () {
-                    $("div").unbind("click dbclick");  //移除绑定了的事件
-                    $(this).attr("disabled", "true");
-                });
-            });
-        </script>
+```js
+<h3>unbind()移除绑定的事件</h3>
+<input id="btntest" type="button" value="移除事件" />
+<div>土豪，咱们交个朋友吧</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("div").bind("click",
+        function () {
+            $(this).removeClass("backcolor").addClass("color");
+        }).bind("dblclick", function () {
+            $(this).removeClass("color").addClass("backcolor");
+        })
+        $("#btntest").bind("click", function () {
+            $("div").unbind("click dbclick");  //移除绑定了的事件
+            $(this).attr("disabled", "true");
+        });
+    });
+</script>
 ```
 
 绑定只会触发一次的事件
-```javascript
+
+```js
 <h3>one()方法执行一次绑定事件</h3>
 <div>请点击我一下</div>
         <script type="text/javascript">
@@ -335,7 +494,8 @@ $("input").change(1995,function(c) {
 ```
 
 主动触发绑定的事件
-```javascript
+
+```js
 <h3>trigger()手动触发事件</h3>
 <div>土豪，咱们交个朋友吧</div>
 <script type="text/javascript">
@@ -349,7 +509,8 @@ $("input").change(1995,function(c) {
 ```
 
 文本框的 获得焦点 和失去焦点事件
-```javascript
+
+```js
 <h3>表单中文本框的focus和blur事件</h3>
 <input id="txtest" type="text" value="" />
         <div></div>
@@ -369,7 +530,8 @@ $("input").change(1995,function(c) {
 ```
 
 下拉框的值改变时触发的事件
-```javascript
+
+```js
 <h3>下拉列表的change事件</h3>
 <select id="seltest">
     <option value="葡萄">葡萄</option>
