@@ -105,6 +105,7 @@ function delCookie(name){
 ```
 
 ## Cookies与Ajax
+
 如果Ajax请求访问一个服务器页面，此服务器页面是可以向用户浏览器写入Cookies和Session的。
 
 ## 好资源

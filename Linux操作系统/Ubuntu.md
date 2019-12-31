@@ -104,6 +104,10 @@ sudo apt-get install redis-server
 sudo apt-get install php 
 ```
 
+## 美化Ubuntu
+
+[Ubuntu18桌面美化(MacOS Mojave)](https://blog.csdn.net/barbarassa/article/details/97301735)
+
 ## 后面待定
 
 ```bash

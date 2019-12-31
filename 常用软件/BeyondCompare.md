@@ -12,6 +12,7 @@
 
 ```bash
 #!/bin/bash
-rm "/Users/$(whoami)/Library/Application Support/Beyond Compare/registry.dat" # 删除注册数据文件，用以绕过注册
+# 删除注册数据文件，用以绕过注册
+rm "/Users/$(whoami)/Library/Application Support/Beyond Compare/registry.dat"
 "`dirname "$0"`"/BCompare.real $@ # 使用脚本启动真正的BCompare执行文件
 ```

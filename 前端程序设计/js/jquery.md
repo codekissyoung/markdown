@@ -235,27 +235,127 @@ children()
 
 ## 事件
 
+### 事件绑定
+
+```js
+// 绑定单击事件
+$("#elem").on("click",function(){
+    // ...
+});
+// 多个事件 绑定到一个函数上
+$("#elem").on("mouseover mouseout",function(){
+    // ...
+});
+// 多个事件 分别绑定到不同函数
+$("#elem").on({
+    mouseover:function(){},  
+    mouseout:function(){}
+});
+// 传递数据到处理函数
+function greet( event ) {
+  alert( "Hello " + event.data.name );
+}
+$( "button" ).on( "click", {
+  name: "慕课网"
+}, greet );
+```
+
+```js
+$("elem").off("mousedown")          // 删除一个事件
+$("elem").off("mousedown mouseup")  // 删除多个事件
+$("elem").off()                     // 删除所有事件
+```
+
+## 委托机制
+
+```html
+<div class="left">
+    <p class="aaron">
+        <a>目标节点</a> //点击在这个元素上
+    </p>
+</div>
+<script>
+$("div").on("click","p",function(){
+    // ...
+})
+</script>
+```
+
+事件绑定在最上层`div`元素上，当用户触发在`a`元素上，事件将往上冒泡，一直会冒泡在`div`元素上。但是，如果提供了第二参数，那么事件在往上冒泡的过程中遇到了选择器匹配的元素，将会触发事件回调函数。
+
+## 事件对象
+
+```js
+<ul>
+    <li>点击：触发一</li>
+    <li>点击：触发二</li>
+    <li>点击：触发三</li>
+    <li>点击：触发四</li>
+</ul>
+<script>
+$("ul").on('click',function( event ){
+    alert('触发的元素是内容是: ' + event.target.textContent );
+}
+</script>
+```
+
+如果要响应每一个`li`的事件，常规方法是给所有的`li`都单独绑定一个事件监听，这样写法很符合逻辑，但是同时有显得繁琐，因为`li`都有一个共同的父元素，而且所有的事件都是一致的。
+
+这里我们可以采用要一个技巧来处理，也是常说的"事件委托"，事件没直接和`li`元素发生关系，而且绑定父元素了。由于浏览器有事件冒泡的这个特性，我们可以在触发`li`的时候把这个事件往上冒泡到`ul`上，因为`ul`上绑定事件响应所以就能够触发这个动作了。
+
+怎么才知道触发的`li`元素是哪一个？
+
+答：通过事件对象。
+
+事件对象是用来记录一些事件发生时的相关信息的对象。事件对象只有事件发生时才会产生，并且只能是事件处理函数内部访问，在所有事件处理函数运行结束后，事件对象就被销毁。
+
+
+```js
+event.target                // 代表当前触发事件的元素
+event.type                  // 获取事件的类型
+event.pageX event.pageY     // 获取鼠标当前相对于页面的坐标
+event.preventDefault()      // 阻止默认行为
+event.stopPropagation()     // 阻止事件冒泡
+event.which()               // 获取在鼠标单击时，单击的是鼠标的哪个键
+event.currentTarget         // 在事件冒泡过程中的当前DOM元素 等同于this
+```
+`js` 中事件是会冒泡的，所以`this`是可以变化的，但`event.target`不会变化，它永远是直接接受事件的目标`DOM`元素.
+
+`this`和`event.target`都是`dom`对象，使用`$()`将他们转换为`jquery`对象。
+
+[自定义事件](https://www.imooc.com/code/10155) 不常用，遇见了再说。
+
+```js
+// 定义事件
+$("div").bind("change-color", function () {
+    $(this).addClass("color");
+});
+// 主动触发事件
+$("div").trigger("change-color");
+```
+
 ### 单击事件
 
 ```js
 $("#test").click(function() {
     //this 指向 div元素
 });
-$("#test").click(11111,function(e) {
+$("#test").click(11111, function(e) {
     //e.data  => 11111 传递数据
 });
+$("#test").click(); // 手动触发
 ```
 
 与单击事件同样用法的有：
 
-- `$("#test").mousedown(fn)` 鼠标按下
-- `$("#test").mouseup(fn)` 鼠标弹起
-- `$("#test").mousemove(fn)` 鼠标移动
-- `$("#test").mouseover(fn)` `mouseenter(fn)` 鼠标移入
-- `$("#test").mouseout(fn)` `mouseleave` 鼠标移出
-- `$("#test").focusin()` `focus()` 当一个元素，或者其内部任何一个元素获得焦点的时候，比如表单
-- `$("#test").focusout()` `blur()` 当一个元素，或者其内部任何一个元素失去焦点的时候
-- `$("#test").select(fn)` 当 `textarea` 或文本类型的 `input` 元素中的文本被选择时，会发生 `select` 事件
+`$("#test").mousedown(fn)` 鼠标按下
+`$("#test").mouseup(fn)` 鼠标弹起
+`$("#test").mousemove(fn)` 鼠标移动
+`$("#test").mouseover(fn)` `mouseenter(fn)` 鼠标移入
+`$("#test").mouseout(fn)` `mouseleave` 鼠标移出
+`$("#test").focusin()` `focus()` 当一个元素，或者其内部任何一个元素获得焦点的时候，比如表单
+`$("#test").focusout()` `blur()` 当一个元素，或者其内部任何一个元素失去焦点的时候
+`$("#test").select(fn)` 当 `textarea` 或文本类型的 `input` 元素中的文本被选择时，会发生 `select` 事件
 
 
 ### 鼠标悬停事件
@@ -274,24 +374,22 @@ $(selector).hover(handlerIn, handlerOut);
 - **select元素**: 对于下拉选择框，当用户用鼠标作出选择时，该事件立即触发
 - **textarea元素**: 多行文本输入框，当有改变时，失去焦点后触发change事件
 
-resize,change(元素的value改变时)
-scroll,unload,click,dblclick,mousedown,mouseup,mousemove,mouseout
-mouseenter,mouseleave,,select,submit,keydown,keypress,keyup,error
-
 ### 提交表单事件
 
-```js
+```html
 <input type="submit">
 <input type="image">
 <button type="submit">
-// 以上三种标签，可以触发提交表单
+<!-- 以上三种标签，可以触发提交表单 -->
 <form id="target" action="destination.html">
   <input type="submit" value="Go" />
 </form>
+<script>
 $("#target").submit(function(data) {
     // this指向 from元素 
    return false; //阻止默认行为，提交表单
 });
+</script>
 ```
 
 ### 键盘事件
@@ -299,14 +397,82 @@ $("#target").submit(function(data) {
 `keydown` 与 `keyup` `keypress`事件。
 
 ```js
-//直接绑定事件
-$elem.keydown( handler(eventObject) )
-//传递参数
-$elem.keydown( [eventData ], handler(eventObject) )
-//手动触发已绑定的事件
-$elem.keydown()
+$elem.keydown( handler(eventObject) )               // 直接绑定事件
+$elem.keydown( [eventData ], handler(eventObject) ) // 传递参数
+$elem.keydown()                                     // 手动触发已绑定的事件
 ```
 
+resize，scroll,unload，error
+
+## 核心方法
+
+```js
+// each 就是 for 循环方法的一个包装，内部就是通过 for 遍历数组与对象
+// 可以很方便的遍历一个数据，不需要考虑这个数据是对象还是数组
+$.each(["Aaron", "慕课网"], function(index, value) {
+    // index是索引,也就是数组的索引
+    // value就是数组中的值了
+    return false; // 停止迭代
+});
+
+// 如果要判断数组中是否存在指定值，你需要通过该函数的返回值不等于(或大于)-1来进行判断
+$.inArray(5,[1,2,3,4,5,6,7]) // 返回对应的索引：4
+
+$.trim(str);   // 去除字符串两边的空白字符 backspace tab \n \r
+```
+
+## Ajax 支持
+
+```js
+// 加载 HTML 文本
+$.load( url, function() {
+    // ...
+});
+
+// 加载 json 数据
+$.getJSON(url,function(){
+    // ...
+});
+
+// 异步请求并执行服务器中的 JS 脚本
+$.getScript(url,function(){
+    // ...
+});
+```
+
+```js
+// 使用 GET 请求获取数据
+$.get(url,function(data){
+    // ...
+},"json");
+
+// 使用 POST 发送数据，并且处理返回
+$.post( url, {
+        num:$("#txtNumber").val()
+    },
+    function(data){
+        // ...
+    },"json" );
+
+// 底层方法
+$.ajax( {
+            url: url ,
+            data: {},
+            dataType: "json",
+            method: 'post',
+            success: function (data, textStatus,xmlHttpRequest) {
+                //do something...
+            },
+            complete: function (XHR, TS) {
+                XHR = null; // 释放 ajax 对象内存
+            }
+        } );
+
+$(selector).serialize(); // 将表单中 name => value 序列化，生成标准URL编码字符串，直接可用于ajax请求
+$.ajaxSetup([dataType:"json"])        // ajax 全局化设置
+$(selector).ajaxStart(function(){})   // ajax 执行前调用的函数
+$(selector).ajaxStop(function(){})    // ajax 执行完后调用的函数
+```
 
 ## 剩下的
 
@@ -335,33 +501,11 @@ $("#mydiv")
     |---$("span").animate({left: "+=100px"},3000, function () {});渐渐向右移动100px
     |---$(selector).stop(); 立即停掉当前元素的所有动画
     |---$(selector).delay(time);将元素的动画延迟time毫秒,再继续执行
-    |
-    |---$.ajax({ url:url ,data:{},dataType:"json",method:'post',
-    |            success: function (data, textStatus,xmlHttpRequest) {
-    |          	    //do something...
-    |            },
-    |            complete: function (XHR, TS) { XHR = null }/*释放 ajax 对象内存*/
-    |          });
-    |---$.ajaxSetup([dataType:"json"]) ajax 全局化设置
-    |---$(selector).ajaxStart(function()) ajax 执行前调用的函数
-    |---$(selector).ajaxStop(function()) ajax 执行完后调用的函数
 ```
 
-## 事件类型
+### data-xxx 自定义属性
 
-
-## 自定义事件
-
-```js
-$("div").bind("change-color", function () {
-    $(this).addClass("color");
-});
-$("div").trigger("change-color");
-```
-
-# data-xxx 自定义属性
-
-jquery的data()方法存取data-xxx 定义属性，方法允许我们在DOM元素上绑定任意类型的数据,避免了循环引用的内存泄漏风险。
+`data()`允许我们在`DOM`元素上绑定任意类型的数据。
 
 ```js
 .data( key, value )
@@ -369,41 +513,43 @@ jquery的data()方法存取data-xxx 定义属性，方法允许我们在DOM元�
 .data( key )
 .data()
 <div data-role="page" data-last-value="43" data-hidden="true" data-options='{"name":"John"}'></div>
-```
-
-下面代码都是返回true的
-
-```javascript
+<script>
+// 下面代码都是返回true的
 $("div").data("role")==="page";
 $("div").data("lastValue")===43;
 $("div").data("hidden")===true;
 $("div").data("options").name==="John";
+</script>
 ```
-
 
 ## jquery.cookie.js 操作web客户端cookie
 
 ```javascript
 $('#create_cookie').on('click',function(){
-// $.cookie('name', 'value');
-$.cookie('name', 'codekissyoung', { expires: 7, path: '/' });
+    // $.cookie('name', 'value');
+    $.cookie('name', 'codekissyoung', { expires: 7, path: '/' });
 });
 
 $('#read_cookie').on('click',function(){
-console.log($.cookie('name')); // => "value"
+    console.log($.cookie('name')); // => "value"
 });
 
 $('#delete_cookie').on('click',function(){
-console.log($.removeCookie('name',{path:'/'})); //true
+    console.log($.removeCookie('name',{path:'/'})); //true
 });
 ```
 
 ## 事件处理
 
-.on()方法事件处理程序到当前选定的jQuery对象中的元素。在jQuery 1.7中，.on()方法 提供绑定事件处理的所有功能。为了帮助从旧的jQuery事件方法转换过来，查看 .bind(), .delegate(), 和 .live(). 要删除的.on()绑定的事件，请参阅.off()。要绑定一个事件，并且只运行一次，然后删除自己， 请参阅.one()
-也就是说 , 新版的 事件绑定变了.......... bind( )  live()  delegate ( ) 都要被替换成 on
-onclick 事件，直接写成触发一个函数！这个应该是最原始的吧！
-```javascript
+.on()方法事件处理程序到当前选定的jQuery对象中的元素。在jQuery 1.7中，.on()方法 提供绑定事件处理的所有功能。
+为了帮助从旧的jQuery事件方法转换过来，查看 .bind(), .delegate(), 和 .live(). 
+要删除的.on()绑定的事件，请参阅 .off()。要绑定一个事件，并且只运行一次，然后删除自己， 请参阅.one()
+也就是说 , 新版的 事件绑定变了 bind( )  live()  delegate ( ) 
+都要被替换成 on onclick 事件，直接写成触发一个函数！
+
+这个应该是最原始的吧！
+
+```js
 <button class="add_event_product　btn btn-xs btn-danger" value="14" onclick="un_publish(this);">
 不发布
 </button>
@@ -411,16 +557,16 @@ onclick 事件，直接写成触发一个函数！这个应该是最原始的吧
 
 值改变就触发的事件
 
-```javascript
+```js
 <form action="">
 	<input type = 'text'>
 </form>
 <script type="text/javascript">
 $("input").change(1995,function(c) {
-	  console.log(c.data);//1995
-	  var a = $(this).val();
-	  alert("change now !"+a);
-	});
+    console.log(c.data); //1995
+    var a = $(this).val();
+    alert("change now !"+a);
+});
 </script>
 ```
 
