@@ -2,24 +2,11 @@
 
 `Ubuntu 18.04` 作为示范机，U盘装机软件 `LinuxLive USB Creator`。
 
-## 0. 安装设置
+## 制作一个干净的 Ubuntu18.04 Server
 
-用户名: `cky` 或 `link`
-软件源: `http://mirrors.aliyun.com/ubuntu/`
+### 1. 更换软件源
 
-#### 通过复制虚拟机 来获取多个节点
-
-```bash
-sudo vim /etc/cloud/cloud.cfg
-
-preserve_hostname: true             # 修改一句
-
-hostnamectl set-hostname cky5     # 之后重启系统
-```
-
-## 1. 更换软件源
-
-如果安装时，未更换软件源，则可修改 `/etc/apt/sources.list` 为如下内容:
+修改 `/etc/apt/sources.list` 为如下内容:
 
 ```bash
 deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
@@ -34,29 +21,148 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted univer
 deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
 ```
 
-## 2. 修改DNS
+### 2. 更换DNS
+
+换到`DNSPod`的 `PublicDNS` [官方指南](https://support.dnspod.cn/Kb/showarticle/tsid/240/#link2)，`Ubuntu18`的设置操作与指南里不同。
 
 ```bash
-sudo vim /etc/systemd/resolved.conf
+$ systemd-resolve --status          # 查看当前使用的 DNS Server
+
+$ sudo vim /etc/systemd/resolved.conf
 
 [Resolve]
-DNS=8.8.8.8
+DNS=119.29.29.29 182.254.116.116    # 换成DNSPod
 
-sudo systemctl restart systemd-resolved.service
+$ sudo systemctl restart systemd-resolved.service # 重启服务
 ```
 
-设置时区:
+### 3. 设置 vim
 
 ```bash
-sudo tzselect   # 选择亚洲Asia，继续选择中国China，最后选择北京Beijing
+$ sudo update-alternatives --config editor                # 默认编辑设置为vim
 ```
 
-## 3. 安装服务端基础开发软件
+```vim
+" ~/.vimrc
+set nu                        " 设置行号
+set hlsearch                  " 高亮查找项
+set incsearch                 " 查找跟随
+set ignorecase                " 查找时忽略大小写
+set fdm=marker                " 设定标记折叠
+set autoindent                " 设置自动缩进
+set tabstop=4                 " 设置tab为4个空格
+set list                      " 显示空格和tab
+set listchars=tab:>-,trail:-  " 显示空格和tab的格式
+syntax on                     " 语法高亮
+set tabpagemax=15             " 设置最大打开的标签页数
+```
+
+### 4. 免密登录
+
+```bash
+$ scp .ssh/id_rsa.pub link@192.168.1.181:/home/link/id_rsa.pub  # PC 机执行
+# 登录虚拟机，然后执行下面两句
+$ ssh-keygen  # 每复制一个虚拟机，公私钥就得重置下，保证每台机器都不同
+$ cat id_rsa.pub >> .ssh/authorized_keys # 公私钥的重置，不影响 authorized_keys 的值
+$ chmod 600 .ssh/authorized_keys              
+```
+
+### 5. 设置时区
+
+```bash
+$ sudo tzselect   # 选择亚洲Asia，继续选择中国China，最后选择北京Beijing
+
+# 将下面这句加入到 ~/.profile
+TZ='Asia/Shanghai'; export TZ
+```
+
+### 6. 设置语言
+
+```bash
+$ sudo apt-get install -y language-pack-zh-hans # 安装中文简体语言包
+$ locale -a                                     # 查看已安装的语言包
+
+# 将下面这句写入到 ~/.bashrc 只给当前用户修改下环境变量，不需要全局
+
+export LANG="zh_CN.utf8"
+
+$ date #　重启后，查看下时间，就知道中文和时区已经配置好了
+2020年 01月 02日 星期四 23:41:23 CST
+```
+
+### 7. 设置 hostname
+
+```bash
+$ sudo vim /etc/cloud/cloud.cfg     # 将 hostname 设置为可修改状态
+
+preserve_hostname: true             # 修改一句
+
+$ hostnamectl set-hostname link1    # 设置新 hostname，重启确认
+```
+
+### 8. 设置静态 IP
+
+首先，我们需要确认下本网段内，哪些私有`IP`已经被使用了，以及网关地址。
+
+```bash
+$ sudo nmap -sP 192.168.13.0/24 # 先嗅探下，找出本网段中没有被使用过的私有 IP 地址
+$ route -n                      # 找出网关地址
+```
+
+找到一个未使用的`IP` 比如 `192.168.0.10`，我们就可以开始设置了。`Ubuntu 18.04`使用了新软件`netplan`来管理`IP`。
+
+```bash
+$ sudo vim /etc/netplan/50-cloud-init.yaml        # yaml 文件名可能有不同
+```
+
+设置如下，`yaml`文件千万要注意格式:
+
+```yaml
+network:
+    ethernets:
+        enp0s3:
+            addresses: [192.168.0.10/24, ]
+            gateway4: 192.168.0.1
+            dhcp4: no
+    version: 2
+```
+
+```bash
+$ sudo netplan apply    # 重启下网络，如果是 ssh 链接，那么执行后会掉线
+$ ifconfig              # 确认下是否已经修改
+```
+
+## 快速复制多个 Ubuntu Server
+
+在制作完一个干净的`Ubuntu 18.04 Server`后，我们完全可以以它作为源，复制出多个`Server`用于实验。这里利用的是`Virtual Box`的 “链接复制”，复制快速，节省磁盘。要注意重新生成网卡的`MAC`地址。
+
+![](https://img.codekissyoung.com/2020/01/03/684bc8654a94444a0fffcd12a11bdfa0.png)
+
+复制完后的`Server`，它们的公私钥、`hostname` 和 `ip` 是一毛一样的，所以我们需要修改下，启动后：
+
+```bash
+$ ssh link@192.168.0.10         # 副本与源Server一毛一样，所以直接ssh登录副本
+
+# SSH 登录副本后
+$ ssh-keygen                                  # 重新生成公私钥
+$ sudo hostnamectl set-hostname link1         # 设置新的 hostname
+$ sudo vim /etc/netplan/50-cloud-init.yaml    # 修改静态 IP
+
+addresses: [192.168.0.11/24, ]                # 修改行
+
+$ sudo netplan apply                          # 应用生效，执行后 SSH 应该已经掉线了 ^_^
+
+# 新开终端后
+$ ssh link@192.168.0.11                       # 使用新 IP 免密登录 link1 Server
+```
+
+服务器都设置好后，使用“无界面启动”模式启动，然后使用`ssh link@192.168.0.*`登录。
+
+## 安装服务端基础开发软件
 
 ```bash
 sudo apt-get install -y apt-transport-https
 sudo apt-get install -y vim git aptitude zsh tree tmux lnav
-sudo apt-get install -y language-pack-zh-hans zhcon        # 中文支持
 sudo apt-get install -y bash-builtins bash-completion bash-doc bash-static
 sudo apt-get install -y rar unrar p7zip zip unzip          # 压缩
 
@@ -67,41 +173,19 @@ sudo apt-get install -y automake autoconf libtool pkg-config intltool checkinsta
 ```
 
 ```bash
-sudo update-alternatives --config editor                # 默认编辑设置为vim
 git config --global core.quotepath false                # git 中文正确显示
 git config --global core.editor vim                     # 默认编辑器 vim
 git config --global user.name "link"                    # git username
 git config --global user.email "link@muchenglin.com"    # git email
 ```
 
-## 4. 设置 vim 
-
-用户目录 `.vimrc` 修改如下:
-
-```vim
-set nu            " 设置行号
-set hlsearch      " 高亮查找项
-set incsearch     " 查找跟随
-set ignorecase    " 查找时忽略大小写
-set fdm=marker    " 设定标记折叠
-set autoindent    " 设置自动缩进
-set tabstop=4     " 设置tab为4个空格
-set list          " 显示空格和tab
-set listchars=tab:>-,trail:- " 显示空格和tab的格式
-syntax on         " 语法高亮
-set tabpagemax=15 " 设置最大打开的标签页数
-
-" 定义快捷键
-noremap <F6> :set nu
-```
-
-## 5. 安装 lnmp 环境
+## 安装 lnmp 环境
 
 ```bash
 sudo apt-get install nginx
 sudo apt-get install mysql-server mysql-client
 sudo apt-get install redis-server
-sudo apt-get install php 
+sudo apt-get install php
 ```
 
 ## 美化Ubuntu
@@ -265,17 +349,6 @@ snap list                 # 列出安装的应用
 /snap/htop
 ```
 
-## 接入GitHub
-
-- 生成密钥 `ssh-keyen`, 将密钥`~/.ssh/id_rsa.pub`上传到 `Github > Settings > SSH And GPG keys`
-
-## 连接到远程开发服务器
-
-- 将密钥`~/.ssh/id_rsa.pub`加入到远程服务器的`~/.ssh/authorized_keys`中
-- 在客户机执行`scp .ssh/id_rsa.pub cky@codekissyoung.com:~/id_rsa.pub`
-- 然后在远程服务器执行 `cat id_rsa.pub >> .ssh/authorized_keys`, 记得修改`authorized_keys`的权限位`600`
-- 登陆远程服务器 `ssh cky@codekissyoung.com`
-
 ## 安装QT
 
 - [QT5.9.5安装包](http://download.qt.io/official_releases/qt/5.9/5.9.5/)
@@ -361,8 +434,13 @@ drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
 
 ## 安装 Memcache
 
-sudo apt-get install memcached #安装php memcached 扩展
-memcached -d -m 50 -p 11211 -u root #启动一个memcached服务
+```bash
+$ sudo apt-get install memcached      # 安装 php memcached 扩展
+$ memcached -d -m 50 -p 11211 -u root # 启动一个 memcached 服务
+# 使用telnet测试 memcached 服务
+$ telnet localhost 11211 Trying 127.0.0.1...Connected to localhost.
+```
+
 -d 是启动一个守护进程 
 -m 指定使用多少兆的缓存空间；
 -p 指定要监听的端口； 
@@ -370,8 +448,7 @@ memcached -d -m 50 -p 11211 -u root #启动一个memcached服务
 -l 是监听的服务器ip地址，默认为127.0.0.1  
 -c 是最大并发连接数，默认1024 
 -P 是保存pid文件 如/tmp/memcached.pid
-使用telnet测试 memcached 服务
-$ telnet localhost 11211 Trying 127.0.0.1...Connected to localhost.
+
 
 ## 安装并配置apache2.4
 
@@ -452,6 +529,7 @@ RewriteCond %{HTTP_HOST} !^www.163.com [NC]RewriteRule ^/(.*) http://www.163.com
 ```
 
 ## 核心模块
+
 ```bash
 core_module,so_module,http_module,mpm
 ```
@@ -495,18 +573,3 @@ Options FollowSymLinks  允许符号链接 Options Indexes         允许�
 AllowOverride None      不允许 .htaccess 重写这个目录，改为 All 则能重写
 </Directory>
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-wget -nc https://dl.winehq.org/wine-builds/winehq.key
-sudo apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'
