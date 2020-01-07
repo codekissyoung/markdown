@@ -50,9 +50,7 @@ func main() {
 	a = v
 
 	var i I = T{"hello"}
-	
 	describe( i )
-	
 	fmt.Printf("%v, %T\n", a, a)
 
 	i.M()
