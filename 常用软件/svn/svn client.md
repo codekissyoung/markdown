@@ -42,7 +42,7 @@ svn revert file/path 回退对某一个文件／目录的修改
 svn revert -R path   递归回退
 ```
 
-- 一般的使用场景: `svn add`了但未提交的，不小心修改但未提交的，不小心删除的在版本库里的文件
+一般的使用场景: `svn add`了但未提交的，不小心修改但未提交的，不小心删除的在版本库里的文件
 
 ## 添加忽略文件
 
@@ -148,4 +148,3 @@ svn resolved  path: 移除工作副本的目录或文件的“冲突”状态。
 svn 分为server 和 client , client 从server copy 副本，commit 修改，update 更新，并且形成日志！
 svn 监听3690端口
 svn 可以是单独svnserver（svn://协议访问） ,也可以是 apache 插件 (http://访问)
-

@@ -250,8 +250,6 @@ if [ $UID -ne 0 ]; then
 fi
 ```
 
-
-
 ### 字符串分割符
 
 `IFS` 是系统环境变量，表示分割字符，通常是空格、制表符 和 换行符
@@ -632,7 +630,6 @@ function repeat()
       sleep 5; # 如果失败了,那么就再延迟5秒，再循环执行命令
     done
 }
-#　eg.
 repeat wget -c http://www.xunlei.com/software-aa.tar.gz
 ```
 
@@ -643,8 +640,8 @@ repeat wget -c http://www.xunlei.com/software-aa.tar.gz
 count=1;
 for img in `find . -iname "*.png" -o -iname '*.jpg'`; do
   ext=${img##*.}
-  new_name="image_"$count.$ext;
-  mv $img $new_name;
-  let count++;
-done;
+  new_name="image_"$count.$ext
+  mv $img $new_name
+  let count++
+done
 ```

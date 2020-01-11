@@ -9,9 +9,9 @@
     "editor.fontFamily": "ubuntu mono",
     "markdown.preview.fontFamily": "'Ubuntu mono', 'Droid Sans', sans-serif",
     "editor.detectIndentation": false,
-    "window.menuBarVisibility":"custom", // 去掉难看的系统标题栏，改用Vscode自己的
-    "editor.fontSize": 16,  // 调整编辑器字体大小
-    "window.zoomLevel": 1   // 调整系统界面大小
+    "window.titleBarStyle":"custom", // 去掉难看的系统标题栏
+    "editor.fontSize": 16,  // 编辑器字体大小
+    "window.zoomLevel": 1   // 系统界面缩放
 }
 ```
 

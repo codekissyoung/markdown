@@ -4,54 +4,43 @@
 
 ## 原理
 
-- 使用一种被称为 **公私钥** 认证的方式来进行ssh登录. 
-- 首先在客户端上创建一对公私钥 （公钥文件：`~/.ssh/id_rsa.pub` 私钥文件`~/.ssh/id_rsa`）然后把公钥放到服务器上（`~/.ssh/authorized_keys`）, 自己保留好私钥
-- 当ssh登录时,ssh程序会发送私钥去和服务器上的公钥做匹配.如果匹配成功就可以登录了
+每台服务器上的每个用户都可以生成本用户的一对 “公私钥”，用户A 将公钥`id_rsa.pub`内容写入到 用户B 的受信任的公钥文件`authorized_keys`里，则用户A使用`ssh userB@hostB`命令登录`hostB`时。用户A 的私钥`id_rsa`与`hostB`中`authorized_keys`的某行内容匹配了，可直接免密登录。
 
-## server
-
-- `/etc/init.d/ssh restart`  启动 ssh
-- `netstat -tlp` 判断ssh是否运行，检测到`tcp6 0 0 *:ssh *:* LISTEN`就说明启动成功
-- `sudo systemctl restart sshd.service` centos7.2 使用
-- 如果用户目录下没有`.ssh`目录 ,则可以使用`ssh-keygen -t rsa`创建下,不要自己`mkdir`
-
-## client
-
-- `ssh caokaiyan@192.168.0.103`登录服务器
-- `ssh-keygen -t rsa`生成密钥对
-- `ssh -t hostA ssh hostB` 直接连接到只能通过主机B连接的主机A 当然，你要能访问主机A才行
-
-## login without password
-
-1. `scp .ssh/id_rsa.pub chenlb@192.168.1.181:/home/chenlb/id_rsa.pub`
-1. `cat id_rsa.pub >> .ssh/authorized_keys`
-1. `chmod 600 .ssh/authorized_keys`
-
-## transmit file
-
-- `scp /home/daisy/full.tar.gz 　root@172.19.2.75:/home/root` 把当前一个文件copy到远程另外一台主机上
-- `scp shuidao@123.56.113.80:/home/shuidao/submail_statistic/* 　./`把文件从远程主机copy到当前系统
-
-## 持久连接
-
-- 设置客户端 `/etc/ssh/ssh_config`
+如果两台机器分别将公钥，写入到对方的`authorized_keys`里，那么可以互相免密登录，俗称“互信”。
 
 ```bash
-ServerAliveInterval 60  #client 每60s请求下server，从而保持连接
-ServerAliveCountMax 3  #client 请求后，server没有响应得次数达到3，就自动断开连接
+$ ssh-keygen                    # 生成公私钥
+~/.ssh/id_rsa.pub               # 公钥文件
+~/.ssh/id_rsa                   # 私钥文件
+~/.ssh/authorized_keys          # 信任的公钥文件 权限 0600
 ```
-
-- 设置服务器端 需要重启 ssh server `/etc/ssh/sshd_config`
 
 ```bash
-ClientAliveInterval 60 # server每60s请求下client，然后client响应，从而保持连接
-ClientAliveCountMax 3 #server请求后，client没有响应得次数达到3，就自动断开连接
+$ /etc/init.d/ssh restart
+$ netstat -tlp                          # 判断ssh是否运行
+$ sudo systemctl restart sshd.service
+$ ssh caokaiyan@192.168.0.103
+$ ssh -t hostA ssh hostB                # 通过 hostB 连接到 hostA 跳板机 
 ```
-
-## 实时SSH网络吞吐量测试
 
 ```bash
-yes | pv | ssh $host "cat > /dev/null" # 首先要apt-get install pv
+$ scp .ssh/id_rsa.pub cky@101.202.144.41:~/id_rsa.pub # 本机传文件到远程机器
+$ cat id_rsa.pub >> .ssh/authorized_keys              # 远程机器 执行
+$ chmod 600 .ssh/authorized_keys                      # 修改权限
 ```
 
-- [25个必须记住的SSH命令](http://blog.urfix.com/25-ssh-commands-tricks/)
+```bash
+$ scp ./full.tar.gz 　cky@101.200.144.41:~/data/ # 本地 => 远程
+$ scp cky@101.200.144.41:~/data/aa.txt ./        # 远程 => 本地
+$ yes | pv | ssh $host "cat > /dev/null"         # 实时SSH网络吞吐量测试
+```
+
+保持持久连接
+
+```bash
+# /etc/ssh/ssh_config
+ServerAliveInterval 20  # 每 20s 请求下 server 从而保持连接
+ServerAliveCountMax 5   # server 未响应5次 就断开连接
+```
+
+[25个必须记住的SSH命令](http://blog.urfix.com/25-ssh-commands-tricks/)

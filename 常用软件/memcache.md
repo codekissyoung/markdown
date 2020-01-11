@@ -89,6 +89,22 @@ If its already installed, specify its path using --with-libevent=/dir/
 - 已经安装了libevent，因为libevent 这个包是系统默认安装的，没有安装相应的开发所用的头文件。可以yum安装如下：`yum install libevent-devel`安装后再编译就没有问题了
 
 
+## 安装 Memcache
+
+```bash
+$ sudo apt-get install memcached      # 安装 php memcached 扩展
+$ memcached -d -m 50 -p 11211 -u root # 启动一个 memcached 服务
+# 使用telnet测试 memcached 服务
+$ telnet localhost 11211 Trying 127.0.0.1...Connected to localhost.
+```
+
+-d 是启动一个守护进程 
+-m 指定使用多少兆的缓存空间；
+-p 指定要监听的端口； 
+-u 指定以哪个用户来运行
+-l 是监听的服务器ip地址，默认为127.0.0.1  
+-c 是最大并发连接数，默认1024 
+-P 是保存pid文件 如/tmp/memcached.pid
 
 
 
