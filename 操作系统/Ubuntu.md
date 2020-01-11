@@ -70,10 +70,15 @@ $ chmod 600 .ssh/authorized_keys
 ### 5. 设置时区
 
 ```bash
+$ sudo apt-get install ntpdate  # 安装时间同步工具
+$ sudo ntpdate cn.pool.ntp.org  # 同步时间
+$ sudo hwclock --systohc        # 将同步后时间写入硬件
+
 $ sudo tzselect   # 选择亚洲Asia，继续选择中国China，最后选择北京Beijing
 
 # 将下面这句加入到 ~/.profile
 TZ='Asia/Shanghai'; export TZ
+$ date                          # 查看时间
 ```
 
 ### 6. 设置语言

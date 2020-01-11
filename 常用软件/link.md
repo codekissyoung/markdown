@@ -152,27 +152,18 @@
 - [InfoQ](http://www.infoq.com/cn)
 - [freebuf 关注黑客与极客](http://www.freebuf.com/)
 - [异步社区　一个电子书社区](http://www.epubit.com.cn/)
-
-### [linux.cn社区](https://linux.cn)
-
+- [linux.cn社区](https://linux.cn)
 - [使用 systemd 中的定时器执行定时任务](https://linux.cn/article-3996-1.html)
 - [如何在 systemd 下管理Linux系统的时间和日期](https://linux.cn/article-4260-1.html)
 - [如何为CentOS 7配置静态IP地址](https://linux.cn/article-3977-1.html)
 - [关于百度DNS的解析过程](http://zhan.renren.com/starshen?gid=3602888498023142484&checked=true)
-
-### [php100网](http://www.php100.com)
-
+- [php100网](http://www.php100.com)
 - [github资源汇总](http://www.php100.com/html/dujia/2015/0105/8267.html)
 - [php如何实现验证码](http://www.php100.com/html/dujia/2015/0919/8975.html)
-
-### [CSDN网](http://www.csdn.net/)
-
+- [CSDN网](http://www.csdn.net/)
 - [一个优秀网站的登录验证流程](http://blog.csdn.net/clevercode/article/details/45481409)
-
-### [PHPhub社区](https://phphub.org)
-
-### [脚本之家](http://jb51.net)
-
+- [PHPhub社区](https://phphub.org)
+- [脚本之家](http://jb51.net)
 - [php实现视频上传](http://www.jb51.net/article/54433.htm)
 
 ### [响应式设计创意例子](http://mediaqueri.es)
@@ -191,3 +182,10 @@
 - <http://www.chadvernon.com/blog/resources/directx9/> 入门
 - <https://github.com/gameKnife/Softrenderer>   进阶
 - <https://github.com/gameknife/gkEngine>  进阶
+
+## 破解软件
+
+- [jetbrains 全家桶破解](http://www.i9.org/)
+
+
+

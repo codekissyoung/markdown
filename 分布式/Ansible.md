@@ -29,7 +29,7 @@ hostfile = hosts
 inventory = hosts
 remote_user = link
 private_key_file = ~/.ssh/id_rsa
-host_key_checking = true
+host_key_checking = false
 ```
 
 ```bash
@@ -115,26 +115,11 @@ server {
 $ ansible-playbook webservers.yml -b -K # 以当前用户登录，并且在执行 sudo 时，询问密码
 ```
 
-上述`book.yml`里的内容称为一个`play`，包含了`host`的无序集合，以及`task`的有序列表。每个`task`中使用了模块完成功能。
+上述`book.yml`里的内容称为一个`play`，包含了`host`的无序集合，以及`task`的有序列表。每个`task`中使用了模块`apt` `copy` `file` `service` `template`完成功能。
 
 当然，一个`yml`文件里可以包含多个`play`。
 
-### 常用模块
 
-```bash
-apt         # apt 包管理工具
-copy        # 将一个文件从本地复制到主机
-file        # 设置文件、符号链接、或者目录的属性
-service     # 启动、停止、或者重启一个服务
-template    # 从模板生成一个文件并复制到主机上
-... 大约有 200 个
-```
-
-查看模块的使用方法：
-
-```bash
-$ ansible-doc service
-```
 
 ### 改进版本
 
@@ -188,7 +173,6 @@ server {
 修改后的`book.yml`：
 
 ```yml
----
 - name: Configure webserver with nginx
   hosts: linkWeb
   vars:
@@ -228,9 +212,28 @@ server {
   handlers:
     - name: restart nginx
       service: name=nginx state=restarted
-...
 ```
 
 最大的变化是引入了 `vars`、`notify -> handlers` 机制。
 
 ## inventory: 描述你的服务器
+
+
+## 模块
+
+常用模块
+
+```bash
+apt         # apt 包管理工具
+copy        # 将一个文件从本地复制到主机
+file        # 设置文件、符号链接、或者目录的属性
+service     # 启动、停止、或者重启一个服务
+template    # 从模板生成一个文件并复制到主机上
+... 大约有 200 个
+```
+
+查看模块的使用方法：
+
+```bash
+$ ansible-doc service
+```
