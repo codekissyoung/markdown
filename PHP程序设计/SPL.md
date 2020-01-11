@@ -41,16 +41,3 @@ $array[0] = 342;
 # 迭代器 Iterator 接口
 current() 当前节点 key() next() prev()
 ArrayIterator 迭代器用于遍历数组
-
-
-#降序堆
-
-#升序堆
-
-#优先级队列
-
-
-#定长数组
-
-
-#对象容器
