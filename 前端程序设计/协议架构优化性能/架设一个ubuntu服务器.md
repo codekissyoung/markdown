@@ -1,9 +1,10 @@
 # Ubuntu 安全配置
+
 虽然阿里云比起其他小服务商的虚拟服务器要安全很多，但是还是建议开启 ECS 实例的 UFW（Ubuntu Firewall），开启步骤如下：
+
 ```shell
 sudo ufw status # 查看当前防火墙状态，当 UFW 处于关闭状态时将显示如下信息：Status: inactive
 ```
-
 
 复制代码
 当 UFW 处于开启状态时将显示如下信息：
@@ -62,4 +63,3 @@ bind-address                = 127.0.0.1
 完成以上配置后，在浏览器访问 http://weba.yourdomain.com，就能映射到指定 IP 地址的 ECS 服务器的 /var/www/html/weba 目录。
 
 
-（本文完）

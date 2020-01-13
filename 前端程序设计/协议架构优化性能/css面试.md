@@ -10,7 +10,6 @@
 （4）link方式的样式权重高于@import的权重。
 （5）使用dom控制样式时的差别。当使用javascript控制dom去改变样式的时候，只能使用link标签，因为@import不是dom可以控制的。
 
-
 # CSS 选择符有哪些？哪些属性可以继承？优先级算法如何计算？CSS 3新增伪类有哪些？
 id选择器（# myid）
 类选择器（.myclassname）
