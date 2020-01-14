@@ -60,3 +60,7 @@ $ sudo ln -s /etc/nginx/sites-available/db.link.com.conf /etc/nginx/sites-enable
 ```
 
 ### 4. 访问验证
+
+```bash
+http://db.link.com          # 浏览器访问
+```
