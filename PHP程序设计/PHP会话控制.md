@@ -1,4 +1,4 @@
-## 概述 ##
+## 概述
 
 http 协议是无状态的，对于每个请求，服务端无法区分用户。php 会话控制就是给了用户一把钥匙(一个加密session字符串)，同时这也是用户身份的一个证明，服务端存放了这把钥匙能打开的箱子(数据库，内存数据库或者使用文件做的)，箱子里面装的就是用户的各个变量信息。
 
@@ -6,7 +6,8 @@ http 协议是无状态的，对于每个请求，服务端无法区分用户。
 １，url 查询字符串中
 ２，浏览器cookie中
 
-## 传统的php session 使用 ##
+## 传统的php session 使用
+
 ```
 <?php
 //page1.php 启动一个会话并注册一个变量
@@ -54,7 +55,3 @@ session_regenerate_id();//重置　session 　字符
 $session_info=array('uid'=>$uid,'session'=>session_encrypt(session_id().time()));
 //下一步将，$session_info 存到　C 中
 ```
-
-
-
-

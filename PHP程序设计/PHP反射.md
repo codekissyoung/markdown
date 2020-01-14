@@ -1,4 +1,4 @@
-# 各种有用的反射类
+# 反射
 
 ```php
 Reflection          为类的摘要信息提供静态函数
@@ -11,7 +11,7 @@ ReflectionExtension PHP扩展信息
 ReflectionException 错误类
 ```
 
-- 这些反射类可以在运行时访问对象、函数和脚本中的扩展信息
+这些反射类可以在运行时访问对象、函数和脚本中的扩展信息
 
 ```php
 <?php
@@ -104,7 +104,7 @@ $test = new ModuleRunner();
 $test -> init();
 ```
 
-#### PHP 是动态实时解析的语言
+## PHP 是动态实时解析的语言
 
 ```php
 function test() {
