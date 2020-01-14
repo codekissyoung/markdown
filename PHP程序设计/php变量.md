@@ -1,4 +1,4 @@
-## null 就是不存在的意思，isset 是只要变量存在就true ##
+## null 就是不存在的意思，isset 是只要变量存在就true
 
 ```php
 $a = '';	var_dump(isset($a));	// true
@@ -6,29 +6,32 @@ $b = null;	var_dump(isset($b));	// false
 var_dump(null);						// NULL
 ```
 
-## empty是只有变量不为空，才flase ##
+## empty是只有变量不为空，才flase
 
-```
+```php
 class A{};
 $a = new A;
 if(!empty($var)) echo "not empty";	
 //'',""，0，"0"，NULL，FALSE，array(),$var; 和没有任何属性的对象在用 empty判断时，都是空的，返回TURE；
 ```
-##用 if 判断 true 和 false 时的自动转换##
-```
+
+## 用 if 判断 true 和 false 时的自动转换
+
+```php
 class A{}
 if('')     echo "true";
 if("")     echo "true";
 if([]) 	   echo "true";
 if(new A)  echo "true";		//true
 if(null)   echo "true";
-if(0)	   echo "true";
+if(0)	     echo "true";
 if(0.0)	   echo "true";
 if("0")	   echo "true";
 ```
 
-## 静态变量 :驻留内存的变量##
-```
+## 静态变量 :驻留内存的变量
+
+```php
 function a(){
 	static $a = 1;
 	echo $a;
@@ -37,13 +40,16 @@ function a(){
 a();//1
 a();//2
 ```
-## 常量：只读变量 ##
-```
+
+## 常量：只读变量
+
+```php
 define("TEST",'codekissyoung');
 echo TEST;//codekissyoung
 ```
-## 可变变量:php是动态实时解析的语言 ##
-```
+
+## 可变变量:php是动态实时解析的语言
+```php
 $a = "test";
 $test = "i am the test";
 function test（）{echo "i am function test!";}   
@@ -51,14 +57,18 @@ echo $a; //test
 echo $$a; // i am the test
 $a(); //i am function test!
 ```
+
 将　assoc 　数组拆解成变量
-```
+
+```php
 foreach ($_POST as $key => $value) {
 			$$key = $value;
 		｝
 ```
+
 动态 new 对象和调用函数
-```
+
+```php
 //example.com?class=person&func=run
 $class=$_GET['class'];
 $func=$_GET['func'];
@@ -67,7 +77,7 @@ $obj->$func();
 ```
 ##  变量的引用　##
 
-```
+```php
 $a="ABC"; 
 $b =&$a; 
 echo $a;//这里输出:ABC 
@@ -214,9 +224,9 @@ $obj=new $class();
 $obj->$func();
 ```
 
-`$_GET`
-================================================================================
-```bash
+## $_GET
+
+```php
 <?php
 // http://www.dadishe.com/test/checkbox.php?a[]=b&a[]=c
 array
@@ -226,46 +236,27 @@ array
             1 => string 'c' (length=1)
 ```
 
-extensions
-================================================================================
-```bash
+`extensions`
+
+```php
 $a = get_loaded_extensions();
 var_dump($a);
 ```
 
-ini_get 拿配置信息
-================================================================================
-```bash
+`ini_get` 拿配置信息
+
+```php
 echo ini_get("allow_url_fopen") ? "支持":"不支持";
 echo ini_get("file_uploads") ? ini_get("upload_max_filesize"):"Disabled";
 echo ini_get("max_execution_time");
 ```
 
+## $GLOBALS
 
-## $GLOBALS ##
-```
+```php
 var_dump($GLOBALS);//一个封装了所有在脚本中的全局变量的数组，包括php内置的和我们自己声明的
 ```
-## $_GET ##
-```
-http://www.dadishe.com/test/checkbox.php?a[]=b&a[]=c
-array
-  'a' => 
-    array
-      0 => string 'b' (length=1)
-      1 => string 'c' (length=1)
-```
-## extensions ##
-```
-$a = get_loaded_extensions();
-var_dump($a);
-```
-## ini_get拿配置信息 ##
-```
-echo ini_get("allow_url_fopen")?"支持":"不支持";
-echo ini_get("file_uploads")?ini_get("upload_max_filesize"):"Disabled";
-echo ini_get("max_execution_time");
-```
+
 ## 配置时区 ##
 ```
 echo date("Y-m-d H:i:s",time());
@@ -273,8 +264,10 @@ echo date_default_timezone_get();
 date_default_timezone_set("ETC/GMT-8");
 echo date("Y-m-d H:i:s",time());
 ```
+
 ## 如何判定常量是否被定义 ##
-```
+
+```php
 bool defined(string constants_name);
 ```
 

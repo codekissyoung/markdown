@@ -51,6 +51,9 @@ set ignorecase                " 查找时忽略大小写
 set fdm=marker                " 设定标记折叠
 set autoindent                " 设置自动缩进
 set tabstop=4                 " 设置tab为4个空格
+set softtabstop=4
+set shiftwidth=4
+set expandtab                 " tab => space
 set list                      " 显示空格和tab
 set listchars=tab:>-,trail:-  " 显示空格和tab的格式
 syntax on                     " 语法高亮
