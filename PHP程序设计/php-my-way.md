@@ -1,13 +1,16 @@
 # php the right way
+
 参考[php the right way](http://laravel-china.github.io/php-the-right-way/)
 
-# 代码环境
+## 代码环境
+
 > mac OS [Homebrew](http://brew.sh/) 
 > PHP 5.6.20 (cli)
 > nginx version: nginx/1.8.1
 > mysql  Ver 14.14 Distrib 5.7.12, for osx10.11 (x86_64) using  EditLine wrapper
 
-#  代码风格
+##  代码风格
+
 [阅读 PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)
 [阅读 PSR-1](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md)
 [阅读 PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
@@ -17,9 +20,11 @@
 使用[PHP_CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/) 检查代码是否符合规范
 使用 [PHP Coding Standards Fixer](http://cs.sensiolabs.org/)自动修复语法格式
 
-# 面向对象
-#### 简单类
-```
+## 面向对象
+
+### 简单类
+
+```php
 class SimpleClass
 {
     public $var = 'a default value';
@@ -31,10 +36,11 @@ $a = new SimpleClass();
 $b = new SimpleClass();
 ```
 
-#### $this 
+### $this 
 
 指向这个类的当前对象
-```
+
+```php
 error_reporting(false);
 class A
 {
@@ -62,14 +68,16 @@ $b = new B();
 $b->bar(); // //$this is defined (B)
 B::bar(); // $this is not defined.
 ```
-#### new 变量名（带命名空间）
-```
+### new 变量名（带命名空间）
+
+```php
 $className = 'SimpleClass';
 $instance = new $className(); // 等同于 new SimpleClass()
 ```
 
-#### 变量赋值与引用
-```
+### 变量赋值与引用
+
+```php
 $instance = new SimpleClass();
 $assigned   =  $instance;
 $reference  = &$instance;
@@ -81,8 +89,9 @@ var_dump($reference); // null
 var_dump($assigned); //object(SimpleClass) 1 (1) { ["var"]=>string(30) "$assigned will have this value"}
 ```
 
-#### 创建对象的几种方式
-```
+### 创建对象的几种方式
+
+```php
 class Test
 {
     static public function getNew()
@@ -103,8 +112,9 @@ $obj4 = Child::getNew();
 var_dump($obj4 instanceof Child); // true
 ```
 
-#### 匿名函数
-```
+### 匿名函数
+
+```php
 class Foo
 {
     public $bar;
