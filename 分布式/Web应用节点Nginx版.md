@@ -1,6 +1,6 @@
 # Web应用节点 Nginx 版
 
-参考 [Ubuntu 装机指南](https://blog.codekissyoung.com/Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/Ubuntu)，获得一个干净的`Server`后，下面可以将这个`Server`做成`Web`应用节点。
+参考 [Ubuntu 装机指南](https://blog.codekissyoung.com/%E5%88%86%E5%B8%83%E5%BC%8F/UbuntuServer)，获得一个干净的`Server`后，下面可以将这个`Server`做成`Web`应用节点。
 
 ## 制作 Nginx + PHP-fpm 节点
 
