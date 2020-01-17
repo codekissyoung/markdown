@@ -1,4 +1,5 @@
 # 异常处理流程
+
 ```php
 <?php
 //自定义的异常类，继承了PHP的异常基类Exception
@@ -37,7 +38,8 @@ try{
 }
 ```
 
-# Exception 类
+## Exception 类
+
 ```php
 message 异常消息内容
 code 异常代码

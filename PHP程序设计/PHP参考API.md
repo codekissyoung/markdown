@@ -1,7 +1,46 @@
+# PHP常用API
+
+## 获取php.ini配置信息
+
+```php
+ini_get("allow_url_fopen");         // 获取 php.ini 中 allow_url_fopen 的设置
+array get_loaded_extensions();            // 获取所有加载的 模块
+```
+
+## Bool 判断
+
+```php
+给定一个变量 $a ,下列是它的所有情况
+
+1. $a; 未赋值过
+2. $a = null;
+3. $a = ""  ''  0  0.00  "0"  '0'  []
+4. $a = new A(); 空对象 class A{}
+5. $a = 其他值
+
+isset($a);          // 3, 4, 5 为 true
+empty($a);          // 1, 2, 3 为 true
+if( $a );           // 4, 5    为 true
+``` 
+
+## 魔术变量
+
+```php
+// http://www.dadishe.com/test/checkbox.php?a[]=b&a[]=c
+$_GET; // ['a'=>['b','c']];
+var_dump($GLOBALS); // 打印脚本中的所有的全局变量
+```
+
+## 常量
+
+```php
+bool defined( ABC_NAME );           // 判断常量是否被定义
+```
+
+
 ## is系列
 
 ```php
-// 确保传入的字符串是函数，能够被call_user_func()和array_walk()等函数调用
 is_bool();
 is_integer();
 is_double();
@@ -10,7 +49,33 @@ is_object();
 is_array();
 is_resource();
 is_null();
-is_callable( [$obj,$method] ); 
+is_callable( [$obj, $method] ); 
+```
+
+## 啥玩意?
+
+```php
+__LINE__            # 文件中的当前行号
+__FILE__            # 文件的完整路径和文件名
+__DIR__             # 文件所在的目录
+__FUNCTION__        # 函数名称
+__CLASS__           # 类的名称
+__TRAIT__           # Trait 的名字
+__METHOD__          # 类的方法名
+__NAMESPACE__       # 当前命名空间的名称
+```
+
+## 如何调试和分析类
+
+```php
+get_declared_classes();        // 获取当前所有已定义的类名
+get_class_methods( $obj );     // 获取所有的方法名
+get_object_vars( $obj );       // 获取所有属性名
+get_parent_class( $sub_obj );  // 获取一个对象的父类
+is_subclass_of( $sub_obj, 'Think\Parent_class' ); // 检查对象是否是一个类的子类
+
+class_implements( $obj );         // 获取该对象实现的所有接口
+$obj instanceof interface_name ; // 判断 $obj 是否实现了某个接口
 ```
 
 ## exists 系列
@@ -126,6 +191,10 @@ date_default_timezone_set("Asia/Shanghai"); // 设置默认时区为中国
 mktime(0,0,0,10,9,2014); //  定制时间 返回2014年9月10号的时间戳
 date('Y年m日d天 H:i:s',time()); // 格式化的时间
 strtotime($stringtime); // 时间字符串转时间戳
+date("Y-m-d H:i:s",time());
+date_default_timezone_get();
+date_default_timezone_set("ETC/GMT-8");
+date("Y-m-d H:i:s",time());
 ```
 
 ## 测试代码执行时间

@@ -43,6 +43,30 @@ xdebug_debug_zval('a');
 xdebug_debug_zval('b');
 ```
 
+可变变量
+
+```php
+//例子1
+$a = "test";
+$test = "i am the test";
+function test（）{　echo "i am function test!";　}
+echo $a; 	//　test
+echo $$a; 	// i am the test
+$a(); 		//　i am function test!
+
+//例子2
+foreach ($_POST as $key => $value) {
+    $$key = $value;    // 利用可变变量，use key name as variable name
+｝
+
+//例子3
+// example.com?class=person&func=run
+$class=$_GET['class'];
+$func=$_GET['func'];
+$obj=new $class();
+$obj->$func();
+```
+
 #### unset
 
 ```php
@@ -261,7 +285,27 @@ function arrayPlus( $array, $num ) {
 }
 ```
 
+```php
+// 测试代码执行时间
+$start_time = microtime();
+//...执行的代码
+$end_time = microtime();
+$execute_time = $end_time - $start_time;
+```
+
+```php
+register_shutdown_function( ['core', 'handleShutdown'] );   // 正常/异常 退出时 调用
+set_exception_handler( ['core', 'handleException'] );       // 设置异常处理函数
+set_error_handler( ['core', 'handleError'] );               // 设置错误处理函数
+```
+
 ## call_user_func_array 调用用户函数
+
+```php
+call_user_func( 'myFunction' );                 // myFunction();
+call_user_func( [$myObj,'method_name'], 20 );   // $myObj -> method_name(20);
+call_user_func_array( [$obj,'method'], $args ); // $obj -> method( $arg1, $arg2 );
+```
 
 ```php
 function foobar($arg, $arg2) {
