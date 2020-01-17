@@ -15,20 +15,6 @@ if(!empty($var)) echo "not empty";
 //'',""，0，"0"，NULL，FALSE，array(),$var; 和没有任何属性的对象在用 empty判断时，都是空的，返回TURE；
 ```
 
-## 用 if 判断 true 和 false 时的自动转换
-
-```php
-class A{}
-if('')     echo "true";
-if("")     echo "true";
-if([]) 	   echo "true";
-if(new A)  echo "true";		//true
-if(null)   echo "true";
-if(0)	     echo "true";
-if(0.0)	   echo "true";
-if("0")	   echo "true";
-```
-
 ## 静态变量 :驻留内存的变量
 
 ```php
@@ -41,14 +27,8 @@ a();//1
 a();//2
 ```
 
-## 常量：只读变量
+## 可变变量 是动态实时解析的语言
 
-```php
-define("TEST",'codekissyoung');
-echo TEST;//codekissyoung
-```
-
-## 可变变量:php是动态实时解析的语言
 ```php
 $a = "test";
 $test = "i am the test";
@@ -75,7 +55,8 @@ $func=$_GET['func'];
 $obj=new $class();
 $obj->$func();
 ```
-##  变量的引用　##
+
+## 变量的引用
 
 ```php
 $a="ABC"; 
@@ -86,8 +67,10 @@ $b="EFG";
 echo $a;//这里$a的值变为EFG 所以输出EFG 
 echo $b;//这里输出EFG 
 ```
+
 引用和函数结合使用
-```
+
+```php
 function test(&$a) { 
 	$a=$a+100; 
 } 
@@ -97,7 +80,7 @@ echo $b;//输出101
 //要注意的是，在这里test(１);的话就会出错，原因自己去想:标量不能按引用传递
 ```
 
-## 变量的全局范围 ##
+## 变量的全局范围
 
 (1)现在的程序(web程序，或者其他)都是只有一个入口的(你以 url/test1.php 和 url/test2.php 去访问的其实是两个程序)。
 
@@ -202,6 +185,7 @@ isset : true	empty : false	if : true
 ```
 
 可变变量
+
 ```php
 <?php
 //例子1
@@ -230,12 +214,10 @@ $obj->$func();
 // http://www.dadishe.com/test/checkbox.php?a[]=b&a[]=c
 array
     'a' =>
-        array
-            0 => string 'b' (length=1)
-            1 => string 'c' (length=1)
+      array
+    	  0 => string 'b' (length=1)
+          1 => string 'c' (length=1)
 ```
-
-`extensions`
 
 ```php
 $a = get_loaded_extensions();
@@ -256,8 +238,8 @@ echo ini_get("max_execution_time");
 var_dump($GLOBALS);//一个封装了所有在脚本中的全局变量的数组，包括php内置的和我们自己声明的
 ```
 
-## 配置时区 ##
-```
+## 配置时区
+```php
 echo date("Y-m-d H:i:s",time());
 echo date_default_timezone_get();
 date_default_timezone_set("ETC/GMT-8");
@@ -269,4 +251,3 @@ echo date("Y-m-d H:i:s",time());
 ```php
 bool defined(string constants_name);
 ```
-

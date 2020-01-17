@@ -1,6 +1,7 @@
 ## is系列
 
 ```php
+// 确保传入的字符串是函数，能够被call_user_func()和array_walk()等函数调用
 is_bool();
 is_integer();
 is_double();
@@ -9,7 +10,7 @@ is_object();
 is_array();
 is_resource();
 is_null();
-is_callable( [$obj,$method] ); // 确保传入的字符串是函数，能够被call_user_func()和array_walk()等函数调用
+is_callable( [$obj,$method] ); 
 ```
 
 ## exists 系列
@@ -64,6 +65,7 @@ header("Access-Control-AllowOrigin:http://dev.kanjiebao.com"); // 允许 ajax �
 ```
 
 ## 加载所有配置文件
+
 ```php
 // glob 是寻找与模式匹配的文件路径，组成数组
 foreach (glob(ROOT_PATH.'config/*') as $file){
@@ -87,6 +89,7 @@ isset($page_size) or exit("未设置page_size");
 ```
 
 ## 数字处理
+
 ```php
 ceil(1243648.43464); // 向上取整 1243649
 round(1243648.43464); // 四舍五入1243648
@@ -218,7 +221,8 @@ substr('abcdefghijklmnopqrstuvwxyz',-5,-1);//从倒数　５　个开始，提�
 ## 替换字符串
 
 ```php
-substr_replace('abcdefghijklmnopqrstuvwxyz','***',0,8); // ***ijklmnopqrstuvwxyz 后面的两个数字的参数的使用方法跟substr 一样：
+// ***ijklmnopqrstuvwxyz 后面的两个数字的参数的使用方法跟substr 一样
+substr_replace('abcdefghijklmnopqrstuvwxyz','***',0,8); 
 // 判断数据是合法的json字符串
 function is_json($string) {
 	json_decode($string);
@@ -267,7 +271,8 @@ list($b,$c,$d) =  array('apple','orange','card');echo $b,$c,$d; //apple orange c
 array_merge($arr1,$arr2);//$arr2 会覆盖同名键的值
 
 // 检查数组中是否存在某个键
-array_key_exists('key',$array);//key存在就返回true,不考虑对应的值isset($array['key']);/*在array 中的键存在，且不为null*/
+array_key_exists('key',$array);
+// key存在就返回true,不考虑对应的值isset($array['key']);/*在array 中的键存在，且不为null*/
 
 // 检查数组中是否包含某个值
 in_array('value',$array);//存在就返回ture
@@ -370,32 +375,35 @@ mysql_real_escape_string($sql); //转义 sql 字符串中的特殊字符
 ## 一些转义函数 ##
 
 htmlspecialchars() 使得 HTML 之中的特殊字符被正确的编码，从而不会被使用者在页面注入 HTML 标签或者 Javascript 代码。
-```
+
+```php
 htmlspecialchars();//将与、单双引号、大于和小于号化成HTML格式 
 nl2br();	//将 '\n' 变为 '<br>'
 addslashes();  //单双引号、反斜线及NULL加上反斜线转义
 stripslashes();	 //﻿去掉反斜线字符
 ```
 
-```
+```php
 //转义　. \ + * ? [ ^ ] ( $ )　元字符集
 $str = "Hello world. (can you hear me?)";
 echo quotemeta($str);//Hello world\. \(can you hear me\?\)
 ```
-```
+
+```php
 转义　正则表达式特殊字符有： . \ + * ? [ ^ ] $ ( ) { } = ! < > | : -
 $keywords = '$40 for a g3/400';
 $keywords = preg_quote($keywords, '/');//第二个参数表明: / 也要被转义
 echo $keywords; // 返回 \$40 for a g3\/400
 ```
 
-```
+```php
 escapeshellcmd();//防止用户的输入执行系统命令
 exec("ls -l");//直接执行系统命令的函数
 ```
 
-## 用于　html 　的一对转义函数 ##
-```
+## 用于　html 　的一对转义函数
+
+```php
 $str = "<? W3S?h????>";
 echo $a = htmlentities($str);
 echo html_entity_decode($a);
@@ -405,9 +413,10 @@ echo htmlspecialchars_decode($a);
 ```
 
 ## 使用filter 拓展对变量进行过滤##
-地址：http://php.net/manual/zh/filter.examples.validation.php
-```
 
+地址：http://php.net/manual/zh/filter.examples.validation.php
+
+```php
 $email_a = 'joe@example.com';
 $email_b = 'bogus';
 
@@ -421,8 +430,7 @@ if (filter_var($email_b, FILTER_VALIDATE_EMAIL)) {
 ?>
 ```
 
-```
-
+```php
 $ip_a = '127.0.0.1';
 $ip_b = '42.42';
 
