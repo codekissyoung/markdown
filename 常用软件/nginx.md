@@ -22,7 +22,6 @@ cky@cky-pc:/etc/nginx$ tree -L 1
 ├── sites-available         # 所有配置的虚拟主机的配置
 ├── sites-enabled           # 已经启用的虚拟主机的配置
 ├── snippets
-
 ```
 
 ## Ubuntu下彻底删除Nginx，重新安装

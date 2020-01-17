@@ -1,4 +1,6 @@
-# 高效用vim
+# 高效用vim和zsh
+
+高效用`vim`和`zsh`。
 
 ## .vimrc 配置
 
@@ -205,4 +207,26 @@ strings A>B
 
 ```vim
 :Man 命令
+```
+
+## 使用`zsh`
+
+```bash
+$ git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
+$ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+```
+
+```zsh
+ZSH_THEME="ys"                # 主题推荐使用 ys
+
+plugins=(
+  git
+  zsh-autosuggestions         # 历史命令推荐
+  zsh-syntax-highlighting     # 命令高亮
+)
+
+alias vimzsh="vim ~/.zshrc"
+alias srczsh="source ~/.zshrc"
+alias vimvim="vim ~/.vimrc"
+alias srcvim="source ~/.vimrc"
 ```
