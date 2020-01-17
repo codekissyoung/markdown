@@ -1,7 +1,6 @@
-# is系列
-```php
+## is系列
 
-// 类型符合就返回true
+```php
 is_bool();
 is_integer();
 is_double();
@@ -10,24 +9,22 @@ is_object();
 is_array();
 is_resource();
 is_null();
-is_callable([$obj,$method]); // 确保传入的字符串是函数，能够被call_user_func()和array_walk()等函数调用
+is_callable( [$obj,$method] ); // 确保传入的字符串是函数，能够被call_user_func()和array_walk()等函数调用
 ```
 
-# exists 系列
-```php
+## exists 系列
 
-// 存在就返回 true
+```php
 file_exists( $file_name );
 class_exists( $classname );
 method_exists( $obj , $method ); // 方法是否存在
 ```
 
-# 类相关
+## 类相关
+
 ```php
-
 get_declared_classes(); // 获取脚本运行到当前行时，所有已经定义的类的数组
-
-get_class($obj); // 获取对象的 类名
+get_class($obj);        // 获取对象的 类名
 
 $obj instanceof interface_name ; // 判断 $obj 是否实现了某个接口
 
@@ -42,18 +39,16 @@ is_subclass_of($sub_obj,'Parent_class'); // 检查是否是一个类的子类
 class_implements($obj); // 获取该对象实现的所有接口
 
 call_user_func('myFunction');
-call_user_func([$myObj,'method_name'],20); // 调用用户函数 / 方法
+call_user_func( [ $myObj, 'method_name'], 20 ); // 调用用户函数 / 方法
 // 等价于
 $myObj -> method_name(20);
 
 call_user_func_array([$obj,'method'],$args); // 等价于 $obj -> method($args); $args 为不定个数的数组
 ```
 
+## 写http头
 
-# 写http头
- 返回json数据
 ```php
-
 header("content-type:application/json ;charset = utf-8;");  // 返回json数据
 header('HTTP/1.1 200 OK'); // 告诉浏览器，请求成功
 header('HTTP/1.1 404 Not Found'); // 无此页面
@@ -65,43 +60,42 @@ header('Pragma:no-cache');
 
 header('Refresh:10;url=http://www.baidu.com/'); //页面重定向,十秒钟后跳到　url
 header('location:http://www.baidu.com'); // 向浏览器发送一条Http头信息，告诉它重定向到莫个网址
-header("Access-Control-AllowOrigin:http://dev.kanjiebao.com"); //允许http://dev.kanjiebao.com 的　ajax 的跨域请求
+header("Access-Control-AllowOrigin:http://dev.kanjiebao.com"); // 允许 ajax 的跨域请求
 ```
 
-# 加载所有配置文件
+## 加载所有配置文件
 ```php
-
 // glob 是寻找与模式匹配的文件路径，组成数组
 foreach (glob(ROOT_PATH.'config/*') as $file){
     require_once $file;
 }
 ```
 
-# 变量方法
-```php
+## 变量方法
 
+```php
 function ($method,$param){
     $this ->input ->$method($param);
 }
 ```
 
-# 使用 or 和 and 截断
+## 使用 or 和 and 截断
+
 ```php
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 isset($page_size) or exit("未设置page_size");
 ```
 
-# 数字处理
+## 数字处理
 ```php
-
 ceil(1243648.43464); // 向上取整 1243649
 round(1243648.43464); // 四舍五入1243648
 intval(1243648.43464); // 强制转换为整型1243648
 ```
 
-# 加密函数
-```php
+## 加密函数
 
+```php
 $urlstr = urlencode("我是codekissyoung");
 echo  urldecode($urlstr); // 汉字加密 解密，为了解决传输时，汉字符会丢失的问题
 // 不可逆加密
@@ -118,9 +112,10 @@ base64_decode($string);
 convert_uudecode($str);
 convert_uuencode($str);
 ```
-# 时间函数
-```php
 
+## 时间函数
+
+```php
 $timestamp=time(); // 拿到当前的时间戳
 date_default_timezone_get(); // 得到当前时区
 date_default_timezone_set('PRC'); // 设置默认时区为中国
@@ -129,18 +124,19 @@ mktime(0,0,0,10,9,2014); //  定制时间 返回2014年9月10号的时间戳
 date('Y年m日d天 H:i:s',time()); // 格式化的时间
 strtotime($stringtime); // 时间字符串转时间戳
 ```
-# 测试代码执行时间
-```php
 
+## 测试代码执行时间
+
+```php
 $start_time=microtime();
 //...执行的代码
 $end_time=microtime();
 $execute_time=$end_time-$start_time;
 ```
 
-# 字符串函数
-```php
+## 字符串函数
 
+```php
 strstr($_POST['email'],'@'); // 判断是否包含子字符串
 strpos($_POST['email'],'@'); // 返回找到的位置
 
@@ -190,9 +186,9 @@ echo $output['arr'][0]; // foo bar
 echo $output['arr'][1]; // baz
 ```
 
-# 编码转换
-```php
+## 编码转换
 
+```php
 $str="编码转换";
 iconv('UTF-8','GBK',$str); // 将$str内的函数转换为utf-8编码
 
@@ -209,9 +205,9 @@ ucfist('how do you do today?'); // How do you do today?`首字母大写
 ucwords("how do you do today?");//How Do You Do Today ?`每个单词首字母大写
 ```
 
-# 提取子字符串
-```php
+## 提取子字符串
 
+```php
 substr('abcdefghijklmnopqrstuvwxyz',0,8);//从下标为０开始，开始提取８个 :abcdefgh
 substr('abcdefghijklmnopqrstuvwxyz',20);//从下标为 20 开始，提取到最后 :　vwxyz
 substr('abcdefghijklmnopqrstuvwxyz',-5);//提取倒数５个字符串　：vwxyz
@@ -219,21 +215,21 @@ substr('abcdefghijklmnopqrstuvwxyz',-5,3);//从倒数５个开始，提取３个
 substr('abcdefghijklmnopqrstuvwxyz',-5,-1);//从倒数　５　个开始，提取到倒数　1 个　: vwxy
 ```
 
-# 替换字符串
-```php
+## 替换字符串
 
+```php
 substr_replace('abcdefghijklmnopqrstuvwxyz','***',0,8); // ***ijklmnopqrstuvwxyz 后面的两个数字的参数的使用方法跟substr 一样：
 // 判断数据是合法的json字符串
 function is_json($string) {
 	json_decode($string);
 	return (json_last_error() == JSON_ERROR_NONE);
 }
-// echo json_encode($arr, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT); 
+echo json_encode($arr, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT); 
 ```
 
-# 数组函数
-```php
+## 数组函数
 
+```php
 // 给数组添加一个元素
 $arr[] = "caokaiyan";//键为数字键
 $arr['xuehao'] = 1001121213;
@@ -343,45 +339,31 @@ $bb=array_unique_fb($aa);
 print_r($bb); //Array ( [0] => Array ( [0] => 123 [1] => 张三 ) [1] => Array ( [0] => 123 [1] => 李四 ) [2] => Array ( [0] => 124 [1] => 王五 ) [4] => Array ( [0] => 126 [1] => 赵六 ) )
 ```
 
-# 下载文件
-前端代码
-```javascript
-<a href="doDownload.php?filename=1.jpg">通过程序下载1.jpg</a><br />
-<a href="doDownload.php?filename=../upload/nv.jpg">下载nv.jpg</a>
-```
-后端代码
-```php
-
-$filename=$_GET['filename'];
-header('content-disposition:attachment;filename='.basename($filename));
-header('content-length:'.filesize($filename));readfile($filename);
-```
-
-# 脚本执行完注册函数
+## 脚本执行完注册函数
 
 ```php
 register_shutdown_function( ['core', 'handleShutdown'] );
 ```
+
 当我们的脚本执行完成或意外死掉导致PHP执行即将关闭时,我们的这个函数将会 被调用.所以,我们可以使用在脚本开始处设置一个变量为false,然后在脚本末尾将之设置为true的方法,让PHP关闭回调函数检查脚本完成与否. 如果我们的变量仍旧是false,我们就知道脚本的最后一行没有执行,因此它肯定在程序执行到某处死掉了
 http://www.blogdaren.com/post-2030.html
 
 
-# 设置异常处理函数
-```php
+## 设置异常处理函数
 
+```php
 set_exception_handler(array('core', 'handleException'));
 ```
 
-# 设置错误处理函数
-```php
+## 设置错误处理函数
 
+```php
 set_error_handler(array('core', 'handleError'));
 ```
 
-
-
 ## 防止 SQL 注入 ##
-```
+
+```php
 mysql_real_escape_string($sql); //转义 sql 字符串中的特殊字符
 ```
 
@@ -484,109 +466,17 @@ if (($int_c = filter_var($int_c, FILTER_VALIDATE_INT, $options)) !== FALSE) {
 //This (int_c) integer is considered valid (between 0 and 3) and is 1.
 ```
 
+## 时间戳
 
-## 下载 ##
-展示页面
-```html
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Insert title here</title>
-</head>
-<body>
-<a href="1.rar">下载1.rar</a>
-<br />
-<a href="1.jpg">下载1.jpg</a>
-<br />
-<a href="doDownload.php?filename=1.jpg">通过程序下载1.jpg</a>
-<br />
-<a href="doDownload.php?filename=../upload/nv.jpg">下载nv.jpg</a>
-</body>
-</html>
-```
-通过程序下载例程 的 doDownload.php : 主要就是发个头，说明下是附件，然后打开要下载的文件就行，basename(); 是用来去除路径的，只留文件名！
-
-```php
-$filename = $_GET['filename'];
-header('content-disposition:attachment;filename='.basename($filename));
-header('content-length:'.filesize($filename));
-readfile($filename);
-```
-
-# 分页函数
-
-```php
-/*
- * @分页函数
- * @param		$total		总记录数
- * @param		$page_now	当前页码
- * @param		$page_size	一页的记录条数
- * @param		$pages		显示的最大页码数
- * */
-function paging( $total, $page_now, $page_size, $pages ) {
-	$return['total_pages'] 	= 	ceil($total/$page_size);     //总页数
-	$return['pre_page']		=	($page_now>1)?$page_now-1:1; //前一页数
-	$return['next_page'] 	=	($page_now<$return['total_pages'])?$page_now+1:$return['total_pages'];//下一页
-	$return['page_now']		=	$page_now;//当前页面
-	
-	//生成页码 : 小于设定的最大页码数　｜　大于设定的最大的页码数
-	if($pages>=$return['total_pages']){
-		for ($p = 1;$p<=$return['total_pages'];$p++){
-			$return['pages'][] = $p;
-		}
-	}else{
-		//如果　page_now 太小了的话
-		if($page_now<=$pages/2){
-			for ($p = 1;$p<=$pages;$p++){
-				$return['pages'][] = $p;
-			}
-		}
-		//如果page_now 接近总页数了
-		elseif($return['total_pages']-$page_now<=$pages/2){
-			for ($a = 1,$p=$return['total_pages'];$a<=$pages;$p--,$a++){
-				$return['pages'][] = $p;
-			}
-			sort($return['pages']);
-		}
-		//page_now 在页码中间
-		else{
-			//处理奇数页时，一个向上取整，一个去除小数
-			for ($p = $page_now -intval($pages/2);$p<$page_now+ceil($pages/2);$p++){
-				$return['pages'][] = $p;
-			}
-		}
-	}
-	return $return;
-}
-```
-
-
-## 时间戳 ##
-```
+```bash
 $timestamp=time();//拿到当前的时间戳
-```
-## 设置时区 ##
-```
 date_default_timezone_get();//得到当前时区
 date_default_timezone_set('PRC');//设置默认时区为中国
-```
-## 格式化时间戳 ##
-```
 echo date('Y年m日d天 H:i:s');　//date返回格式化的当前时间
 $date3=date('Y-m-d H:i:s',"1228348800");
-```
-## 拿到某个时间的时间戳 ##
-```
 mktime(0,0,0,10,9,2014);//返回2014年9月10号的时间戳
 ```
-## 测试代码执行时间 ##
-```
-$start_time=microtime();
-//...执行的代码
-$end_time=microtime();
-$execute_time=$end_time-$start_time;
-```
+
 
 ## 建立自己函数库时，先判断函数是否已经定义了 ##
 ```
@@ -596,12 +486,7 @@ if (!function_exists('is_php')) {
 	}
 }
 ```
-## 将配置文件全加载进来的方法 ##
-```
-foreach (glob(ROOT_PATH.'config/*') as $file) {
-	require_once $file;//glob 是寻找与模式匹配的文件路径，组成数组
-}
-```
+
 ## 定义网站的起始路径，之后所有的引用都可以基于这个路径了 ##
 ```
 define("APP_PATH",dirname(__FILE__));
@@ -805,34 +690,40 @@ function array_unique_fb($array2D){
             //Array ( [0] => Array ( [0] => 123 [1] => 张三 ) [1] => Array ( [0] => 123 [1] => 李四 ) [2] => Array ( [0] => 124 [1] => 王五 ) [4] => Array ( [0] => 126 [1] => 赵六 ) )  
 ```
 
+给数组添加一个元素
 
-
-- 给数组添加一个元素
-```
+```bash
 $arr[] = "caokaiyan";//键为数字键
 $arr['xuehao'] = 1001121213;
 array_push($array,$var); 
 ```
-- ﻿删除数组中的元素
-```
+
+删除数组中的元素
+
+```bash
 unset($arr['xuehao']);
 $var = array_pop($array);//$var 获取数组最后一个元素,数组减去那个元素
 $array2 = array_unique($array);//删除数组中重复的元素
 ```
-- 数组计数
-```
+
+数组计数
+
+```bash
 $array2 =array(array('PHP1','php2','php3'),array('asp1'));  
-echo count($array2,COUNT_RECURSIVE);//后面标志表示递归  
+echo count($array2,COUNT_RECURSIVE);  //后面标志表示递归  
 ```
 
-- 遍历数组中的元素　$key  和　$value 都是副本 , 修改value 的值不会影响到　$arr
-```
+遍历数组中的元素　$key  和　$value 都是副本 , 修改value 的值不会影响到　$arr
+
+```bash
 foreach($arr as $key => $value){
     print   '键 :'.$key.'   值：'.$value;
 }
 ```
-- 遍历数组　　\$value  是引用 ,　修改\$value  的值会影响到　$arr
-```
+
+遍历数组　　\$value  是引用 ,　修改\$value  的值会影响到　$arr
+
+```bash
 $arr = array(1, 2, 3, 4);
 foreach ($arr as &$value) {
    $value = $value * 2;
@@ -840,131 +731,119 @@ foreach ($arr as &$value) {
 // $arr is now array(2, 4, 6, 8)
 unset($value); // 最后取消掉引用
 ```
-- 将多个值保存在匿名数组中
-```
+
+将多个值保存在匿名数组中
+
+```bash
 $fruits['red'][]='strawberry';
 $fruits['red'][]='apple';
 ```
-- 将关联数组，根据 键名 拆成 一个个的变量！
-```
+
+将关联数组，根据 键名 拆成 一个个的变量！
+
+```bash
 extract($var_array, EXTR_PREFIX_SAME, "ex"); 
 //如果前面有定义过此变量，则变量名加前缀　ex
 ```
-- list构造器　将数组里面的值分别指定给单独变量
-```
+
+list构造器　将数组里面的值分别指定给单独变量
+
+```bash
 list($b,$c,$d) =  array('apple','orange','card');
 echo $b,$c,$d; //apple orange card
 ```
-- 合并两个数组
-```
+
+合并两个数组
+
+```bash
 array_merge($arr1,$arr2);//$arr2 会覆盖同名键的值
 ```
-- 检查数组中是否存在某个键
-```
+
+检查数组中是否存在某个键
+
+```bash
 array_key_exists('key',$array);//key存在就返回true,不考虑对应的值
 isset($array['key']);/*在array 中的键存在，且不为null*/
 ```
-- 检查数组中是否包含某个值
-```
+
+检查数组中是否包含某个值
+
+```bash
 in_array('value',$array);//存在就返回ture
 ```
-- 将数组按键排序
-```
+
+将数组按键排序
+
+```bash
 ksort($array);
 ```
-- 计算两个数组的并集
-```
+
+计算两个数组的并集
+
+```bash
 $union = array_unique(array_merge($A,$b));
 ```
-- 使用回调函数过滤　array 中的值
-```
+
+使用回调函数过滤　array 中的值
+
+```bash
 $ar = array("hello", null, "world");
 print(implode(',', $ar)); // hello,,world
 print(implode(',', array_filter($ar, function($v){ return $v !== null; }))); // hello,world
 ```
-- 数组合并为字符串
-```
+
+数组合并为字符串
+```bash
 join(',',$arr);//返回以 , 分割的字符串
 implode('-',array('a','b','c'));
 ```
 
-- 给数组添加一个元素
-```
+给数组添加一个元素
+
+```bash
 $arr[] = "caokaiyan";//键为数字键
 $arr['xuehao'] = 1001121213;
 array_push($array,$var); 
 ```
-- 删除数组中的元素
-```
+
+删除数组中的元素
+
+```bash
 unset($arr['xuehao']);
 $var = array_pop($array);//$var 获取数组最后一个元素,数组减去那个元素
 $array2 = array_unique($array);//删除数组中重复的元素
 ```
-- 数组计数
-```
+
+数组计数
+
+```bash
 $array2 =array(array('PHP1','php2','php3'),array('asp1'));  
 echo count($array2,COUNT_RECURSIVE);//后面标志表示递归  
 ```
 
-- 遍历数组中的元素　$key  和　$value 都是副本 , 修改value 的值不会影响到　$arr
-```
-foreach($arr as $key => $value){
-    print   '键 :'.$key.'   值：'.$value;
-}
-```
-- 遍历数组　　\$value  是引用 ,　修改\$value  的值会影响到　$arr
-```
-$arr = array(1, 2, 3, 4);
-foreach ($arr as &$value) {
-   $value = $value * 2;
-}
-// $arr is now array(2, 4, 6, 8)
-unset($value); // 最后取消掉引用
-```
-- 将多个值保存在匿名数组中
-```
-$fruits['red'][]='strawberry';
-$fruits['red'][]='apple';
-```
-- 将关联数组，根据 键名 拆成 一个个的变量！
-```
-extract($var_array, EXTR_PREFIX_SAME, "ex"); 
-//如果前面有定义过此变量，则变量名加前缀　ex
-```
-- list构造器　将数组里面的值分别指定给单独变量
-```
-list($b,$c,$d) =  array('apple','orange','card');
-echo $b,$c,$d; //apple orange card
-```
-- 合并两个数组
-```
-array_merge($arr1,$arr2);//$arr2 会覆盖同名键的值
-```
-- 检查数组中是否存在某个键
-```
-array_key_exists('key',$array);//key存在就返回true,不考虑对应的值
-isset($array['key']);/*在array 中的键存在，且不为null*/
-```
-- 检查数组中是否包含某个值
-```
-in_array('value',$array);//存在就返回ture
-```
-- 将数组按键排序
-```
+将数组按键排序
+
+```bash
 ksort($array);
 ```
-- 计算两个数组的并集
-```
+
+计算两个数组的并集
+
+```php
 $union = array_unique(array_merge($A,$b));
 ```
-- 使用回调函数过滤　array 中的值
-```
+
+使用回调函数过滤　array 中的值
+
+```php
 $ar = array("hello", null, "world");
 print(implode(',', $ar)); // hello,,world
 print(implode(',', array_filter($ar, function($v){ return $v !== null; }))); // hello,world
 ```
-- 数组合并为字符串
-```
+
+数组合并为字符串
+
+```php
 join(',',$arr);//返回以 , 分割的字符串
 implode('-',array('a','b','c'));
 ```
@@ -997,59 +876,65 @@ echo "I'd like an {${beers::$ale}}\n";
 echo "This square is {$square->width} centimeters broad.";
 ```
 
- 判断是否包含子字符串
- ```
- if(strpos($_POST['email'],'@') === false){
-     print 'there was no @ in the e-mail address ';
- }
- ```
- 字符串长度
- ```
- strlen("codekissyoung"); //13
- ```
- 删除字符串两端空白
- ```
- echo trim('  caokaiyan  '); //caokaiyan
- ```
- 将字符串切成数组
- ```
- 
- // 示例 1
- $pizza  = "piece1 piece2 piece3 piece4 piece5 piece6";
- $pieces = explode(" ", $pizza);
- echo $pieces[0]; // piece1
- echo $pieces[1]; // piece2
- // 示例 2
- $data = "foo:*:1023:1000::/home/foo:/bin/sh";
- list($user, $pass, $uid, $gid, $gecos, $home, $shell) = explode(":", $data);
- echo $user; // foo
- echo $pass; // *
- ```
- 将数组连成字符串　：在生成表格，生成 sql 语句方面有大用
+判断是否包含子字符串
 
- ```
- $elements = array('a', 'b', 'c');
- echo "<ul><li>" . implode("</li><li>", $elements) . "</li></ul>";
- // array containing data
- $array = array(
- 		"name" => "John",
- 		"surname" => "Doe",
- 		"email" => "j.doe@intelligence.gov"
- );
- // build query...
- $sql  = "INSERT INTO table";
- // implode keys of $array...
- $sql .= " (`".implode("`, `", array_keys($array))."`)";
- // implode values of $array...
- $sql .= " VALUES ('".implode("', '", $array)."') ";
- echo $sql;
- //Select name,email,phone from usertable where user_id IN (?,?,?,?,?)
- $id_nums = array(1,6,12,18,24);
- $nums_list = implode(',', $id_nums);
-  
- $sqlquery = "Select name,email,phone from usertable where user_id IN ($nums_list)";
- echo $sqlquery;
- ```
+```php
+if(strpos($_POST['email'],'@') === false){
+    print 'there was no @ in the e-mail address ';
+}
+```
+
+字符串长度
+
+```php
+strlen("codekissyoung"); //13
+```
+
+删除字符串两端空白
+
+```php
+echo trim('  caokaiyan  '); //caokaiyan
+```
+
+将字符串切成数组
+
+```php
+$pizza  = "piece1 piece2 piece3 piece4 piece5 piece6";
+$pieces = explode(" ", $pizza);
+echo $pieces[0]; // piece1
+echo $pieces[1]; // piece2
+// 示例 2
+$data = "foo:*:1023:1000::/home/foo:/bin/sh";
+list($user, $pass, $uid, $gid, $gecos, $home, $shell) = explode(":", $data);
+echo $user; // foo
+echo $pass; // *
+```
+
+将数组连成字符串　：在生成表格，生成 sql 语句方面有大用
+
+```php
+$elements = array('a', 'b', 'c');
+echo "<ul><li>" . implode("</li><li>", $elements) . "</li></ul>";
+// array containing data
+$array = array(
+    "name" => "John",
+    "surname" => "Doe",
+    "email" => "j.doe@intelligence.gov"
+);
+// build query...
+$sql  = "INSERT INTO table";
+// implode keys of $array...
+$sql .= " (`".implode("`, `", array_keys($array))."`)";
+// implode values of $array...
+$sql .= " VALUES ('".implode("', '", $array)."') ";
+echo $sql;
+//Select name,email,phone from usertable where user_id IN (?,?,?,?,?)
+$id_nums = array(1,6,12,18,24);
+$nums_list = implode(',', $id_nums);
+
+$sqlquery = "Select name,email,phone from usertable where user_id IN ($nums_list)";
+echo $sqlquery;
+```
 
  将url 的　查询字符串　解析成数组
  ```
