@@ -25,7 +25,7 @@
 └── ThinkPHP                # 框架内核目录
 ```
 
-## 入口文件
+入口文件`index.php`
 
 ```php
 // THINK_PATH	框架目录
@@ -40,9 +40,7 @@ define('BIND_ACTION', '动作名称');          # 入口文件绑定默认访问
 require './ThinkPHP/ThinkPHP.php';
 ```
 
-## Application 配置文件
-
-`Application/Common/Conf/config.php`
+配置文件`Application/Common/Conf/config.php`
 
 ```php
 'SHOW_PAGE_TRACE' => true,                  # 开启Trace调试工具
@@ -55,9 +53,7 @@ require './ThinkPHP/ThinkPHP.php';
 'DB_PREFIX' => 'prefix_',                   # 表的前缀
 ```
 
-## Hello ThinkPHP
-
-我们找到自动生成的 `Home/Controller/IndexController.class.php` 文件：
+控制器`Home/Controller/IndexController.class.php`
 
 ```php
 namespace Home\Controller;
@@ -71,17 +67,11 @@ class IndexController extends Controller{
 }
 ```
 
-在浏览器中访问 `localhost` 即可看到 `Hello ThinkPHP`。这里我们需要了解的事情有：
+在浏览器中访问 `http://host/Home/Index/index` 即是访问`IndexController`类的`index()`方法。
 
-- 控制器类名：控制器名（驼峰 首字母大写）+ `Controller`
-- 控制器文件名：类名 + `class.php`
-- `namespace` 与 目录 的对应关系：
+`spl_autoload_register`注册的自动加载函数中，是以`Application`作为查找路径的，所以相应的完整类名为:`Home\Controller\IndexController`。
 
-```bash
-Home\Controller\IndexController
-对应:
-Home/Controller/IndexController.class.php
-```
+PS: 控制器文件名以`.class.php`结尾，这是`ThinkPHP`框架要求的，在框架代码里面强制要求类符合这一规范，才会自动被加载。
 
 ## 开发规范
 
