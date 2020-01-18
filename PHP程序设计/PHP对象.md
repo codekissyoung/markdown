@@ -23,6 +23,32 @@ PHP提供了类型提示，在传入一个对象作为参数时，可以使用�
 - 父类定义的静态属性会被子类继承
 - 类所产生的对象，它们之间是共享静态属性的
 
+### 创建对象的几种方式
+
+```php
+class Test
+{
+    static public function getNew()
+    {
+        return new static; // new static 是返回当前对象模板实例化的变量，
+    }
+}
+class Child extends Test{
+
+}
+
+$obj1 = new Test();
+$obj2 = new $obj1; // 通过new对象实例来创建一个该类的新对象
+var_dump($obj1 !== $obj2); // true
+
+$obj3 = Test::getNew();
+var_dump($obj3 instanceof Test); // true
+
+$obj4 = Child::getNew();
+var_dump($obj4 instanceof Child); // true
+```
+
+
 ```php
 <?php
 class Father{

@@ -20,6 +20,17 @@ PHP系统核心与最佳实践
 
 Modern PHP
 
+[php the right way](http://laravel-china.github.io/php-the-right-way/)
+
+[阅读 PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)
+[阅读 PSR-1](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md)
+[阅读 PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
+[阅读 PSR-4](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md)
+[阅读 PEAR 编码准则](http://pear.php.net/manual/en/standards.php)
+[阅读 Symfony 编码准则](http://symfony.com/doc/current/contributing/code/standards.html)
+[PHP_CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/) 检查代码是否符合规范
+[PHP Coding Standards Fixer](http://cs.sensiolabs.org/) 自动修复语法格式
+
 ## 变量
 
 #### Copy on write
@@ -41,6 +52,20 @@ xdebug_debug_zval('b');
 $b = range( 4, 7 );         // 改变 $b 等与 改变 $a
 xdebug_debug_zval('a');
 xdebug_debug_zval('b');
+```
+
+### 变量赋值与引用
+
+```php
+$instance = new SimpleClass();
+$assigned   =  $instance;
+$reference  = &$instance;
+$instance -> var = '$assigned will have this value';
+$instance = null; // $instance and $reference become null
+
+var_dump($instance); // null
+var_dump($reference); // null
+var_dump($assigned); //object(SimpleClass) 1 (1) { ["var"]=>string(30) "$assigned will have this value"}
 ```
 
 可变变量
