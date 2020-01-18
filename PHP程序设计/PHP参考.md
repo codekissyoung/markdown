@@ -300,119 +300,6 @@ function is_json($string) {
 echo json_encode($arr, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT); 
 ```
 
-## 数组函数
-
-```php
-// 给数组添加一个元素
-$arr[] = "caokaiyan";//键为数字键
-$arr['xuehao'] = 1001121213;
-array_push($array,$var);
-
-// 删除数组中的元素
-unset($arr['xuehao']);
-$var = array_pop($array);//$var 获取数组最后一个元素,数组减去那个元素
-$array2 = array_unique($array);//删除数组中重复的元素
-
-// 数组计数
-$array2 =array(array('PHP1','php2','php3'),array('asp1'));
-echo count($array2,COUNT_RECURSIVE);//后面标志表示递归
-
-// 遍历数组中的元素　key和value 都是副本 , 修改value 的值不会影响到　$arr
-foreach($arr as $key => $value){     print   '键 :'.$key.'   值：'.$value;}
-
-// 遍历数组 $value 是引用 ,　修改$value 的值会影响到　$arr
-$arr = array(1, 2, 3, 4);
-foreach ($arr as &$value) {
-    $value = $value * 2;
-} // $arr is now array(2, 4, 6, 8)
-unset($value); // 最后取消掉引用
-
-// 将多个值保存在匿名数组中
-$fruits['red'][]='strawberry';$fruits['red'][]='apple';
-
-// 将关联数组，根据 键名 拆成 一个个的变量！
-extract($var_array, EXTR_PREFIX_SAME, "ex"); //如果前面有定义过此变量，则变量名加前缀　ex
-
-// list构造器　将数组里面的值分别指定给单独变量
-list($b,$c,$d) =  array('apple','orange','card');echo $b,$c,$d; //apple orange card
-
-// 合并两个数组
-array_merge($arr1,$arr2);//$arr2 会覆盖同名键的值
-
-// 检查数组中是否存在某个键
-array_key_exists('key',$array);
-// key存在就返回true,不考虑对应的值isset($array['key']);/*在array 中的键存在，且不为null*/
-
-// 检查数组中是否包含某个值
-in_array('value',$array);//存在就返回ture
-
-// 将数组按键排序
-ksort($array);
-
-// 计算两个数组的并集
-$union = array_unique(array_merge($A,$b));
-
-// 使用回调函数过滤　array 中的值
-$ar = array("hello", null, "world");
-print(implode(',', $ar));
-worldprint(implode(',', array_filter($ar, function($v){ return $v !== null; }))); // hello,world
-
-// 数组合并为字符串
-join(',',$arr);//返回以 , 分割的字符串implode('-',array('a','b','c'));
-
-// 一维数字去重
-$aa=array("apple","banana","pear","apple","wail","watermalon");
-$bb=array_unique($aa);
-print_r($bb); //Array ( [0] => apple [1] => banana [2] => pear [4] => wail [5] => watermalon)
-
-// 二维数组去重,因为某一键名的值不能重复，删除重复项
-$aa = array(
-    array('id' => 123, 'name' => '张三'),
-    array('id' => 123, 'name' => '李四'),
-    array('id' => 124, 'name' => '王五'),
-    array('id' => 125, 'name' => '赵六'),
-    array('id' => 126, 'name' => '赵六')
-);//需求，id 不能重复
-function assoc_unique($arr, $key){
-    $tmp_arr = array();
-    foreach($arr as $k => $v){
-        //搜索$v[$key]是否在$tmp_arr数组中存在，若存在返回true
-        if(in_array($v[$key], $tmp_arr)){
-            unset($arr[$k]);
-        }else {
-            $tmp_arr[] = $v[$key];
-       }
-    }
-    sort($arr); //sort函数对数组进行排序
-    return $arr;
-}
-$key = 'id';
-assoc_unique(&$aa, $key);
-print_r($aa);//Array ( [0] => Array ( [id] => 123 [name] => 张三 ) [1] => Array ( [id] => 124 [name] => 王五 ) [2] => Array ( [id] => 125 [name] => 赵六 ) [3] => Array ( [id] => 126 [name] => 赵六 ) )
-
-// 二维数组去重,因内部的一维数组不能完全相同，而删除重复项
-$aa = array(
-    array('id' => 123, 'name' => '张三'),
-    array('id' => 123, 'name' => '李四'),
-    array('id' => 124, 'name' => '王五'),
-    array('id' => 123, 'name' => '李四'),
-    array('id' => 126, 'name' => '赵六')
-);
-function array_unique_fb($array2D){
-    foreach ($array2D as $v){
-        $v = join(",",$v); //降维,也可以用implode,将一维数组转换为用逗号连接的字符串
-        $temp[] = $v;
-    }
-    $temp = array_unique($temp); //去掉重复的字符串,也就是重复的一维数组
-    foreach ($temp as $k => $v){
-        $temp[$k] = explode(",",$v); //再将拆开的数组重新组装
-    }
-    return $temp;
-}
-$bb=array_unique_fb($aa);
-print_r($bb); //Array ( [0] => Array ( [0] => 123 [1] => 张三 ) [1] => Array ( [0] => 123 [1] => 李四 ) [2] => Array ( [0] => 124 [1] => 王五 ) [4] => Array ( [0] => 126 [1] => 赵六 ) )
-```
-
 ## 脚本执行完注册函数
 
 ```php
@@ -513,8 +400,7 @@ if (filter_var($ip_b, FILTER_VALIDATE_IP)) {
 //输出 ： This (ip_a) IP address is considered valid.
 ```
 
-```
-
+```php
 $int_a = '1';
 $int_b = '-1';
 $int_c = '4';
@@ -648,282 +534,7 @@ function is_json($string) {
 }
 ```
 
-## csv 文件格式 ##
-```
-"数据１"，"数据２"，"数据３"
-"数据４"，"数据５"，"数据６"
-```
-## 将二维数组存为　csv  文件fputcsv() ##
-```
-$csv_arr = (
-    array(1,2,3,4),
-    array(5,6,7,8),
-    array(12,34,56,78)
-);
-$fh = fopen('test.csv','w') or die("can't open file test.csv")；
-foreach($csv_arr as $csv_arr_line){
-    if(fputcsv($fh,$csv_arr_line) === false){
-        die(‘can not write test.csv !’)；
-    }
-}
-fclose($fh) or  die("can not close test.csv !");
-```
-## 想输出　csv 格式的数据　php://output ##
-```
-$csv_arr = (
-    array(1,2,3,4),
-    array(5,6,7,8),
-    array(12,34,56,78)
-);
-$fh = fopen('php://output','w');
-foreach($csv_arr as $csv_arr_line){
-    if(fputcsv($fh,$csv_arr_line) === false){
-        die(‘can not write csv line !’)；
-    }
-}
-fclose($fh);
-```
-## 想将　csv 格式的数据存到字符串中 ob buffer  ##
-```
-$csv_arr = (
-    array(1,2,3,4),
-    array(5,6,7,8),
-    array(12,34,56,78)
-);
-ob_start();
-$fh = fopen('test.csv','w') or die("can't open php://output")；
-foreach($csv_arr as $csv_arr_line){
-    if(fputcsv($fh,$csv_arr_line) === false){
-        die(‘can not write csv line !’)；
-    }
-}
-fclose($fh) or  die("can not close php://output !");
-$output = ob_get_contents();
-ob_end_clean();
-```
 
-
-## 一维数组 ##
-
-```php
-$aa=array("apple","banana","pear","apple","wail","watermalon");
-$bb=array_unique($aa);
-print_r($bb);//Array ( [0] => apple [1] => banana [2] => pear [4] => wail [5] => watermalon
-```
-
-## 二维数组 ##
-1）因为某一键名的值不能重复，删除重复项
-```
-$aa = array(
-            array('id' => 123, 'name' => '张三'),
-            array('id' => 123, 'name' => '李四'),
-            array('id' => 124, 'name' => '王五'),
-            array('id' => 125, 'name' => '赵六'),
-            array('id' => 126, 'name' => '赵六')
-            );
-//需求，id 不能重复
-function assoc_unique($arr, $key){
-	$tmp_arr = array();
-		foreach($arr as $k => $v){
-			//搜索$v[$key]是否在$tmp_arr数组中存在，若存在返回true
-			if(in_array($v[$key], $tmp_arr)){
-	             unset($arr[$k]);
-	        }else {
-				$tmp_arr[] = $v[$key];
-			}
-		}
-        sort($arr); //sort函数对数组进行排序
-		return $arr;
-}
-$key = 'id';
-assoc_unique(&$aa, $key);
-print_r($aa);
-//Array ( [0] => Array ( [id] => 123 [name] => 张三 ) [1] => Array ( [id] => 124 [name] => 王五 ) [2] => Array ( [id] => 125 [name] => 赵六 ) [3] => Array ( [id] => 126 [name] => 赵六 ) )
-```
-
-2）因内部的一维数组不能完全相同，而删除重复项
-
-```
- $aa = array(
-            array('id' => 123, 'name' => '张三'),
-            array('id' => 123, 'name' => '李四'),
-            array('id' => 124, 'name' => '王五'),
-            array('id' => 123, 'name' => '李四'),
-            array('id' => 126, 'name' => '赵六')
-            );
-function array_unique_fb($array2D){
-                 foreach ($array2D as $v){
-                     $v = join(",",$v); //降维,也可以用implode,将一维数组转换为用逗号连接的字符串
-                     $temp[] = $v;
-                 }
-                 $temp = array_unique($temp);    //去掉重复的字符串,也就是重复的一维数组
-                foreach ($temp as $k => $v){
-                    $temp[$k] = explode(",",$v);   //再将拆开的数组重新组装
-                }
-                return $temp;
-            }
-            $bb=array_unique_fb($aa);
-            print_r($bb);
-            //Array ( [0] => Array ( [0] => 123 [1] => 张三 ) [1] => Array ( [0] => 123 [1] => 李四 ) [2] => Array ( [0] => 124 [1] => 王五 ) [4] => Array ( [0] => 126 [1] => 赵六 ) )  
-```
-
-给数组添加一个元素
-
-```bash
-$arr[] = "caokaiyan";//键为数字键
-$arr['xuehao'] = 1001121213;
-array_push($array,$var); 
-```
-
-删除数组中的元素
-
-```bash
-unset($arr['xuehao']);
-$var = array_pop($array);//$var 获取数组最后一个元素,数组减去那个元素
-$array2 = array_unique($array);//删除数组中重复的元素
-```
-
-数组计数
-
-```bash
-$array2 =array(array('PHP1','php2','php3'),array('asp1'));  
-echo count($array2,COUNT_RECURSIVE);  //后面标志表示递归  
-```
-
-遍历数组中的元素　$key  和　$value 都是副本 , 修改value 的值不会影响到　$arr
-
-```bash
-foreach($arr as $key => $value){
-    print   '键 :'.$key.'   值：'.$value;
-}
-```
-
-遍历数组　　\$value  是引用 ,　修改\$value  的值会影响到　$arr
-
-```bash
-$arr = array(1, 2, 3, 4);
-foreach ($arr as &$value) {
-   $value = $value * 2;
-}
-// $arr is now array(2, 4, 6, 8)
-unset($value); // 最后取消掉引用
-```
-
-将多个值保存在匿名数组中
-
-```bash
-$fruits['red'][]='strawberry';
-$fruits['red'][]='apple';
-```
-
-将关联数组，根据 键名 拆成 一个个的变量！
-
-```bash
-extract($var_array, EXTR_PREFIX_SAME, "ex"); 
-//如果前面有定义过此变量，则变量名加前缀　ex
-```
-
-list构造器　将数组里面的值分别指定给单独变量
-
-```bash
-list($b,$c,$d) =  array('apple','orange','card');
-echo $b,$c,$d; //apple orange card
-```
-
-合并两个数组
-
-```bash
-array_merge($arr1,$arr2);//$arr2 会覆盖同名键的值
-```
-
-检查数组中是否存在某个键
-
-```bash
-array_key_exists('key',$array);//key存在就返回true,不考虑对应的值
-isset($array['key']);/*在array 中的键存在，且不为null*/
-```
-
-检查数组中是否包含某个值
-
-```bash
-in_array('value',$array);//存在就返回ture
-```
-
-将数组按键排序
-
-```bash
-ksort($array);
-```
-
-计算两个数组的并集
-
-```bash
-$union = array_unique(array_merge($A,$b));
-```
-
-使用回调函数过滤　array 中的值
-
-```bash
-$ar = array("hello", null, "world");
-print(implode(',', $ar)); // hello,,world
-print(implode(',', array_filter($ar, function($v){ return $v !== null; }))); // hello,world
-```
-
-数组合并为字符串
-```bash
-join(',',$arr);//返回以 , 分割的字符串
-implode('-',array('a','b','c'));
-```
-
-给数组添加一个元素
-
-```bash
-$arr[] = "caokaiyan";//键为数字键
-$arr['xuehao'] = 1001121213;
-array_push($array,$var); 
-```
-
-删除数组中的元素
-
-```bash
-unset($arr['xuehao']);
-$var = array_pop($array);//$var 获取数组最后一个元素,数组减去那个元素
-$array2 = array_unique($array);//删除数组中重复的元素
-```
-
-数组计数
-
-```bash
-$array2 =array(array('PHP1','php2','php3'),array('asp1'));  
-echo count($array2,COUNT_RECURSIVE);//后面标志表示递归  
-```
-
-将数组按键排序
-
-```bash
-ksort($array);
-```
-
-计算两个数组的并集
-
-```php
-$union = array_unique(array_merge($A,$b));
-```
-
-使用回调函数过滤　array 中的值
-
-```php
-$ar = array("hello", null, "world");
-print(implode(',', $ar)); // hello,,world
-print(implode(',', array_filter($ar, function($v){ return $v !== null; }))); // hello,world
-```
-
-数组合并为字符串
-
-```php
-join(',',$arr);//返回以 , 分割的字符串
-implode('-',array('a','b','c'));
-```
 
 ```php
 $juices = array("apple", "orange", "koolaid1" => "purple");
@@ -987,109 +598,78 @@ echo $user; // foo
 echo $pass; // *
 ```
 
-将数组连成字符串　：在生成表格，生成 sql 语句方面有大用
-
+编码转换
 ```php
-$elements = array('a', 'b', 'c');
-echo "<ul><li>" . implode("</li><li>", $elements) . "</li></ul>";
-// array containing data
-$array = array(
-    "name" => "John",
-    "surname" => "Doe",
-    "email" => "j.doe@intelligence.gov"
-);
-// build query...
-$sql  = "INSERT INTO table";
-// implode keys of $array...
-$sql .= " (`".implode("`, `", array_keys($array))."`)";
-// implode values of $array...
-$sql .= " VALUES ('".implode("', '", $array)."') ";
-echo $sql;
-//Select name,email,phone from usertable where user_id IN (?,?,?,?,?)
-$id_nums = array(1,6,12,18,24);
-$nums_list = implode(',', $id_nums);
-
-$sqlquery = "Select name,email,phone from usertable where user_id IN ($nums_list)";
-echo $sqlquery;
+//将$str内的函数转换为utf-8编码
+$str="编码转换";
+iconv('UTF-8','GBK',$str);
 ```
 
- 将url 的　查询字符串　解析成数组
- ```
- $str = "first=value&arr[]=foo+bar&arr[]=baz";
- parse_str($str);
- echo $first;  // value
- echo $arr[0]; // foo bar
- echo $arr[1]; // baz
- parse_str($str, $output);
- echo $output['first'];  // value
- echo $output['arr'][0]; // foo bar
- echo $output['arr'][1]; // baz
- ```
- 编码转换
- ```
- //将$str内的函数转换为utf-8编码
- $str="编码转换";
- iconv('UTF-8','GBK',$str);
- ```
- 解决中文字符串问题：mbstring
- ```
- 多字节字符串
- echo mb_substr('这样一来我的字符串就不会有乱码^_^', 0, 7, 'utf-8'); 
- echo mb_strcut('这样一来我的字符串就不会有乱码^_^', 0, 7, 'utf-8');  
- echo mb_strlen("我是个好人","utf-8");
- mb_substr是按字来切分字符，而mb_strcut是按字节来切分字符，但是都不会产生半个字符的现象。
- ```
- 不希望浏览器解析html标签
- ```
- string htmlspecialchars(string str);
- ```
- 字符串大小写转换
- ```
- echo strtoupper('caokaiyan'); //CAOKAIYAN
- echo strtolower('CAOkaiyan');//caokaiyan
- ```
- 首字母小写
- ```
- $foo = 'HelloWorld';
- $foo = lcfirst($foo);             // helloWorld
- ```
- 首字母大写
- ```
- echo ucfist('how do you do today?'); // How do you do today?
- echo ucwords("how do you do today?");//How Do You Do Today ?
- ```
- 替换子字符串
- ```
- substr_replace('abcdefghijklmnopqrstuvwxyz','***',0,8);
- //后面的两个数字的参数的使用方法跟　substr 一样：***ijklmnopqrstuvwxyz
- ```
- 提取子字符串
- ```
- substr('abcdefghijklmnopqrstuvwxyz',0,8);//从下标为０开始，开始提取８个 :abcdefgh
- substr('abcdefghijklmnopqrstuvwxyz',20);//从下标为 20 开始，提取到最后 :　vwxyz
- substr('abcdefghijklmnopqrstuvwxyz',-5);//提取倒数５个字符串　：vwxyz
- substr('abcdefghijklmnopqrstuvwxyz',-5,3);//从倒数５个开始，提取３个：　vwx
- substr('abcdefghijklmnopqrstuvwxyz',-5,-1);//从倒数　５　个开始，提取到倒数　1 个　: vwxy
- ```
+解决中文字符串问题：mbstring
+ 
+```php
+多字节字符串
+echo mb_substr('这样一来我的字符串就不会有乱码^_^', 0, 7, 'utf-8'); 
+echo mb_strcut('这样一来我的字符串就不会有乱码^_^', 0, 7, 'utf-8');  
+echo mb_strlen("我是个好人","utf-8");
+mb_substr是按字来切分字符，而mb_strcut是按字节来切分字符，但是都不会产生半个字符的现象。
+```
 
- ```
- header('HTTP/1.1 200 OK');//告诉浏览器，请求成功
- header('HTTP/1.1 404 Not Found');//无此页面
+不希望浏览器解析html标签
 
- //禁止浏览器缓存
- header('Cache-Control:no-cache,no-store,max-age=0,must-revalidate');
- header('Expires：Mon,26 Jul 1997 05:00:00 GMT');
- header('Pragma:no-cache');
+```php
+string htmlspecialchars(string str);
+```
 
- //页面重定向,十秒钟后跳到　url 
- header('Refresh:10;url=http://www.baidu.com/');
+字符串大小写转换
 
- //向浏览器发送一条Http头信息，告诉它重定向到莫个网址
- header('location:http://www.baidu.com');
+```php
+echo strtoupper('caokaiyan'); //CAOKAIYAN
+echo strtolower('CAOkaiyan');//caokaiyan
+```
 
- //允许 http://dev.kanjiebao.com 的　ajax 的跨域请求
- header("Access-Control-AllowOrigin:http://dev.kanjiebao.com");
+首字母小写
+```php
+$foo = 'HelloWorld';
+$foo = lcfirst($foo);             // helloWorld
+```
 
- ```
+首字母大写
+```php
+echo ucfist('how do you do today?'); // How do you do today?
+echo ucwords("how do you do today?");//How Do You Do Today ?
+```
 
+替换子字符串
+```php
+substr_replace('abcdefghijklmnopqrstuvwxyz','***',0,8);
+//后面的两个数字的参数的使用方法跟　substr 一样：***ijklmnopqrstuvwxyz
+```
+
+提取子字符串
+```php
+substr('abcdefghijklmnopqrstuvwxyz',0,8);//从下标为０开始，开始提取８个 :abcdefgh
+substr('abcdefghijklmnopqrstuvwxyz',20);//从下标为 20 开始，提取到最后 :　vwxyz
+substr('abcdefghijklmnopqrstuvwxyz',-5);//提取倒数５个字符串　：vwxyz
+substr('abcdefghijklmnopqrstuvwxyz',-5,3);//从倒数５个开始，提取３个：　vwx
+substr('abcdefghijklmnopqrstuvwxyz',-5,-1);//从倒数　５　个开始，提取到倒数　1 个　: vwxy
+```
+
+```php
+header('HTTP/1.1 200 OK');//告诉浏览器，请求成功
+header('HTTP/1.1 404 Not Found');//无此页面
+
+//禁止浏览器缓存
+header('Cache-Control:no-cache,no-store,max-age=0,must-revalidate');
+header('Expires：Mon,26 Jul 1997 05:00:00 GMT');
+header('Pragma:no-cache');
+
+//页面重定向,十秒钟后跳到　url 
+header('Refresh:10;url=http://www.baidu.com/');
+
+//向浏览器发送一条Http头信息，告诉它重定向到莫个网址
+header('location:http://www.baidu.com');
+
+//允许 http://dev.kanjiebao.com 的　ajax 的跨域请求
+header("Access-Control-AllowOrigin:http://dev.kanjiebao.com");
 ```
