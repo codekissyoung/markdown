@@ -1,25 +1,24 @@
 # 设计模式
 
+本文是`PHP`常用的设计模式的梳理。
+
 ## 工厂模式
 
-- 使用函数或者类方法生成对象，而不是在代码中直接 new !
-- 使用工厂模式的一个考虑就是，假如在系统中多次使用了这个类new对象，如果该类发生改变，那么所有new代码都需要改正，但是如果把new这一操作封装到工厂方法里，就只需要改工厂里new的代码就行了，所有使用到该对象(调用工厂方法获得的对象)的地方都不用改
+使用函数或者类方法生成对象，而不是在代码中直接`new`，使用工厂模式的一个考虑就是，假如在系统中多次使用了这个类`new`对象，如果该类发生改变，那么所有`new`代码都需要改正，但是如果把`new`这一操作封装到工厂方法里，就只需要改工厂里`new`的代码就行了，所有使用到该对象的地方都不用改。
+
 ```php
-<?php
 class  Factory {
     static function createDb(){
         $db = new Database ;
         return $db;
     }
 }
-Factory : : createDb();
+Factory::createDb();
 ```
 
 ## 单例模式
 
-保证程序运行时，只能存在某个类的一个实例对象！比如链接MySQL的对象，链接Memcache的对象
-- 先将 `__construct()` 设置为 private 这样就不允许在外部 new 了
-- 在类的内部实例化一个对象。外部可以得到就行
+保证程序运行时，只能存在某个类的一个实例对象！比如链接`MySQL`的对象，链接`Memcache`的对象。
 
 ```php
 <?php
@@ -44,7 +43,6 @@ $mem = Memcache::get_mem_ins();  //调用
 用来将一些全局需要使用的 `对象/变量` 挂载到注册树上，程序任何地方都可以通过注册器树取到想要的 `对象/变量`
 
 ```php
-<?php
 class Register{
     protected static $objects;
     static function set($alias,$object){
@@ -72,18 +70,14 @@ interface Database{
     function connect($host,$user,$passwd,$dbname);
     function query($sql);
     function close();
-    
 }
 
 class MySQL implements Database{
     function connect($host,$user,$passwd,$dbname){
-        // 实现该方法
     }
     function query($sql){
-        // 实现该方法
     }
     function close(){
-        // ...
     }
 }
 
@@ -108,8 +102,6 @@ $db->close();
 如果在代码中使用`if else `区分用户，分别实现，那么 当新增加一类用户时，比如`儿童`，所有的`if else`都要作相应的调整
 
 ```php
-<?php
-
 // 不使用策略模式
 if (男生){
     // 展示男生目录
@@ -118,8 +110,6 @@ if (男生){
 }else{
     // 展示儿童目录
 }
-
-// ... 
 if (男生){
     // 展示男生广告
 }else if(女生){
@@ -127,9 +117,6 @@ if (男生){
 }else{
     // 展示儿童广告
 }
-// ...
-
-// ... 
 if (男生){
     // 展示男生广告
 }else if(女生){
@@ -138,43 +125,29 @@ if (男生){
     // 展示儿童广告
 }
 ```
-- 约定一个接口 interface Show{...} ,根据上下文环境,分别实现n个符合接口的策略类
+约定一个接口`interface Show{...}` ,根据上下文环境,分别实现n个符合接口的策略类
 ```php
 interface UserStrategy{
     function showAd();
     function showCategory();
 } 
-
 class ManUserStrategy implements UserStrategy{
-    function showAd(){
-        // 展示男性用户广告
-    }
-    function showCategory(){
-        // 展示男性用户类目
-    }
+    function showAd(){}
+    function showCategory(){}
 }
-
 class WomenUserStrategy implements UserStrategy{
-    function showAd(){
-        // 展示女性用户广告
-    }
-    function showCategory(){
-        // 展示女性用户类目
-    }
+    function showAd(){}
+    function showCategory(){}
 }
+class ChildUserStrategy implements UserStrategy{ }
 
-class ChildUserStrategy implements UserStrategy{
-    // ... 实现儿童相关的方法
-}
-
-
-// 选择策略
 if(男性){
     $strategy = 'ManUserStrategy';
 }else if(女性){
     $strategy = 'WomenUserStrategy';
 } else{
-    // 假如新增了一类用户，只需要新增一个策略继承UserStrategy,然后这里的选择策略多一个判断而已，下面调用策略实现功能的代码都是一样的
+	// 假如新增了一类用户，只需要新增一个策略继承UserStrategy
+	// 然后这里的选择策略多一个判断而已，下面调用策略实现功能的代码都是一样的
     $strategy = 'ChildUserStrategy'; 
 }
 
@@ -193,7 +166,6 @@ $user_strategy -> showAd();
 - 假如A类里面，需要使用到B类的对象帮助其实现功能，那么A是依赖B的，这是一种紧耦合
 
 ```php
-<?php
 class Page{
     // 展示页面
     function index(){
@@ -206,15 +178,15 @@ class Page{
         $strategy -> showCategory();
     }
 }
-// Page 需要使用到 ManUserStrategy/WomenUserStrategy 帮助其实现功能，所以 Page 依赖于ManUserStrategy/WomenUserStrategy
+// Page 需要使用到 ManUserStrategy/WomenUserStrategy 帮助其实现功能
+// 所以 Page 依赖于ManUserStrategy/WomenUserStrategy
 $page = new Page();
 $page -> index();
 ```
 
-- 但是我们通过约定接口，传递符合接口的策略对象进入Page对象，那么Page类对于每个具体的策略没有依赖关系，只对约定的接口有依赖关系,这就解除Page对于ManUserStrategy/WomenUserStrategy的耦合关系了
+但是我们通过约定接口，传递符合接口的策略对象进入Page对象，那么Page类对于每个具体的策略没有依赖关系，只对约定的接口有依赖关系,这就解除Page对于ManUserStrategy/WomenUserStrategy的耦合关系了
 
 ```php
-<?php
 class Page{
     function index(UserStrategy $strategy){
         $strategy -> showAd();
@@ -242,12 +214,10 @@ $page -> index(new $strategy());
 ```php
 class User{
     protected $db;
-    
     public $id;
     public $name;
     public $mobile;
     public $regtime;
-    
     function __construct($id){
         $this -> db = new Mysqli('127.0.0.1','root','root','test'); // 链接到数据库
         $res = $this -> db -> query("select * from test where id = $id"); // 获取 该id 的用户记录
@@ -257,9 +227,9 @@ class User{
         $this -> mobile = $res['mobile'];
         $this -> regtime = $res['regtime'];
     }
-    
     function __destruct(){
-        $sql = "update test set name = '{$this -> name}',mobile = '{$this -> mobile}',regtime = '{$this -> regtime}' where id = '{$this -> id}'";
+		$sql = "update test set name = '{$this -> name}',mobile = '{$this -> mobile}',";
+		$sql .= "regtime = '{$this -> regtime}' where id = '{$this -> id}'";
     }
 }
 
@@ -267,7 +237,6 @@ $user = new User(25); // 初始化类的对象，获取了 id 为 25的用户的
 $user -> name = "codekissyoung"; // 修改对象属性的值
 // 代码运行结束，__destruct 会自动运行，将对属性的修改 写回到数据库
 ```
-
 
 ## 依赖倒置原则（Dependence Inversion Principle, DIP）
 

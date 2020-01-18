@@ -1,95 +1,86 @@
 # PHP 语言
 
-PHP与MySQL程序设计(第四版)
+如何从一门编程语言的角度，去学习`PHP`?
 
-安全PHP编程
+## 准备工作
 
-Laravel框架关键技术解析
+首先，安装好`xdebug`工具，方便我们调试`PHP`代码。
 
-[PHP设计模式全集2018](https://learnku.com/docs/php-design-patterns/2018)
+```bash
+$ sudo apt-get install php-xdebug
+```
 
-PHP应用程序安全编程
-
-深入PHP面向对象、模式与实践
-
-PHP与Mysql高性能开发
-
-PHP系统核心与最佳实践
-
-高性能PHP应用开发
-
-Modern PHP
-
-[php the right way](http://laravel-china.github.io/php-the-right-way/)
-
-[阅读 PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)
-[阅读 PSR-1](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md)
-[阅读 PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
-[阅读 PSR-4](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md)
-[阅读 PEAR 编码准则](http://pear.php.net/manual/en/standards.php)
-[阅读 Symfony 编码准则](http://symfony.com/doc/current/contributing/code/standards.html)
-[PHP_CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/) 检查代码是否符合规范
-[PHP Coding Standards Fixer](http://cs.sensiolabs.org/) 自动修复语法格式
+```php
+$name = "Link";
+xdebug_debug_zval( 'name' ); // name: (refcount=1, is_ref=0) string 'Link' (length=4)
+```
 
 ## 变量
 
-#### Copy on write
+`$a`作为一个标识符，如果不赋值的话，解释器表示找不到这个标识符，表示不存在的意思。其实`null`也表示这个意思。
+
+```php
+$a;         // a: no such symbol
+```
+
+赋值的话，`$a`这个标识符，就与一个实体`10`绑定了，更容易理解的说法是：`$a`就代表了这个实体。
+
+```php
+$a = 10;    // a: (refcount=0, is_ref=0)int 10
+```
+
+那么，能赋值给`$a`，或者说，`$a`能够存储的数据有哪些呢?
+
+> 答: `String` `Integer` `Float` `Boolean` `Array` `Object` `NULL`
+
+`&`是引用符号，将两个标识符绑定到同一块内存上，`$a`与`$b`互相作为对方的别名。
 
 ```php
 $a = 10;
-$b = $a;    // $a 与 $b 指向同一块内存    
-$b = 100;   // 执行到这句,才重新开辟一块内存给 $b ，然后写入 
-```
-
-#### 引用
-
-```php
-$a = range( 0, 3 );
-xdebug_debug_zval('a');
 $b = &$a;
-xdebug_debug_zval('a');
-xdebug_debug_zval('b');
-$b = range( 4, 7 );         // 改变 $b 等与 改变 $a
-xdebug_debug_zval('a');
-xdebug_debug_zval('b');
+$b = 20;
+// 执行后
+// a: (refcount=2, is_ref=1)int 20
+// b: (refcount=2, is_ref=1)int 20
 ```
 
-### 变量赋值与引用
+对于`Object`来说，默认就是 赋值 就是 引用：
 
 ```php
-$instance = new SimpleClass();
-$assigned   =  $instance;
-$reference  = &$instance;
-$instance -> var = '$assigned will have this value';
-$instance = null; // $instance and $reference become null
-
-var_dump($instance); // null
-var_dump($reference); // null
-var_dump($assigned); //object(SimpleClass) 1 (1) { ["var"]=>string(30) "$assigned will have this value"}
+class SimpleClass
+{
+    public $name = "Link";
+}
+$a = new SimpleClass();
+$b = $a;
+$b->name = "Sam";
+// 执行后
+// a: (refcount=2, is_ref=0)
+// object(SimpleClass)[1]
+//   public 'name' => (refcount=2, is_ref=0)string 'Sam' (length=3)
+// b: (refcount=2, is_ref=0)
+// object(SimpleClass)[1]
+//   public 'name' => (refcount=2, is_ref=0)string 'Sam' (length=3)
 ```
 
 可变变量
 
 ```php
-//例子1
-$a = "test";
+$a    = "test";
+
 $test = "i am the test";
-function test（）{　echo "i am function test!";　}
-echo $a; 	//　test
+function test(){
+    echo "i am function test!";
+}
+
 echo $$a; 	// i am the test
-$a(); 		//　i am function test!
+$a(); 		// i am function test!
 
-//例子2
-foreach ($_POST as $key => $value) {
-    $$key = $value;    // 利用可变变量，use key name as variable name
-｝
-
-//例子3
 // example.com?class=person&func=run
-$class=$_GET['class'];
-$func=$_GET['func'];
-$obj=new $class();
-$obj->$func();
+$class = $_GET['class'];
+$func  = $_GET['func'];
+$obj = new $class();
+$obj -> $func();
 ```
 
 #### unset
@@ -100,39 +91,18 @@ $b = &$a;
 unset($b);  // 只会取消 $b 到内存的引用，不会销毁空间
 ```
 
-#### 对象本身 就是引用传递
-
-```php
-class Person { public $name = "zhangsan"; }
-
-$p1 = new Person;
-xdebug_debug_zval('p1');
-// p1: (refcount=1, is_ref=0)=class Person { public $name = (refcount=2, is_ref=0)='zhangsan' }
-
-$p2 = $p1;
-xdebug_debug_zval('p1');
-// p1: (refcount=2, is_ref=0)=class Person { public $name = (refcount=2, is_ref=0)='zhangsan' }
-
-$p2->name = "lisi";
-xdebug_debug_zval('p1');
-// p1: (refcount=2, is_ref=0)=class Person { public $name = (refcount=0, is_ref=0)='lisi' }
-```
-
 #### 变量的地址
 
 ```php
+// 这里其实隐藏了 $val = $data[$key] 操作
 $data = ['a', 'b', 'c'];
-foreach ($data as $key => $val)  // 这里其实隐藏了 $val = $data[$key] 操作
-{
-    $val = &$data[$key];
+foreach ( $data as $key => $val ) {
+    $val = &$data[$key];        // $val 与 $data[$key] 互为引用， 指向当前 $data[$key] 表示的实体
     var_dump($data);
 }
 var_dump($data);
 // 结果: [a,b,c],[b,b,c],[b,c,c],[b,c,c]
 ```
-
-`$val = &$data[$key];` 表示将 `$data[$key]` 的地址给了 `$val`
-
 
 ## Trait 的使用
 
@@ -240,7 +210,7 @@ $link = enclosePerson("link");
 $link("give me a book");    // link, give me a book
 ```
 
-- 方法2 闭包其实是个`Closure`类实例, 它可以使用 `bindTo()` 方法,绑定到其他对象上,这样在闭包内部,可以通过`$this`访问到被绑对象的所有 `属性` 和 `方法`
+闭包其实是个`Closure`类实例, 它可以使用 `bindTo()` 方法,绑定到其他对象上,这样在闭包内部,可以通过`$this`访问到被绑对象的所有 `属性` 和 `方法`
 
 ```php
 class App{
@@ -311,14 +281,6 @@ function arrayPlus( $array, $num ) {
 ```
 
 ```php
-// 测试代码执行时间
-$start_time = microtime();
-//...执行的代码
-$end_time = microtime();
-$execute_time = $end_time - $start_time;
-```
-
-```php
 register_shutdown_function( ['core', 'handleShutdown'] );   // 正常/异常 退出时 调用
 set_exception_handler( ['core', 'handleException'] );       // 设置异常处理函数
 set_error_handler( ['core', 'handleError'] );               // 设置错误处理函数
@@ -342,7 +304,7 @@ class foo {
     }
 }
 
-call_user_func_array("foobar", array("one", "two")); // 等价 foobar("one", "two")
+call_user_func_array("foobar", ["one", "two"]); // 等价 foobar("one", "two")
 
 $foo = new foo;
 call_user_func_array([$foo, "bar"], ["three", "four"]); // 等价 $foo->bar("three","four")
@@ -357,18 +319,28 @@ class Foo {
     }
 }
 
-call_user_func_array( __NAMESPACE__ .'\Foo::test', array('Hannes'));
-call_user_func_array( [__NAMESPACE__ .'\Foo', 'test'], array('Philip'));
+call_user_func_array( __NAMESPACE__ .'\Foo::test', ['Hannes']);
+call_user_func_array( [__NAMESPACE__ .'\Foo', 'test'], ['Philip']);
 ```
 
+## 参考
 
-
-
-
-
-
-
-
-
-
-
+PHP与MySQL程序设计(第四版)
+安全PHP编程
+Laravel框架关键技术解析
+[PHP设计模式全集2018](https://learnku.com/docs/php-design-patterns/2018)
+PHP应用程序安全编程
+深入PHP面向对象、模式与实践
+PHP与Mysql高性能开发
+PHP系统核心与最佳实践
+高性能PHP应用开发
+Modern PHP
+[php the right way](http://laravel-china.github.io/php-the-right-way/)
+[阅读 PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)
+[阅读 PSR-1](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md)
+[阅读 PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
+[阅读 PSR-4](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md)
+[阅读 PEAR 编码准则](http://pear.php.net/manual/en/standards.php)
+[阅读 Symfony 编码准则](http://symfony.com/doc/current/contributing/code/standards.html)
+[PHP_CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/) 检查代码是否符合规范
+[PHP Coding Standards Fixer](http://cs.sensiolabs.org/) 自动修复语法格式

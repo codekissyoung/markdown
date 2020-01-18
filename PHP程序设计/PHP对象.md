@@ -1,21 +1,13 @@
 # 概念
 
-PHP对象允许动态设置属性,这就很坑了，比如本来是`$A -> ab = 45;` 被写成了 `$A -> ba = 54;`,编译器执行也不会报错
-变量和对象属性没有类型的，这一方面是便利，提供了很大的灵活性；另一方面是麻烦，在方法或者函数希望接收某种数据类型的值时，这种灵活性会引发代码歧义
-
-PHP提供了类型提示，在传入一个对象作为参数时，可以使用类型提示来限制传入的类,`function write(ShopProduct $p)`
-
-## 属性/方法
-
-- 由于属性没有强制类型的约束，允许对类的属性进行直接的访问是非常危险的事情，应该将属性设置为`private`,然后提供各种`setter`和`getter`方法用于对特定属性进行读写
-- 对象外,`对象名 -> 属性`来使用属性，对象内部使用`$this -> 属性`来使用属性
+本文是`PHP`对象的笔记，也论述了一些`PHP`面向对象实现上的得与失。
 
 ## 静态属性
 
 - 属性/方法 是随着对象的实例化而诞生的，只能通过对象来访问它们
 - 而在类中定义的静态属性/静态方法，却是随着类的定义而诞生的，可以直接通过类使用它，也可以通过对象中使用它
 - 对于静态属性/方法的访问都是`类名::`,但是在子类中，对父类方法的访问用的也是`parent::`
-- 静态方法中，不能使用 对象的属性和方法 以及`$this`
+- 静态方法中，不能使用对象的属性和方法 以及`$this`
 
 ## 属性 和 静态属性 之间的区别
 
@@ -50,7 +42,6 @@ var_dump($obj4 instanceof Child); // true
 
 
 ```php
-<?php
 class Father{
     private $pri = '私有';
     protected $pro = '保护';
@@ -119,7 +110,7 @@ $f -> test2();
 ## 一个简单类以及继承的例子
 
 ```php
-<?php
+
 class Product {
     public $title;
     static public $company = "彦游天下网络技术有限公司";
@@ -153,7 +144,7 @@ $a -> show();
 ## 方法 和 静态方法之间的区别
 
 ```php
-<?php 
+ 
 class Father {
     
     protected $pro = "pro";
@@ -240,7 +231,7 @@ $f -> test();
 ## 迟静态绑定 PHP面向对象中 非常强大的技术
 
 ```php
-<?php
+
 class Father{
 
 }
@@ -262,7 +253,7 @@ var_dump(Girl::create());// Object Girl
 考虑下，子类的两个方法，都是用来实例化自身的，功能相同，只是类不同而已，能不能把它放入`Father`中，然后子类通过继承获取这种能力呢？
 
 ```php
-<?php
+
 class Father{
     static function create(){
         return new self();
@@ -281,7 +272,7 @@ var_dump(Girl::create()); // Object Father
 所以PHP 5.3 之后，开发了迟静态绑定技术,使用`static`替代掉`self`,声明该处的代码，在实际执行的时候，根据它的执行者(对象/类)，来绑定它所属的类
 
 ```php
-<?php
+
 class Father{
     static function create(){
         return new static();
@@ -297,7 +288,7 @@ var_dump(Girl::create()); // Object Girl
 ```
 
 ```php
-<?php 
+ 
 class Father{
     public function show(){
         echo static::data();
@@ -332,7 +323,7 @@ $s -> show(); // Son data pri , 因为执行者是 Son ,所以 static 指向的�
 ## 魔术方法 (拦截器) (overloader)
 
 ```php
-<?php
+
 class Test{
     public $params = [];
     public function __construct(){  
@@ -402,7 +393,7 @@ class Test{
 * 绝对命名空间 与 相对命名空间
 
 ```php
-<?php
+
 namespace main; // 声明命名空间
 
 // 相对命名空间 ，因为是在命名空间 main 底下，所以实际解析运行时，会在前面加上 main,即变成 main\com\geti...
@@ -415,7 +406,7 @@ com\getinstance\util\Debug::helloworld();
 * 命名空间就像一个容器，将类、函数、变量放入其中，要用到的时候，使用`use`导入命名空间即可
 
 ```php
-<?php
+
 use function App\model\query;
 use App\model\ActiveRecord;
 $res = query($sql);
@@ -424,7 +415,7 @@ $ar  = new ActiveRecord();
 
 * 如果导入了多个命名空间，不同命名空间里，有命名相同的类、函数、变量的话，那么就通过对要使用的类、函数、变量 取别名
 ```php
-<?php
+
 use function App\model\query as q;
 use App\model\ActiveRecord as AR;
 use App\model\Debug as A_Debug;
@@ -435,12 +426,12 @@ A_debug('xxx');
 L_debug("xxxxxxxxx");
 ```
 
-- `__NAMESPACE__` 魔术常量，用于显示当前行所在命名空间
+`__NAMESPACE__` 魔术常量，用于显示当前行所在命名空间
 
 ## ::class获取类的完全限定名称
 
 ```php
-<?php
+
 namespace NS;
     class ClassName {    }
     echo ClassName::class;  // NS\ClassName
@@ -464,7 +455,8 @@ namespace NS;
 为什么使用抽象类？
 1，我觉得是为了提取各个子类的功能，使之抽象化，方便调用！
 2，屏蔽了子类的区别，只关注子类的共同功能，并且不关心功能的具体实现！
-```
+
+```php
 abstract class Father{
     abstract public function say();
 }
@@ -488,7 +480,8 @@ $say->ask_son_say($son2);
 1,是功能的封装抽象，我们只关注功能，不关心功能的实现，只要是继承了该接口的类，就应该具有接口的功能！
 2,也就是说，你只要知道了一个对象的类型(继承了什么父类，实现了什么接口)，就知道它能做什么！
 3,接口和抽象类的区别在于：抽象类关注的是其子类的功能和共性的抽象，而接口更关注的是功能,实现该接口的类就需要有该功能,它不在意类的继承关系
-```
+
+```php
 interface Chargeable{    public function getPrice();}
 class ShopProduct implements Chargeable{
     public function getPrice(){
@@ -504,7 +497,7 @@ class Test{
 Test::echo_price(new ShopProduct());	// 5
 ```
 
-# 对象语法参考
+## 对象语法参考
 
 ```php
 class Myclass{
@@ -598,7 +591,7 @@ StaticExample::func();//在外部调用静态方法
 * 为何要使用静态变量和静态方法？
 1，在程序任意可以访问到类的地方都可以使用，不用为了获取一个简单的功能而实例化一个对象！
 2，由该类new出来的对象之间，可以共享一些东西！
-* 静态方法中，$this伪变量不允许使用。可以使用self，parent，static在内部调用静态方法与属性。
+* 静态方法中，`$this`变量不允许使用。可以使用`self，parent，static`在内部调用静态方法与属性。
 
 ```php
 class Car {
@@ -622,19 +615,21 @@ echo BigCar::getSpeed();
 ## 类的自动加载
 
 ```php
-<?php
+
 spl_autoload_register("autoload1");
 spl_autoloda_register("autoload2");
-function autoload1($class){
-    // 如果在本文件中，使用的函数或者类没有定义，就尝试引入这个文件，$class 为new 的类名(带命名空间的)
+
+// 如果 new 操作未找到对应的类，就会执行注册好的自动加载函数
+function autoload1( $class ) {
+    // $class 为带命名空间的类名 
     require  __DIR__.$class.'.php'; 
 }
-function autoload2($class){
+function autoload2( $class ) {
     require  __DIR__.'/framework/'.$class.'.php';
 }
 ```
 
-# 对象之间的相互调用关系：聚合 组合
+## 对象之间的相互调用关系：聚合 组合
 
 * 聚合：类A和B，A通过自己的method获取到B的一个实例，从而能够使用B的功能，称为A聚合B！
 * 组合：类A完全拥有B，A负责实例化B,常用于A是唯一需要使用B的类的场景
@@ -644,3 +639,4 @@ function autoload2($class){
 A对象消亡时，B是否还应该存在？如果B不应该存在，使用组合，如果存在，就应该使用聚合！
 组合会使对象之间出现紧耦合！
 聚合的问题：B对象被多个对象聚合，任何一个对象对B对象状态的改变都可能会影响到其他对象，要多考虑B的代码重用性！
+
