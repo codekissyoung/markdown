@@ -2,99 +2,6 @@
 
 本文是`PHP`对象的笔记，也论述了一些`PHP`面向对象实现上的得与失。
 
-## 静态属性
-
-- 属性/方法 是随着对象的实例化而诞生的，只能通过对象来访问它们
-- 而在类中定义的静态属性/静态方法，却是随着类的定义而诞生的，可以直接通过类使用它，也可以通过对象中使用它
-- 对于静态属性/方法的访问都是`类名::`,但是在子类中，对父类方法的访问用的也是`parent::`
-- 静态方法中，不能使用对象的属性和方法 以及`$this`
-
-## 属性 和 静态属性 之间的区别
-
-- 就是 属性都是各个 对象私有的，各不干扰
-- 父类定义的静态属性会被子类继承
-- 类所产生的对象，它们之间是共享静态属性的
-
-### 创建对象的几种方式
-
-```php
-class Test
-{
-    static public function getNew()
-    {
-        return new static; // new static 是返回当前对象模板实例化的变量，
-    }
-}
-class Child extends Test{
-
-}
-
-$obj1 = new Test();
-$obj2 = new $obj1; // 通过new对象实例来创建一个该类的新对象
-var_dump($obj1 !== $obj2); // true
-
-$obj3 = Test::getNew();
-var_dump($obj3 instanceof Test); // true
-
-$obj4 = Child::getNew();
-var_dump($obj4 instanceof Child); // true
-```
-
-
-```php
-class Father{
-    private $pri = '私有';
-    protected $pro = '保护';
-    public $pub = '公有';
-    
-    private static $pri_s = "静态私有";
-    protected static $pro_s = "静态保护";
-    public static $pub_s = "静态公有";
-    
-    function test2(){
-        echo self::$pro_s."\t";
-        echo self::$pub_s."\n"; 
-        
-        echo $this -> pro."\t"; 
-        echo $this -> pub."\n"; 
-    }
-}
-
-class Son extends Father{
-    
-    // 测试 : 子类对于父类的继承情况
-    function test1(){
-        // echo $this -> pri."\t"; // 报错 ，说明私有属性不能继承
-        echo $this -> pro."\t"; 
-        echo $this -> pub."\n"; 
-        
-        // echo self::$pri_s."\t"; // 报错 ，说明私有静态属性 不能继承
-        echo self::$pro_s."\t"; 
-        echo self::$pub_s."\n"; 
-    }
-    
-    // 测试 ：子类对继承的静态属性进行修改，看是否会影响到父类
-    function test2(){
-        self::$pro_s = self::$pro_s."_子类修改";
-        self::$pub_s = self::$pub_s."_子类修改";
-        $this->pro = $this->pro."_子类修改";
-        $this->pub = $this->pub."_子类修改";
-    }
-}
-
-// 测试1 
-$s = new Son();
-$s -> test1(); 
-// 保护	公有
-// 静态保护	静态公有
-
-$f = new Father();
-$s -> test2();
-$f -> test2();
-// 静态保护_子类修改	静态公有_子类修改
-// 保护	公有
-```
-
 ## 类常量
 
 - 在类中定义常量,`const STATUS_OUT = 1`,在类外边,使用`类名::常量名`来访问常量
@@ -105,174 +12,28 @@ $f -> test2();
 - 关于继承，很重要的一点是，子类要尽量使用父类提供的常量/静态变量/函数，在此基础上拓展子类自身的功能，并且子类要尽量避免给父类传递任何信息
 - 属性一定是针对对象说的，对象内使用 `$this -> name` 访问属性，对象就只能访问自身的属性
 - 静态属性是共享的，在对象内，使用`self::$static` `parent::$static` `类名::$static`其实都是一样的
-- 父类的方法会被子类继承/重写; 在子类中,使用`$this -> func()`访问本类方法，使用`parent::func()`访问父类方法(无论是否是静态方法,都这么访问)
+- 父类的方法会被子类继承/重写; 在子类中,使用`$this -> func()`访问本类方法，使用`parent::func()`访问父类方法
 
-## 一个简单类以及继承的例子
-
-```php
-
-class Product {
-    public $title;
-    static public $company = "彦游天下网络技术有限公司";
-    
-    function __construct($title){
-        $this -> title = $title;
-    }
-    
-    static public function show_company(){
-        print "公司:".Product::$company;
-    }
-    
-    function show(){
-        print "产品名:$this->title";
-        Product::show_company();
-    }
-}
-
-class Apple extends Product{
-    private $price;
-    function __construct($title,$price){
-        parent::__construct($title);
-        $this -> price = $price;
-    }
-}
-
-$a = new Apple('富士山',10);
-$a -> show();
-```
-
-## 方法 和 静态方法之间的区别
-
-```php
- 
-class Father {
-    
-    protected $pro = "pro";
-    
-    public function func(){
-        echo "Father {$this -> pro} \n";
-    }
-    
-    public static function func_s(){
-        echo "Father Static\n";
-    }
-    
-    public function test(){
-        // Son::func(); // 直接报错了，因为它不是静态方法 ,  Uncaught Error: Using $this when not in object context
-        Son::func_s();
-    }
-}
-
-class Son extends Father {
-    
-    public function func(){
-        echo "Son {$this -> pro} \n";
-    }
-    
-    public static function func_s(){
-        echo "Son Static\n";
-    }
-    
-    public function test(){
-        self::func();
-        $this -> func();
-        
-        self::func_s();
-        $this -> func_s();
-        
-        parent::func();
-        parent::func_s();
-    }
-}
-
-// 测试可以直接使用类名调用静态方法
-Son :: func_s(); // Son Static
-
-// 测试通过对象来调用方法 静态方法
-$s = new Son();
-$s -> func(); 
-$s -> func_s();
-$s::func_s();
-// Son pro 
-// Son Static
-// Son Static
-
-// 测对象内部调用方法 静态方法
-$s -> test();
-// Son pro 
-// Son pro 
-// Son Static
-// Son Static
-// Father pro 
-// Father Static
-
-// 测试在父对象中，调用子类中的静态方法
-$f = new Father();
-$f -> test();
-// Son Static
-```
-
-## 抽象类 / 抽象方法
-
-- `abstract`声明一个抽象类，以及抽象方法
-- 抽象类 不能示例化，抽象方法定义在抽象类中
-- 子类继承抽象类，抽象类中的所有抽象方法都要在子类中实现，或者自己也声明为抽象方法，等待自己的子类实现
-
-## 接口
-
-- `interface 接口名{ 属性; 空方法}` 定义一个接口
-- 任何实现接口的类，都要实现接口中定义的所有方法
-- 接口的作用相当于约束了一种类型，比如 A 类，B类，C类都实现了接口D ,那么当传参要求为实现了接口D的对象时,任意一个A类/B类/C类的实例都可以；再比如，你知道了一个类它实现的接口，你就知道这个类可以完成什么样的功能了。
-- 一个类可以实现多个接口 `class A implements B C D {...}`
-- 继承在接口的前面,`class A extends C implements D F {}`
-
-## 一个简单的抽象类/接口的例子
-
-## 迟静态绑定 PHP面向对象中 非常强大的技术
-
-```php
-
-class Father{
-
-}
-class Son extends Father{
-    static function create(){
-        return new self();
-    }
-}
-class Girl extends Father{
-    static function create(){
-        return new self();
-    }
-}
-
-var_dump(Son::create()); // Object Son
-var_dump(Girl::create());// Object Girl
-```
+## 迟静态绑定
 
 考虑下，子类的两个方法，都是用来实例化自身的，功能相同，只是类不同而已，能不能把它放入`Father`中，然后子类通过继承获取这种能力呢？
 
 ```php
-
 class Father{
     static function create(){
         return new self();
     }
 }
-class Son extends Father{
-}
-class Girl extends Father{
-}
+class Son extends Father{ }
+class Girl extends Father{ }
 
 var_dump(Son::create()); // Object Father
 var_dump(Girl::create()); // Object Father
 ```
-上诉代码行不通的，self 在类定义的时候，已经和该类绑定到一起了；所以在子类中，哪怕通过继承获取到了父类的功能，但是代码里的`self`指向的还是父类
 
-所以PHP 5.3 之后，开发了迟静态绑定技术,使用`static`替代掉`self`,声明该处的代码，在实际执行的时候，根据它的执行者(对象/类)，来绑定它所属的类
+`self`在类定义的时候，已经和该类绑定到一起了，即便子类继承了父类的`create()`函数，但是`self()`还是指向父类。所以`PHP5.3`之后，开发了迟静态绑定技术，使用`static`替代掉`self`，声明该处的代码，在实际执行的时候，根据它的执行者，来决定它所指向的类。
 
 ```php
-
 class Father{
     static function create(){
         return new static();
@@ -287,174 +48,68 @@ var_dump(Son::create()); // Object Son ,Son 执行的代码，所以 static 指�
 var_dump(Girl::create()); // Object Girl
 ```
 
-```php
- 
-class Father{
-    public function show(){
-        echo static::data();
-    }
-}
-class Son extends Father{
-    public $pri = 'pri';
-    public function data(){
-        return "Son data {$this -> pri}\n";
-    }
-}
-class Girl extends Father{
-    public function data(){
-        return "Girl data\n";
-    }
-}
-
-$s = new Son();
-$s -> show(); // Son data pri , 因为执行者是 Son ,所以 static 指向的是Son
-```
-
 ## 判断对象相等
 
-`==`只要两个对象属性一致就相等,`===`必须为同一个对象才相等
+`==` 只要两个对象属性一致就相等，`===`必须为同一个对象才相等。
 
 ## 对象克隆
 
-`$b = $a` 直接赋值的其实是引用,$a与$b指向同一个对象
-`$b = clone $a;` 是克隆一个$a对象,$a 与 $b 分别指向不同对象(内存地址)
-
+`$b = $a` 直接赋值的其实是引用，`$a`与`$b`指向同一个对象。
+`$b = clone $a;` 是克隆一个`$a`对象，`$a` 与 `$b` 分别指向不同的内存地址。
 
 ## 魔术方法 (拦截器) (overloader)
 
 ```php
-
-class Test{
+class Test {
     public $params = [];
-    public function __construct(){  
-        //当对象被创建时调用 
-    }
+    public function __construct(){} // 当对象被创建时调用
+    public function __destruct(){}  // 对象被销毁时调用
     
-    public function __destruct(){ 
-        //对象被销毁时调用 
-    }
-    
-    //当对象设置不存在的属性时,使用一个$params变量将设置的值保存起来
-    public function __set($key,$value){
-        $this->params[$key] = $value;   //$test->name = '曹开彦'; $key 对应 name , $value 对应 '曹开彦'
-    }
-    
-    public function __get($key){
-        return $this->params[$key];     // echo $test->name; 时调用,$key 对应 name
-    }
-    
+    // 当对象设置不存在的属性时,使用一个$params变量将设置的值保存起来
+    public function __set($key,$value){$this->params[$key] = $value;}
+    public function __get($key){return $this->params[$key];}
+
     //在对象调用不存在的方法时执行
-    public function __call($func,$params){
-        var_dump($func,$params);   //$test->show('caokaiyan','1995');  $func 对应'show',$params = ['caokaiyan','1995'];
-    }
-    
-    static public function __callStatic($func,$params){ 
-        //跟 __call 类似,给静态方法提供的
-    }
-    
-    public function __toString(){ 
-        return __DIR__; //把一个对象当做字符串使用时执行 
-    }
-    
-    public function __invoke($params){ 
-        var_dump($params); //当对象被当做一个函数使用时调用,如$test('caokaiyan','21'); $params存的是函数参数['caokaiyan','21']
-    } // $test($params); 时调用，将类作为函数使用，调用__invoke,输出$params
-    
-    __isset 对不可访问或不存在的属性调用isset()或empty()时被调用
-    function __unse(){
-        
-    } // 对不可访问或不存在的属性进行unset时被调用
-    
-    function __sleep(){
-        
-    } // 当使用serialize时被调用，当你不需要保存大对象的所有数据时很有用
-    
-    function __wakeup(){
-        
-    } // 当使用unserialize时被调用，可用于做些对象的初始化操作
-    
-    function __clone(){
-        
-    } // 进行对象clone时被调用，用来调整对象的克隆行为
-    
-    function __set_state(){
-        
-    } // 当调用var_export()导出类时，此静态方法被调用。用__set_state的返回值做为var_export的返回值。
-    
-    function __debuginfo(){
-        
-    } // 当调用var_dump()打印对象时被调用（当你不想打印所有属性）适用于PHP5.6版本
+    public function __call($func,$params){var_dump($func,$params);}
+    static public function __callStatic($func,$params){} // 跟 __call 类似,给静态方法提供的
+    public function __toString(){return __DIR__;}   // 把一个对象当做字符串使用时执行
+    public function __invoke($params){}             // 当对象被当做一个函数使用时调用
+    function __isset(){}        // 对不可访问或不存在的属性调用isset()或empty()时被调用
+    function __unse(){}         // 对不可访问或不存在的属性进行unset时被调用
+    function __sleep(){}        // 当使用serialize时被调用，当你不需要保存大对象的所有数据时很有用
+    function __wakeup(){}       // 当使用unserialize时被调用，可用于做些对象的初始化操作
+    function __clone(){}        // 进行对象clone时被调用，用来调整对象的克隆行为
+    function __set_state(){}    // 当调用var_export()导出类时，此静态方法被调用
+    function __debuginfo(){}    // 当调用var_dump()打印对象时被调用
 }
 ```
 
 ## 命名空间
 
-* 无命名空间的 php 代码都是在同一个空间下，不能有重名的类，和方法，属性。
-* 绝对命名空间 与 相对命名空间
+无命名空间的 php 代码都是在同一个空间下，不能有重名的类，和方法，属性。
+
+`__NAMESPACE__` 魔术常量，用于显示当前行所在命名空间
+
+绝对命名空间 与 相对命名空间
 
 ```php
-
 namespace main; // 声明命名空间
 
-// 相对命名空间 ，因为是在命名空间 main 底下，所以实际解析运行时，会在前面加上 main,即变成 main\com\geti...
+// 相对命名空间 ，实际解析运行时，会在前面加上 main，即变成 main\com\geti...
 com\getinstance\util\Debug::helloworld();
 
 // 绝对命名空间，告诉PHP从根命名空间开始搜索
 \com\getinstance\util\Debug::helloworld();
 ```
 
-* 命名空间就像一个容器，将类、函数、变量放入其中，要用到的时候，使用`use`导入命名空间即可
-
-```php
-
-use function App\model\query;
-use App\model\ActiveRecord;
-$res = query($sql);
-$ar  = new ActiveRecord();
-```
-
-* 如果导入了多个命名空间，不同命名空间里，有命名相同的类、函数、变量的话，那么就通过对要使用的类、函数、变量 取别名
-```php
-
-use function App\model\query as q;
-use App\model\ActiveRecord as AR;
-use App\model\Debug as A_Debug;
-use App\Log\Debug as L_debug;
-$res = q($sql);
-$res = new AR();
-A_debug('xxx');
-L_debug("xxxxxxxxx");
-```
-
-`__NAMESPACE__` 魔术常量，用于显示当前行所在命名空间
 
 ## ::class获取类的完全限定名称
 
 ```php
-
 namespace NS;
     class ClassName {    }
     echo ClassName::class;  // NS\ClassName
 ```
-
-## 面向对象和面向过程的核心区别？
-
-区别在于如何分配职责。
-过程式代码:表现为一系列命令和方法的连续调用。控制代码根据不同的条件执行不同的职责。这中自顶向下的控制方式导致了重复和相互依赖的代码遍布整个项目。
-面向对象:则是将职责从客户端代码移动到专门的对象中，尽量减少相互依赖！
-
-## 面向对象的核心:抽象
-
-封装（encapsulation）：在类的接口后面隐藏实现和数据。
-多态（polymorphism）：使用一个共同的父类，允许在运行时透明地替换特定的子类。
-面向对象可以提高程序的封装性，可重用性，可维护性，但仅仅是可以，根本还是取决于编程和设计人员对程序的深入思考。
-在面向对象开发中，专注于特定任务，忽略外界上下文是一个很重要的原则！
-
-## 抽象类
-
-为什么使用抽象类？
-1，我觉得是为了提取各个子类的功能，使之抽象化，方便调用！
-2，屏蔽了子类的区别，只关注子类的共同功能，并且不关心功能的具体实现！
 
 ```php
 abstract class Father{
@@ -464,8 +119,8 @@ class Son1 extends Father{ public function say(){ echo "son1\n";}}
 class Son2 extends Father{ public function say(){ echo "son2\n";}}
 class Son_say{
     public function ask_son_say(Father $father){
-        	 //参数 ，我们使用的是抽象类，只要是该抽象类的子类，都有 say 方法，当然就有了各自的实现
-        	 $father->say();
+        // 参数 ，我们使用的是抽象类，只要是该抽象类的子类，都有 say 方法，当然就有了各自的实现
+        $father->say();
     }
 }
 $son1 = new Son1();
@@ -482,7 +137,7 @@ $say->ask_son_say($son2);
 3,接口和抽象类的区别在于：抽象类关注的是其子类的功能和共性的抽象，而接口更关注的是功能,实现该接口的类就需要有该功能,它不在意类的继承关系
 
 ```php
-interface Chargeable{    public function getPrice();}
+interface Chargeable{ public function getPrice(); }
 class ShopProduct implements Chargeable{
     public function getPrice(){
         return 5;
@@ -501,18 +156,18 @@ Test::echo_price(new ShopProduct());	// 5
 
 ```php
 class Myclass{
-    private $id=0;//私有属性
+    private $id = 0;//私有属性
     protected $name;
-    const SUCCESS="hehe";//类常量
+    const SUCCESS = "hehe";//类常量
     static private $instance=NULL;//静态变量
     public function __construct(){
-        echo "这是标准php5构造方法";
+        echo "构造方法";
     }
     public function __destruct(){
-        echo "这是php5标准析构方法";
+        echo "析构方法";
     }
     public function getId(){
-        echo self::$instance;//类内部直接使用静态变量
+        echo self::$instance; // 类内部使用静态变量
         return $this->id;
     }
     public static function hellostatic(){
@@ -520,26 +175,24 @@ class Myclass{
     }
     final function getBaseClassName(){
         echo "final修饰，这个方法不允许被子类重写";
-        return __CLASS__; //返回本类的类名
-    }
-    function __clone(){
-        echo "对象已经被克隆";
+        return __CLASS__; // 返回本类的类名
     }
 }
+```
+
+```php
 $obj = new Myclass();
-//克隆一个新对象（有独立的内存）
-$obj_copy= clone $obj;
-echo Myclass::SUCCESS;//直接使用类常量
-Myclass::hellostatic();//直接使用静态方法
-echo Myclass::$instance;//直接使用类静态变量
+$obj_copy= clone $obj;      // 克隆一个新对象，有独立的内存地址
+echo Myclass::SUCCESS;      // 直接使用类常量
+Myclass::hellostatic();     // 直接使用静态方法
+echo Myclass::$instance;    // 直接使用类静态变量
 final class FinalClass(){
     function display(){
         echo 'final修饰，这个类是不允许被继承的';
     }
 }
 interface Display{
-    function display(){
-    }
+    function display(){}
 }
 class Circle implements Display{
     function display(){
@@ -553,9 +206,7 @@ abstract class MyBaseClass(){
     function display(){
         echo "抽象类禁止被实例化，只能被继承";
     }
-    abstract function show(){
-        //抽象类，没有任何功能，只能被继承
-    }
+    abstract function show(){} // 抽象类，没有任何功能，只能被继承
 }
 ```
 
@@ -588,10 +239,11 @@ echo StaticExample::$num."\n";//在外部访问静态属性
 StaticExample::func();//在外部调用静态方法
 ```
 
-* 为何要使用静态变量和静态方法？
-1，在程序任意可以访问到类的地方都可以使用，不用为了获取一个简单的功能而实例化一个对象！
-2，由该类new出来的对象之间，可以共享一些东西！
-* 静态方法中，`$this`变量不允许使用。可以使用`self，parent，static`在内部调用静态方法与属性。
+为何要使用静态变量和静态方法？
+
+- 在程序任意可以访问到类的地方都可以使用，不用为了获取一个简单的功能而实例化一个对象！
+- 由该类new出来的对象之间，可以共享一些东西！
+- 静态方法中，`$this`变量不允许使用。可以使用`self，parent，static`在内部调用静态方法与属性。
 
 ```php
 class Car {
@@ -628,15 +280,3 @@ function autoload2( $class ) {
     require  __DIR__.'/framework/'.$class.'.php';
 }
 ```
-
-## 对象之间的相互调用关系：聚合 组合
-
-* 聚合：类A和B，A通过自己的method获取到B的一个实例，从而能够使用B的功能，称为A聚合B！
-* 组合：类A完全拥有B，A负责实例化B,常用于A是唯一需要使用B的类的场景
-* 使用建议：
-
-试想下：
-A对象消亡时，B是否还应该存在？如果B不应该存在，使用组合，如果存在，就应该使用聚合！
-组合会使对象之间出现紧耦合！
-聚合的问题：B对象被多个对象聚合，任何一个对象对B对象状态的改变都可能会影响到其他对象，要多考虑B的代码重用性！
-
