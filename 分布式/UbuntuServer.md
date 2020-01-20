@@ -43,7 +43,6 @@ $ sudo update-alternatives --config editor                # 默认编辑设置�
 ```
 
 ```vim
-" ~/.vimrc
 set nu                        " 设置行号
 set hlsearch                  " 高亮查找项
 set incsearch                 " 查找跟随
@@ -200,6 +199,12 @@ sudo apt-get install php
 
 [Ubuntu18桌面美化(MacOS Mojave)](https://blog.csdn.net/barbarassa/article/details/97301735)
 
+护眼软件：
+
+```shell
+sudo apt install gtk-redshift redshift python-appindicator
+```
+
 ## 后面待定
 
 ```bash
@@ -239,7 +244,7 @@ F5                      # 刷新
 - `sudo locale-gen`
 - `sudo vim /etc/default/locale` 添加 `LANG=zh_CN.UTF-8`
 
-`gnome-session-properties` 设置开机自动运行软件。
+`gnome-session-properties` 设置开机自动运行软件
 
 ```php
 # 安装 Tab 栏目显示 CPU 和 内存使用率 工具
@@ -331,32 +336,6 @@ make
 sudo checkinstall # 构建debian包并且安装
 ```
 
-#### snap 安装软件包
-
-`snap`包思路模仿苹果软件包,没有依赖关系，体积大，下载安装包后，将下载的安装文件挂载到`/snap`目录下并自动创建挂载点，然后复制文件到指定位置
-
-```bash
-snap find htop            # 查找软件
-sudo snap install htop    # 安装软件
-sudo snap refresh stop    # 更新软件
-sudo snap remove stop     # 删除一个应用
-snap list                 # 列出安装的应用
-
-➜  htop tree   
-.
-├── 68
-│   ├── bin
-│   │   └── htop
-│   ├── command-htop.wrapper
-│   ├── meta
-│   │   └── snap.yaml
-│   └── share
-└── current -> 68
-
-➜  htop pwd
-/snap/htop
-```
-
 ## 安装QT
 
 - [QT5.9.5安装包](http://download.qt.io/official_releases/qt/5.9/5.9.5/)
@@ -380,12 +359,6 @@ snap list                 # 列出安装的应用
   - 执行命令`sudo aptitude install build-essential`
   - 在展示`1)      build-essential [未安装的]`等保持原样，并且询问 `是否接受该解决方案？[Y/n/q/?]` 时，填入 `n`,表示不接受
   - 在继续展示 `降级 下列软件包：1)     gcc-7-base [7.3.0-21ubuntu1~16.04 (now) -> 7.3.0-16ubuntu3 (bionic)]`, 并询问`是否接受该解决方案？[Y/n/q/?]`时，填入`Y` 表示接受软件包降级，这样问题就解决了
-
-## NFS(Network File System)文件共享服务
-
-## FTP(File Transfer Protocol)
-
-## Samba
 
 ## linux用于完成特定任务的用户
 
@@ -432,7 +405,7 @@ drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
 - 使用命令 `chmod o+t /tmp` 来添加此权限
 
 
-# 限制用户进程数
+限制用户进程数
 
 - 在`/etc/security/limits.conf` 文件后面添加上下面代码，限制用户进程数为200
 
