@@ -20,6 +20,28 @@
 
 ## PSR-4 自动加载规范
 
+一个符合`PSR-4`自动加载规范的注册函数例子。
+
+```php
+// 执行 new \Foo\Bar\Baz\Qux; 会自动 require /path/to/project/src/Baz/Qux.php
+spl_autoload_register(function ($class) {
+    $prefix = 'Foo\\Bar\\';
+    $base_dir = __DIR__ . '/src/'; // base directory for the namespace prefix
+
+    // 是本注册函数自动加载的类么？ 不是 则跳过，尝试下一个注册函数
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        // no, move to the next registered autoloader
+        return;
+    }
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+```
+
 ## PSR-6 缓存接口规范
 
 ## PSR-7 HTTP 消息接口规范
