@@ -14,6 +14,8 @@
 研发习惯：Ubuntu / Git / Vim / Tmux / VScode / Gcc
 自我评价：熟悉常用的数据结构和 TCP/IP 网络，熟悉 Linux 下基于 Ractor 模式的 C Service 开发，熟悉 LNMP 架构及 PHP 脚本，熟悉 Shell 脚本 ，了解汇编和 C++
 
+## 2019.12 - 至今 小雨伞互联网保险 运维开发工程师
+
 ## 2017.7 - 2019.9 旅行社交分享平台 青驿网 服务端研发
 
 项目地址 ：www.iqingyi.com
