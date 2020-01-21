@@ -1,20 +1,22 @@
 # 基础概念
+
 客户端的代码一定是可以被看见的,js是直接可看,java等编译语言可以反编译看!
 存在客户端的数据一定是不安全的
 网络上的包是一定可以被截获的,也就是你的请求一定是可以被别人拿到并看见的!
 
 # 跨域访问api问题
+
 最好的方法是限定几个可以访问api的域名,其他域名全部拒绝。
 但是`Access-Control-Allow-Origin`只能设置一个值，所以要多端共用,只有`header("Access-Control-Allow-Origin:*");`
 
-
-
 ## Ajax跨域请求带上COOKIE
+
 前端：`'xhrFields': {'withCredentials': true}`(jquery ajax设置)，注意：`Access-Control-Allow-Origin:*　` 与这个有冲突
 `A wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header when the credentials flag is true`
 后端：`header("Access-Control-Allow-Credentials: true");`跨域请求允许带cookie
 
 ## web客户端储存数据
+
 前提：读写的数据必须要同域
 使用cookie存储和读取
 Web Storage (IE 789无法使用)
@@ -24,6 +26,7 @@ FileAPI 这个API可以结合File表单和Formdata 从而实现异步上传文�
 ## 如何保证只有自己的客户端才可以调用接口
 
 # api ajax调用思考
+
 如何保证多个客户端调用api接口时都是合法的(不是我们自己的客户端不能调用api接口拿数据),人为的(不是机器),数据安全的(不会被别人窃取数据),
 首先要明白几点：
 get数据不可信,post数据不可信,referer数据不可信,host域名DNS不可信,明文传输容易被抓包截取,cookie可能被盗用!
@@ -64,15 +67,18 @@ http是不安全，无状态协议。意味着你无法判断客服端是否是�
 
 
 # 好的api应该满足
+
 对于用户
 * 易学习：有完善的文档及提供尽可能多的示例和可copy－paste的代码，像其他设计工作一样，你应该应用最小惊讶原则。
 * 易使用：没有复杂的程序、复杂的细节，易于学习；灵活的API允许按字段排序、可自定义分页、 排序和筛选等。一个完整的API意味着被期望的功能都包含在内。
 * 难误用：对详细的错误提示，有些经验的用户可以直接使用API而不需要阅读文档。
+
 对于开发人员
 * 易阅读：代码的编写只需要一次一次，但是当调试或者修改的时候都需要对代码进行阅读。
 * 易开发：个最小化的接口是使用尽可能少的类以及尽可能少的类成员。这样使得理解、记忆、调试以及改变API更容易。
 
 # 开发一个好的api的总结
+
 * 面向用例设计
 如果一个API被广泛使用了，那么就不可能了解所有使用该API的用户。如果设计者希望能够设计出被广泛使用的API，那么必须站在用户的角度来理解如何设计API库，以及如何才能设计出这样的API库。
 * 设计思路

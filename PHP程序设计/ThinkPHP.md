@@ -1,58 +1,31 @@
 # ThinkPHP 3.2.3框架
 
+`ThinkPHP`的使用笔记.
+
 ## 目录结构
 
 ```bash
 .
-├── Application # 应用目录
-│   ├── Common  # 公共模块 （不能直接访问）
-│   │   ├── Common   # 应用公共函数目录
-│   │   └── Conf     # 应用公共配置文件目录
-│   ├── Home         # 前台 模块目录 (默认会生成的)       
-│   │   ├── Common  # 模块函数公共目录
-│   │   ├── Conf    # 模块配置文件目录
-│   │   ├── Controller # 模块控制器目录
-│   │   ├── Model   # 模块模型目录
-│   │   └── View    # 模块视图目录
-│   │   └── Logic    # 模块内逻辑层目录 （可选）
-│   │   └── Service  # 模块内 Service 目录 （可选）
-│   └── Admin       # 后台模块目录（需要自己建立的）
-│   └── Runtime     # 缓存、日志等运行数据
-├── composer.json
-├── index.php   # 入口
-├── Public      # 资源文件目录
-│   └── README.md
-├── README.md
-└── ThinkPHP    # 框架系统
-    ├── Common  # 核心公共函数
-    │   └── functions.php
-    ├── Conf    # 核心配置
-    │   ├── convention.php
-    │   └── debug.php
-    ├── Lang    # 核心语言包
-    │   ├── zh-cn.php
-    │   └── zh-tw.php
-    ├── Library # 框架类库
-    │   ├── Behavior    # 行为类库
-    │   ├── Org         # Org类库包
-    │   ├── Think       # 核心Think类库包
-    │   └── Vendor      # 第三方类库
-    ├── Mode            # 框架应用模式
-    │   ├── Api
-    │   ├── api.php
-    │   ├── common.php
-    │   ├── Lite
-    │   ├── lite.php
-    │   ├── Sae
-    │   └── sae.php
-    ├── ThinkPHP.php # 框架入口文件
-    └── Tpl #  系统模板
-        ├── dispatch_jump.tpl
-        ├── page_trace.tpl
-        └── think_exception.tpl
+├── Application             # 应用目录
+│   ├── Common              # 公共模块 （不能直接访问）
+│   │   ├── Common          # 应用公共函数目录
+│   │   └── Conf            # 应用公共配置文件目录
+│   ├── Home                # 前台 模块目录 (默认会生成的)       
+│   │   ├── Common          # 函数公共目录
+│   │   ├── Conf            # 配置文件目录
+│   │   ├── Controller      # 控制器目录
+│   │   ├── Model           # 模型目录
+│   │   └── View            # 视图目录
+│   │   └── Logic           # 逻辑层目录 （可选）
+│   │   └── Service         # Service 层目录 （可选）
+│   └── Admin               # 后台模块目录（可选）
+│   └── Runtime             # 缓存、日志等运行数据
+├── index.php               # 入口
+├── Public                  # 资源文件目录
+└── ThinkPHP                # 框架内核目录
 ```
 
-## 入口文件
+入口文件`index.php`
 
 ```php
 // THINK_PATH	框架目录
@@ -67,16 +40,10 @@ define('BIND_ACTION', '动作名称');          # 入口文件绑定默认访问
 require './ThinkPHP/ThinkPHP.php';
 ```
 
-## Application 配置文件
-
-`Application/Common/Conf/config.php`
+配置文件`Application/Common/Conf/config.php`
 
 ```php
 'SHOW_PAGE_TRACE' => true,                  # 开启Trace调试工具
-'TMPL_L_DELIM' => '{ ',                     # 模板标签开始标记
-'LAYOUT_ON' => true,                        # 模版布局的功能
-'LAYOUT_NAME' => 'layout',                  # 模版布局基础页的名字
-'URL_HTML_SUFFIX' => 'html',                # 伪静态后缀，默认为html
 'URL_CASE_INSENSITIVE' => true,             # 忽略大小写
 'DB_TYPE' => 'mysql',                       # mysql数据库类型
 'DB_HOST' => 'localhost',                   # 数据库 host
@@ -86,9 +53,7 @@ require './ThinkPHP/ThinkPHP.php';
 'DB_PREFIX' => 'prefix_',                   # 表的前缀
 ```
 
-## Hello ThinkPHP
-
-我们找到自动生成的 `Home/Controller/IndexController.class.php` 文件：
+控制器`Home/Controller/IndexController.class.php`
 
 ```php
 namespace Home\Controller;
@@ -102,17 +67,11 @@ class IndexController extends Controller{
 }
 ```
 
-在浏览器中访问 `localhost` 即可看到 `Hello ThinkPHP`。这里我们需要了解的事情有：
+在浏览器中访问 `http://host/Home/Index/index` 即是访问`IndexController`类的`index()`方法。
 
-- 控制器类名：控制器名（驼峰 首字母大写）+ `Controller`
-- 控制器文件名：类名 + `class.php`
-- `namespace` 与 目录 的对应关系：
+`spl_autoload_register`注册的自动加载函数中，是以`Application`作为查找路径的，所以相应的完整类名为:`Home\Controller\IndexController`。
 
-```bash
-Home\Controller\IndexController
-对应:
-Home/Controller/IndexController.class.php
-```
+PS: 控制器文件名以`.class.php`结尾，这是`ThinkPHP`框架要求的，在框架代码里面强制要求类符合这一规范，才会自动被加载。
 
 ## 开发规范
 
@@ -127,7 +86,6 @@ namespace 要求为：Home\Controller
 ```
 
 - 大小写敏感，类名 与 文件名 一定要保持一致
-
 - 函数命名：小写字母 + 下划线  `get_client_ip()`
 - 方法命名：小写字母开头 驼峰法 `getUserName()`
 - 私有方法：下划线开头 + 小写字母 + 驼峰法 `_parseType()`
@@ -239,76 +197,41 @@ $ php index.php 模块/控制器/操作/[参数名/参数值...]
 ## CBD 模式
 
 ```bash
-./TinkPHP
-├── Common
-│   └── functions.php   # 核心函数库
-├── Conf
-│   ├── convention.php  # 惯例配置文件
-│   └── debug.php       # 惯例调试配置文件
-├── Library
-│   ├── Behavior    # 系统行为类库
-│   │   ├── AgentCheckBehavior.class.php
-│   │   └── WriteHtmlCacheBehavior.class.php
-│   ├── Org
-│   │   ├── Net
-│   │   └── Util
-│   ├── Think   # 核心类库包
-│   │   ├── App.class.php   # 核心应用类
-│   │   ├── Auth.class.php
-│   │   ├── Behavior.class.php
-│   │   ├── Build.class.php
-│   │   ├── Cache
-│   │   ├── Cache.class.php # 核心缓存类
-│   │   ├── Controller
-│   │   ├── Controller.class.php # 基础控制器类
-│   │   ├── Crypt
-│   │   ├── Crypt.class.php
-│   │   ├── Db
-│   │   ├── Db.class.php # 数据库操作类
-│   │   ├── Dispatcher.class.php # URL解析调度类
-│   │   ├── Exception.class.php # 系统基础异常类
-│   │   ├── Hook.class.php # 系统钩子类
-│   │   ├── Image
-│   │   ├── Image.class.php
-│   │   ├── Log
-│   │   ├── Log.class.php # 系统日志记录类
-│   │   ├── Model
-│   │   ├── Model.class.php # 系统基础模型类
-│   │   ├── Page.class.php
-│   │   ├── Route.class.php # 系统路由类
-│   │   ├── Session
-│   │   ├── Storage
-│   │   ├── Storage.class.php # 系统存储类
-│   │   ├── Template
-│   │   ├── Template.class.php # 内置模板引擎类
-│   │   ├── Think.class.php # 系统引导类
-│   │   ├── Upload
-│   │   ├── Upload.class.php
-│   │   ├── Verify
-│   │   ├── Verify.class.php
-│   │   └── View.class.php # 系统视图类
-│   └── Vendor # 第三方库
-│       ├── Boris
-│       └── TemplateLite
-├── Mode
+./TinkPHP                                       # 框架系统
+├── ThinkPHP.php                                # 框架入口文件
+├── Common                                      # 核心公共函数
+│   └── functions.php                           # 核心函数库
+├── Conf                                        # 核心配置
+│   ├── convention.php                          # 惯例配置文件
+│   └── debug.php                               # 惯例调试配置文件
+├── Library                                     # 框架类库
+│   ├── Behavior                                # 系统行为类库
+│   ├── Org                                     # Org类库包
+│   ├── Think                                   # 核心类库包
+│   │   ├── App.class.php                       # 核心应用类
+│   │   ├── Cache.class.php                     # 核心缓存类
+│   │   ├── Controller.class.php                # 基础控制器类
+│   │   ├── Db.class.php                        # 数据库操作类
+│   │   ├── Dispatcher.class.php                # URL解析调度类
+│   │   ├── Exception.class.php                 # 系统基础异常类
+│   │   ├── Hook.class.php                      # 系统钩子类
+│   │   ├── Log.class.php                       # 系统日志记录类
+│   │   ├── Model.class.php                     # 系统基础模型类
+│   │   ├── Route.class.php                     # 系统路由类
+│   │   ├── Storage.class.php                   # 系统存储类
+│   │   ├── Template.class.php                  # 内置模板引擎类
+│   │   ├── Think.class.php                     # 系统引导类
+│   │   └── View.class.php                      # 系统视图类
+│   └── Vendor                                  # 第三方库
+├── Mode                                        # 框架应用模式
 │   ├── Api
-│   │   ├── App.class.php
-│   │   ├── Controller.class.php
-│   │   ├── Dispatcher.class.php
-│   │   └── functions.php
 │   ├── api.php
-│   ├── common.php  # 普通模式定义文件
+│   ├── common.php                              # 普通模式定义文件
 │   ├── Lite
-│   │   ├── App.class.php
-│   │   ├── Controller.class.php
-│   │   ├── convention.php
-│   │   ├── Dispatcher.class.php
-│   │   ├── functions.php
-│   │   ├── Model.class.php
-│   │   └── View.class.php
 │   ├── Sae
-│   │   └── convention.php
 │   └── sae.php
+└── Tpl                 # 系统模板
+    └── think_exception.tpl
 ```
 
 ## 调试
@@ -317,52 +240,3 @@ $ php index.php 模块/控制器/操作/[参数名/参数值...]
 dump( C() );                                        # 获取 ThinkPHP 中定义的所有配置
 dump( get_defined_constants(true)['user'] );        # 获取 ThinkPHP 中定义的所有常量
 ```
-
-## 类库拓展
-
-### 公共类库
-
-```bash
-Think目录：系统核心类库
-Org目录：第三方公共类库
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

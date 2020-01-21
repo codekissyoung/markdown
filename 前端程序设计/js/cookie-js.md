@@ -72,41 +72,9 @@ document.cookie = "username=Darren;secure"
 document.cookie = name + "="+ escape (value)
 return unescape(document.cookie.substring(c_start,c_end))
 
-## js 管理cookie
-
-```js
-function setCookie(name,value,expires_seconds){
-    var cookieString = name + "=" + escape(value);
-    //判断是否设置过期时间
-    if(expires_seconds > 0){
-        var date=new Date();
-        date.setTime(date.getTime() + expires_seconds * 1000);
-        cookieString += "; expires=" + date.toGMTString() + "; path=/";
-    }
-    console.log(cookieString);
-    document.cookie = cookieString;
-}
-
-function getCookie(name){
-    var strCookie=document.cookie;
-    var arrCookie=strCookie.split("; ");
-    for(var i=0;i<arrCookie.length;i++){
-        var arr=arrCookie[i].split("=");
-        if(arr[0]==name) return arr[1];
-    }
-    return "";
-}
-
-function delCookie(name){
-    var date = new Date();
-    date.setTime( date.getTime() - 10000 );
-    document.cookie = name + "=v; expires=" + date.toGMTString();
-}
-```
-
 ## Cookies与Ajax
 
-如果Ajax请求访问一个服务器页面，此服务器页面是可以向用户浏览器写入Cookies和Session的。
+如果`Ajax`请求访问一个服务器页面，此服务器页面是可以向用户浏览器写入`Cookies`和`Session`的。
 
 ## 好资源
 

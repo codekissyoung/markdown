@@ -8,22 +8,20 @@ sudo systemctl start nginx.service      # 启动
 cky@codekissyoung2:~$ sudo lsof -i:80   # 检测是否启动
 
 # 配置目录
-cky@codekissyoung2:/etc/nginx$ ls -l
-total 56
-drwxr-xr-x 2 root root 4096 Jul 12 18:34 conf.d         # 一般性的配置文件
--rw-r--r-- 1 root root 1077 Feb 12  2017 fastcgi.conf   # FastCGI 配置文件 
--rw-r--r-- 1 root root 1007 Feb 12  2017 fastcgi_params # FastCGI 默认参数
--rw-r--r-- 1 root root 2837 Feb 12  2017 koi-utf
--rw-r--r-- 1 root root 2223 Feb 12  2017 koi-win
--rw-r--r-- 1 root root 3957 Feb 12  2017 mime.types     # 资源的媒体类型相关配置
--rw-r--r-- 1 root root 1462 Feb 12  2017 nginx.conf     # 主配置文件
--rw-r--r-- 1 root root  180 Feb 12  2017 proxy_params
--rw-r--r-- 1 root root  636 Feb 12  2017 scgi_params
-drwxr-xr-x 2 root root 4096 Aug  8 17:39 sites-available # 所有配置的虚拟主机的配置
-drwxr-xr-x 2 root root 4096 Aug  8 17:39 sites-enabled   # 已经启用的虚拟主机的配置
-drwxr-xr-x 2 root root 4096 Aug  8 17:39 snippets
--rw-r--r-- 1 root root  664 Feb 12  2017 uwsgi_params
--rw-r--r-- 1 root root 3071 Feb 12  2017 win-utf
+cky@cky-pc:/etc/nginx$ tree -L 1
+.
+├── conf.d                  # 一般性的配置文件
+├── fastcgi.conf            # FastCGI 配置文件 
+├── fastcgi_params          # FastCGI 默认参数
+├── mime.types              # 资源的媒体类型相关配置
+├── modules-available
+├── modules-enabled
+├── nginx.conf              # 主配置文件
+├── proxy_params
+├── scgi_params
+├── sites-available         # 所有配置的虚拟主机的配置
+├── sites-enabled           # 已经启用的虚拟主机的配置
+├── snippets
 ```
 
 ## Ubuntu下彻底删除Nginx，重新安装
@@ -76,14 +74,16 @@ WINCH 从容关闭工作进程
 
 ## 配置
 
-```bash
+```conf
 # 全局块 主要设置一些影响Ngnix整体运行的配置指令
-worker_processes  3;        # worker 进程数
-user nobody nobody;         # 设置哪些用户/组可以启动nginx,nobody是所有用户都可以
+worker_processes  3;
+user nobody nobody; # 设置哪些用户/组可以启动nginx,nobody是所有用户都可以
 pid /home/caokaiyan/workspace/etc_sh/nginx/nginx.pid; # pid 路径
 # 错误日志路径,日志级别：debug info notice warn error crit alert emerg
-error_log /home/caokaiyan/workspace/etc_sh/nginx/nginx_error.log warn;
+error_log /home/caokaiyan/workspace/etc_sh/nginx/nginx_error.log info;
+```
 
+```conf
 # events 块
 events {
     worker_connections  1024; # 每个 worker 最大链接数
@@ -94,71 +94,120 @@ events {
     multi_accept on;          # worker 能同时接收多个新到达的网络连接
     use epoll;                # 强制使用 epoll
 }
+```
 
+```conf
 # http 块
 http {
     include       mime.types;                # 将其他nginx配置包含进来,相对路径
     default_type  application/octet-stream;  # 处理前端请求的MIME类型
-
     access_log    /var/log/nginx/access.log combined; # 日志文件
-
     sendfile        on;                      # 允许传输文件
     sendfile_max_chunk 1024k;                # 上传的文件不能超过1M,设置为０的话表示无限制
-
     keepalive_timeout  65;                   # 服务端对链接的保持时间
     gzip  on;                                # 开启压缩
     client_header_buffer_size    1k;         # 设定请求缓冲
     large_client_header_buffers  4 4k;       #
 
-    # 虚拟主机块
-    server{
-        listen       80;                       # 监听80端口上的所有ip连接
-        server_name  nginx.codekissyoung.com;  # 绑定域名
-        error_page   500 502 503 504 /50x.html;
-
-        # location 块基于 域名/uri-string 中的 /uri-string 部分进行匹配，对特定的请求进行处理。
-        # 地址重定向，数据缓存，应答控制等功能都是在这部分实现
-        location / {
-            root /var/www/site1;    # 站点根目录
-            index  index.php index.html index.htm;
-        }
-
-        # 定义错误提示页面
-        location = /50x.html {
-            root   /root;
-        }
-
-        # 静态文件，nginx自己处理
-        location ~ ^/(images|javascript|js|css|flash|media|static)/ {
-            root /var/www/virtual/htdocs;
-            # 过期30天，静态文件不怎么更新，过期可以设大一点，如果频繁更新，则可以设置得小一点。
-            expires 30d;
-        }
-
-        # PHP 脚本请求全部转发到 FastCGI处理. 使用FastCGI默认配置.
-        location ~ \.php$ {
-            root /root;
-            fastcgi_pass 127.0.0.1:9000;
-            fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME /home/www/www$fastcgi_script_name;
-            include fastcgi_params;
-        }
-
-        # 禁止访问 .htxxx 文件
-        location ~ /\.ht {
-            deny all;
-        }
-
-        # 设定查看Nginx状态的地址
-        location /NginxStatus {
-            stub_status            on;
-            access_log             on;
-            auth_basic             "NginxStatus";
-            auth_basic_user_file  conf/htpasswd;
-        }
+    # 主机块，后面详细讲
+    Server{
+        # ...
     }
 }
 ```
+
+```conf
+server{
+    listen       80;                       # 监听80端口上的所有ip连接
+    server_name  nginx.codekissyoung.com;  # 绑定域名
+    error_page   500 502 503 504 /50x.html;
+
+    # location 块基于 域名/uri-string 中的 /uri-string 部分进行匹配，对特定的请求进行处理。
+    # 地址重定向，数据缓存，应答控制等功能都是在这部分实现
+    location / {
+        root /var/www/site1;    # 站点根目录
+        index  index.php index.html index.htm;
+    }
+    location = /50x.html {
+        root   /root;
+    }
+    location ~ ^/(images|javascript|js|css|flash|media|static)/ { # 静态文件，nginx自己处理
+        root /var/www/virtual/htdocs;
+        expires 30d; # 过期时间30天
+    }
+    location ~ \.php$ { # PHP 脚本请求全部转发到 FastCGI处理. 使用FastCGI默认配置.
+        root /root;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME /home/www/www$fastcgi_script_name;
+        include fastcgi_params;
+    }
+    location ~ /\.ht { # 禁止访问 .htxxx 文件
+        deny all;
+    }
+    
+    location /NginxStatus { # 设定查看Nginx状态的地址
+        stub_status            on;
+        access_log             on;
+        auth_basic             "NginxStatus";
+        auth_basic_user_file  conf/htpasswd;
+    }
+}
+```
+
+
+`Ubuntu18.04`默认的`nginx`中`Server`的配置参考，隐藏`index.php`并且带`PATHINFO`解析：
+
+```conf
+server {
+    listen          80;
+    server_name     www.ci.com;
+    root            /home/cky/workspace/tp;
+    index           index.php index.html;
+    rewrite_log     on; 
+
+    # url重写: host/welcome/deal => host/index.php/welcome/deal
+    location / { 
+        if ( !-e $request_filename ) { 
+            rewrite ^/(.*)$ /index.php/$1 last;
+            break;
+        }
+    }
+    location ~ \.php($|/) {
+        fastcgi_pass                unix:/run/php/php7.2-fpm.sock;
+        include                     snippets/fastcgi-php.conf;  # pathinfo 生效
+        fastcgi_param               SCRIPT_FILENAME     $document_root$fastcgi_script_name;
+        include                     fastcgi_params;
+    }   
+}
+```
+
+其实在编译版本，本质上差不多，参考如下：
+
+```bash
+server {
+    listen       80;
+    server_name  www.pc.com;
+    index        index.php index.html index.htm;
+    root         /home/cky/workspace/tp322;
+    rewrite_log         on;
+    location / { 
+        if ( !-e $request_filename ) { 
+            rewrite ^/(.*)$ /index.php/$1 last;
+            break;
+        }
+    }
+    location ~ \.php($|/) {
+        fastcgi_pass   unix:/run/php/php7.2-fpm.sock;
+        fastcgi_index  index.php;
+        fastcgi_split_path_info ^(.+\.php)(.*)$;
+        fastcgi_param  PATH_INFO  $fastcgi_path_info;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+}
+```
+
 
 ## 负载均衡时nginx http配置
 

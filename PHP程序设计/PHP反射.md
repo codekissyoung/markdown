@@ -1,4 +1,8 @@
-# 各种有用的反射类
+# 反射
+
+`PHP`的反射类。
+
+## PHP提供的反射类的相关知识
 
 ```php
 Reflection          为类的摘要信息提供静态函数
@@ -11,7 +15,7 @@ ReflectionExtension PHP扩展信息
 ReflectionException 错误类
 ```
 
-- 这些反射类可以在运行时访问对象、函数和脚本中的扩展信息
+这些反射类可以在运行时访问对象、函数和脚本中的扩展信息
 
 ```php
 <?php
@@ -102,30 +106,4 @@ class ModuleRunner {
 
 $test = new ModuleRunner();
 $test -> init();
-```
-
-#### PHP 是动态实时解析的语言
-
-```php
-function test() {
-	echo "i am function test!";
-}
-
-$a 		= "test";
-$test 	= "i am the test";
-
-echo $a; 	// test
-echo $$a; 	// i am the test
-$a(); 		// i am function test!
-
-foreach ($_POST as $key => $value)
-{
-	$$key = $value; // 将　assoc 　数组拆解成变量
-}
-
-//example.com?class=person&func=run  动态 new 对象和调用函数
-$class = $_GET['class'];
-$func  = $_GET['func'];
-$obj   = new $class();
-$obj -> $func();
 ```

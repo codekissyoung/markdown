@@ -1,4 +1,5 @@
-# 传参不定
+## 传参不定
+
 ```php
 function more_args(){
     $args=func_get_args();//将所有传递进来的参数封装成一个数组
@@ -6,17 +7,20 @@ function more_args(){
 }
 ```
 
-# 变量函数
+## 变量函数
+
 ```php
-function varfunc($a,$b){
+function varfunc( $a, $b ) {
     return $a + $b;
 }
 $a = 'varfunc';
-echo $a(2,56);
+echo $a( 2, 56 );
 ```
 
-# 回调函数
+## 回调函数
+
 将一个函数名当做参数传入,执行
+
 ```php
 function   filter（$fun）{
     $i=2;
@@ -28,21 +32,20 @@ function one($i){
 filter(one);// 这里将回调函数的名称当作变量，传入里面！
 ```
 
-# 动态创建一个函数
-```php
-$func_name = create_function('$message','echo "hello ,{$message}"')；
-echo $func_name;//调用动态创建的函数
-```
 
-# 递归函数
+## 递归函数
+
 ```php
 function A($i){
     if($i<=1) return $i;
     return A($i-1)*$i;
 }
 ```
-# 匿名函数
+
+## 匿名函数
+
 也叫闭包(Closures), 经常被用来临时性地创建一个无名函数，用于回调函数等用途。
+
 ```php
 $func = function($arg)
 {
@@ -57,7 +60,6 @@ $func("Hello World");
 
 然后我们又调用了 $func 所储存的匿名函数。
 
-# 函数作为参数　匿名函数
 ```php
 $input = array(1, 2, 3, 4, 5, 6);
 
@@ -77,7 +79,8 @@ $output = array_filter($input, function($item) {
 print_r($output);
 ```
 
-# 匿名函数还可以用 use 关键字来捕捉外部变量
+匿名函数还可以用 use 关键字来捕捉外部变量
+
 ```php
 function arrayPlus($array, $num)
 {
@@ -91,14 +94,9 @@ function arrayPlus($array, $num)
 在匿名函数的参数列表后，我们用 use 关键字将匿名函数外的 $num 捕捉到了函数内，以便知道到底应该加上多少。
 
 
-# php 闭包使用 use 关键字
+## php 闭包使用 use 关键字
+
 ```php
-<?php
-/**
- * Creates an anonymous filter function accepting items > $min
- *
- * Returns a single filter out of a family of "greater than n" filters
- */
 function criteria_greater_than($min)
 {
     return function($item) use ($min) {
@@ -114,7 +112,8 @@ $output = array_filter($input, criteria_greater_than(3));
 print_r($output); // items > 3
 ```
 
-# call_user_func_array 调用用户函数
+## call_user_func_array 调用用户函数
+
 ```php
 function foobar($arg, $arg2) {
     echo __FUNCTION__, " got $arg and $arg2\n";
@@ -125,27 +124,16 @@ class foo {
     }
 }
 
-
-// Call the foobar() function with 2 arguments
-call_user_func_array("foobar", array("one", "two"));
-
-// Call the $foo->bar() method with 2 arguments
+call_user_func_array("foobar", ["one", "two"]); // 调用函数
 $foo = new foo;
-call_user_func_array(array($foo, "bar"), array("three", "four"));
+call_user_func_array( [$foo, "bar"], ["three", "four"]); // 调用方法
 
-
-// 带命名空间
 namespace Foobar;
-
 class Foo {
     static public function test($name) {
         print "Hello {$name}!\n";
     }
 }
-
-// As of PHP 5.3.0
-call_user_func_array(__NAMESPACE__ .'\Foo::test', array('Hannes'));
-
-// As of PHP 5.3.0
-call_user_func_array(array(__NAMESPACE__ .'\Foo', 'test'), array('Philip'));
+call_user_func_array(　__NAMESPACE__ .'\Foo::test', ['Hannes']);
+call_user_func_array(　[　__NAMESPACE__ .'\Foo', 'test'], ['Philip']);
 ```

@@ -1,46 +1,86 @@
 # PHP 语言
 
-PHP与MySQL程序设计(第四版)
+如何从一门编程语言的角度，去学习`PHP`?
 
-安全PHP编程
+## 准备工作
 
-Laravel框架关键技术解析
+首先，安装好`xdebug`工具，方便我们调试`PHP`代码。
 
-[PHP设计模式全集2018](https://learnku.com/docs/php-design-patterns/2018)
+```bash
+$ sudo apt-get install php-xdebug
+```
 
-PHP应用程序安全编程
-
-深入PHP面向对象、模式与实践
-
-PHP与Mysql高性能开发
-
-PHP系统核心与最佳实践
-
-高性能PHP应用开发
-
-Modern PHP
+```php
+$name = "Link";
+xdebug_debug_zval( 'name' ); // name: (refcount=1, is_ref=0) string 'Link' (length=4)
+```
 
 ## 变量
 
-#### Copy on write
+`$a`作为一个标识符，如果不赋值的话，解释器表示找不到这个标识符，表示不存在的意思。其实`null`也表示这个意思。
+
+```php
+$a;         // a: no such symbol
+```
+
+赋值的话，`$a`这个标识符，就与一个实体`10`绑定了，更容易理解的说法是：`$a`就代表了这个实体。
+
+```php
+$a = 10;    // a: (refcount=0, is_ref=0)int 10
+```
+
+那么，能赋值给`$a`，或者说，`$a`能够存储的数据有哪些呢?
+
+> 答: `String` `Integer` `Float` `Boolean` `Array` `Object` `NULL`
+
+`&`是引用符号，将两个标识符绑定到同一块内存上，`$a`与`$b`互相作为对方的别名。
 
 ```php
 $a = 10;
-$b = $a;    // $a 与 $b 指向同一块内存    
-$b = 100;   // 执行到这句,才重新开辟一块内存给 $b ，然后写入 
+$b = &$a;
+$b = 20;
+// 执行后
+// a: (refcount=2, is_ref=1)int 20
+// b: (refcount=2, is_ref=1)int 20
 ```
 
-#### 引用
+对于`Object`来说，默认就是 赋值 就是 引用：
 
 ```php
-$a = range( 0, 3 );
-xdebug_debug_zval('a');
-$b = &$a;
-xdebug_debug_zval('a');
-xdebug_debug_zval('b');
-$b = range( 4, 7 );         // 改变 $b 等与 改变 $a
-xdebug_debug_zval('a');
-xdebug_debug_zval('b');
+class SimpleClass
+{
+    public $name = "Link";
+}
+$a = new SimpleClass();
+$b = $a;
+$b->name = "Sam";
+// 执行后
+// a: (refcount=2, is_ref=0)
+// object(SimpleClass)[1]
+//   public 'name' => (refcount=2, is_ref=0)string 'Sam' (length=3)
+// b: (refcount=2, is_ref=0)
+// object(SimpleClass)[1]
+//   public 'name' => (refcount=2, is_ref=0)string 'Sam' (length=3)
+```
+
+可变变量
+
+```php
+$a    = "test";
+
+$test = "i am the test";
+function test(){
+    echo "i am function test!";
+}
+
+echo $$a; 	// i am the test
+$a(); 		// i am function test!
+
+// example.com?class=person&func=run
+$class = $_GET['class'];
+$func  = $_GET['func'];
+$obj = new $class();
+$obj -> $func();
 ```
 
 #### unset
@@ -51,39 +91,18 @@ $b = &$a;
 unset($b);  // 只会取消 $b 到内存的引用，不会销毁空间
 ```
 
-#### 对象本身 就是引用传递
-
-```php
-class Person { public $name = "zhangsan"; }
-
-$p1 = new Person;
-xdebug_debug_zval('p1');
-// p1: (refcount=1, is_ref=0)=class Person { public $name = (refcount=2, is_ref=0)='zhangsan' }
-
-$p2 = $p1;
-xdebug_debug_zval('p1');
-// p1: (refcount=2, is_ref=0)=class Person { public $name = (refcount=2, is_ref=0)='zhangsan' }
-
-$p2->name = "lisi";
-xdebug_debug_zval('p1');
-// p1: (refcount=2, is_ref=0)=class Person { public $name = (refcount=0, is_ref=0)='lisi' }
-```
-
 #### 变量的地址
 
 ```php
+// 这里其实隐藏了 $val = $data[$key] 操作
 $data = ['a', 'b', 'c'];
-foreach ($data as $key => $val)  // 这里其实隐藏了 $val = $data[$key] 操作
-{
-    $val = &$data[$key];
+foreach ( $data as $key => $val ) {
+    $val = &$data[$key];        // $val 与 $data[$key] 互为引用， 指向当前 $data[$key] 表示的实体
     var_dump($data);
 }
 var_dump($data);
 // 结果: [a,b,c],[b,b,c],[b,c,c],[b,c,c]
 ```
-
-`$val = &$data[$key];` 表示将 `$data[$key]` 的地址给了 `$val`
-
 
 ## Trait 的使用
 
@@ -191,7 +210,7 @@ $link = enclosePerson("link");
 $link("give me a book");    // link, give me a book
 ```
 
-- 方法2 闭包其实是个`Closure`类实例, 它可以使用 `bindTo()` 方法,绑定到其他对象上,这样在闭包内部,可以通过`$this`访问到被绑对象的所有 `属性` 和 `方法`
+闭包其实是个`Closure`类实例, 它可以使用 `bindTo()` 方法,绑定到其他对象上,这样在闭包内部,可以通过`$this`访问到被绑对象的所有 `属性` 和 `方法`
 
 ```php
 class App{
@@ -221,18 +240,107 @@ $app -> addRoute('/users/link', function(){
 $app -> dispatch('/users/link');
 ```
 
+## 匿名函数 / 闭包 Closures
+
+```php
+# 不定参函数
+function more_args() {
+    $args = func_get_args();    // 返回包含所有参数的数组
+    echo $args[0];
+}
+
+// 变量函数
+function varfunc( $a, $b ) {
+    return $a + $b;
+}
+$a = 'varfunc';
+echo $a( 2, 56 );
+```
 
 
+```php
+$func = function( $arg ) {
+    print $arg;
+};
+$func("Hello World");
 
+// array_filter 要求传递 一个 function( $item ) 类型函数
+$input = array(1, 2, 3, 4, 5, 6);
+$output = array_filter( $input, function( $item ) {
+    return ( $item % 2 ) == 0;
+});
 
+// use 关键字 捕捉外部变量
+function arrayPlus( $array, $num ) {
+    // 为一个数组的每一项执行一个回调函数
+    // 将匿名函数外的 $num 捕捉到了函数内
+    array_walk($array, function( &$v ) use( $num ) {
+        $v += $num;
+    });
+}
+```
 
+```php
+register_shutdown_function( ['core', 'handleShutdown'] );   // 正常/异常 退出时 调用
+set_exception_handler( ['core', 'handleException'] );       // 设置异常处理函数
+set_error_handler( ['core', 'handleError'] );               // 设置错误处理函数
+```
 
+## call_user_func_array 调用用户函数
 
+```php
+call_user_func( 'myFunction' );                 // myFunction();
+call_user_func( [$myObj,'method_name'], 20 );   // $myObj -> method_name(20);
+call_user_func_array( [$obj,'method'], $args ); // $obj -> method( $arg1, $arg2 );
+```
 
+```php
+function foobar($arg, $arg2) {
+    echo __FUNCTION__, " got $arg and $arg2\n";
+}
+class foo {
+    function bar($arg, $arg2) {
+        echo __METHOD__, " got $arg and $arg2\n";
+    }
+}
 
+call_user_func_array("foobar", ["one", "two"]); // 等价 foobar("one", "two")
 
+$foo = new foo;
+call_user_func_array([$foo, "bar"], ["three", "four"]); // 等价 $foo->bar("three","four")
+```
 
+```php
+namespace Foobar;
 
+class Foo {
+    static public function test($name) {
+        print "Hello {$name}!\n";
+    }
+}
 
+call_user_func_array( __NAMESPACE__ .'\Foo::test', ['Hannes']);
+call_user_func_array( [__NAMESPACE__ .'\Foo', 'test'], ['Philip']);
+```
 
+## 参考
 
+PHP与MySQL程序设计(第四版)
+安全PHP编程
+Laravel框架关键技术解析
+[PHP设计模式全集2018](https://learnku.com/docs/php-design-patterns/2018)
+PHP应用程序安全编程
+深入PHP面向对象、模式与实践
+PHP与Mysql高性能开发
+PHP系统核心与最佳实践
+高性能PHP应用开发
+Modern PHP
+[php the right way](http://laravel-china.github.io/php-the-right-way/)
+[阅读 PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)
+[阅读 PSR-1](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md)
+[阅读 PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
+[阅读 PSR-4](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md)
+[阅读 PEAR 编码准则](http://pear.php.net/manual/en/standards.php)
+[阅读 Symfony 编码准则](http://symfony.com/doc/current/contributing/code/standards.html)
+[PHP_CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/) 检查代码是否符合规范
+[PHP Coding Standards Fixer](http://cs.sensiolabs.org/) 自动修复语法格式

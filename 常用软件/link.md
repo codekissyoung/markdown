@@ -6,6 +6,11 @@
 
 ## 在线工具
 
+### 技术网站
+
+[运维派](http://www.yunweipai.com/)
+[SDNLAB 专注网络创新技术](https://www.sdnlab.com/)
+
 ### 电子书搜索
 
 - [鸠摩搜索电子书](https://www.jiumodiary.com)
