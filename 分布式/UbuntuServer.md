@@ -412,3 +412,9 @@ drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
 ```bash
 *   hard    nproc   200
 ```
+
+### 笔记本fn键问题
+
+按`fn + Esc`切换功能键与`F1~F12`。
+
+

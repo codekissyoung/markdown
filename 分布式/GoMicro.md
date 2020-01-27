@@ -53,7 +53,3 @@ $ protoc --proto_path=. --micro_out=. --go_out=. proto/example/example.proto
 $ go run main.go                # 运行服务，注意，前提是 consul 要运行
 $ micro list services           # 列出已经运行的服务
 ```
-
-
-
-

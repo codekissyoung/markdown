@@ -1,7 +1,5 @@
 <h2>特殊选择器this</h2>
-
 <p id="test1">点击测试：通过原生DOM处理</p>
-
 <p id="test2">点击测试：通过原生jQuery处理</p>
 <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
 <script src="./index.js"></script>
