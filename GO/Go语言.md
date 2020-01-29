@@ -9,6 +9,7 @@
 [Go语言官网](https://golang.google.cn/)
 [Go代码包文档](http://godoc.org)
 [搜索Go语言项目](https://gowalker.org/)
+[Go语言入门教程](http://c.biancheng.net/golang/)
 
 ## 1. 基础
 
