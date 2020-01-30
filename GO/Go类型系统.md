@@ -1,14 +1,16 @@
 # Go类型系统
 
+特点：不同类型不允许`=`操作，只有强制类型转换
+
 ## 概述
 
-初始化的变量，默认为所属类型的 “零值”。不同基本类型的变量之间的赋值，要通过**显示强制转换**，没有隐式转换 ^_^
+#### 基本类型
 
 ```go
 bool   // 零值 false
 string // 零值 ""
-int  int8  int16  int32  int64 uint uint8/byte uint16 uint32 uint64 uintptr // 零值 0
-rune // int32 的别名 表示一个 Unicode 码点
+int  int8  int16  int32(rune)  int64 uint uint8(byte) uint16 uint32 uint64 uintptr // 零值 0
+rune                        // 表示一个 Unicode 码点
 float32 float64             // 浮点数
 complex64 complex128        // 复数
 array struct string         // 其他值类型
@@ -17,6 +19,24 @@ interface                   // 接口类型
 func()                      // 函数类型
 ```
 
+这些类型定义时的写法：
+
+```go
+var is_ok bool
+var name string
+var age uint8
+var weight float32
+var score []float64
+var pAge *int64
+var test_score func() bool
+var student struct {
+    name string
+    age uint8
+    sex int8
+}
+fmt.Printf("type: %T\n", name) // 查看变量的类型
+fmt.Println(name)              // 查看变量的值
+```
 
 #### 结构体
 
