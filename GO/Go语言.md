@@ -73,10 +73,17 @@ switch today := time.Now().Weekday(); time.Saturday {
     default:
         fmt.Println("Too far away.")
 }
+
+// 多个 case 要放在一起的时候
+var a = "mum"
+switch a {
+case "mum", "daddy":
+    fmt.Println("family")
+}
 ```
 
 ```go
-// 无 判定变量 的变形用法
+// 分支表达式 语法
 switch t := time.Now(); {
     case t.Hour() < 12:
         fmt.Println("Good morning!")
@@ -104,6 +111,24 @@ for {                           // 死循环
 }
 ```
 
+#### goto 语句
+
+与`C`语言保持一致，用来集中处理重复错误，或者直接跳出内层循环，都比较方便。
+
+```go
+for x := 0; x < 10; x++ {
+    for y := 0; y < 10; y++ {
+        if y == 2 {
+            goto breakHere // 跳转到标签
+        }
+    }
+}
+return // 手动返回, 避免执行进入标签
+
+breakHere:
+    fmt.Println("done")
+```
+
 #### defer 栈
 
 用于推迟语句到 **函数退出前**，使用在释放资源语句上，还蛮合适的 ^_^
@@ -115,20 +140,6 @@ func main() {
 		fmt.Printf("hello ")
 }
 // hello world nice to meet you 
-```
-
-#### 遍历 For Range
-
-用于遍历 `Array` `Slice` 和 `Map`。
-
-```go
-pow := []int {1, 2, 4, 8, 16, 32, 64, 128}
-for i, v := range pow {                 // 依次将下标 和 值 复制 给 i 和 v
-    fmt.Printf("pow[%d] = %d\n", i, v)
-}
-for _, v := range pow { ... }           // 不复制 下标
-for i, _ := range pow { ... }           // 不复制 值
-for i := range pow { ... }              // 不复制 值，简写版
 ```
 
 #### 指针
@@ -301,10 +312,6 @@ Go语言中，使用 大小写 来决定该 常量、变量、类型、接口、
 `{` 不能单独放在一行。
 
 同一个文件夹下的源码文件，只能在一个包名下。
-
-不使用`;`。
-
-`+`用于字符串连接。
 
 `type` 放在变量的后面。
 
