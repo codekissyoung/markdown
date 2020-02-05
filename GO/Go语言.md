@@ -11,9 +11,9 @@
 [搜索Go语言项目](https://gowalker.org/)
 [Go语言入门教程](http://c.biancheng.net/golang/)
 
-## 1. 基础
+## 基础
 
-#### 声明变量
+#### 变量
 
 ```go
 var x int, y int
@@ -33,11 +33,9 @@ var (                                       // 多个不同类型变量
 变量的生存周期：
 
 - 包一级声明的变量，生存期和整个程序运行周期一致
-- 局部变量，从该变量声明开始，到该变量不再被引用，被自动回收后结束．
+- 局部变量，从该变量声明开始，到该变量不再被引用，被自动回收后结束
 
-变量声明后，由 `Go` 编译器决定存储在 `heap` 或是 `stack`，这个称为“变量逃逸分析” 。
-
-所以 `Go` 函数是可以返回局部变量的，因为 `Go` 编译器会将它存储在 `heap` 上，这点和 `C` 语言有很大的区别 ^_^
+所有变量都是由 `Go` 编译器决定存储在 `heap` 或是 `stack`，这个称为“变量逃逸分析” 。所以 `Go` 函数是可以返回局部变量的，因为 `Go` 编译器会将它存储在 `heap` 上，这点和 `C` 语言有很大的区别 ^_^
 
 ```bash
 $ go run -gcflags "-m -l" cky.go        # 变量逃逸分析
@@ -45,6 +43,25 @@ $ go run -gcflags "-m -l" cky.go        # 变量逃逸分析
 
 - `-m` 表示进行内存分配分析
 - `-l` 表示避免程序内联，也就是避免进行程序优化
+
+### 作用域
+
+```go
+x := "hello!"
+
+for _, x := range x {
+    x := x + 'A' - 'a'
+    fmt.Printf("%c", x)
+}
+
+for i := 0; i < len(x); i++ {
+    x := x[i]
+    if x != '!' {
+        x := x + 'A' - 'a'
+        fmt.Printf("%c", x)
+    }
+}
+```
 
 #### 分支语句
 
@@ -77,8 +94,8 @@ switch today := time.Now().Weekday(); time.Saturday {
 // 多个 case 要放在一起的时候
 var a = "mum"
 switch a {
-case "mum", "daddy":
-    fmt.Println("family")
+    case "mum", "daddy":
+        fmt.Println("family")
 }
 ```
 
@@ -274,7 +291,6 @@ func main() {
     customer(channel)
 }
 ```
-
 
 #### 接口类型
 

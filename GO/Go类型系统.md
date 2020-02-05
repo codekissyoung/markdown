@@ -2,6 +2,13 @@
 
 特点：不同类型不允许`=`操作，只有强制类型转换
 
+类型分为：
+
+- 基本类型：`number` `string` `boolean`
+- 聚合类型：`array` `struct`
+- 引用类型：`pointer` `slice` `map` `function` `channel` 共同点是全部间接指向程序变量或者状态
+- 接口类型：
+
 ## 概述
 
 #### 基本类型
