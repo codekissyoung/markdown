@@ -88,6 +88,30 @@ func main() {
 }
 ```
 
+对象就是附有行为的数据，闭包就是附有数据的行为。闭包设计的目的是：在函数间传递共享数据时，不想传参，不想依赖全局变量。是一种隐秘的共享数据的方式。
+
+```go
+var GlobalValue = 10
+func main() {
+	f := fa(1)
+	g := fa(1)
+	println(f(1))
+	println(f(1))
+	fmt.Println("GlobalValue: ", GlobalValue)
+	println(g(2))
+	println(g(3))
+	fmt.Println("GlobalValue: ", GlobalValue)
+}
+func fa(a int) func(i int) int {
+	return func(i int) int {
+		println(&a, a)
+		a = a + i
+		GlobalValue = a * 2
+		return a
+	}
+}
+```
+
 闭包实现 斐波纳契数列 
 
 ```go 
@@ -139,4 +163,47 @@ func (i *myInt) add( another int ) myInt {
 i1 := myInt(1)
 i2 := i1.add(2)
 fmt.Println(i1, i2) // 3 3
+```
+
+## panic 和 recover 机制
+
+```go
+func main() {
+	defer func() { fmt.Println("clean main resources") }()
+	// defer catch()
+	test()
+	fmt.Println("afterErrorfunc() finished")
+}
+func test() {
+	defer func() { fmt.Println("clean test resourses") }()
+	// defer catch()
+	testError()
+	fmt.Println("test() finished")
+}
+func testError() {
+	defer func() { fmt.Println("cleaned testEroor resources") }()
+	// panic("i am testError painc")
+	fmt.Println("testError() finished")
+	// panic("i am second painc")
+}
+```
+
+```go
+func catch() {
+	if r := recover(); r != nil {
+		fmt.Println("got a painc :", r)
+		var err error
+		switch x := r.(type) {
+		case string:
+			err = errors.New(x)
+		case error:
+			err = x
+		default:
+			err = errors.New("")
+		}
+		if err != nil {
+			fmt.Println("recovered :", err)
+		}
+	}
+}
 ```

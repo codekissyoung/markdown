@@ -4,6 +4,8 @@
 
 `GDB`是 符号式 调试器，必须通过`-g`选项，在程序编译时将源代码到机器指令的信息写入到可执行文件的 符号表 中。在包含多个源代码文件的大型程序中，必须在编译每个模块的时候都使用`-g`选项。
 
+[GDBFrontend 一个GUI调试工具](https://oguzhaneroglu.com/projects/gdb-frontend/) 
+
 ## 启用gdb调试
 
 ```bash

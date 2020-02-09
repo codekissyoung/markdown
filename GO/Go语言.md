@@ -10,8 +10,65 @@
 [Go代码包文档](http://godoc.org)
 [搜索Go语言项目](https://gowalker.org/)
 [Go语言入门教程](http://c.biancheng.net/golang/)
+[Go靠谱书推荐](https://www.zhihu.com/question/30461290)
 
 ## 基础
+
+标识符`identifiers` 与 关键字`keywords`
+
+变量 与 常量
+
+运算符`operators` 和 分隔符`delimiters`
+
+表达式
+
+简单语句
+
+控制结构
+
+#### 类型系统
+
+动态语言 or 静态语言
+强类型 or 弱类型
+基本数据类型: 基本类型 + 支持的运算符操作
+自定义数据类型: 包括类型 + 支持的运算符操作 
+
+#### 抽象特性
+
+是否支持函数特性：
+
+- 函数
+- 匿名函数
+- 高阶函数
+- 闭包
+
+是否支持面向对象：
+
+多态：如何支持多态
+
+接口：是否支持接口，以及接口实现模式
+
+#### 元编程特性
+
+泛型：是否支持
+
+反射：是否支持
+
+#### 运行和跨平台特性
+
+编译模式：编译成机器码? 编译成中间代码？解释器执行？
+运行模式：由OS加载？由虚拟机加载？由解释器加载？
+内存管理：支持垃圾回收？
+并发支持：原生支持？库支持？
+跨平台支持：支持的平台？
+交叉编译：是否支持？
+
+#### 语言的软实力
+
+库：标准库 和 第三方库 是否丰富、好用、高效
+框架：是否有非常出众的框架
+兼容性：语言规范是否经常变动，语言新版本向前兼容性
+语言影响力：是否有商业公司支持，社区活跃性，是否著名项目
 
 #### 变量
 
@@ -171,130 +228,7 @@ p = &i              // p 指向 i
 fmt.Println( *p );  // 通过 p 访问 i
 ```
 
-#### 为 结构体 绑定 方法
-
-`Go` 没有类，也没有对象，但是 `object.func()` 这样的方式，又很具有表达力．所以 `Go` 采用了＂为结构体绑定方法＂这一设计．
-
-方法可以理解为一个特别的函数，该函数的默认入参是：当前结构体变量，为了和其他入参区分开，结构体入参位置在 函数名 前面 ^_^
-
-```go
-type Vertex struct {
-	X, Y float64
-}
-func ( v Vertex ) Abs() float64 { // 入参是 普通结构体变量, 是当前结构体的副本
-	return math.Sqrt( v.X * v.X + v.Y * v.Y)
-}
-func ( v *Vertex ) Scale(f float64) { // 入参 是 结构体指针，方法内部可直接修改 当前结构体
-	v.X *= f
-	v.Y *= f
-}
-// 等价的函数实现:
-func Abs( v Vertex ) float64 {
-	return math.Sqrt( v.X * v.X + v.Y * v.Y )
-}
-func Scale( v *Vertex, f float64 ) {
-	v.X *= f
-	v.Y *= f
-}
-func main() {
-	v := Vertex{3, 4}
-	v.Scale( 2 )
-	fmt.Println( v ) 			// { 6, 8 }
-}
-```
-
-```go
-func main() {
-    v := Vertex{ 3, 4 }
-    fmt.Println( v.Abs() )		// 5
-	Scale( &v, 10 )
-	fmt.Println(Abs(v))         // 50
-}
-```
-
-通过 `Scale( &v, 10 )` 我能明确知道，`v` 是通过指针传递的，`Scale()` 内部是可以直接修改 `v` 
-
-而通过 `v.Scale( 2 )` 我在不知道 `Scale` 的 声明/实现 的情况下，无法确认 `Scale()` 会不会直接修改 `v`
-
-再看下 结构体指针 调用方法的情况：
-
-```go
-v := Vertex{3, 4}
-p := &v
-Scale( v, 10 )	    // cannot use v (type Vertex) as type *Vertex in argument to Scale
-Scale( &v, 10 )     // ok
-Scale( p, 10 )      // ok
-v.Scale( 10 )       // ok
-(&v).Scale( 10 )    // ok
-p.Scale( 10 )       // ok
-fmt.Println( v, p )
-```
-
-对于 `Scale( v, 10 )` ，会因为　＂函数参数类型检查不一致＂ 而报错
-
-但是对于 `v.Scale( 10 )` `(&v).Scale( 10 )` `p.Scale( 10 )` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^_^
-
-再来观察下:
-
-```go
-func main() {
-	v := Vertex{3, 4}
-    p := &v
-    fmt.Println( Abs(v) )  // 5
-	fmt.Println( Abs(&v) ) // cannot use &v (type *Vertex) as type Vertex in argument to Abs
-	fmt.Println( Abs(p) )  // cannot use p (type *Vertex) as type Vertex in argument to Abs
-	fmt.Println( v.Abs() )   // 5
-	fmt.Println( (*p).Abs() )// 5
-	fmt.Println( p.Abs() )   // 5
-}
-```
-
-对于 `Abs( &v )` `Abs( p )` 会因为　＂函数参数类型检查不一致＂ 而报错
-
-而`v.Abs()` `(*p).Abs()` `p.Abs()` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^_^
-
-PS: 这种为了方便而牺牲 "一致性" 和 ＂类型检查＂ 的做法是 **利大于弊** 的么？
-
 ### 接口
-
-[Go靠谱书推荐](https://www.zhihu.com/question/30461290)
-
-```go
-package main
-import (
-        "fmt"
-        "math/rand"
-        "time"
-)
-
-func producer(header string, channel chan<- string) {
-     for {
-            channel <- fmt.Sprintf("%s: %v", header, rand.Int31())
-            time.Sleep(time.Second)
-        }
-}
-
-func customer(channel <-chan string) {
-     for {
-            message := <-channel    // 从通道中取出数据, 此处会阻塞直到信道中返回数据
-            fmt.Println(message)
-        }
-}
-
-func main() {
-    // 创建一个字符串类型的通道
-    channel := make(chan string)
-    // 创建producer()函数的并发goroutine
-    go producer("cat", channel)
-    go producer("dog", channel)
-    // 数据消费函数
-    customer(channel)
-}
-```
-
-#### 接口类型
-
-定义一组行为，由方法表示。
 
 ```go
 type Talk interface {       // 新接口 Talk
@@ -312,39 +246,25 @@ func (talk *myTalk) Talk( heard string ) (saying string, end bool, err error) {
 // 实现了 Hello() 和 Talk() 两个函数后，myTalk 类型自动成为了 Talk 接口的实现
 ```
 
-
-只有 package 名称为 main 的包可以包含 main 函数
-一个可执行程序 有且仅有 一个 main 包
-
-通过 type 关键字来进行结构(struct)或接口(interface)的声明
-通过 func 关键字来进行函数的声明
-
-可见性规则
-
-Go语言中，使用 大小写 来决定该 常量、变量、类型、接口、结构、函数是否可以被外部包所调用：根据约定，函数名首字母 小写 即为private
-
-首字母大写，包外可见，首字母小写，只在包内可见。
-
-`{` 不能单独放在一行。
-
-同一个文件夹下的源码文件，只能在一个包名下。
-
-`type` 放在变量的后面。
-
-Goroutine？是啥？从根本上将一切都并发化，用类协程的方式来处理并发单元，却又在运行时层面做了更深度的优化处理。这使得语法上的并发编程变得极为容易，无须处理回调，无须关注线程切换，仅一个关键字，简单而自然。
-goroutine 类似于线程，但并非线程。可以将 goroutine 理解为一种虚拟线程。Go语言运行时会参与调度 goroutine，并将 goroutine 合理地分配到每个 CPU 中，最大限度地使用 CPU 性能。
-多个 goroutine 中，Go语言使用通道（channel）进行通信，通道是一种内置的数据结构，可以让用户在不同的 goroutine 之间同步发送具有类型的消息。这让编程模型更倾向于在 goroutine 之间发送消息，而不是让多个 goroutine 争夺同一个数据的使用权。
-
-程序可以将需要并发的环节设计为生产者模式和消费者的模式，将数据放入通道。通道另外一端的代码将这些数据进行并发计算并返回结果
-
-搭配 channel，实现 CSP 模型。将并发单元间的数据耦合拆解开来，各司其职，这对所有纠结于内存共享、锁粒度的开发人员都是一个可期盼的解脱。若说有所不足，那就是应该有个更大的计划，将通信从进程内拓展到进程外，实现真正意义上的分布式。
-
-如何实现高并发下的内存分配和管理就是个难题。好在 Go 选择了 tcmalloc，它本就是为并发而设计的高性能内存分配组件。使用 cache 为当前执行线程提供无锁分配，多个 central 在不同线程间平衡内存单元复用。在更高层次里，heap 则管理着大块内存，用以切分成不同等级的复用内存块。快速分配和二级内存平衡机制，让内存分配器能优秀地完成高压力下的内存管理任务。
-
-它会竭力将对象分配在栈上，以降低垃圾回收压力，减少管理消耗，提升执行性能。可以说，除偶尔因性能问题而被迫采用对象池和自主内存管理外，我们基本无须参与内存管理操作。
-
-因指针的存在，所以回收内存不能做收缩处理。幸好，指针运算被阻止，否则要做到精确回收都难。
-
-
-## go 语句、channel、同步方法
-
+```go
+func producer(header string, channel chan<- string) {
+    for {
+        channel <- fmt.Sprintf("%s: %v", header, rand.Int31())
+        time.Sleep(time.Second)
+    }
+}
+func customer(channel <-chan string) {
+    for{
+        message := <-channel    // 从通道中取出数据, 此处会阻塞直到信道中返回数据
+        fmt.Println(message)
+    }
+}
+func main() {
+    channel := make(chan string)    // 创建一个字符串类型的通道
+    
+    go producer("cat", channel)     // 创建producer()函数的并发goroutine
+    go producer("dog", channel)     // 创建producer()函数的并发goroutine
+    
+    customer(channel)               // 数据消费函数
+}
+```
