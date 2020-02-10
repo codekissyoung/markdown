@@ -79,20 +79,10 @@ $ ssh-add -L                        # 查看存储的公钥
 ssh-rsa AAAAxV..........vxr33B .ssh/tmpzale
 ```
 
+因为每次输入`passphrase`都很麻烦，所以不考虑安全性的话，完全可以将附着在私钥上的`passphrase`去掉，直接使用私钥，这样就无需输入操作了.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```bash
+$ openssl rsa -in ./tmpzale -out ./tmpzale.new
+Enter pass phrase for ./tmpzale:
+writing RSA key
+```
