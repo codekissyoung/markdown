@@ -4,7 +4,7 @@
 
 `Go` 没有类，也没有对象，但是 `object.func()` 这样的方式，又很具有表达力．所以 `Go` 采用了＂为结构体绑定方法＂这一设计．
 
-方法可以理解为一个特别的函数，该函数的默认入参是：当前结构体变量，为了和其他入参区分开，结构体入参位置在 函数名 前面 ^_^
+方法可以理解为一个特别的函数，该函数的默认入参是：当前结构体变量，为了和其他入参区分开，结构体入参位置在 函数名 前面 ^\_^
 
 ```go
 type Vertex struct {
@@ -41,7 +41,7 @@ func main() {
 }
 ```
 
-通过 `Scale( &v, 10 )` 我能明确知道，`v` 是通过指针传递的，`Scale()` 内部是可以直接修改 `v` 
+通过 `Scale( &v, 10 )` 我能明确知道，`v` 是通过指针传递的，`Scale()` 内部是可以直接修改 `v`
 
 而通过 `v.Scale( 2 )` 我在不知道 `Scale` 的 声明/实现 的情况下，无法确认 `Scale()` 会不会直接修改 `v`
 
@@ -61,7 +61,7 @@ fmt.Println( v, p )
 
 对于 `Scale( v, 10 )` ，会因为　＂函数参数类型检查不一致＂ 而报错
 
-但是对于 `v.Scale( 10 )` `(&v).Scale( 10 )` `p.Scale( 10 )` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^_^
+但是对于 `v.Scale( 10 )` `(&v).Scale( 10 )` `p.Scale( 10 )` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^\_^
 
 再来观察下:
 
@@ -80,6 +80,47 @@ func main() {
 
 对于 `Abs( &v )` `Abs( p )` 会因为　＂函数参数类型检查不一致＂ 而报错
 
-而`v.Abs()` `(*p).Abs()` `p.Abs()` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^_^
+而`v.Abs()` `(*p).Abs()` `p.Abs()` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^\_^
 
 PS: 这种为了方便而牺牲 "一致性" 和 ＂类型检查＂ 的做法是 **利大于弊** 的么？
+
+## 接口
+
+```go
+type Talk interface {       // 新接口 Talk
+    Hello( userName string ) string
+    Talk( heard string ) ( saying string, end bool, err error )
+}
+
+type myTalk string          // 新类型 myTalk
+func (talk *myTalk) Hello( userName string ) string {
+    // ...
+}
+func (talk *myTalk) Talk( heard string ) (saying string, end bool, err error) {
+    // ...
+}
+// 实现了 Hello() 和 Talk() 两个函数后，myTalk 类型自动成为了 Talk 接口的实现
+```
+
+```go
+func producer(header string, channel chan<- string) {
+    for {
+        channel <- fmt.Sprintf("%s: %v", header, rand.Int31())
+        time.Sleep(time.Second)
+    }
+}
+func customer(channel <-chan string) {
+    for{
+        message := <-channel    // 从通道中取出数据, 此处会阻塞直到信道中返回数据
+        fmt.Println(message)
+    }
+}
+func main() {
+    channel := make(chan string)    // 创建一个字符串类型的通道
+
+    go producer("cat", channel)     // 创建producer()函数的并发goroutine
+    go producer("dog", channel)     // 创建producer()函数的并发goroutine
+
+    customer(channel)               // 数据消费函数
+}
+```

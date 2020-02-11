@@ -112,9 +112,9 @@ func fa(a int) func(i int) int {
 }
 ```
 
-闭包实现 斐波纳契数列 
+闭包实现 斐波纳契数列
 
-```go 
+```go
 func fibonacci() func() int {
 	n1, n2, cnt := 0, 1, 0
 	return func() int {
@@ -126,7 +126,7 @@ func fibonacci() func() int {
 				return n2
 			default:
 				sum := n1 + n2
-				n1, n2 = n2, sum 
+				n1, n2 = n2, sum
 				return sum
 		}
 	}

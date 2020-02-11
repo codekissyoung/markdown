@@ -1,4 +1,4 @@
-# Go标准库
+# Go 标准库
 
 记录了一些标准库函数的用法。
 
@@ -81,7 +81,6 @@ for line, n := range counts {
     fmt.Printf("%d \t %s \n", n, line)
 }
 ```
-
 
 ## net/http
 
