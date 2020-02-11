@@ -6,6 +6,7 @@
 [使用prometheus_client_php对接prometheus监控系统](https://16bh.github.io/2017/07/25/prometheus-on-php/)
 [Prometheus 简单使用及 exporter 开发，使用prometheus_client_php](https://segmentfault.com/a/1190000021314370)
 [使用Prometheus针对自己的服务器采集自定义的参数](https://segmentfault.com/a/1190000021164508?utm_source=tag-newest)
+[从零搭建Prometheus监控报警系统 PushGateWay方式](https://www.cnblogs.com/chenqionghe/p/10494868.html)
 
 ## 安装
 
