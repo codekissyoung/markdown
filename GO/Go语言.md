@@ -153,3 +153,44 @@ p = &i              // p 指向 i
 *p = 21             // 通过 p 改变 i
 fmt.Println( *p );  // 通过 p 访问 i
 ```
+
+示例：`Defer` 对命名的函数返回值的影响：
+
+```go
+func f1() (r int) {
+	defer func() {
+		r++             // 闭包，引用到了返回值列表里的 r
+	}()
+	return 0
+}
+func f2() (r int) {
+	t := 5
+	defer func() {
+		t = t + 5       // 引用到的是局部变量 t，先 return，再执行 defer
+	}()
+	return t
+}
+func f3() (r int) {
+	defer func(r int) {
+		r = r + 5
+	}(r)                // 这里的 r 传值 copy
+	return 1
+}
+func f4() int {
+	r := 0
+	defer func() {
+		r++
+	}()
+	return r
+}
+func f5() int {
+	r := 0
+	defer func(i int) {
+		i++
+	}(r)
+	return 0
+}
+func main() {
+	println(f1(), f2(), f3(), f4(), f5()) // 1 5 1 0 0
+}
+```
