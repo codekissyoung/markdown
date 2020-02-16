@@ -1,17 +1,52 @@
-# Goroutine
+# Goroutine 并发
 
 ## go 语句、channel、同步方法
 
-Goroutine？是啥？从根本上将一切都并发化，用类协程的方式来处理并发单元，却又在运行时层面做了更深度的优化处理。这使得语法上的并发编程变得极为容易，无须处理回调，无须关注线程切换，仅一个关键字，简单而自然。
-goroutine 类似于线程，但并非线程。可以将 goroutine 理解为一种虚拟线程。Go 语言运行时会参与调度 goroutine，并将 goroutine 合理地分配到每个 CPU 中，最大限度地使用 CPU 性能。
-多个 goroutine 中，Go 语言使用通道（channel）进行通信，通道是一种内置的数据结构，可以让用户在不同的 goroutine 之间同步发送具有类型的消息。这让编程模型更倾向于在 goroutine 之间发送消息，而不是让多个 goroutine 争夺同一个数据的使用权。
+示范 1 ：`main goroutin`同步阻塞等待 3 个 `doSomething goroutine` 结束：
 
-程序可以将需要并发的环节设计为生产者模式和消费者的模式，将数据放入通道。通道另外一端的代码将这些数据进行并发计算并返回结果
+```go
+func main() {
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go doSomething(1, &wg)
+	go doSomething(2, &wg)
+	go doSomething(3, &wg)
+	wg.Wait()
+}
+func doSomething(id int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	log.Printf("before do job:(%d) \n", id)
+	time.Sleep(3 * time.Second)
+	log.Printf("after do job:(%d) \n", id)
+}
+```
 
-搭配 channel，实现 CSP 模型。将并发单元间的数据耦合拆解开来，各司其职，这对所有纠结于内存共享、锁粒度的开发人员都是一个可期盼的解脱。若说有所不足，那就是应该有个更大的计划，将通信从进程内拓展到进程外，实现真正意义上的分布式。
+范例 2：专用于`Go`通道的`Select`：
 
-如何实现高并发下的内存分配和管理就是个难题。好在 Go 选择了 tcmalloc，它本就是为并发而设计的高性能内存分配组件。使用 cache 为当前执行线程提供无锁分配，多个 central 在不同线程间平衡内存单元复用。在更高层次里，heap 则管理着大块内存，用以切分成不同等级的复用内存块。快速分配和二级内存平衡机制，让内存分配器能优秀地完成高压力下的内存管理任务。
-
-它会竭力将对象分配在栈上，以降低垃圾回收压力，减少管理消耗，提升执行性能。可以说，除偶尔因性能问题而被迫采用对象池和自主内存管理外，我们基本无须参与内存管理操作。
-
-因指针的存在，所以回收内存不能做收缩处理。幸好，指针运算被阻止，否则要做到精确回收都难。
+```go
+func main() {
+	chStr := make(chan string)
+	chInt := make(chan int)
+	go strWorker(chStr)
+	go intWorker(chInt)
+	for {
+		select {
+		case <-chStr:
+			fmt.Println("get value from strWorker")
+		case <-chInt:
+			fmt.Println("get value from intWorker")
+		}
+		fmt.Println("one worker catched")
+	}
+}
+func strWorker(ch chan string) {
+	for i := 0; i < 10; i++ {
+		time.Sleep(3 * time.Second)
+		ch <- "str" + strconv.Itoa(i)
+	}
+}
+func intWorker(ch chan int) {
+	time.Sleep(5 * time.Second)
+	ch <- 1
+}
+```

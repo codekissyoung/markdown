@@ -5,22 +5,6 @@
 ## 普通函数
 
 ```go
-func 函数名(入参列表) (返回值列表) {
-	// 函数体
-}
-```
-
-```go
-func add(x, y int) int {
-	return x + y
-}
-
-func swap(x, y string) (string, string) {
-	return y, x
-}
-
-a, b := swap("hello", "world") // a b 分别接收函数返回值
-
 // 如果给返回值命名，则可以直接在函数内部赋值，作为返回．非常好用的设计 ^_^
 func my_division(sum, num int) ( quotient int, remainder int ) {
 	quotient  = sum / num;
