@@ -1,8 +1,6 @@
 # Docker K8s 和 jenkins
 
-[NordVPN翻墙](https://support.cn-accelerator.site/Restricted-countries/1396307432/Connecting-from-countries-with-internet-restrictions-on-Linux.htm?nsukey=0K8hKmt%2B4dV0Szy7nj4CPuQTEUx2riCzBAso%2FAPCpjLnNXNJQorSeHbivwM2jxTQN9fE2uGNDL5gJFWc4XaQzAiFR7gij7490V9lsnNGlRQiHHEc6TPrxvny7k%2BW21xg3D4CoEcezXOhLkiDN9EjnbZdFhLu4oKsExIVvgcV5IHAf3cOJfsq3xcbQaJh4WFgVy25CHL1hSbok8fEstO6SA%3D%3D)
-
-[K8s官方文档](https://kubernetes.io/zh/docs/tutorials/kubernetes-basics/)
+[K8s 官方文档](https://kubernetes.io/zh/docs/tutorials/kubernetes-basics/)
 
 https://kubernetes.io/docs/tutorials/hello-minikube/
 
@@ -30,7 +28,7 @@ $ docker run --name 取名 -d centos /bin/bash -c "echo hello world"
 $ exit                                                    # 在容器里执行, 退出容器
 $ sudo docker ps -a                                       # 查看当前已经建立的容器
 $ sudo docker start [container_name|container_ID]         # 重新启动已经停止的容器
-$ sudo docker attach [container_name|container_ID]        # 附着到一个容器上,连接到容器的shell 
+$ sudo docker attach [container_name|container_ID]        # 附着到一个容器上,连接到容器的shell
 $ sudo docker logs -ft container_name                     # -f 输出最后几条日志 -t 在每条日志前显示时间
 $ sudo docker top container_name                                # 查看容器内进程
 $ sudo docker exec -d daemon_dave touch /etc/new_config_file    # 直接执行命令
@@ -42,14 +40,16 @@ $ sudo docker rm $(docker ps -a -q)                             # 删除所有�
 $ sudo docker image ls                                          # 列出本地所有镜像
 ```
 
-
 ## 容器被关闭时自动重启
+
 docker run --restart=always --name daemon_dave -d centos /bin/sh -c "..."
 --restart=on-failure:5 退出代码非０时才重启,重启次数为５次
 
 ## 构建自己的镜像:DockerFile
-### Docker Hub(类似于Git Hub的平台)注册账号
-### 登录Docker Hub
+
+### Docker Hub(类似于 Git Hub 的平台)注册账号
+
+### 登录 Docker Hub
 
 ```bash
 [root@iZ252e1zy6zZ ~]# docker login
@@ -60,43 +60,54 @@ WARNING: login credentials saved in /root/.docker/config.json
 Login Succeeded
 ```
 
-### 通过commit创建自己的镜像
+### 通过 commit 创建自己的镜像
+
 docker commit container_ID codekissyoung/daemon_dave;
 docker commit -m"提交信息：msg" --author="codekissyoung" container_ID codekissyoung/image_name:image_tag;
 
-### 通过Dockerfile创建镜像
+### 通过 Dockerfile 创建镜像
+
 docker build -t="codekissyoung/static_web:v1" ./
 docker build -t="codekissyoung/static_web:v2" git@github.com:codekissyoung/docker_web
 
-* 假设这个git仓库下有Dockerfile文件
+- 假设这个 git 仓库下有 Dockerfile 文件
 
-### 单步调试Dockerfile
+### 单步调试 Dockerfile
+
 docker run -t -i step_return_id /bin/bash;
-* 通过每步返回的step_id进入容器,调试正确后,退出修改Dockerfile
+
+- 通过每步返回的 step_id 进入容器,调试正确后,退出修改 Dockerfile
 
 ### 取消构建缓存
+
 docker build --no-cache -t="codekissyoung/static_web"
 
-* build会缓存之前成功的步骤,如果不需要可以去除
+- build 会缓存之前成功的步骤,如果不需要可以去除
 
 ### 查看一个镜像的构建历史
+
 docker history image_id;
 
 ### 从一个新创建的镜像构建容器
+
 docker run -d -p 80 --name=nginx2 codekissyoung/nginx:v1 nginx -g "daemon off;";
 
-### 查看容器的80端口映射到本地哪个端口
+### 查看容器的 80 端口映射到本地哪个端口
+
 docker port container_name 80;
+
 ```
 [root@iZ252e1zy6zZ static_web]# docker port ddeed87650a3 80;
 0.0.0.0:32773
 ```
-### 访问docker容器
+
+### 访问 docker 容器
+
 curl localhost:32773
 
-### 将镜像发布到Docker　Hub上
-docker push codekissyoung/nginx:v1;
+### 将镜像发布到 Docker 　 Hub 上
 
+docker push codekissyoung/nginx:v1;
 
 ```bash
 $ sudo apt-get install -y docker.io     # 安装 docker
@@ -194,11 +205,11 @@ $ kubectl cluster-info      # 查看 cluster 信息
 
 ```js
 // node/server.js
-var http = require('http');
+var http = require("http");
 var handleRequest = function(request, response) {
-  console.log('Received request for URL: ' + request.url);
+  console.log("Received request for URL: " + request.url);
   response.writeHead(200);
-  response.end('Hello World!');
+  response.end("Hello World!");
 };
 var www = http.createServer(handleRequest);
 www.listen(8080);
@@ -235,7 +246,7 @@ $ kubectl get events                                        # 查看 集群 even
 $ kubectl config view                                       # 查看 kubectl 配置
 ```
 
-默认情况，`Pod`只能通过`Kubernetes`群集内部IP访问。要使`hello-node`容器从`Kubernetes`虚拟网络外部访问，须要使用`Kubernetes Service`暴露`Pod`
+默认情况，`Pod`只能通过`Kubernetes`群集内部 IP 访问。要使`hello-node`容器从`Kubernetes`虚拟网络外部访问，须要使用`Kubernetes Service`暴露`Pod`
 
 ```bash
 $ kubectl expose deployment hello-node --type=LoadBalancer  # 将 Pod 暴露到外部环境
@@ -278,9 +289,3 @@ $ kubectl delete service hello-node
 $ kubectl delete deployment hello-node
 $ minikube stop
 ```
-
-
-
-
-
-
