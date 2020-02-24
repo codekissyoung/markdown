@@ -2,7 +2,7 @@
 
 本文包括`CLion` `PHPStorm` `Goland`等`IDE`的配置。
 
-## 重新获取30天试用
+## 重新获取 30 天试用
 
 ```bash
 $ rm -rf .GoLand2019.1/config/eval
@@ -41,3 +41,7 @@ cky@cky-pc:~/go/src$ tree -L 2
 添加自动引入包 `goimports` 和 格式化代码 `go fmt` 工具
 
 ![](https://img.codekissyoung.com/2020/02/06/ea4011e0ab5e25cfc8302aa6ccb4c191.png)
+
+## 快捷健
+
+`Ctrl + Alt + shift + l`选中的代码块格式化，如果没有选中代码，则默认是全局。
