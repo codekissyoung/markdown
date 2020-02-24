@@ -25,6 +25,10 @@ empty($a);          // 1, 2, 3 为 true
 if( $a );           // 4, 5    为 true
 ```
 
+坑爹的`isset`和`empty`判断：
+
+![](https://img.codekissyoung.com/2020/02/25/7caca23bd2a077dfe6041027864ecc55.png)
+
 ## 魔术变量
 
 ```php
