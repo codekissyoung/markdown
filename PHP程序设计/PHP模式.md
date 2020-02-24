@@ -59,9 +59,9 @@ class Register{
 
 ## 适配器模式
 
-将不同的 `函数接口/对象` 封装成统一的API,比如PHP数据库操作有 mysql mysqli pdo 3种，可以使用适配器模式统一成一致。类似的有 `cache适配器`，将`Memcache redis/file/apc`等不同缓存函数统一成一致
+将不同的 `函数接口/对象` 封装成统一的 API,比如 PHP 数据库操作有 mysql mysqli pdo 3 种，可以使用适配器模式统一成一致。类似的有 `cache适配器`，将`Memcache redis/file/apc`等不同缓存函数统一成一致
 
-实现思路：定义一个接口约束Interface DB ,里面定义了要实现的方法,MySQL,MySQLi,PDO分别是这个接口的三种实现。
+实现思路：定义一个接口约束 Interface DB ,里面定义了要实现的方法,MySQL,MySQLi,PDO 分别是这个接口的三种实现。
 
 ```php
 <?php
@@ -99,7 +99,7 @@ $db->close();
 
 将一组特定的`行为和算法`封装成类,以适应某些特定的上下文环境,比如一个电商系统，针对`男/女生用户`分别要展示不同的商品类目，并且所有广告位展示不同的广告
 
-如果在代码中使用`if else `区分用户，分别实现，那么 当新增加一类用户时，比如`儿童`，所有的`if else`都要作相应的调整
+如果在代码中使用`if else`区分用户，分别实现，那么 当新增加一类用户时，比如`儿童`，所有的`if else`都要作相应的调整
 
 ```php
 // 不使用策略模式
@@ -125,12 +125,14 @@ if (男生){
     // 展示儿童广告
 }
 ```
-约定一个接口`interface Show{...}` ,根据上下文环境,分别实现n个符合接口的策略类
+
+约定一个接口`interface Show{...}` ,根据上下文环境,分别实现 n 个符合接口的策略类
+
 ```php
 interface UserStrategy{
     function showAd();
     function showCategory();
-} 
+}
 class ManUserStrategy implements UserStrategy{
     function showAd(){}
     function showCategory(){}
@@ -148,7 +150,7 @@ if(男性){
 } else{
 	// 假如新增了一类用户，只需要新增一个策略继承UserStrategy
 	// 然后这里的选择策略多一个判断而已，下面调用策略实现功能的代码都是一样的
-    $strategy = 'ChildUserStrategy'; 
+    $strategy = 'ChildUserStrategy';
 }
 
 // 下面的代码都是统一的
@@ -159,11 +161,11 @@ $user_strategy -> showAd();
 
 ## 使用策略模式 实现 IOC 解耦合 控制反转 依赖倒置
 
-- 依赖: 类A 调用了　类B , 称　类A依赖于类B 
-- 耦合: 类A 调用了　类B 或者　类B 调用了 类A ,称类A与类B之间有耦合关系
+- 依赖: 类 A 调用了　类 B , 称　类 A 依赖于类 B
+- 耦合: 类 A 调用了　类 B 或者　类 B 调用了 类 A ,称类 A 与类 B 之间有耦合关系
 - 耦合度: 类之间依赖程度的一种量化描述
-- 控制: 类A 调用了 类B 和 类C ,称　类A 控制着　类B 类C
-- 假如A类里面，需要使用到B类的对象帮助其实现功能，那么A是依赖B的，这是一种紧耦合
+- 控制: 类 A 调用了 类 B 和 类 C ,称　类 A 控制着　类 B 类 C
+- 假如 A 类里面，需要使用到 B 类的对象帮助其实现功能，那么 A 是依赖 B 的，这是一种紧耦合
 
 ```php
 class Page{
@@ -184,7 +186,7 @@ $page = new Page();
 $page -> index();
 ```
 
-但是我们通过约定接口，传递符合接口的策略对象进入Page对象，那么Page类对于每个具体的策略没有依赖关系，只对约定的接口有依赖关系,这就解除Page对于ManUserStrategy/WomenUserStrategy的耦合关系了
+但是我们通过约定接口，传递符合接口的策略对象进入 Page 对象，那么 Page 类对于每个具体的策略没有依赖关系，只对约定的接口有依赖关系,这就解除 Page 对于 ManUserStrategy/WomenUserStrategy 的耦合关系了
 
 ```php
 class Page{
@@ -206,10 +208,9 @@ $page = new Page();
 $page -> index(new $strategy());
 ```
 
-
 ## 数据对象　映射模式
 
-将`对象`和`数据存储`映射起来，对一个`对象`的操作 会 映射为对`数据存储`的操作，最典型的实现是ORM,对象的属性映射到数据库的字段，对属性的值的修改，会映射成数据库记录的修改，这样可以使PHP对数据库的操作的代码显得更加优雅
+将`对象`和`数据存储`映射起来，对一个`对象`的操作 会 映射为对`数据存储`的操作，最典型的实现是 ORM,对象的属性映射到数据库的字段，对属性的值的修改，会映射成数据库记录的修改，这样可以使 PHP 对数据库的操作的代码显得更加优雅
 
 ```php
 class User{
@@ -240,24 +241,23 @@ $user -> name = "codekissyoung"; // 修改对象属性的值
 
 ## 依赖倒置原则（Dependence Inversion Principle, DIP）
 
-DIP　的核心思想是上层定义接口，下层实现这个接口， 从而使得下层依赖于上层，降低耦合度，提高整个系统的弹性。这是一种经实践证明的有效策略。
+DIP 　的核心思想是上层定义接口，下层实现这个接口， 从而使得下层依赖于上层，降低耦合度，提高整个系统的弹性。这是一种经实践证明的有效策略。
 
 ## 控制反转（Inversion of Control, IoC）
 
-而IoC是一种实现DIP的方法。IoC的核心是将类（上层）所依赖的单元（下层）的实例化过程交由第三方来实现。一个简单的特征，就是类中不对所依赖的单元有诸如 $component = new yii\component\SomeClass（） 的实例化语句。
+而 IoC 是一种实现 DIP 的方法。IoC 的核心是将类（上层）所依赖的单元（下层）的实例化过程交由第三方来实现。一个简单的特征，就是类中不对所依赖的单元有诸如 \$component = new yii\component\SomeClass（） 的实例化语句。
 
 ## 依赖注入（Dependence Injection, DI）
 
-DI是IoC的一种设计模式，是一种套路，按照DI的套路，就可以实现IoC，就能符合DIP原则。 DI的核心是把类所依赖的单元的实例化过程，放到类的外面去实现。
+DI 是 IoC 的一种设计模式，是一种套路，按照 DI 的套路，就可以实现 IoC，就能符合 DIP 原则。 DI 的核心是把类所依赖的单元的实例化过程，放到类的外面去实现。
 
 ##　控制反转容器（IoC Container）
 
-当项目比较大时，依赖关系可能会很复杂。 而IoC Container提供了动态地创建、注入依赖单元，映射依赖关系等功能，减少了许多代码量。 Yii 设计了一个 yii\di\Container 来实现了 DI Container。
+当项目比较大时，依赖关系可能会很复杂。 而 IoC Container 提供了动态地创建、注入依赖单元，映射依赖关系等功能，减少了许多代码量。 Yii 设计了一个 yii\di\Container 来实现了 DI Container。
 
 ## 服务定位器（Service Locator）Service Locator
 
-是IoC的另一种实现方式， 其核心是把所有可能用到的依赖单元交由Service Locator进行实例化和创建、配置， 把类对依赖单元的依赖，转换成类对Service Locator的依赖。 DI 与 Service Locator并不冲突，两者可以结合使用。 目前，Yii2.0把这DI和Service Locator这两个东西结合起来使用，或者说通过DI容器，实现了Service Locator。
-
+是 IoC 的另一种实现方式， 其核心是把所有可能用到的依赖单元交由 Service Locator 进行实例化和创建、配置， 把类对依赖单元的依赖，转换成类对 Service Locator 的依赖。 DI 与 Service Locator 并不冲突，两者可以结合使用。 目前，Yii2.0 把这 DI 和 Service Locator 这两个东西结合起来使用，或者说通过 DI 容器，实现了 Service Locator。
 
 # 组合模式 Composite
 
@@ -331,7 +331,7 @@ class Army extends Unit {
 		}
 		$this -> units[] = $unit;
 	}
-	
+
 	function removeUnit( Unit $unit ){
 		$this -> units = array_udiff( $this -> units , [$unit] , function($a,$b){ return ($a == $b) ? 0 : 1; } );
 	}
@@ -448,7 +448,7 @@ class LogRequest extends DecorateProcess{
 }
 
 class AuthRequest extends DecorateProcess{
-	
+
 	function process ( RequestHelper $req ) {
 		print __CLASS__." : authenticating data \n";
 		$this -> processrequest -> process( $req );
@@ -464,10 +464,10 @@ class StrucRequest extends DecorateProcess{
 
 $process = new AuthRequest( new StrucRequest( new LogRequest( new MainProcess() )) );
 $process -> process( new RequestHelper() );
-// AuthRequest : authenticating data 
-// StrucRequest : struc request data 
-// LogRequest : logging data 
-// MainProcess : doing something userful with request ! 
+// AuthRequest : authenticating data
+// StrucRequest : struc request data
+// LogRequest : logging data
+// MainProcess : doing something userful with request !
 ```
 
 ## 外观模式 Facade
@@ -577,7 +577,7 @@ class Preferences {
 	public function getProperty( $key ){
 		return $this -> props[$key];
 	}
-	
+
 	public static function getInstance(){
 		if( empty( self::$instance ) ){
 			self::$instance = new self();
@@ -701,23 +701,21 @@ print $blog -> encode();
 
 ```
 
-
-
-
 # Abstract Factory 抽象工厂模式
+
 ```php
 <?php
 abstract class CommsManager {
 	const APPT = 1;
 	const TTD = 2;
 	const CONTACT = 3;
-	
+
 	abstract function getHeaderText();
 
 //	abstract function getApptEncoder();
 //	abstract function getTtdEncoder();
 //	abstract function getContactEncoder();
-	
+
 	// 抽象工厂
 	abstract function make( $type );
 	abstract function getFooterText();
@@ -741,7 +739,7 @@ class BloggsCommsManager extends CommsManager {
 	function getContactEncoder(){
 		return new BloggsContactEncoder();
 	}
-	
+
 */
 	function make ( $type ) {
 		switch($type){
@@ -764,6 +762,7 @@ class BloggsCommsManager extends CommsManager {
 ```
 
 # Prototype 原型模式
+
 ```php
 <?php
 class Sea{
@@ -771,7 +770,7 @@ class Sea{
 	function __construct( $navigability ){
 		$this -> navigability = $navigability;
 	}
-	
+
 }
 class EarthSea extends Sea {}
 class MarsSea extends Sea {}
@@ -785,7 +784,7 @@ class EarthForest extends Forest {}
 class MarsForest extends Forest {}
 
 class TerrainFactory {
-	
+
 	private $sea;
 	private $forest;
 	private $plains;
@@ -807,7 +806,7 @@ class TerrainFactory {
 	function getForest() {
 		return clone $this -> forest;
 	}
-	
+
 }
 
 $factory = new TerrainFactory( new EarthSea( -1 ) ,new EarthPlains() ,new EarthForest() );
@@ -818,6 +817,7 @@ print_r( $factory -> getForest() );
 ```
 
 # 深复制 和 浅复制
+
 ```php
 <?php
 class Contained{}

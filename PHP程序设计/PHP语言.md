@@ -118,10 +118,10 @@ trait Geocodable {
     protected $address;
     protected $geocoder;
     public function setGeocoder(){
-        //... 
+        //...
     }
     public function getLatitude(){
-        // ... 
+        // ...
     }
     protected function geocodeAddress(){
         // ...
@@ -140,7 +140,7 @@ class Car {
 `yield`的出现,为迭代处理数据提供了一种很 "简洁 清晰"的写法,不使用`yield`也能完成同样的任务,但是没有`yield`代码这么优雅
 
 ```php
-// 占用内存为 $length 
+// 占用内存为 $length
 function badMakeRange( $length ){
     $data = [];
     for( $i = 0; $i < $length; $i++)
@@ -193,9 +193,9 @@ $arr = array_map( function($num){
 }, [1,2,3] ); // 简洁而富有表达力
 ```
 
-JS的闭包是自动将 上下文状态 封装到闭包里面的,而 PHP 中需要手动操作:
+JS 的闭包是自动将 上下文状态 封装到闭包里面的,而 PHP 中需要手动操作:
 
-- 方法1 使用 `use` 关键字
+- 方法 1 使用 `use` 关键字
 
 ```php
 function enclosePerson( $name ){
@@ -219,7 +219,7 @@ class App{
     protected $type   = 'text/html';
     protected $body   = 'hello world';
     public function addRoute( $path, $routeCallback ) {
-        // 将闭包绑定到 当前 App 实例, 
+        // 将闭包绑定到 当前 App 实例,
         $this -> routes[$path] = $routeCallback->bindTo( $this, __CLASS__ );
     }
     public function dispatch( $cur_path ){
@@ -256,7 +256,6 @@ function varfunc( $a, $b ) {
 $a = 'varfunc';
 echo $a( 2, 56 );
 ```
-
 
 ```php
 $func = function( $arg ) {
@@ -325,15 +324,15 @@ call_user_func_array( [__NAMESPACE__ .'\Foo', 'test'], ['Philip']);
 
 ## 参考
 
-PHP与MySQL程序设计(第四版)
-安全PHP编程
-Laravel框架关键技术解析
-[PHP设计模式全集2018](https://learnku.com/docs/php-design-patterns/2018)
-PHP应用程序安全编程
-深入PHP面向对象、模式与实践
-PHP与Mysql高性能开发
-PHP系统核心与最佳实践
-高性能PHP应用开发
+PHP 与 MySQL 程序设计(第四版)
+安全 PHP 编程
+Laravel 框架关键技术解析
+[PHP 设计模式全集 2018](https://learnku.com/docs/php-design-patterns/2018)
+PHP 应用程序安全编程
+深入 PHP 面向对象、模式与实践
+PHP 与 Mysql 高性能开发
+PHP 系统核心与最佳实践
+高性能 PHP 应用开发
 Modern PHP
 [php the right way](http://laravel-china.github.io/php-the-right-way/)
 [阅读 PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)
@@ -342,5 +341,5 @@ Modern PHP
 [阅读 PSR-4](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md)
 [阅读 PEAR 编码准则](http://pear.php.net/manual/en/standards.php)
 [阅读 Symfony 编码准则](http://symfony.com/doc/current/contributing/code/standards.html)
-[PHP_CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/) 检查代码是否符合规范
+[PHP_CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/)  检查代码是否符合规范
 [PHP Coding Standards Fixer](http://cs.sensiolabs.org/) 自动修复语法格式

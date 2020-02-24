@@ -2,7 +2,6 @@
 
 ```php
 <?php
-//自定义的异常类，继承了PHP的异常基类Exception
 class My_Exception extends Exception {
     function getInfo() {
         return '自定义错误信息';
@@ -10,7 +9,7 @@ class My_Exception extends Exception {
 }
 
 try{
-    // 业务代码 1 
+    // 业务代码 1
     if(...){
         throw new My_Exception ("异常提示-数字必须小于等于1");
     }

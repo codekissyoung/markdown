@@ -2,7 +2,7 @@
 
 `PHP`的反射类。
 
-## PHP提供的反射类的相关知识
+## PHP 提供的反射类的相关知识
 
 ```php
 Reflection          为类的摘要信息提供静态函数
@@ -67,7 +67,7 @@ class ModuleRunner {
 		var_dump($interface);
 		foreach ( $this -> configData as $modulename => $params ){
 			$module_class = new ReflectionClass( $modulename );
-			
+
 			if( ! $module_class -> isSubclassOf($interface)){
 				throw new Exception("Unkown module type : $modulename");
 			}

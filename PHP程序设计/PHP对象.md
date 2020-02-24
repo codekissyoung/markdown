@@ -64,7 +64,7 @@ class Test {
     public $params = [];
     public function __construct(){} // 当对象被创建时调用
     public function __destruct(){}  // 对象被销毁时调用
-    
+
     // 当对象设置不存在的属性时,使用一个$params变量将设置的值保存起来
     public function __set($key,$value){$this->params[$key] = $value;}
     public function __get($key){return $this->params[$key];}
@@ -102,8 +102,7 @@ com\getinstance\util\Debug::helloworld();
 \com\getinstance\util\Debug::helloworld();
 ```
 
-
-## ::class获取类的完全限定名称
+## ::class 获取类的完全限定名称
 
 ```php
 namespace NS;
@@ -242,7 +241,7 @@ StaticExample::func();//在外部调用静态方法
 为何要使用静态变量和静态方法？
 
 - 在程序任意可以访问到类的地方都可以使用，不用为了获取一个简单的功能而实例化一个对象！
-- 由该类new出来的对象之间，可以共享一些东西！
+- 由该类 new 出来的对象之间，可以共享一些东西！
 - 静态方法中，`$this`变量不允许使用。可以使用`self，parent，static`在内部调用静态方法与属性。
 
 ```php
@@ -273,8 +272,8 @@ spl_autoloda_register("autoload2");
 
 // 如果 new 操作未找到对应的类，就会执行注册好的自动加载函数
 function autoload1( $class ) {
-    // $class 为带命名空间的类名 
-    require  __DIR__.$class.'.php'; 
+    // $class 为带命名空间的类名
+    require  __DIR__.$class.'.php';
 }
 function autoload2( $class ) {
     require  __DIR__.'/framework/'.$class.'.php';

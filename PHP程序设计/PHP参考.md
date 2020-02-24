@@ -1,8 +1,8 @@
-# PHP常用API
+# PHP 常用 API
 
 `PHP`常用`API`参考。
 
-## 获取php.ini配置信息
+## 获取 php.ini 配置信息
 
 ```php
 ini_get("allow_url_fopen");         // 获取 php.ini 中 allow_url_fopen 的设置
@@ -39,8 +39,7 @@ var_dump($GLOBALS); // 打印脚本中的所有的全局变量
 bool defined( ABC_NAME );           // 判断常量是否被定义
 ```
 
-
-## is系列
+## is 系列
 
 ```php
 is_bool();
@@ -51,7 +50,7 @@ is_object();
 is_array();
 is_resource();
 is_null();
-is_callable( [$obj, $method] ); 
+is_callable( [$obj, $method] );
 ```
 
 ## 啥玩意?
@@ -114,7 +113,7 @@ $myObj -> method_name(20);
 call_user_func_array([$obj,'method'],$args); // 等价于 $obj -> method($args); $args 为不定个数的数组
 ```
 
-## 写http头
+## 写 http 头
 
 ```php
 header("content-type:application/json ;charset = utf-8;");  // 返回json数据
@@ -214,16 +213,14 @@ $end_time=microtime();
 $execute_time=$end_time-$start_time;
 ```
 
-
 ## 脚本执行完注册函数
 
 ```php
 register_shutdown_function( ['core', 'handleShutdown'] );
 ```
 
-当我们的脚本执行完成或意外死掉导致PHP执行即将关闭时,我们的这个函数将会 被调用.所以,我们可以使用在脚本开始处设置一个变量为false,然后在脚本末尾将之设置为true的方法,让PHP关闭回调函数检查脚本完成与否. 如果我们的变量仍旧是false,我们就知道脚本的最后一行没有执行,因此它肯定在程序执行到某处死掉了
+当我们的脚本执行完成或意外死掉导致 PHP 执行即将关闭时,我们的这个函数将会 被调用.所以,我们可以使用在脚本开始处设置一个变量为 false,然后在脚本末尾将之设置为 true 的方法,让 PHP 关闭回调函数检查脚本完成与否. 如果我们的变量仍旧是 false,我们就知道脚本的最后一行没有执行,因此它肯定在程序执行到某处死掉了
 http://www.blogdaren.com/post-2030.html
-
 
 ## 设置异常处理函数
 
@@ -237,12 +234,11 @@ set_exception_handler(array('core', 'handleException'));
 set_error_handler(array('core', 'handleError'));
 ```
 
-## 防止 SQL 注入 ##
+## 防止 SQL 注入
 
 ```php
 mysql_real_escape_string($sql); //转义 sql 字符串中的特殊字符
 ```
-
 
 ## 使用 filter 拓展对变量进行过滤
 
@@ -259,7 +255,7 @@ if (filter_var($ip_a, FILTER_VALIDATE_IP)) {
 }
 ```
 
-## 定义网站的起始路径，之后所有的引用都可以基于这个路径了 ##
+## 定义网站的起始路径，之后所有的引用都可以基于这个路径了
 
 ```php
 define("APP_PATH",dirname(__FILE__));
@@ -273,7 +269,7 @@ require_once APP_PATH.'/myscript.php';
 $obj -> method1() -> method2();
 ```
 
-## 限定函数参数类型 ##
+## 限定函数参数类型
 
 ```php
 function expectMyclass(Myclass $obj){
@@ -282,7 +278,7 @@ function expectMyclass(Myclass $obj){
 }
 ```
 
-## 不可逆加密　md5散列值，sha1 散列值
+## 不可逆加密　 md5 散列值，sha1 散列值
 
 ```php
 echo  md5("hehexiix23");

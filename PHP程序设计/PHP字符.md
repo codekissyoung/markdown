@@ -1,4 +1,4 @@
-# PHP字符串
+# PHP 字符串
 
 `PHP`字符串笔记。
 
@@ -11,7 +11,7 @@ mb_strcut('这样一来我的字符串就不会有乱码^_^', 0, 7, 'utf-8');
 mb_strlen("我是个好人","utf-8");
 
 // ***ijklmnopqrstuvwxyz 后面的两个数字的参数的使用方法跟substr 一样
-substr_replace('abcdefghijklmnopqrstuvwxyz','***',0,8); 
+substr_replace('abcdefghijklmnopqrstuvwxyz','***',0,8);
 strstr($_POST['email'],'@'); // 判断是否包含子字符串
 strpos($_POST['email'],'@'); // 返回找到的位置
 
@@ -35,7 +35,6 @@ lcfirst($foo); // 首字母小写
 ucfist('how do you do today?'); // How do you do today?`首字母大写
 ucwords("how do you do today?");//How Do You Do Today ?`每个单词首字母大写
 ```
-
 
 ## 转义函数
 
@@ -64,17 +63,17 @@ escapeshellcmd();		// 防止用户的输入执行系统命令
 exec("ls -l");			// 直接执行系统命令的函数
 ```
 
-## 汉字加密 解密，为了解决传输时，汉字符会丢失的问题 ##
+## 汉字加密 解密，为了解决传输时，汉字符会丢失的问题
 
 ```php
 $urlstr = urlencode("我是codekissyoung");
  urldecode($urlstr);
 ```
 
-## JSON字符串
+## JSON 字符串
 
 ```php
-json_encode( $arr, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); 
+json_encode( $arr, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
 json_decode( $json, [ture] ); // ture 表示解析成数组
 
@@ -84,8 +83,6 @@ function is_json($string) {
  return (json_last_error() == JSON_ERROR_NONE);
 }
 ```
-
-
 
 ## 字符串大小写
 
