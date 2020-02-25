@@ -301,3 +301,43 @@ base64_decode($string);
 convert_uudecode($str);
 convert_uuencode($str);
 ```
+
+#### method_exists 与 is_callable
+
+```php
+class Foo {
+    public function PublicMethod(){}
+    private function privateMethod(){}
+    public static function PublicStaticMethod(){}
+    private static function PrivateStaticMethod(){}
+}
+$foo = new Foo();
+$callbacks = [
+    [$foo,'PublicMethod'],
+    [$foo,'PrivateMethod'],
+    [$foo,'PublicStaticMethod'],
+    [$foo,'PrivateStaticMethod'],
+    ['Foo','PublicMethod'],
+    ['Foo','PrivateMethod'],
+    ['Foo','PublicStaticMethod'],
+    ['Foo','PrivateStaticMethod']
+];
+class MethodTest {
+    public function __call($name, $args) {
+        echo $name;
+        echo "\n";
+        var_dump($args);
+    }
+}
+$obj = new MethodTest();
+$obj -> runtest('???????????');
+var_dump(method_exists($obj,'runtest'));
+var_dump(is_callable([$obj,'runtest']));
+```
+
+#### PHP 执行 shell 命令
+
+```php
+$out = `ls -al`;
+var_dump( $out );
+```

@@ -240,6 +240,20 @@ $app -> addRoute('/users/link', function(){
 $app -> dispatch('/users/link');
 ```
 
+```php
+$x = 3;
+
+$func1 = function() use(&$x) { return $x *= 2; };
+// 对比下
+$func2 = function() use($x) { return $x *= 2; };
+
+$x = 4;
+
+print $func1(); // 8
+print $func2(); // 6
+print $x;       // 8
+```
+
 ## 匿名函数 / 闭包 Closures
 
 ```php
