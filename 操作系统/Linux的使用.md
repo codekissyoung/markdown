@@ -1,8 +1,8 @@
-# Linux的使用
+# Linux 的使用
 
 本文是我使用`Linux`的总结，只涉及服务器日常命令操作，不涉及到开发和原理。
 
-## ubuntu增加swap空间
+## ubuntu 增加 swap 空间
 
 #### 查看系统内 Swap 分区大小
 
@@ -29,7 +29,7 @@ sudo swapon swapfile                                    # 启用这个swap文件
 sudo swapoff swapfile      # 卸载这个 swap文件
 ```
 
-如果想默认使用这个swapfile文件 ，则需修改`/etc/fstab`文件
+如果想默认使用这个 swapfile 文件 ，则需修改`/etc/fstab`文件
 
 ```bash
 /swap/swapfile /swap swap defaults 0 0
@@ -56,7 +56,8 @@ $ crontab -l    # 列出已经设定的定时任务列表
 */2 * * * * /home/cky/clear-log                        # 每隔 2 分钟,清理日志
 ```
 
-## 字符匹配 ##
+## 字符匹配
+
 ```
 * 代表任意字符串
 ？代表一个字符
@@ -64,28 +65,38 @@ $ crontab -l    # 列出已经设定的定时任务列表
 [1-9] [a-z] 表示范围
 [!abcd] 代表除这些字符串之外
 ```
-## 重定向 ##
+
+## 重定向
+
 ```
 ls  -l  /tmp > /tmp.msg   不再屏幕显示，而是输入到/tmp.msg 这个文件
 date >> /tep.msg    >>表示在末尾追加
 grep 127 < /etc/hosts   输入重定向
 cp -R /usr   /backup/usr.bak  2> /bak.error   错误输出重定向
 ```
-## 管道：将一个命令的输入作为另一个命令的输入 ##
+
+## 管道：将一个命令的输入作为另一个命令的输入
+
 ```
 ps aux | grep  apache2
 ```
-## 命令链接符  ##
+
+## 命令链接符
+
 ```
 ls  -l  /etc/hosts;ls -l /etc/host;   命令依次执行
 sudo service apache2  stop&&sudo  service apache2  start   前面命令执行成功后，才执行后面命令
 service apache2 restart || sudo service apache2 restart  前面命令执行失败后，后面命令才执行
 ```
-## 命令替换符  ##
+
+## 命令替换符
+
 ```
 ls  -l  `which touch`  将which touch的输入作为 ls -l 的参数
 ```
-## 目录与文件管理命令 ##
+
+## 目录与文件管理命令
+
 ```
 ls  -ald  /root  显示/root下所有文件
 pwd   显示当前目录
@@ -100,10 +111,12 @@ cat Myfile 查看文件
 more  Myfile 分页查看文件内容，空格：下一页，enter：下一行，q：退出
 tail -num log.txt 实时查看文件前num行内容
 ln source.txt  /var/source.txt   创建硬链接（相当于copy + 实时更新）
-ln -s  source.txt  /var/source.txt  创建软连接（相当于快捷方式）    
+ln -s  source.txt  /var/source.txt  创建软连接（相当于快捷方式）
 sudo chmod -R 777 /sh
 ```
-## 压缩和解压 ##
+
+## 压缩和解压
+
 ```
 gzip    -d    文件：压缩为 .gz文件，不支持目录，不保留源文件，-d 为解压缩
 bzip2  -k    文件：压缩为.bz2 文件，它的压缩比非常惊人，-k 会保留源文件。
@@ -114,13 +127,17 @@ zip  services.zip  /etc/services  压缩文件
 zip  test.zip  /test  压缩目录 zip 是保留源文件的压缩。
 uzip    压缩文件：解压文件；
 ```
-## 文件权限 ##
+
+## 文件权限
+
 ```
 chmod  [-R]  777   /var/home/www    改变文件/目录权限 -R是递归
 chown   caokaiyan    /var/home/www/aa.txt    改变文件所有者
 chgrp  [-R]  admin        /var/home/www/aa.txt    改变文件所有组
 ```
-## 用户管理 ##
+
+## 用户管理
+
 ```
 useradd  caokaiyan  向系统添加一个用户
 passwd   caokaiyan  给用户设定一个秘密
@@ -128,7 +145,9 @@ su  切换到root用户
 sudo  普通用户使用root用户权限操作，一般在Debian系列linux才有
 logout   注销登录
 ```
-## 文件搜索 ##
+
+## 文件搜索
+
 ```
 which  ls   定位到ls命令的绝对路径；提供 命令别名信息
 whereis  ls 定位到ls命令的绝对路径；提供帮助文档信息
@@ -136,7 +155,9 @@ find  /etc  host    在/etc 里面查找名字带有 host 的文件
 locate  host   基于linux内置文件数据库查找带有 host 名的文件，一般在找之前 updatedb 一下，更新内置数据库
 file    文件：判断文件类型
 ```
-## 网络通信命令 ##
+
+## 网络通信命令
+
 ```
 ping    + ip地址/URL：发送数据包，看看能不能得到包的返回
 ping    自己机器ip地址：如果能通，说明自己的网络设置是没问题的！
@@ -147,7 +168,9 @@ netstat -anp：监控网络状态，端口号，哪个进程监听的这个端�
 traceroute  +域名/主机 IP ：追踪路由
 route -n：显示本机路由表
 ```
-## 关机 ##
+
+## 关机
+
 ```
 shutdown  -h [now/等待时间]
 shutdown    -r    [now/等待时间] 重启
@@ -156,7 +179,8 @@ init    0    关机
 init    6    重启
 halt    系统停机
 ```
-## 查看硬盘分区情况 ##
+
+## 查看硬盘分区情况
 
 ```
 fdisk    -l    [/dev/had]硬盘分区情况
@@ -164,7 +188,8 @@ df    -h    硬盘分区的使用情况
 du    -sh   /root    查看/root下所有目录大小
 uname    -a 所用的linux 版本号
 ```
-## linux环境配置 ##
+
+## linux 环境配置
 
 ```
 Locale    查看当前语言环境
@@ -174,17 +199,19 @@ env    列出所有的环境变量
 date    显示当前时间
 cal    显示当前日历
 ```
-## 进程管理 ##
+
+## 进程管理
+
 ```
 ps aux 查看运行的所有进程
-ps e   
+ps e
 kill  8024  通过PID杀死进程
 Kill  -9  8935   强制杀死进程
 killall  8323   杀死它和它的子进程
 top   实时监控进程
 ```
 
-- 在单个shell登录终端如何进行多个任务
+- 在单个 shell 登录终端如何进行多个任务
 
 ```bash
 ctrl + z  # 将当前执行的程序放入后台,程序是暂停的
@@ -199,13 +226,13 @@ nohup 命令 &  # 后台命令脱离终端运行
 ## 用户类型
 
 linux 中只有`root`用户和`非root`用户两种用户
-`nobody` `adm` `ftp` 等系统预设用户是不分配密码和shell的 一般作为进程指定用户使用 比如nginx指定nobody为运行用户
+`nobody` `adm` `ftp` 等系统预设用户是不分配密码和 shell 的 一般作为进程指定用户使用 比如 nginx 指定 nobody 为运行用户
 `whoami` 当前用户
-`useradd  caokaiyan`  向系统添加一个用户
-`passwd   caokaiyan` 给用户设定一个秘密
-`sudo + 命令`  普通用户使用root用户权限操作
+`useradd caokaiyan` 向系统添加一个用户
+`passwd caokaiyan` 给用户设定一个秘密
+`sudo + 命令` 普通用户使用 root 用户权限操作
 `usermod -l newuser1 newuser` 修改 newuser 的用户名为 newuser1
-`usermod -L newuser1`  锁定账号 newuser1
+`usermod -L newuser1` 锁定账号 newuser1
 `usermod -U newuser1` 解除对 newuser1 的锁定
 `userdel -r username` 彻底消除一个用户,包括他的目录
 `logout` 注销登录
@@ -236,18 +263,18 @@ linux 中只有`root`用户和`非root`用户两种用户
 
 ## /etc/gshadow 组密码文件
 
-## 给用户sudo权限(centOs系统)
+## 给用户 sudo 权限(centOs 系统)
 
-`su`切换到root用户
-`visudo` 编辑sudo文件
-下面是sudo文件的配置
-`root  ALL=(ALL)  ALL` 这一行下面，再加入一行
-`caokaiyan  ALL=(ALL) ALL` 给caokaiyan用户跟root一样的sudo权限
-`%admin ALL=(ALL) ALL` 给admin这个用户组跟root一样的sudo权限,admin用户组里的成员都拥有
+`su`切换到 root 用户
+`visudo` 编辑 sudo 文件
+下面是 sudo 文件的配置
+`root ALL=(ALL) ALL` 这一行下面，再加入一行
+`caokaiyan ALL=(ALL) ALL` 给 caokaiyan 用户跟 root 一样的 sudo 权限
+`%admin ALL=(ALL) ALL` 给 admin 这个用户组跟 root 一样的 sudo 权限,admin 用户组里的成员都拥有
 `%admin ALL=/sbin/mount /mnt/cdrom,/sbin/umount /mnt/cdrom`
-上面命令限制admin用户组只能使用`/sbin/mount /mnt/cdrom`,`/sbin/umount /mnt/cdrom`两个命令
-`%admin ALL=(ALL) ALL,!/usr/sbin/adduser,!/usr/sbin/useradd` `!`表示admin禁用的命令
-建议：明文禁止su命令被sudo特权执行,原因是 `sudo su anyone`这样可以切换到任意一个linux用户的目录
+上面命令限制 admin 用户组只能使用`/sbin/mount /mnt/cdrom`,`/sbin/umount /mnt/cdrom`两个命令
+`%admin ALL=(ALL) ALL,!/usr/sbin/adduser,!/usr/sbin/useradd` `!`表示 admin 禁用的命令
+建议：明文禁止 su 命令被 sudo 特权执行,原因是 `sudo su anyone`这样可以切换到任意一个 linux 用户的目录
 保存退出
 
 ## 查看当前在线的所有用户
@@ -274,7 +301,8 @@ pkill -9 -t pts/1
 
 ## `ps aux`
 
-`USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND`
+`USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND`
+
 ```bash
 USER：该 process 属于那个使用者账号的
 PID ：该 process 的号码
@@ -299,39 +327,39 @@ COMMAND：该程序的实际指令
 `-p` 同时显示进程的`pid`
 `-u` 同时显示该进程的用户
 
-`ps axjf`               树状形式查看所有进程
-`PPID   PID  PGID   SID TTY      TPGID STAT   UID   TIME COMMAND`
+`ps axjf` 树状形式查看所有进程
+`PPID PID PGID SID TTY TPGID STAT UID TIME COMMAND`
 
 ## `top`
 
 - http://www.2cto.com/os/201209/157960.html
-实时监控进程，监控服务器的健康情况
-交互命令
-`[shift] P`  按cpu使用率从大到小排序
-`[shift] M` 按内存从大到小排序
-`[shift] N`  按pid从小到大排序
+  实时监控进程，监控服务器的健康情况
+  交互命令
+  `[shift] P` 按 cpu 使用率从大到小排序
+  `[shift] M` 按内存从大到小排序
+  `[shift] N` 按 pid 从小到大排序
 
 `buffer` 缓冲,用于加速数据的写入,每次代码写操作不是直接写硬盘,而是写在内存里,等积累到一定数量了,一次性全部写入磁盘
 `cache` 缓存,用于加速数据的读出,从磁盘或者数据库中取出到数据暂时存在内存里,若下次使用相同数据,就可以直接使用内存了
 第一行：
 10:01:23 当前系统时间
-126 days, 14:29 系统已经运行了126天14小时29分钟（在这期间没有重启过）
-2 users 当前有2个用户登录系统
-load average: 1.15, 1.42, 1.44 load average后面的三个数分别是1分钟、5分钟、15分钟的负载情况。
-load average数据是每隔5秒钟检查一次活跃的进程数，然后按特定算法计算出的数值。如果这个数除以逻辑CPU的数量，结果高于5的时候就表明系统在超负荷运转了。
+126 days, 14:29 系统已经运行了 126 天 14 小时 29 分钟（在这期间没有重启过）
+2 users 当前有 2 个用户登录系统
+load average: 1.15, 1.42, 1.44 load average 后面的三个数分别是 1 分钟、5 分钟、15 分钟的负载情况。
+load average 数据是每隔 5 秒钟检查一次活跃的进程数，然后按特定算法计算出的数值。如果这个数除以逻辑 CPU 的数量，结果高于 5 的时候就表明系统在超负荷运转了。
 
 第二行：
-Tasks 任务（进程），系统现在共有183个进程，其中处于运行中的有1个，182个在休眠（sleep），stoped状态的有0个，zombie状态（僵尸）的有0个。
+Tasks 任务（进程），系统现在共有 183 个进程，其中处于运行中的有 1 个，182 个在休眠（sleep），stoped 状态的有 0 个，zombie 状态（僵尸）的有 0 个。
 
-第三行：cpu状态
-6.7% us 用户空间占用CPU的百分比。
-0.4% sy 内核空间占用CPU的百分比。
-0.0% ni 改变过优先级的进程占用CPU的百分比
-92.9% id 空闲CPU百分比
-0.0% wa IO等待占用CPU的百分比
-0.0% hi 硬中断（Hardware IRQ）占用CPU的百分比
-0.0% si 软中断（Software Interrupts）占用CPU的百分比
-在这里CPU的使用比率和windows概念不同，如果你不理解用户空间和内核空间，需要充充电了。
+第三行：cpu 状态
+6.7% us 用户空间占用 CPU 的百分比。
+0.4% sy 内核空间占用 CPU 的百分比。
+0.0% ni 改变过优先级的进程占用 CPU 的百分比
+92.9% id 空闲 CPU 百分比
+0.0% wa IO 等待占用 CPU 的百分比
+0.0% hi 硬中断（Hardware IRQ）占用 CPU 的百分比
+0.0% si 软中断（Software Interrupts）占用 CPU 的百分比
+在这里 CPU 的使用比率和 windows 概念不同，如果你不理解用户空间和内核空间，需要充充电了。
 
 第四行：内存状态
 8306544k total 物理内存总量（8GB）
@@ -339,40 +367,40 @@ Tasks 任务（进程），系统现在共有183个进程，其中处于运行�
 530668k free 空闲内存总量（530M）
 79236k buffers 缓存的内存量 （79M）
 
-第五行：swap交换分区
+第五行：swap 交换分区
 2031608k total 交换区总量（2GB）
 2556k used 使用的交换区总量（2.5M）
 2029052k free 空闲交换区总量（2GB）
 4231276k cached 缓冲的交换区总量（4GB）
 第七行以下：各进程（任务）的状态监控
-PID 进程id
+PID 进程 id
 USER 进程所有者
 PR 进程优先级
-NI nice值。负值表示高优先级，正值表示低优先级
-VIRT 进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES
-RES 进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA
-SHR 共享内存大小，单位kb
+NI nice 值。负值表示高优先级，正值表示低优先级
+VIRT 进程使用的虚拟内存总量，单位 kb。VIRT=SWAP+RES
+RES 进程使用的、未被换出的物理内存大小，单位 kb。RES=CODE+DATA
+SHR 共享内存大小，单位 kb
 S 进程状态。D=不可中断的睡眠状态 R=运行 S=睡眠 T=跟踪/停止 Z=僵尸进程
-%CPU 上次更新到现在的CPU时间占用百分比
+%CPU 上次更新到现在的 CPU 时间占用百分比
 
 %MEM 进程使用的物理内存百分比
-TIME+ 进程使用的CPU时间总计，单位1/100秒
+TIME+ 进程使用的 CPU 时间总计，单位 1/100 秒
 COMMAND 进程名称（命令名/命令行）
-多U多核CPU监控
+多 U 多核 CPU 监控
 
 ## 杀死进程
 
 `kill -1 pid` 平滑重启
 `killall -1 pid` 平滑重启某一类进程
-`Kill  -9  8935` 通过PID强制杀死进程
-`killall -9  8323` 杀死它和它的子进程
+`Kill -9 8935` 通过 PID 强制杀死进程
+`killall -9 8323` 杀死它和它的子进程
 
 ## 进程优先级
 
-就是决定cpu先执行哪个进程
+就是决定 cpu 先执行哪个进程
 除非做内核裁剪或者嵌入式开发,否则没有多大意义
 
-## 按16进制 对照查看文件
+## 按 16 进制 对照查看文件
 
 ```bash
 ➜  cky git:(master) od -ax shell
@@ -389,7 +417,7 @@ COMMAND 进程名称（命令名/命令行）
 ### fping
 
 - `fping -As -c3 192.168.1.1 192.168.1.74 192.168.1.20`
-- `fping -Aes -c3 -g 101.200.144.0/24` 查看某个网段的所有ip情况
+- `fping -Aes -c3 -g 101.200.144.0/24` 查看某个网段的所有 ip 情况
 
 ```bash
 Usage: fping [options] [targets...]
@@ -407,7 +435,7 @@ Usage: fping [options] [targets...]
 
 ### Hping
 
-- Hping是一个命令行下使用的TCP/IP数据包组装/分析工具，其命令模式很像Unix下的ping命令，但是它不是只能发送ICMP回应请求，它还可以支持TCP、UDP、ICMP和RAW-IP协议，它有一个路由跟踪模式，能够在两个相互包含的通道之间传送文件。Hping常被用于检测网络和主机
+- Hping 是一个命令行下使用的 TCP/IP 数据包组装/分析工具，其命令模式很像 Unix 下的 ping 命令，但是它不是只能发送 ICMP 回应请求，它还可以支持 TCP、UDP、ICMP 和 RAW-IP 协议，它有一个路由跟踪模式，能够在两个相互包含的通道之间传送文件。Hping 常被用于检测网络和主机
 
 ## 路由扫描
 
@@ -487,12 +515,12 @@ HOST: cky                         Loss%   Snt   Last   Avg  Best  Wrst StDev
 ### ncat
 
 ```
-/bin    /sbin    /usr/bin    /usr/sbin    /usr/local/bin  存放命令的文件    
-/opt    安装的大应用程序文件    
-/tmp    临时文件    
-/lost+found 系统修复过程中恢复的文件     
+/bin    /sbin    /usr/bin    /usr/sbin    /usr/local/bin  存放命令的文件
+/opt    安装的大应用程序文件
+/tmp    临时文件
+/lost+found 系统修复过程中恢复的文件
 /dev    设备文件目录
-/dev/cdrom        光驱设备    
+/dev/cdrom        光驱设备
 /dev/fd0    软驱
 
 /etc/lilo.conf    启动引导程序文件
@@ -533,8 +561,8 @@ HOST: cky                         Loss%   Snt   Last   Avg  Best  Wrst StDev
 
 `-l` 只显示本地磁盘(默认)
 `-a` 显示所有文件系统
-`-h` 以1024计算
-`-H` 以1000计算
+`-h` 以 1024 计算
+`-H` 以 1000 计算
 `-T` 磁盘类型
 `-t` 显示指定类型文件系统的磁盘分区
 `-x` 不显示指定类型文件系统的磁盘分区
@@ -550,22 +578,25 @@ tmpfs          tmpfs     521M     0  521M    0% /sys/fs/cgroup
 tmpfs          tmpfs     105M     0  105M    0% /run/user/1000
 ```
 
-主分区：最多只能有4个
+主分区：最多只能有 4 个
 扩展分区：
-> * 最多只能一个
-> * 主分区加拓展分区最多有4个
-> * 不能写入数据,只能包含逻辑分区
+
+> - 最多只能一个
+> - 主分区加拓展分区最多有 4 个
+> - 不能写入数据,只能包含逻辑分区
 
 逻辑分区
 
 主要目的是写入特定文件系统，首先将分区指定区域分成等大小的储存块,再将分区中另一指定区域做成文件分配表，目录表，它们纪录了该分区下所有文件实际存储的块以及用于文件管理。
 
 # 使用分区
-> **windows** : 分区 ----> 分配盘符  -----> 格式化
-> **linux** : 分区 -----> 格式化 -----> 取个设备文件名  ---> 挂载
+
+> **windows** : 分区 ----> 分配盘符 -----> 格式化
+> **linux** : 分区 -----> 格式化 -----> 取个设备文件名 ---> 挂载
 
 # 批量安装日志
-安装完系统后，在`root`的home目录下
+
+安装完系统后，在`root`的 home 目录下
 `/root/install.log` 储存了安装在系统中的软件包及其版本信息
 `/root/install.log.syslog` 储存了安装过程中留下的事件纪录
-`/root/anaconda-ks.cfg` 以Kickstart配置文件的格式纪录安装过程中设置的选项信息
+`/root/anaconda-ks.cfg` 以 Kickstart 配置文件的格式纪录安装过程中设置的选项信息
