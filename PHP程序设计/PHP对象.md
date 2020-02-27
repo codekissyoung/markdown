@@ -266,13 +266,12 @@ echo BigCar::getSpeed();
 ## 类的自动加载
 
 ```php
-
 spl_autoload_register("autoload1");
 spl_autoloda_register("autoload2");
 
 // 如果 new 操作未找到对应的类，就会执行注册好的自动加载函数
+// $class 为带命名空间的类名
 function autoload1( $class ) {
-    // $class 为带命名空间的类名
     require  __DIR__.$class.'.php';
 }
 function autoload2( $class ) {

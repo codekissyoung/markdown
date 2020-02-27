@@ -2,11 +2,11 @@
 
 关于`SSH`远程登录服务器的所有相关知识。
 
-[25个必须记住的SSH命令](http://blog.urfix.com/25-ssh-commands-tricks/)
+[25 个必须记住的 SSH 命令](http://blog.urfix.com/25-ssh-commands-tricks/)
 
 ## 原理
 
-每台服务器上的每个用户都可以生成本用户的一对 “公私钥”，用户A 将公钥`id_rsa.pub`内容写入到 用户B 的受信任的公钥文件`authorized_keys`里，则用户A使用`ssh userB@hostB`命令登录`hostB`时。用户A 的私钥`id_rsa`与`hostB`中`authorized_keys`的某行内容匹配了，可直接免密登录。
+每台服务器上的每个用户都可以生成本用户的一对 “公私钥”，用户 A 将公钥`id_rsa.pub`内容写入到 用户 B 的受信任的公钥文件`authorized_keys`里，则用户 A 使用`ssh userB@hostB`命令登录`hostB`时。用户 A 的私钥`id_rsa`与`hostB`中`authorized_keys`的某行内容匹配了，可直接免密登录。
 
 如果两台机器分别将公钥，写入到对方的`authorized_keys`里，那么可以互相免密登录，俗称“互信”。
 
@@ -22,7 +22,7 @@ $ /etc/init.d/ssh restart
 $ netstat -tlp                          # 判断ssh是否运行
 $ sudo systemctl restart sshd.service
 $ ssh caokaiyan@192.168.0.103
-$ ssh -t hostA ssh hostB                # 通过 hostB 连接到 hostA 跳板机 
+$ ssh -t hostA ssh hostB                # 通过 hostB 连接到 hostA 跳板机
 ```
 
 ```bash
@@ -45,7 +45,6 @@ ServerAliveInterval 20  # 每 20s 请求下 server 从而保持连接
 ServerAliveCountMax 5   # server 未响应5次 就断开连接
 ```
 
-
 ## 临的公私钥登录
 
 拿到公钥`tmpzale.pub`、私钥`tmpzale.pub`、和 `passphrase` 密码为 `pwd1234`。放到`.ssh`目录下：
@@ -63,7 +62,7 @@ ServerAliveCountMax 5   # server 未响应5次 就断开连接
 
 ```bash
 $ ssh link@10.20.30.40 -i~/.ssh/tmpzale -p9510
-Enter passphrase for key '/home/cky/.ssh/tmpzale': 
+Enter passphrase for key '/home/cky/.ssh/tmpzale':
 ```
 
 这样做每次都需要输入`passphrase`，在一个终端里，可以使用`ssh-agent`来存储公私钥，然后`ssh`直接从`ssh-agent`里取，就不用再输入`passphrase`了。

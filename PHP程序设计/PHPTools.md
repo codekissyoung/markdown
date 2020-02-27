@@ -1,16 +1,9 @@
 # PHP Tools
 
-## PHP Coding Standards Fixer
+## PSR-1 PSR-2 代码格式化
 
-一款将`PHP`代码格式化成 `PSR-1` `PSR-2` 等风格的工具：[官网](https://cs.symfony.com/)
+### VScode 插件 phpfmt PHP formatter
 
-```bash
-$ wget https://cs.symfony.com/download/php-cs-fixer-v2.phar -O php-cs-fixer
-$ sudo chmod a+x php-cs-fixer
-$ sudo mv php-cs-fixer /usr/local/bin/php-cs-fixer
-$ sudo php-cs-fixer self-update
-$ php-cs-fixer fix /path/to/dir
-$ php-cs-fixer fix /path/to/file
-```
+![](https://img.codekissyoung.com/2020/02/28/e148ae9fd3b2e4374ca0b26a4a757d17.png)
 
-## 
+### PhpStorm

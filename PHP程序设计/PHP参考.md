@@ -282,7 +282,7 @@ function expectMyclass(Myclass $obj){
 }
 ```
 
-## 不可逆加密　 md5 散列值，sha1 散列值
+## 不可逆加密 md5 散列值，sha1 散列值
 
 ```php
 echo  md5("hehexiix23");

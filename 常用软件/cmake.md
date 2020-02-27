@@ -4,9 +4,9 @@
 
 ## 概述
 
-### cmake是什么
+### cmake 是什么
 
-`cmake`是一款优秀的工程构建工具。KDE开发者在使用了近10年`autotools`之后，终于决定为`KDE4`选择一个新的工程构建工具。
+`cmake`是一款优秀的工程构建工具。KDE 开发者在使用了近 10 年`autotools`之后，终于决定为`KDE4`选择一个新的工程构建工具。
 
 特点:
 
@@ -19,7 +19,7 @@
 - 支持机器字节序以及其他硬件特性问题的测试
 - 在大部分平台下支持并行构建和自动生成文件依赖
 
-### 为什么选用cmake
+### 为什么选用 cmake
 
 为什么不用`autotools`?
 
@@ -197,7 +197,7 @@ PROJECT(PROJECT_ONE)
 add_executable(main main.c mod1/mod1.c mod1/mod1_func.c) # 指明需要的源代码文件就好
 ```
 
-### 将mod1模块作为动态库
+### 将 mod1 模块作为动态库
 
 对于上述文件，如果想让`mod1`独立编译，然后再链接进入可执行文件。则需要做出的修改如下:
 
@@ -228,7 +228,7 @@ target_link_libraries(main mod1)    # 链接 mod1
 add_library(mod1 SHARED mod1.c mod1_func.c) # 生成动态库 libmod1.so
 ```
 
-### mod1依赖静态库mod2
+### mod1 依赖静态库 mod2
 
 ```bash
 .
@@ -292,7 +292,7 @@ target_link_libraries(mod1 mod2) # 将 libmod2.a 链接进入 libmod1.so 中
 add_library(mod2 STATIC mod2.c) # 生成静态库 libmod2.a
 ```
 
-思考下下列4种依赖关系:
+思考下下列 4 种依赖关系:
 
 ```bash
 main -> libmod1.so -> libmod2.a
@@ -358,7 +358,7 @@ install(TARGETS mod2 LIBRARY DESTINATION lib)  # 安装到 usr/lib
 install(FILES mod2.h DESTINATION include/mod2) # 安装到 usr/include/mod2
 ```
 
-### 添加一个Find模块
+### 添加一个 Find 模块
 
 其实纯粹依靠`cmake`本身提供的基本指令来管理工程是一件非常复杂的事情，所以`cmake`设计成了可扩展的架构，可以通过编写一些通用的模块来扩展`cmake`。这便是`Finder`功能，对于`linux`里一些常用的内置库，`cmake`也预先提供了这样模块，比如`FindCURL`、`FindCurses`、`FindImageMagick`模块。在`CMakeLists.txt`里的使用如下:
 
@@ -613,7 +613,7 @@ cd release && cmake -DCMAKE_BUILD_TYPE=release .. # 进入release目录，执行
 make && ./main                                    # 编译，然后运行
 ```
 
-### 总结ONE_PROJECT项目
+### 总结 ONE_PROJECT 项目
 
 ```bash
 .
@@ -809,4 +809,4 @@ message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASE = " ${CMAKE_STATIC_LINKER_FLAG
 
 - [CMake 入门实战](http://www.hahack.com/codes/cmake/)
 - [CMake Official Tutorial——教程还是官方的好](https://www.cnblogs.com/Xiaoyan-Li/p/5674747.html)
-- [cmake教程 基本语法](https://blog.csdn.net/luanpeng825485697/article/details/81202136)
+- [cmake 教程 基本语法](https://blog.csdn.net/luanpeng825485697/article/details/81202136)

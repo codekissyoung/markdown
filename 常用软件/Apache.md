@@ -1,4 +1,4 @@
-# Apache服务器
+# Apache 服务器
 
 ## apache https 配置
 
@@ -25,7 +25,7 @@
 └── www.dadishe.com.zip
 ```
 
-### 开启Apache ssl mod
+### 开启 Apache ssl mod
 
 ```bash
 ➜ apache2 apache2 -v
@@ -63,7 +63,7 @@ Module ssl already enabled
 
 ## Apache 虚拟主机配置
 
-### 1、在主配置文件中中包含Apache vitualHost模块
+### 1、在主配置文件中中包含 Apache vitualHost 模块
 
 ```conf
 Include conf/extra/httpd-vhosts.conf #apache2.2配置
@@ -74,7 +74,7 @@ IncludeOptional sites-enabled/*.conf #ubuntu apache2.4配置
 
 ![这里写图片描述](http://img.blog.csdn.net/20150914111258795)
 
-### 3、开启分布式文件.htaccess可重写
+### 3、开启分布式文件.htaccess 可重写
 
 ```conf
 AllowOverride  All # 主要是实现网站单入口访问！
@@ -84,18 +84,18 @@ AllowOverride  All # 主要是实现网站单入口访问！
 
 ![000-default 文件配置](http://img.blog.csdn.net/20150430120333283)
 
-### url重写
+### url 重写
 
 ```conf
-http://www.example.com/USA/California/San_Diego  
+http://www.example.com/USA/California/San_Diego
 “/USA/California/San_Diego” 是能够Rewrite的字符串！
-重写：就是实现URL的跳转和隐藏真实地址，基于Perl语言的正则表达式规范。平时帮助我们实现拟静态，拟目录，域名跳转，防止盗链等 
+重写：就是实现URL的跳转和隐藏真实地址，基于Perl语言的正则表达式规范。平时帮助我们实现拟静态，拟目录，域名跳转，防止盗链等
 ```
 
 ### .htaccess
 
 ```conf
-RewriteEnine on 
+RewriteEnine on
 RewriteRule  ^/t_(.*).html$  /test.php?id = $1
 #当访问任何以t_开头，以.html结尾的文件时，将$1用与(.*)匹配的字符替换后，访问相应的test.php页面
 RewriteRule ^/test([0-9]*).html$ /test.php?id=$1
@@ -105,7 +105,7 @@ RewriteCond %{HTTP_HOST} !^www.163.com [NC]
 RewriteRule ^/(.*) http://www.163.com/ [L]
 ```
 
-### Apache Rewrite规则修正符
+### Apache Rewrite 规则修正符
 
 ```conf
 1) R 强制外部重定向
@@ -123,38 +123,46 @@ RewriteRule ^/(.*) http://www.163.com/ [L]
 12) NE 不在输出转义特殊字符 \%3d$1 等价于 =$1
 ```
 
-
-
-
 # apache 相关的
+
 http://blog.csdn.net/u013178760/article/details/45393183    Apache 2.4 Rewrite 模块
 http://blog.csdn.net/u013178760/article/details/48436777    Apache2 虚拟主机配置
 
-# 安装apache
+# 安装 apache
+
 ```bash
 sudo apt-get install apache2
 ```
+
 # 开启和关闭模块
+
 ```bash
 sudo a2enmod rewrite #启用rewrite模块 
 sudo a2dismod rewrite #禁用rewrite模块
 ```
+
 # 开启和关闭站点
+
 ```bash
 sudo a2ensite sitename ＃启用站点 
 sudo a2dissite sitename ＃停用站点
 ```
+
 # 允许使用.htaccess
+
 ```bash
 AllowOverride None 改为 AllowOverride  All
 ```
-# 重启|开启｜关闭apache 
+
+# 重启|开启｜关闭 apache 
+
 ```bash
 sudo service apache2 restart|start|stop             重启|开启｜关闭apache 
 sudo  /etc/init.d/apache2 restart|start|stop     　　重启｜开启｜关闭apache
 ```
 
-## url重写
+## url 重写
+
 ```bash
 http://www.example.com/USA/California/San_Diego  
 “/USA/California/San_Diego” 是能够Rewrite的字符串！
@@ -170,7 +178,8 @@ RewriteRule ^/test([0-9]*).html$ /test.php?id=$1RewriteRule ^/new([0-9]*)/$ /new
 RewriteCond %{HTTP_HOST} !^www.163.com [NC]RewriteRule ^/(.*) http://www.163.com/ [L]
 ```
 
-## Apache Rewrite规则修正符
+## Apache Rewrite 规则修正符
+
 ```bash
 1) R 强制外部重定向
 2) F 禁用URL,返回403HTTP状态码。
@@ -232,11 +241,12 @@ AllowOverride None      不允许 .htaccess 重写这个目录，改为 All �
 </Directory>
 ```
 
-## 安装并配置apache2.4
+## 安装并配置 apache2.4
 
 ```bash
 sudo apt-get install apache2
 ```
+
 ```
 sudo vim /etc/apache2/apache2.conf
     // 将 <Directory /var/www/>

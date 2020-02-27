@@ -42,11 +42,11 @@ svn revert file/path 回退对某一个文件／目录的修改
 svn revert -R path   递归回退
 ```
 
-一般的使用场景: `svn add`了但未提交的，不小心修改但未提交的，不小心删除的在版本库里的文件
+一般的使用场景: `svn add`了但未提交的，不小心  修改但未提交的，不小心删除的在版本库里的文件
 
 ## 添加忽略文件
 
-svn忽略文件的原理是，在当前文件夹设置忽略属性，设置命令如下：
+svn 忽略文件的原理是，在当前文件夹设置忽略属性，设置命令如下：
 
 ```svn
 svn propedit svn:ignore .
@@ -59,7 +59,6 @@ PS：文本编辑器一般是使用`linux`系统的默认编辑器。 如果需�
 ```bash
 export SVN_EDITOR=vim
 ```
-
 
 ## 副本的文件添加到版本控制
 
@@ -111,7 +110,7 @@ svn lock -m “lock test file“ [--force] test.php
 svn unlock test.php
 ```
 
-## 更新到1920版本
+## 更新到 1920 版本
 
 ```bash
 svn update -r1920 test.php
@@ -145,6 +144,6 @@ svn resolved  path: 移除工作副本的目录或文件的“冲突”状态。
 注意: 本子命令不会依语法来解决冲突或是移除冲突标记；它只是移除冲突的相关文件，然后让 PATH 可以再次提交。
 ```
 
-svn 分为server 和 client , client 从server copy 副本，commit 修改，update 更新，并且形成日志！
-svn 监听3690端口
-svn 可以是单独svnserver（svn://协议访问） ,也可以是 apache 插件 (http://访问)
+svn 分为 server 和 client , client 从 server copy 副本，commit 修改，update 更新，并且形成日志！
+svn 监听 3690 端口
+svn 可以是单独 svnserver（svn://协议访问） ,也可以是 apache 插件 (http://访问)

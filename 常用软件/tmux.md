@@ -1,4 +1,4 @@
-# Tmux 
+# Tmux
 
 ## 安装
 
@@ -6,15 +6,15 @@
 
 ## 基础使用
 
-- `tmux attach-session -t session_name` 选择tmux
-- `tmux new-session -s session-name` 新建tmux
-- `tmux kill-session -t session-name` 删除tmux
-- `tmux ls` 显示已有tmux会话
+- `tmux attach-session -t session_name` 选择 tmux
+- `tmux new-session -s session-name` 新建 tmux
+- `tmux kill-session -t session-name` 删除 tmux
+- `tmux ls` 显示已有 tmux 会话
 
 ## 横向和纵向分割窗口
 
-- `Ctrl b % ` 纵向分割
-- `Ctrl b " ` 横向分割
+- `Ctrl b %` 纵向分割
+- `Ctrl b "` 横向分割
 - `Ctrl b 方向健` 进入该窗口
 - `exit` 命令直接关掉该窗口
 
@@ -32,5 +32,5 @@
 
 ## 资源
 
-- [Tmux使用初体验](http://blog.chinaunix.net/uid-26285146-id-3252286.html)
-- [如何使用Tmux提高终端环境下的效率](http://os.51cto.com/art/201410/453671.htm)
+- [Tmux 使用初体验](http://blog.chinaunix.net/uid-26285146-id-3252286.html)
+- [如何使用 Tmux 提高终端环境下的效率](http://os.51cto.com/art/201410/453671.htm)

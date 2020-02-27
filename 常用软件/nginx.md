@@ -11,7 +11,7 @@ cky@codekissyoung2:~$ sudo lsof -i:80   # 检测是否启动
 cky@cky-pc:/etc/nginx$ tree -L 1
 .
 ├── conf.d                  # 一般性的配置文件
-├── fastcgi.conf            # FastCGI 配置文件 
+├── fastcgi.conf            # FastCGI 配置文件
 ├── fastcgi_params          # FastCGI 默认参数
 ├── mime.types              # 资源的媒体类型相关配置
 ├── modules-available
@@ -24,9 +24,9 @@ cky@cky-pc:/etc/nginx$ tree -L 1
 ├── snippets
 ```
 
-## Ubuntu下彻底删除Nginx，重新安装
+## Ubuntu 下彻底删除 Nginx，重新安装
 
-如果自己手动删除Nginx后，删除`/etc/nginx`目录后，或者其他相关文件后，再次重装，可能会发生安装不上的问题，所以要 **完全清理**,以下是方法
+如果自己手动删除 Nginx 后，删除`/etc/nginx`目录后，或者其他相关文件后，再次重装，可能会发生安装不上的问题，所以要 **完全清理**,以下是方法
 
 ```bash
 # 1. 关闭Nginx进程
@@ -38,7 +38,7 @@ sudo apt-get --purge remove nginx-common
 sudo apt-get --purge remove nginx-core
 ```
 
-## 编译安装Nginx
+## 编译安装 Nginx
 
 ```bash
 # 安装依赖
@@ -66,11 +66,11 @@ WINCH 从容关闭工作进程
 
 ## Nginx 平滑升级
 
-- 将`./sbin/nginx`旧版本备份成`./sbin/nginx.2018.10.09`,然后将新编译好的nginx版本移入`./sbin`
+- 将`./sbin/nginx`旧版本备份成`./sbin/nginx.2018.10.09`,然后将新编译好的 nginx 版本移入`./sbin`
 - 执行`sudo kill -USR2 旧版本的Nginx主进程号`
-- 旧版本Nginx的主进程将重新命名它的`.pid`文件为`.pid.oldbin`,然后执行新版本的Nginx可执行程序，依次启动新的主进程和新的工作进程
-- 此时新、旧版本的Nginx实例会同时运行，共同处理输入的请求，要逐步停止旧版本的Nginx实例，必须发送`WINCH`信号给旧的主进程，平滑关闭它,命令为`sudo kill -WINCH 旧版本Nginx主进程号`
-- 一段时间后，旧的工作进程处理了所有已连接的请求后退出，仅由新的Nginx工作进程来处理输入的请求了
+- 旧版本 Nginx 的主进程将重新命名它的`.pid`文件为`.pid.oldbin`,然后执行新版本的 Nginx 可执行程序，依次启动新的主进程和新的工作进程
+- 此时新、旧版本的 Nginx 实例会同时运行，共同处理输入的请求，要逐步停止旧版本的 Nginx 实例，必须发送`WINCH`信号给旧的主进程，平滑关闭它,命令为`sudo kill -WINCH 旧版本Nginx主进程号`
+- 一段时间后，旧的工作进程处理了所有已连接的请求后退出，仅由新的 Nginx 工作进程来处理输入的请求了
 
 ## 配置
 
@@ -145,7 +145,7 @@ server{
     location ~ /\.ht { # 禁止访问 .htxxx 文件
         deny all;
     }
-    
+
     location /NginxStatus { # 设定查看Nginx状态的地址
         stub_status            on;
         access_log             on;
@@ -155,7 +155,6 @@ server{
 }
 ```
 
-
 `Ubuntu18.04`默认的`nginx`中`Server`的配置参考，隐藏`index.php`并且带`PATHINFO`解析：
 
 ```conf
@@ -164,11 +163,11 @@ server {
     server_name     www.ci.com;
     root            /home/cky/workspace/tp;
     index           index.php index.html;
-    rewrite_log     on; 
+    rewrite_log     on;
 
     # url重写: host/welcome/deal => host/index.php/welcome/deal
-    location / { 
-        if ( !-e $request_filename ) { 
+    location / {
+        if ( !-e $request_filename ) {
             rewrite ^/(.*)$ /index.php/$1 last;
             break;
         }
@@ -178,7 +177,7 @@ server {
         include                     snippets/fastcgi-php.conf;  # pathinfo 生效
         fastcgi_param               SCRIPT_FILENAME     $document_root$fastcgi_script_name;
         include                     fastcgi_params;
-    }   
+    }
 }
 ```
 
@@ -191,8 +190,8 @@ server {
     index        index.php index.html index.htm;
     root         /home/cky/workspace/tp322;
     rewrite_log         on;
-    location / { 
-        if ( !-e $request_filename ) { 
+    location / {
+        if ( !-e $request_filename ) {
             rewrite ^/(.*)$ /index.php/$1 last;
             break;
         }
@@ -208,8 +207,7 @@ server {
 }
 ```
 
-
-## 负载均衡时nginx http配置
+## 负载均衡时 nginx http 配置
 
 ```nginx
 #设定http服务器，利用它的反向代理功能提供负载均衡支持
@@ -275,7 +273,6 @@ http {
      }
 }
 ```
-
 
 ```
 #设定负载均衡的服务器列表

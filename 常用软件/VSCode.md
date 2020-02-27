@@ -6,12 +6,12 @@
 
 ```json
 {
-    "editor.fontFamily": "ubuntu mono",
-    "markdown.preview.fontFamily": "'Ubuntu mono', 'Droid Sans', sans-serif",
-    "editor.detectIndentation": false,
-    "window.titleBarStyle":"custom", // 去掉难看的系统标题栏
-    "editor.fontSize": 16,  // 编辑器字体大小
-    "window.zoomLevel": 1   // 系统界面缩放
+  "editor.fontFamily": "ubuntu mono",
+  "markdown.preview.fontFamily": "'Ubuntu mono', 'Droid Sans', sans-serif",
+  "editor.detectIndentation": false,
+  "window.titleBarStyle": "custom", // 去掉难看的系统标题栏
+  "editor.fontSize": 16, // 编辑器字体大小
+  "window.zoomLevel": 1 // 系统界面缩放
 }
 ```
 
@@ -23,25 +23,21 @@
 
 ```json
 {
-    "name":"markdown博客",
-    "protocol": "sftp",
-    "host": "101.200.144.41",
-    "username": "cky",
-    "port": 22,
-    "interactiveAuth": true,
-    "remotePath": "/home/cky/workspace/markdown",
-    "uploadOnSave": true,
-    "privateKeyPath": "/Users/iqingyi/.ssh/id_rsa",
-    "watcher": {
-        "files": "**/*",
-        "autoUpload": true,
-        "autoDelete": true
-    },
-    "ignore": [
-        ".vscode",
-        ".git",
-        ".DS_Store"
-    ]
+  "name": "markdown博客",
+  "protocol": "sftp",
+  "host": "101.200.144.41",
+  "username": "cky",
+  "port": 22,
+  "interactiveAuth": true,
+  "remotePath": "/home/cky/workspace/markdown",
+  "uploadOnSave": true,
+  "privateKeyPath": "/Users/iqingyi/.ssh/id_rsa",
+  "watcher": {
+    "files": "**/*",
+    "autoUpload": true,
+    "autoDelete": true
+  },
+  "ignore": [".vscode", ".git", ".DS_Store"]
 }
 ```
 
@@ -51,4 +47,6 @@
 
 安装好后，可以考虑将 `editor.formatOnSave` 设置为`true`。
 
+## 其他代码格式化工具
 
+![](https://img.codekissyoung.com/2020/02/28/04c68600fd6679a6450566c68535d327.png)
