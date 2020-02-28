@@ -38,19 +38,19 @@
 
 在日志里正确显示中文 shell 里执行
 
-```
+```bash
 export LESSCHARSET=utf-8
 ```
 
 中文名称正确显示(utf-8 下) shell 里执行
 
-```
-git config --global core.quotepath false
+```bash
+$ git config --global core.quotepath false
 ```
 
 ## .gitignore
 
-```
+```bash
 # no .a files
 *.a
 
@@ -78,7 +78,7 @@ doc/**/*.pdf
 
 ## 新建代码库
 
-```
+```bash
 # 在当前目录新建一个Git代码库
 $ git init
 # 新建一个目录，将其初始化为Git代码库
@@ -89,41 +89,43 @@ $ git clone [url]
 
 ## 本地操作
 
-```
-$ git diff # 查看未暂存的所有修改
-$ git add . #　将所有修改的文件暂存
-$ git reset file # 将暂存区文件撤回,回到修改状态
-$ git checkout -- file ＃　将文件恢复到修改之前,等于是丢弃了对这个文件的修改
-$ git diff --staged # 查看已经暂存起来的变化,同--cached
+```bash
+$ git diff 					# 查看未暂存的所有修改
+$ git add . 				#　将所有修改的文件暂存
+$ git reset file 			# 将暂存区文件撤回,回到修改状态
+$ git checkout file  		# 将文件恢复到修改之前,等于是丢弃了对这个文件的修改
+$ git diff --staged 		# 查看已经暂存起来的变化,同--cached
 $ git commit -m "提交说明"　# 提交暂存区里的文件快照　，产生一个commit
-$ git commit --amend # 将最后一次提交再次提交，最终你只会有一个提交 ，第二次提交将代替第一次提交的结果，重写提交说明
-$ git rm PROJECTS.md # 只从库里移除一个文件,不会物理删除
-$ git rm --cached README  # 想让文件保留在磁盘，但是并不想让 Git 继续跟踪
-$ git mv file_from file_to # 重命名
-$ git log # 查看日志
-$ git log -p -2 # 显示最近两次提交的内容差异
+$ git commit --amend 		# 将最后一次提交再次提交，最终你只会有一个提交 ，第二次提交将代替第一次提交的结果，重写提交说明
+$ git rm PROJECTS.md 		# 只从库里移除一个文件,不会物理删除
+$ git rm --cached README  	# 想让文件保留在磁盘，但是并不想让 Git 继续跟踪
+$ git mv file_from file_to 	# 重命名
+$ git log 					# 查看日志
+$ git log -p -2 			# 显示最近两次提交的内容差异
 ```
 
 ## 远程仓库的使用
 
-```
-$ git remote add [remote_name] git://github.com/codekissyoung/[project-name].git 为本地库添加远程库,并取名为remote_name
-$ git clone https://github.com/codekissyoung/git.git 克隆远程库为本地库，并取名为origin(默认推送的库)
+```bash
+# 为本地库添加远程库,并取名为remote_name
+$ git remote add [remote_name] git://github.com/codekissyoung/[project-name].git 
+$ git clone https://github.com/codekissyoung/markdown.git
 $ git remote -v　# 列出所有的远程库
 $ git remote show [remote-name] # 查看一个远程库的详细信息
-$ git push -u origin master # 将当前分支与远程origin库的master分支关联起来
-$ git branch -a　# 列出所有分支，包括远程和本地的
-$ git fetch --all # 将全部远程仓库的更新获取到本地
-$ git merge origin/master # 当前分支合并远程分支
-$ git push origin test # 将当前分支推送到origin的test分支,如果远程库没有该分支，则创建
-$ git remote rm git_test 删除远程仓库
+$ git push -u origin master		# 将当前分支与远程origin库的master分支关联起来
+$ git branch -a　				# 列出所有分支，包括远程和本地的
+$ git fetch --all 				# 将全部远程仓库的更新获取到本地
+$ git merge origin/master 		# 当前分支合并远程分支
+$ git push origin test 			# 将当前分支推送到origin的test分支,如果远程库没有该分支，则创建
+$ git remote rm git_test 		# 删除远程仓库
 $ git remote rename [remote_name] [new_remote_name] 修改远程库名字
-$ git checkout branch_name # 切换到某一分支　，若该分支为远程分支,则以该分支为基础，在本地新建一个与之同名的分支，并设置为跟踪该远程分支　
+# 切换到某一分支，若该分支为远程分支,则以该分支为基础，在本地新建一个与之同名的分支，并设置为跟踪该远程分支　
+$ git checkout branch_name 					 
 $ git branch --set-upstream-to=github/master # 设置当前分支跟踪远程的github/master分支
-$ git checkout -b newBrach origin/master # 在origin/master的基础上，创建一个新分支
+$ git checkout -b newBrach origin/master 	 # 在origin/master的基础上，创建一个新分支
 ```
 
-## git commit 　产生的对象(commit 对象　 tree 对象 blob 快照对象)
+## git commit 产生的对象(commit 对象　 tree 对象 blob 快照对象)
 
 ![分支](https://git-scm.com/book/en/v2/book/03-git-branching/images/commit-and-tree.png)
 
@@ -152,6 +154,7 @@ http://blog.csdn.net/wangjia55/article/details/8802490
 ## 一个牛逼的 git 分支模型的使用
 
 http://www.oschina.net/translate/a-successful-git-branching-model
+
 查看附件,有模型的图
 
 ## git 获取远程分支
@@ -159,8 +162,8 @@ http://www.oschina.net/translate/a-successful-git-branching-model
 通过`Git clone` 获取的远端 git 库，只包含了远端 git 库的当前工作分支。
 如果想获取其它分支信息，需要使用`git branch –r`来查看， 如果需要将远程的其它分支代码也获取过来，可以使用命令：
 
-```
-git checkout -b 本地分支名 远程分支名
+```bash
+$ git checkout -b 本地分支名 远程分支名
 ```
 
 其中，远程分支名为`git branch –r`所列出的分支名， 一般是诸如`origin/分支名`的样子
