@@ -14,39 +14,7 @@
 
 ## git 配置
 
-- `git config --global user.name "John Doe"`　写的文件：`~/.gitconfig` 或 `~/.config/git/config`
-- `git config user.name "codekissyoung"` 写的文件`项目目录/.git/config`
-- `git config --global core.editor vim` 设置默认编辑器
 - `git config --list` 列出当前库所有配置选项，配置变量会重复，值取最后获取到的
-
-## 给自己的项目设置 git 参数`.git/config`
-
-```
-➜  ~ cat ~/.gitconfig
-[user]
-	email = cky951010@163.com
-	name = caokaiyan
-[push]
-	default = simple
-[alias]
-	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-[core]
-	quotepath = false # 支持中文文件名
-```
-
-## 中文支持
-
-在日志里正确显示中文 shell 里执行
-
-```bash
-export LESSCHARSET=utf-8
-```
-
-中文名称正确显示(utf-8 下) shell 里执行
-
-```bash
-$ git config --global core.quotepath false
-```
 
 ## .gitignore
 
@@ -108,7 +76,7 @@ $ git log -p -2 			# 显示最近两次提交的内容差异
 
 ```bash
 # 为本地库添加远程库,并取名为remote_name
-$ git remote add [remote_name] git://github.com/codekissyoung/[project-name].git 
+$ git remote add [remote_name] git://github.com/codekissyoung/[project-name].git
 $ git clone https://github.com/codekissyoung/markdown.git
 $ git remote -v　# 列出所有的远程库
 $ git remote show [remote-name] # 查看一个远程库的详细信息
@@ -120,7 +88,7 @@ $ git push origin test 			# 将当前分支推送到origin的test分支,如果�
 $ git remote rm git_test 		# 删除远程仓库
 $ git remote rename [remote_name] [new_remote_name] 修改远程库名字
 # 切换到某一分支，若该分支为远程分支,则以该分支为基础，在本地新建一个与之同名的分支，并设置为跟踪该远程分支　
-$ git checkout branch_name 					 
+$ git checkout branch_name
 $ git branch --set-upstream-to=github/master # 设置当前分支跟踪远程的github/master分支
 $ git checkout -b newBrach origin/master 	 # 在origin/master的基础上，创建一个新分支
 ```
@@ -132,15 +100,6 @@ $ git checkout -b newBrach origin/master 	 # 在origin/master的基础上，创�
 ## 分支运用
 
 `git rebase origin/master` 在当前分支上，合并 origin/master
-
-## 别名
-
-```
-$ git config --global alias.co checkout
-$ git config --global alias.br branch
-$ git config --global alias.ci commit
-$ git config --global alias.st status
-```
 
 ## git rebase 变基
 
