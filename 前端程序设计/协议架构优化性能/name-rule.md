@@ -1,126 +1,127 @@
 # 文件夹
-digg      顶
 
-en-us     英文
+digg 顶
 
-zh_tw     繁体中文
+en-us 英文
 
-zh-cn     简体中文
+zh_tw 繁体中文
 
-extend    延伸
+zh-cn 简体中文
 
-install   安装
+extend 延伸
 
-Lang      语言包
+install 安装
 
-Lib       库
+Lang 语言包
 
-mall      商城
+Lib 库
 
-picture   组图
+mall 商城
 
-product   商品
+picture 组图
 
-search    搜索
+product 商品
 
-section   区块
+search 搜索
 
-shop      商店
+section 区块
 
-static    静态
+shop 商店
 
-system    系统
+static 静态
+
+system 系统
 
 templates 模版
 
-tuan      团购
+tuan 团购
 
-ucenter   用户中心
+ucenter 用户中心
 
-upload    上传
+upload 上传
 
-video     视频
+video 视频
 
-vote      投票
+vote 投票
 
 #文件
 
-404.html              404错误页
+404.html 404 错误页
 
-print.html            打印页
+print.html 打印页
 
-header.html           页头
+header.html 页头
 
-footer.html           页脚
+footer.html 页脚
 
-sitemap.html          网站地图
+sitemap.html 网站地图
 
-passport.html         通行证
+passport.html 通行证
 
-rank.html             排行榜
+rank.html 排行榜
 
-roll.html             滚动新闻
+roll.html 滚动新闻
 
-solution.html         解决方案
+solution.html 解决方案
 
-joinus.html           加入我们
+joinus.html 加入我们
 
-partner.html          合作伙伴
+partner.html 合作伙伴
 
-service.html          服务
+service.html 服务
 
-aboutus.html          关于我们
+aboutus.html 关于我们
 
-contact.html          联系我们
+contact.html 联系我们
 
-company.html          公司介绍
+company.html 公司介绍
 
-organization.html     组织结构
+organization.html 组织结构
 
-culture.html          企业文化
+culture.html 企业文化
 
-strategy.html         发展策略
+strategy.html 发展策略
 
-honor.html            公司荣誉
+honor.html 公司荣誉
 
-aptitudes.html        企业资质
+aptitudes.html 企业资质
 
-events.html           大事记
+events.html 大事记
 
-business.html         商务合作
+business.html 商务合作
 
-contract.html         服务条款
+contract.html 服务条款
 
-privacy.html          隐私声明
+privacy.html 隐私声明
 
-CSR.html              企业社会责任
+CSR.html 企业社会责任
 
-news-开头.html         新闻相关
+news-开头.html 新闻相关
 
-article-开头.html      资讯相关
+article-开头.html 资讯相关
 
-picture-开头.html      图片相关
+picture-开头.html 图片相关
 
-photo-开头.html        相册相关
+photo-开头.html 相册相关
 
-product-开头.html      产品相关
+product-开头.html 产品相关
 
-goods-开头.html        商品相关
+goods-开头.html 商品相关
 
-system-开头.html       系统相关
+system-开头.html 系统相关
 
-tag-开头.html          tag相关
+tag-开头.html tag 相关
 
-brand-开头.html        品牌相关
+brand-开头.html 品牌相关
 
-help-开头.html         帮助相关
+help-开头.html 帮助相关
 
-member-开头.html       会员相关
+member-开头.html 会员相关
 
-search-开头.html       搜索相关
-
+search-开头.html 搜索相关
 
 # css 类
+
 current 当前
 
 hover 悬停
@@ -139,11 +140,11 @@ success 成功
 
 error 出错
 
-header　头部
+header 　头部
 
-content　内容
+content 　内容
 
-title　标题
+title 　标题
 
 item 项目（条）
 
@@ -230,7 +231,7 @@ goodsDetail 商品详情
 goodsInfo 商品信息
 tuan 团购
 tuanList 团购列表
-tuanDetail  团购详情
+tuanDetail 团购详情
 tuanInfo 团购信息
 transition 动画
 shadow 阴影

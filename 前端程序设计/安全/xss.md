@@ -1,13 +1,13 @@
 ## HTML ENCODE
 
 - 将HTML标签里的 中括号 ，单引号，引号 之类的特殊字符进行实体字符转换编码
+
 ```php
 fString = replace(fString, ">", "&gt;")
 fString = replace(fString, "<", "&lt;")
 fString = Replace(fString, CHR(32), "&nbsp;")
 fString = Replace(fString, CHR(34), "&quot;")
 ```
-
 
 ## URL ENCODE
 

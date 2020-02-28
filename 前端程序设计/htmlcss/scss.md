@@ -4,7 +4,7 @@
 
 ## 安装
 
-[Sass官方文档](https://sass-lang.com/documentation)
+[Sass 官方文档](https://sass-lang.com/documentation)
 
 ```bash
 # ubuntu 18.04 默认是 2.5 版本，能够满足需求了
@@ -25,13 +25,13 @@ $ sass --watch --style expressed scss/:css/  # 监听文件夹,编译风格为�
 ## Sass 变量
 
 ```scss
-$blue : #1875e7;
-$side : left;
+$blue: #1875e7;
+$side: left;
 div {
-　　　color : $blue
+  　　　color: $blue;
 }
 .rounded {
-　　　　border-#{$side}-radius: 5px; //变量写在#{}之中
+  　　　　border-#{$side}-radius: 5px; //变量写在#{}之中
 }
 ```
 
@@ -57,19 +57,19 @@ div {
 
 减法|加法|乘法|除法：数字之间,颜色之间
 
-除法：`(100px / 2)` 括号是必须的,不加会当做css处理 如`font: 10px/8px;`
+除法：`(100px / 2)` 括号是必须的,不加会当做 css 处理 如`font: 10px/8px;`
 
 字符串： + 链接
 
 ## 程序控制
 
-`@for $i from <start> through <end>` 包含end
+`@for $i from <start> through <end>` 包含 end
 
-`@for $i from <start> to <end>` 不包含end
+`@for $i from <start> to <end>` 不包含 end
 
-`@for $i from 1 through 3 {  .item-#{$i} { width: 2em * $i; } }`
+`@for $i from 1 through 3 { .item-#{$i} { width: 2em * $i; } }`
 
-`@if 条件判断 { ... }  @else { ... }`
+`@if 条件判断 { ... } @else { ... }`
 
 `@while $types > 0 { ... }`
 
@@ -81,16 +81,18 @@ div {
 
 ## @extend
 
-继承类.class或者占位符`%`的样式
+继承类.class 或者占位符`%`的样式
 
 ```scss
-.class1{
-    margin-bottom: 10px;
+.class1 {
+  margin-bottom: 10px;
 }
-%mt5 { margin-top: 5px; }  //占位符只有被@extend调用才产生代码
+%mt5 {
+  margin-top: 5px;
+} //占位符只有被@extend调用才产生代码
 .btn {
-    @extend %mt5;
-    @extend .class1;
+  @extend %mt5;
+  @extend .class1;
 }
 ```
 
@@ -99,24 +101,30 @@ div {
 ```scss
 $properties: (margin, padding);
 @mixin set-value($side, $value) {
-    @each $prop in $properties {
-        #{$prop}-#{$side}: $value;
-    }
+  @each $prop in $properties {
+    #{$prop}-#{$side}: $value;
+  }
 }
 .login-box {
-    @include set-value(top, 14px);
+  @include set-value(top, 14px);
 }
 //编译后
 .login-box {
-    margin-top: 14px;
-    padding-top: 14px;
+  margin-top: 14px;
+  padding-top: 14px;
 }
 
 // 运用插值定义选择器
 @mixin generate-sizes($class, $small, $medium, $big) {
-    	.#{$class}-small { font-size: $small; }
-    	.#{$class}-medium { font-size: $medium; }
-    	.#{$class}-big { font-size: $big; }
+  .#{$class}-small {
+    font-size: $small;
+  }
+  .#{$class}-medium {
+    font-size: $medium;
+  }
+  .#{$class}-big {
+    font-size: $big;
+  }
 }
 @include generate-sizes("header-text", 12px, 20px, 40px);
 
@@ -125,34 +133,34 @@ $margin-big: 40px;
 $margin-medium: 20px;
 $margin-small: 12px;
 @mixin set-value($size) {
-    margin-top: $margin-#{$size};
+  margin-top: $margin-#{$size};
 }
 .login-box {
-    @include set-value(big);
+  @include set-value(big);
 }
 
 // 插值不能用于mixin
 @mixin updated-status {
-    	margin-top: 20px;
-    	background: #F00;
+  margin-top: 20px;
+  background: #f00;
 }
 $flag: "status";
 .navigation {
-    @include updated-#{$flag};
+  @include updated-#{$flag};
 }
 
 // 插值可以用于 % 和 @extend
 %updated-status {
-    	margin-top: 20px;
-    	background: #F00;
+  margin-top: 20px;
+  background: #f00;
 }
 .selected-status {
-    font-weight: bold;
+  font-weight: bold;
 }
 $flag: "status";
 .navigation {
-    @extend %updated-#{$flag};
-    @extend .selected-#{$flag};
+  @extend %updated-#{$flag};
+  @extend .selected-#{$flag};
 }
 ```
 
@@ -186,12 +194,12 @@ map 的使用
 
 ```scss
 $map: (
-    	key1: value1,
-    	 key2: (
-        	 key-1: value-1,
-        	 key-2: value-2,
-    	 ),
-    	 key3: value3
+  key1: value1,
+  key2: (
+    key-1: value-1,
+    key-2: value-2
+  ),
+  key3: value3
 );
 ```
 
@@ -214,28 +222,37 @@ $map: (
 
 ## @ 规则
 
-`@import "colors";` 引入 _colors.scss 文件,但不会被编译为colors.css文件,因为有下划线
+`@import "colors";` 引入 \_colors.scss 文件,但不会被编译为 colors.css 文件,因为有下划线
 `@media` 媒体查询,暂时不了解
 `@extend` 继承类或占位符
 
 ```scss
 .a {
-    color: red;
-    	.b {
-    	    	color: orange;
-            .c {
-                color: yellow;
-                @at-root .d {            //从多重嵌套里面跳出来,直接到根下面
-                    color: green;
-                }
-            }
+  color: red;
+  .b {
+    color: orange;
+    .c {
+      color: yellow;
+      @at-root .d {
+        //从多重嵌套里面跳出来,直接到根下面
+        color: green;
       }
+    }
+  }
 }
 //编译后
-.a {  color: red; }
-.a .b {  color: orange; }
-.a .b .c {  color: yellow; }
-.d {  color: green; }
+.a {
+  color: red;
+}
+.a .b {
+  color: orange;
+}
+.a .b .c {
+  color: yellow;
+}
+.d {
+  color: green;
+}
 ```
 
 @debug @warn @error 调试用的
@@ -244,8 +261,8 @@ $map: (
 
 ```scss
 $baseLineHeight: 2; //会覆盖掉默认的
-$baseLineHeight: 1.5 !default;     // 设置默认的
-body{
-    line-height: $baseLineHeight;  // 2
+$baseLineHeight: 1.5 !default; // 设置默认的
+body {
+  line-height: $baseLineHeight; // 2
 }
 ```

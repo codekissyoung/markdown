@@ -16,3 +16,9 @@
 rm "/Users/$(whoami)/Library/Application Support/Beyond Compare/registry.dat"
 "`dirname "$0"`"/BCompare.real $@ # 使用脚本启动真正的BCompare执行文件
 ```
+
+## Linux下永久试用
+
+```bash
+/bin/rm -rf /home/link/.config/bcompare/registry.dat
+```

@@ -1,6 +1,6 @@
 # Ubuntu 装机指南
 
-`Ubuntu 18.04` 作为示范机，U盘装机软件 `LinuxLive USB Creator`。
+`Ubuntu 18.04` 作为示范机，U 盘装机软件 `LinuxLive USB Creator`。
 
 ## 制作一个干净的 Ubuntu18.04 Server
 
@@ -21,7 +21,7 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted univer
 deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
 ```
 
-### 2. 更换DNS
+### 2. 更换 DNS
 
 换到`DNSPod`的 `PublicDNS` [官方指南](https://support.dnspod.cn/Kb/showarticle/tsid/240/#link2)，`Ubuntu18`的设置操作与指南里不同。
 
@@ -66,7 +66,7 @@ $ scp .ssh/id_rsa.pub link@192.168.1.181:/home/link/id_rsa.pub  # PC 机执行
 # 登录虚拟机，然后执行下面两句
 $ ssh-keygen  # 每复制一个虚拟机，公私钥就得重置下，保证每台机器都不同
 $ cat id_rsa.pub >> .ssh/authorized_keys # 公私钥的重置，不影响 authorized_keys 的值
-$ chmod 600 .ssh/authorized_keys              
+$ chmod 600 .ssh/authorized_keys
 ```
 
 ### 5. 设置时区
@@ -126,12 +126,12 @@ $ sudo vim /etc/netplan/50-cloud-init.yaml        # yaml 文件名可能有不�
 
 ```yaml
 network:
-    ethernets:
-        enp0s3:
-            addresses: [192.168.0.10/24, ]
-            gateway4: 192.168.0.1
-            dhcp4: no
-    version: 2
+  ethernets:
+    enp0s3:
+      addresses: [192.168.0.10/24]
+      gateway4: 192.168.0.1
+      dhcp4: no
+  version: 2
 ```
 
 ```bash
@@ -195,9 +195,9 @@ sudo apt-get install redis-server
 sudo apt-get install php
 ```
 
-## 美化Ubuntu
+## 美化 Ubuntu
 
-[Ubuntu18桌面美化(MacOS Mojave)](https://blog.csdn.net/barbarassa/article/details/97301735)
+[Ubuntu18 桌面美化(MacOS Mojave)](https://blog.csdn.net/barbarassa/article/details/97301735)
 
 护眼软件：
 
@@ -214,7 +214,7 @@ lsb_release -a
 cat /etc/issue
 uname -a
 
-# 安装调试软件 insight 的依赖 
+# 安装调试软件 insight 的依赖
 sudo apt-get install autoconf autogen texinfo zlib1g-dev tcl-dev tk-dev mesa-common-dev
 sudo apt-get install libjpeg-dev libtogl-dev python-dev
 sudo apt-get install flex bison itcl3 itk3 iwidgets4
@@ -308,7 +308,7 @@ sudo add-apt-repository -r ppa:ppsspp/stable 删除ppa源
 sudo aptitude update                         再次更新源
 ```
 
-#### dpkg 管理 Debian软件包
+#### dpkg 管理 Debian 软件包
 
 ```bash
 dpkg -l                         列出系统安装的所有debian包
@@ -336,33 +336,33 @@ make
 sudo checkinstall # 构建debian包并且安装
 ```
 
-## 安装QT
+## 安装 QT
 
-- [QT5.9.5安装包](http://download.qt.io/official_releases/qt/5.9/5.9.5/)
+- [QT5.9.5 安装包](http://download.qt.io/official_releases/qt/5.9/5.9.5/)
 
 ### 截图工具
 
 自带的截图软件，使用 `shift + printscreen` 截图，自动保存到指定文件夹，也挺好的！
 
-[Linux上好用的截图工具 flameshot](https://blog.csdn.net/qq_34347375/article/details/83589772)，这一款是带画笔工具的，非常好用，唯一就是每次都需要选定保存的文件夹。
-[Flameshot一个简洁但功能丰富的截图工具](https://linux.cn/article-10180-1.html)
+[Linux 上好用的截图工具 flameshot](https://blog.csdn.net/qq_34347375/article/details/83589772)，这一款是带画笔工具的，非常好用，唯一就是每次都需要选定保存的文件夹。
+[Flameshot 一个简洁但功能丰富的截图工具](https://linux.cn/article-10180-1.html)
 
 ### 安装企业微信
 
-[Ubuntu16.04/18.04安装企业微信教程](https://blog.svenhetin.com/ubuntu16-04an-zhuang-qi-ye-wei-xin-jiao-cheng/)
+[Ubuntu16.04/18.04 安装企业微信教程](https://blog.svenhetin.com/ubuntu16-04an-zhuang-qi-ye-wei-xin-jiao-cheng/)
 
 ## 解决软件包版本太高问题
 
 - `E:无法修正错误，因为您要求某些软件包保持现状，就是它们破坏了软件包间的依赖关系 解决办法` 就是这个提示
-- 解决办法: [Ubuntu解决包依赖关系](https://blog.csdn.net/newmann/article/details/70149021)
+- 解决办法: [Ubuntu 解决包依赖关系](https://blog.csdn.net/newmann/article/details/70149021)
 - 方案就是使用`aptitude`
   - 执行命令`sudo aptitude install build-essential`
-  - 在展示`1)      build-essential [未安装的]`等保持原样，并且询问 `是否接受该解决方案？[Y/n/q/?]` 时，填入 `n`,表示不接受
-  - 在继续展示 `降级 下列软件包：1)     gcc-7-base [7.3.0-21ubuntu1~16.04 (now) -> 7.3.0-16ubuntu3 (bionic)]`, 并询问`是否接受该解决方案？[Y/n/q/?]`时，填入`Y` 表示接受软件包降级，这样问题就解决了
+  - 在展示`1) build-essential [未安装的]`等保持原样，并且询问 `是否接受该解决方案？[Y/n/q/?]` 时，填入 `n`,表示不接受
+  - 在继续展示 `降级 下列软件包：1) gcc-7-base [7.3.0-21ubuntu1~16.04 (now) -> 7.3.0-16ubuntu3 (bionic)]`, 并询问`是否接受该解决方案？[Y/n/q/?]`时，填入`Y` 表示接受软件包降级，这样问题就解决了
 
-## linux用于完成特定任务的用户
+## linux 用于完成特定任务的用户
 
-- `nobody` `admin` `ftp` ，无密码,无home目录，无shell,主要就是为了运行某些特定的进程，比如 nginx 使用nobody用户来运行
+- `nobody` `admin` `ftp` ，无密码,无 home 目录，无 shell,主要就是为了运行某些特定的进程，比如 nginx 使用 nobody 用户来运行
 
 ## 特殊权限
 
@@ -392,8 +392,8 @@ sudo checkinstall # 构建debian包并且安装
 -rwxr-sr-x 1 root mlocate 39K 11月 18  2014 /usr/bin/mlocate
 ```
 
-- SGID 权限,与 s 权限相同，不同的是，SGID在执行过程中还会得到该程序的用户组的支持
-- 对于设置了SGID权限的目录来说,用户拥有r x权限时，可以进入该目录,用户在此目录下的有效用户变为该目录的用户，创建的文件的所属用户也是该目录的用户
+- SGID 权限,与 s 权限相同，不同的是，SGID 在执行过程中还会得到该程序的用户组的支持
+- 对于设置了 SGID 权限的目录来说,用户拥有 r x 权限时，可以进入该目录,用户在此目录下的有效用户变为该目录的用户，创建的文件的所属用户也是该目录的用户
 - 使用 `chmod g+s file` 来添加此权限
 
 ```bash
@@ -401,20 +401,28 @@ sudo checkinstall # 构建debian包并且安装
 drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
 
 ```
-- SBIT 权限, `--t` ,该权限只对目录有效,用户在该目录下创建的文件或目录，权限默认为`-rw-r--r--`,即只有该用户和root可以删除
-- 使用命令 `chmod o+t /tmp` 来添加此权限
 
+- SBIT 权限, `--t` ,该权限只对目录有效,用户在该目录下创建的文件或目录，权限默认为`-rw-r--r--`,即只有该用户和 root 可以删除
+- 使用命令 `chmod o+t /tmp` 来添加此权限
 
 限制用户进程数
 
-- 在`/etc/security/limits.conf` 文件后面添加上下面代码，限制用户进程数为200
+- 在`/etc/security/limits.conf` 文件后面添加上下面代码，限制用户进程数为 200
 
 ```bash
 *   hard    nproc   200
 ```
 
-### 笔记本fn键问题
+### 笔记本 fn 键问题
 
 按`fn + Esc`切换功能键与`F1~F12`。
 
+### Ubuntu 防火墙
 
+```bash
+$ sudo ufw status
+$ sudo ufw allow 80
+$ sudo ufw allow 443
+$ sudo ufw allow 3306
+$ sudo ufw allow 22
+```

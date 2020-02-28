@@ -1,12 +1,13 @@
-1 能够提供web内容的东西都是web资源，比如一个图片文件，一个图书馆公共网关，因特网搜索引擎。
+1 能够提供 web 内容的东西都是 web 资源，比如一个图片文件，一个图书馆公共网关，因特网搜索引擎。
 
-2 MIME type  ，用于描述并标记web多媒体内容。
-比如：html格式文档由 text/html 标识，ASCII 文本由 text/plain 类型标识，gif ：image/gif ，jpeg 标识：image/jpeg
+2 MIME type ，用于描述并标记 web 多媒体内容。
+比如：html 格式文档由 text/html 标识，ASCII 文本由 text/plain 类型标识，gif ：image/gif ，jpeg 标识：image/jpeg
 
 3 URL 统一资源定位符：方案+服务器地址+ 某个具体资源
 如：http ://www.joes-hardware.com/specials/saw-blade.gif
 
 4 http 方法
+
 ```bash
 GET     得到web资源
 PUT     将来自客户端的数据存储到一个web资源里去
@@ -16,6 +17,7 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 ```
 
 5，http 状态码
+
 ```bash
 100            Continue             收到了客户端的初始部分，请客户端继续
 200            OK                   获取成功
@@ -35,9 +37,10 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 508            GateWay  Timeout     某个网关响应超时了
 ```
 
-6，一张web页面通常不是单个资源，而是一组资源的集合。每个资源都使用一个单独的http请求！
+6，一张 web 页面通常不是单个资源，而是一组资源的集合。每个资源都使用一个单独的 http 请求！
 
 7，http 报文
+
 ```
 请求报文
 请求起始行：GET    /tools.html    HTTP/1.0
@@ -58,6 +61,7 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 ```
 
 8 ，HTTP 网络协议栈
+
 ```
 应用层                 HTTP
 传输层                 TCP
@@ -67,6 +71,7 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 ```
 
 9，http 发送报文前会先建立一条 tcp/ip 链接！
+
 ```
   a. http://www.netscape.com/index.html 通过DNS解析域名对应的 ip 地址和端口
   b. 解析后：http://207.200.83:80/index.html
@@ -76,8 +81,9 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
   c  . 关闭tcp/ip链接 ，浏览器显示文档 !
 ```
 
-10 ， HTTP 协议是基于文本的，人很容易通过 http 协议，与web 服务器对话
+10 ， HTTP 协议是基于文本的，人很容易通过 http 协议，与 web 服务器对话
 使用 telnet 模拟如下
+
 ```bash
 cky@cky-pc:~$ telnet kanjiebao.com 80
 Trying 101.200.172.72...
@@ -106,4 +112,4 @@ Content-Type: text/html; charset=UTF-8
 > GET /index HTTP/1.1
   Host:kanjiebao.com                /*  手写 http 请求报文 ，回车就拿到了响应的报文 ^ V ^ */
   [空行]
-  ```
+```
