@@ -6,7 +6,7 @@
 
 ```bash
 $ sudo cp /usr/share/doc/rsync/examples/rsyncd.conf /etc/rsyncd.conf
-$ sudo systemctl start rsync.service 
+$ sudo systemctl start rsync.service
 ```
 
 ## 配置信息
@@ -26,7 +26,7 @@ log file=/var/log/rsyncd        # rsync 不能正确工作时，需要查看该�
     lock file = /var/lock/rsyncd
     address = 192.168.0.100     # 监听地址
     port 873                    # 监听端口
-    read only = yes             # 只读限定 
+    read only = yes             # 只读限定
     list = yes                  # 客户请求可用模块时，是否列出该模块
     uid = nobody                # 守护进程使用的 uid
     gid = nogroup               # 守护进程使用的 gid
@@ -42,8 +42,8 @@ log file=/var/log/rsyncd        # rsync 不能正确工作时，需要查看该�
 ## 设置忽略文件
 
 ```bash
-exclude = 
-exclude from = 
+exclude =
+exclude from =
 include =
 include from =
 ```

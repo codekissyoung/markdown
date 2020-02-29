@@ -2,7 +2,7 @@
 
 参考 [Ubuntu 装机指南](https://blog.codekissyoung.com/%E5%88%86%E5%B8%83%E5%BC%8F/UbuntuServer)，获得一个干净的`Server`后，下面可以将这个`Server`做成`MySQL`节点。
 
-## 制作Mysql节点
+## 制作 Mysql 节点
 
 ### 1. 安装
 
@@ -14,8 +14,8 @@ $ pgrep -a mysql        # 确认进程运行
 2247 /usr/sbin/mysqld --daemonize --pid-file=/run/mysqld/mysqld.pid
 $ sudo netstat -natp    # 查看监听的端口
 Active Internet connections (servers and established)
-Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
-tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      2247/mysqld     
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      2247/mysqld
 $ sudo lsof -i:3306     # 查看 3306 端口的占用情况
 COMMAND  PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 mysqld  2247 mysql   30u  IPv4  26625      0t0  TCP localhost:mysql (LISTEN)
@@ -30,14 +30,14 @@ $ sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf
 bind-address = 0.0.0.0 # 修改为本句
 
 $ netstat -natp          # 确认下
-tcp6       0      0 :::3306                 :::*                    LISTEN      -     
+tcp6       0      0 :::3306                 :::*                    LISTEN      -
 ```
 
 ### 3. 安全设置
 
 ```bash
 $ sudo mysql_secure_installation
-New password:                           # 随便填，因为没效果 
+New password:                           # 随便填，因为没效果
 Re-enter new password:                  # 随便填，因为没效果
 Remove anonymous users?                 # y 移除匿名用户
 Disallow root login remotely?           # y 不给 root 远程登录权限
@@ -65,12 +65,13 @@ mysql> show character set like '%utf%';
 +---------+------------------+--------------------+--------+
 ```
 
-### 4. 创建一个数据库 xproject 
+### 4. 创建一个数据库 xproject
 
 ```bash
 mysql> create database xproject default charset utf8mb4 collate utf8mb4_general_ci;
 ```
-PS: 使用 `utf8mb4` 和 `utf8mb4_general_ci`，避免一切诡异编码问题 ^_^
+
+PS: 使用 `utf8mb4` 和 `utf8mb4_general_ci`，避免一切诡异编码问题 ^\_^
 
 ### 5. 创建用户 xuser 来管理 xproject 数据库
 
@@ -85,13 +86,13 @@ mysql> flush privileges;
 Query OK, 0 rows affected (0.01 sec)
 ```
 
-### 6. 在PC上验证
+### 6. 在 PC 上验证
 
 ```bash
 $ mysql -h192.168.13.3 -uxuser -p
 ```
 
-## 修改root用户
+## 修改 root 用户
 
 新安装的`mysql-server`的默认用户信息都在`/etc/mysql/debian.cnf`文件里：
 

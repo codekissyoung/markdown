@@ -2,11 +2,11 @@
 
 监控系统`Prometheus`的相关知识。
 
-[使用prometheus_client_php为Prometheus提供数据](https://blog.csdn.net/JackLiu16/article/details/80381210)
-[使用prometheus_client_php对接prometheus监控系统](https://16bh.github.io/2017/07/25/prometheus-on-php/)
-[Prometheus 简单使用及 exporter 开发，使用prometheus_client_php](https://segmentfault.com/a/1190000021314370)
-[使用Prometheus针对自己的服务器采集自定义的参数](https://segmentfault.com/a/1190000021164508?utm_source=tag-newest)
-[从零搭建Prometheus监控报警系统 PushGateWay方式](https://www.cnblogs.com/chenqionghe/p/10494868.html)
+[使用 prometheus_client_php 为 Prometheus 提供数据](https://blog.csdn.net/JackLiu16/article/details/80381210)
+[使用 prometheus_client_php 对接 prometheus 监控系统](https://16bh.github.io/2017/07/25/prometheus-on-php/)
+[Prometheus 简单使用及 exporter 开发，使用 prometheus_client_php](https://segmentfault.com/a/1190000021314370)
+[使用 Prometheus 针对自己的服务器采集自定义的参数](https://segmentfault.com/a/1190000021164508?utm_source=tag-newest)
+[从零搭建 Prometheus 监控报警系统 PushGateWay 方式](https://www.cnblogs.com/chenqionghe/p/10494868.html)
 
 ## 安装
 
@@ -37,18 +37,19 @@ api_http_requests_total{method="POST", handler="/messages"}  // ag.
 
 **指标类型**是由各个`Prometheus Client`提出来区分的。
 
-
 #### Counter 计数器类型
 
 特征：`Value` 大小只增不减
 
 可用的`GO Client API`参考:
+
 ```go
 Inc()           // 将 counter 值加1.
 Add(float64)    // 将指定值加到 counter 值上，如果指定值 < 0 会 panic.
 ```
 
 可用的`PromQL`参考:
+
 ```go
 rate(http_requests_total[5m])   // 通过 rate() 函数获取 HTTP 请求量的增长率
 topk(10, http_requests_total)   // 查询当前系统中，访问量前10的HTTP地址
@@ -59,6 +60,7 @@ topk(10, http_requests_total)   // 查询当前系统中，访问量前10的HTTP
 特征：`Value`可以任意变化，通常用于像温度或者内存使用率这种指标数据
 
 可用的`PromQL`参考:
+
 ```go
 dalta(cpu_temp_celsius{host="zeus"}[2h]) // 计算 CPU 温度在两小时内的差异
 
@@ -124,21 +126,3 @@ http_requests_latency_seconds_histogram_count{path="/",method="GET",code="200",}
 - 如果关注的是一个它的所有`Value`值的一个直方分布图，那也用`PromQL`去查询，算这个时间序列的`Histogram`
 
 纯粹是`Client`为了根据不同的目的查询，区分出来的 “指标类型”。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

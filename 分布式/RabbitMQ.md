@@ -1,6 +1,6 @@
 # RabbitMQ
 
-[RabbitMQ PHP版](https://xiaoxiami.gitbook.io/rabbitmq_into_chinese_php/ying-yong-jiao-cheng/php-ban/3-publish_subscribe.md)
+[RabbitMQ PHP 版](https://xiaoxiami.gitbook.io/rabbitmq_into_chinese_php/ying-yong-jiao-cheng/php-ban/3-publish_subscribe.md)
 
 ## 基础
 
@@ -51,14 +51,14 @@ Setting tags for user "root" to [administrator]
 用户角色`Tag`:
 
 - `administrator`：可登陆管理控制台，可查看所有的信息，并且可以对用户，策略(policy)进行操作
-- `monitoring`：可登陆管理控制台，同时可以查看rabbitmq节点的相关信息(进程数，内存使用情况，磁盘使用情况等)
-- `policymaker`：可登陆管理控制台, 同时可以对policy进行管理。但无法查看节点的相关信息
+- `monitoring`：可登陆管理控制台，同时可以查看 rabbitmq 节点的相关信息(进程数，内存使用情况，磁盘使用情况等)
+- `policymaker`：可登陆管理控制台, 同时可以对 policy 进行管理。但无法查看节点的相关信息
 - `management`：仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理
 - `other`：无法登陆管理控制台，通常就是普通的生产者和消费者
 
 ```bash
-$ sudo rabbitmqctl add_vhost xxx                               # 新建virtual_host 
-$ rabbitmqctl delete_vhost xxx                                   # 撤销virtual_host 
+$ sudo rabbitmqctl add_vhost xxx                               # 新建virtual_host
+$ rabbitmqctl delete_vhost xxx                                   # 撤销virtual_host
 ```
 
 ```bash
@@ -82,12 +82,9 @@ $ sudo rabbitmqctl cluster_status                       # 查看集群内节点�
 $ sudo rabbitmqctl join_cluster 节点@主机名             # 创建集群
 ```
 
-
-## 
-
+##
 
 `Message` : `{ Label, payload }` , `Broker` 根据 `Label` 将 `Message` 分发给不同的 `Consumer`。
-
 
 交换器类型:
 
@@ -97,7 +94,6 @@ direct
 
 topic
 
-
 headers
 
 ```bash
@@ -105,14 +101,14 @@ headers
 return [
     'vendor' => [
         'path' => '../vendor'
-    ],  
+    ],
     'rabbitmq' => [
         'host' => '127.0.0.1',
         'port' => '5672',
         'login' => 'guest',
         'password' => 'guest',
-        'vhost' => '/' 
-    ]   
+        'vhost' => '/'
+    ]
 ];
 ```
 
@@ -170,12 +166,12 @@ list($queue_name, , ) = $channel -> queue_declare("", false, false, true, false 
 
 /*
 $channel->queue_declare('task_queue', false, true, false, false);
- 
+
 echo ' [*] Waiting for messages. To exit press CTRL+C', "\n";
 
 $callback = function($msg) {
-  echo " [x] Received ", $msg->body, "\n";  
-  sleep(substr_count($msg->body, '.')); 
+  echo " [x] Received ", $msg->body, "\n";
+  sleep(substr_count($msg->body, '.'));
   echo " [x] Done", "\n";
   $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
 };
@@ -195,9 +191,3 @@ $channel->close();
 $connection->close();
 
 ```
-
-
-
-
-
-

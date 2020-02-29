@@ -1,4 +1,4 @@
-# Web应用节点 Nginx 版
+# Web 应用节点 Nginx 版
 
 参考 [Ubuntu 装机指南](https://blog.codekissyoung.com/%E5%88%86%E5%B8%83%E5%BC%8F/UbuntuServer)，获得一个干净的`Server`后，下面可以将这个`Server`做成`Web`应用节点。
 
@@ -10,11 +10,11 @@
 $ sudo apt-get install nginx
 $ pgrep -a nginx
 2031 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
-2033 nginx: worker process                           
+2033 nginx: worker process
 2034 nginx: worker process
 $ sudo netstat -natp
-tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      2031/nginx: master  
-tcp6       0      0 :::80                   :::*                    LISTEN      2031/nginx: master  
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      2031/nginx: master
+tcp6       0      0 :::80                   :::*                    LISTEN      2031/nginx: master
 $ sudo lsof -i:80
 nginx   2031     root    6u  IPv4  22976      0t0  TCP *:http (LISTEN)
 nginx   2033 www-data    6u  IPv4  22976      0t0  TCP *:http (LISTEN)
@@ -40,12 +40,12 @@ link@link2:/etc/nginx/sites-available$ sudo cp default db.link.com.conf # 新建
 
 ```conf
 server {
-    listen 80; 
+    listen 80;
     listen [::]:80;
     server_name db.link.com;            # 域名
     root /home/link/phpMyAdmin;         # 代码根目录
     index index.php index.html;         # 入口文件 index.php
-    location / { 
+    location / {
         try_files $uri $uri/ =404;
     }
     location ~ \.php$ {
@@ -56,7 +56,7 @@ server {
 ```
 
 ```bash
-$ sudo ln -s /etc/nginx/sites-available/db.link.com.conf /etc/nginx/sites-enabled/db.link.com.conf 
+$ sudo ln -s /etc/nginx/sites-available/db.link.com.conf /etc/nginx/sites-enabled/db.link.com.conf
 ```
 
 ### 4. 访问验证

@@ -1,4 +1,4 @@
-# PHP节点
+# PHP 节点
 
 在安装完`Nginx`或者`Apache2`后，总是需要安装`PHP`的基础支持软件。
 
@@ -13,7 +13,7 @@ $ php -r "copy('https://install.phpcomposer.com/installer', 'composer-setup.php'
 $ php composer-setup.php
 $ php -r "unlink('composer-setup.php');"
 $ sudo mv composer.phar /usr/local/bin/composer
-$ sudo composer selfupdate                              
+$ sudo composer selfupdate
 ```
 
 配置中国镜像：
@@ -26,17 +26,17 @@ $ composer config -g repo.packagist composer https://packagist.phpcomposer.com
 
 ```json
 {
-    "name": "wx/wx",
-    "description": "a composer package for wx",
-    "authors": [
-        {
-            "name": "caokaiyan",
-            "email": "cky951010@163.com"
-        }
-    ],
-    "require": {
-		"monolog/monolog": "1.0.*"
-	}
+  "name": "wx/wx",
+  "description": "a composer package for wx",
+  "authors": [
+    {
+      "name": "caokaiyan",
+      "email": "cky951010@163.com"
+    }
+  ],
+  "require": {
+    "monolog/monolog": "1.0.*"
+  }
 }
 ```
 
@@ -83,9 +83,9 @@ $logger->info('My logger is now ready');
 ## 安装牛逼的 Laravel 框架
 
 ```bash
-$ sudo apt-get install php7.2-bcmath 
-$ sudo apt-get install php7.2-json 
-$ sudo apt-get install php7.2-mbstring 
+$ sudo apt-get install php7.2-bcmath
+$ sudo apt-get install php7.2-json
+$ sudo apt-get install php7.2-mbstring
 $ sudo apt-get install php7.2-zip
 $ sudo apt-get install php7.2-xml
 $ sudo systemctl restart php7.2-fpm.service
@@ -138,7 +138,3 @@ link@phpServer:~/t1$ tree -L 1
 ![](https://img.codekissyoung.com/2020/01/15/13619d72fb58e1e71168e15d0841b4ee.png)
 
 访问`http://t1.cky.com`看到上图，则安装成功!
-
-
-
-
