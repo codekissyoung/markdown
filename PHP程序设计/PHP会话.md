@@ -1,90 +1,100 @@
+# PHP Session 机制
+
+http 协议是无状态的，对于每个请求，服务端无法区分用户。PHP 为了区分用户，采用了 Session 机制。
+
 ## 概述
 
-http 协议是无状态的，对于每个请求，服务端无法区分用户。php 会话控制就是给了用户一把钥匙(一个加密 session 字符串)，同时这也是用户身份的一个证明，服务端存放了这把钥匙能打开的箱子(数据库，内存数据库或者使用文件做的)，箱子里面装的就是用户的各个变量信息。
+第一次用户通过 HTTP 请求访问时，php 会根据此刻的一些条件(用户 ip，浏览器号，时间等)生成一个 PHPSESSID 字符串。该字符串会写入到 HTTP 返回报文的 Cookie 中：
 
-这把钥匙放在哪儿呢？
-１，url 查询字符串中
-２，浏览器 cookie 中
+![](https://img.codekissyoung.com/2020/02/29/286b496bdd16dc195374d787c83cd0dc.png)
 
-## 传统的 php session 使用
+要完成这个操作，在 PHP 中只需要一句代码：
 
-```
-<?php
-//page1.php 启动一个会话并注册一个变量
+```php
 session_start();
-$_SESSION['user_var'] = "hello,codekissyoung!";
-//这里的可以将$_SESSION理解为用户的箱子，实际的实现是php在服务器端生成的小文件
-?>
 ```
 
-```
-<?php
-//page2.php
+此后，获取到了 PHPSESSID 并且存储到 Cookie 中的浏览器，在每次发送 HTTP 请求中都会带上该 PHPSESSID：
+
+![](https://img.codekissyoung.com/2020/02/29/82ddf07d8905a230aea2c0557d64e3d3.png)
+
+这样，我们的 PHP Server 就有了识别不同用户的能力。
+
+#### Session 存储用户数据
+
+如果想要存储一些个人数据，只需要通过：
+
+```php
+// index.php
 session_start();
-echo $_SESSION['user_var'];//通过钥匙访问自己的箱子内的变量
-$_SESSION['user_var'] = "bey,codekissyoung!";
+$_SESSION['username'] = "link";
 ```
 
+而读取只需要：
+
+```php
+// read.php
+session_start();
+echo $_SESSION['username'];
 ```
-<?php
-//page3.php 销毁钥匙,一般在用户注销时，访问page3.php文件
+
+为了隐私，销毁数据只需要：
+
+```php
+// destroy.php
 session_start();
 session_destroy();
-?>
 ```
 
-提一个问题，钥匙呢？没看见给用户钥匙的操作啊？
-这个操作是 php 背后帮我们做了的，自从你访问 page1.php 程序运行，session_start();这句时，php 会根据此刻的一些条件(用户 ip,浏览器号，时间等)生成一个 PHPSESSID 变量，http response 回客户端后，这个 PHPSESSID 就已经存在你的浏览器 cookie 里了，每次你再次访问这个域名时，该 PHPSESSID 都会发送到服务端。这个 PHPSESSID 就是我这里说的用户钥匙了。
+#### Session 数据实际存储的地方
 
-再一个问题，这个 PHPSESSID 的安全性，它是否容易被窃取，是否容易被伪造，是否容易被篡改？
-使用 Https 可以防止被篡改。不使用 PHPSESSID,而是自己生成一把秘钥给用户可以防止被伪造。至于是否容易被窃取，还真没怎么研究过。比如如果你电脑连着网，黑客入侵你电脑。
+打开`php.ini`配置文件，正常来说，默认配置下 Session 机制数据是存储在文件中的，但是我将它改为了存储在无密码的本地 Redis Server 里：
 
-## 将生成的秘钥存入浏览器 cookie 中
-
-```
-设置cookie
-setCookie('key','value',time()+3600);
-删除cookie
-setCookie('key','',time()-1);
-```
-
-## 实现单点登录:session 共享
-
-单点登录：多个子系统之间共用一套用户验证体系，在其中一处登录，就可以访问所有子系统。
-试想这么一种情景：假设服务器 A 与 B 的 php 环境一致。用户在 服务器 A 上拿到了自己的钥匙，然后他拿着这把钥匙去访问服务器 B,请问服务器 B 认识么？
-很显然不能，服务器 A 生成的钥匙，服务器并不认识。
-解决办法：用户无论访问 A 或 B,生成的钥匙我都存储在 C（同一个数据库，或缓存系统）中，用户再次访问 A 或 B 时，A 和 B 都去问下 C:这个用户的钥匙对么？对的话，用户就可以使用自己存在 A 或者 B 那里的箱子了。
-
-```
-<?php
-session_regenerate_id();//重置　session 　字符
-$session_info=array('uid'=>$uid,'session'=>session_encrypt(session_id().time()));
-//下一步将，$session_info 存到　C 中
-```
-
-提一个问题，钥匙呢？没看见给用户钥匙的操作啊？
-这个操作是 php 背后帮我们做了的，自从你访问 page1.php 程序运行，session_start();这句时，php 会根据此刻的一些条件(用户 ip,浏览器号，时间等)生成一个 PHPSESSID 变量，http response 回客户端后，这个 PHPSESSID 就已经存在你的浏览器 cookie 里了，每次你再次访问这个域名时，该 PHPSESSID 都会发送到服务端。这个 PHPSESSID 就是我这里说的用户钥匙了。
-再一个问题，这个 PHPSESSID 的安全性，它是否容易被窃取，是否容易被伪造，是否容易被篡改？
-使用 Https 可以防止被篡改。不使用 PHPSESSID,而是自己生成一把秘钥给用户可以防止被伪造。
-
-## 将生成的秘钥存入浏览器 cookie 中
-
-```php
-<?php
-setCookie('key','value',time()+3600); //设置cookie
-setCookie('key','',time()-1); // 删除cookie
+```conf
+[Session]
+session.save_handler = redis
+session.save_path = "tcp://127.0.0.1:6379"
+session.use_strict_mode = 0
+session.use_cookies = 1
+session.use_only_cookies = 1
+session.name = PHPSESSID
+session.auto_start = 1
+session.cookie_lifetime = 0
+session.cookie_path = /
+session.cookie_domain =
+session.cookie_httponly = 1
+session.serialize_handler = php
+session.gc_probability = 0
+session.gc_divisor = 1000
+session.gc_maxlifetime = 1440
+session.referer_check =
+session.cache_limiter = nocache
+session.cache_expire = 180
+session.use_trans_sid = 0
+session.sid_length = 26
+session.trans_sid_tags = "a=href,area=href,frame=src,form="
+session.sid_bits_per_character = 5
 ```
 
-## 实现单点登录:session 共享
+来看下数据实际存储时候的样子：
 
-单点登录：多个子系统之间共用一套用户验证体系，在其中一处登录，就可以访问所有子系统。
-试想这么一种情景：假设服务器 A 与 B 的 php 环境一致。用户在 服务器 A 上拿到了自己的钥匙，然后他拿着这把钥匙去访问服务器 B,请问服务器 B 认识么？
-很显然不能，服务器 A 生成的钥匙，服务器并不认识。
-解决办法：用户无论访问 A 或 B,生成的钥匙我都存储在 C（同一个数据库，或缓存系统）中，用户再次访问 A 或 B 时，A 和 B 都去问下 C:这个用户的钥匙对么？对的话，用户就可以使用自己存在 A 或者 B 那里的箱子了。
-
-```php
-<?php
-session_regenerate_id();//重置session
-$session_info=['uid'=>$uid,'session'=>session_encrypt(session_id().time())];
-//下一步将，$session_info 存到　C 中
+```bash
+127.0.0.1:6379> keys *SESSION*
+ 1) "PHPREDIS_SESSION:een87vp13avk7c1epo4dodfvi7"
+ 2) "PHPREDIS_SESSION:3h6v2tau5gp0dpk1uj9cst7jkg"
+ 3) "PHPREDIS_SESSION:1e09v5uk3eb76klkkji5p006ig"
+127.0.0.1:6379> type PHPREDIS_SESSION:06k7lnq7mnshkdq7crjpmem1ol
+string
+127.0.0.1:6379> get PHPREDIS_SESSION:06k7lnq7mnshkdq7crjpmem1ol
+"username|s:4:\"link\";"
 ```
+
+#### Session 共享问题
+
+接着上面的讨论，假如我们不使用本地 Redis,而是所有 PHP Server 共用一个中心 Redis，那么它们的 Session 不就共享了么 ^\_^，用户通过负载均衡过来的请求，无论最后分给哪一个 PHP Server 处理，都能拿到该用户存储在 Session 中的数据。
+
+![](https://img.codekissyoung.com/2020/02/29/494edee80eb7df61267580d82172f72d.png)
+
+#### Session 机制安全性
+
+再一个问题，这个 PHPSESSID 的安全性，它是否容易被窃取，是否容易被伪造，是否容易被篡改？使用 Https 可以防止被篡改。
