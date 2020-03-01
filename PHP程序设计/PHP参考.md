@@ -341,3 +341,82 @@ var_dump(is_callable([$obj,'runtest']));
 $out = `ls -al`;
 var_dump( $out );
 ```
+
+#### ORM
+
+```bash
+abstract class ActiveRecord{
+    protected static $table;
+    protected $fieldvalues;
+    public $queryStr;
+
+    static function findById($id){
+        $query = "select * from " . static::$table . " where id = $id";
+        return self::createDomain($query);
+    }
+
+    public function __get($name){
+        return $this->fieldvalues[$name];
+    }
+
+    static function __callStatic($name, $arguments)
+    {
+        $field = preg_replace('/^findBy(\w*)$/','${1}',$name);
+        $query = "select * from ". static::$table. " where $field = '$arguments[0]'";
+        return self::createDomain($query);
+    }
+
+    private static function createDomain($query){
+        $class = get_called_class();
+        $domain = new $class();
+        $domain -> fieldvalues = [];
+        $domain -> queryStr = $query;
+        // @todo exec query and set it to fieldvalues[]
+        foreach ($class::$fields as $field => $type){
+            $domain->fieldvalues[$field] = "$type to be set";
+        }
+        return $domain;
+    }
+}
+class Customer extends ActiveRecord {
+    protected static $table = 'custdb';
+    protected static $fields = [
+        'id' => 'int',
+        'email' => 'varchar',
+        'lastname' => 'varchar'
+    ];
+}
+class Sales extends ActiveRecord {
+    protected static $table = 'saledb';
+    protected static $fields = [
+        'id' => 'int',
+        'item' => 'varchar',
+        'qty' => 'varchar'
+    ];
+}
+
+echo Customer::findById(123) -> queryStr , PHP_EOL;
+echo Sales::findById(321) -> queryStr , PHP_EOL;
+echo Customer::findById(123) -> email, PHP_EOL;
+echo Customer::findBylastname('Deno court') -> queryStr, PHP_EOL;
+```
+
+#### \_\_call 与 \_\_toString
+
+```php
+class Strings{
+    private $str = '';
+    public function __construct($str){
+        $this -> str = $str;
+    }
+    public function __call($name,$args){
+        $this -> str = call_user_func($name,$this->str);
+        return $this;
+    }
+    public function __toString(){
+        return $this -> str."";
+    }
+}
+$str = new Strings(" I want go die");
+echo $str -> trim() -> strlen();
+```

@@ -1,4 +1,4 @@
-# ThinkPHP 3.2.3框架
+# ThinkPHP 3.2.3 框架
 
 `ThinkPHP`的使用笔记.
 
@@ -10,7 +10,7 @@
 │   ├── Common              # 公共模块 （不能直接访问）
 │   │   ├── Common          # 应用公共函数目录
 │   │   └── Conf            # 应用公共配置文件目录
-│   ├── Home                # 前台 模块目录 (默认会生成的)       
+│   ├── Home                # 前台 模块目录 (默认会生成的)
 │   │   ├── Common          # 函数公共目录
 │   │   ├── Conf            # 配置文件目录
 │   │   ├── Controller      # 控制器目录
@@ -36,7 +36,7 @@ define('APP_DEBUG', TRUE);                  # debug mode
 define('APP_PATH','./Application/');        # apps dir, only one
 define('RUNTIME_PATH', '/tmp/tp-runtime');  # runtime dir, need writable
 define('BIND_CONTROLLER','控制器名称');     # 入口文件绑定默认访问控制器
-define('BIND_ACTION', '动作名称');          # 入口文件绑定默认访问动作  
+define('BIND_ACTION', '动作名称');          # 入口文件绑定默认访问动作
 require './ThinkPHP/ThinkPHP.php';
 ```
 
@@ -86,7 +86,7 @@ namespace 要求为：Home\Controller
 ```
 
 - 大小写敏感，类名 与 文件名 一定要保持一致
-- 函数命名：小写字母 + 下划线  `get_client_ip()`
+- 函数命名：小写字母 + 下划线 `get_client_ip()`
 - 方法命名：小写字母开头 驼峰法 `getUserName()`
 - 私有方法：下划线开头 + 小写字母 + 驼峰法 `_parseType()`
 - 属性、私有属性命名 与 方法、私有方法 一致，`tableName` `_instance`
@@ -136,7 +136,7 @@ Application/当前模块名/Conf/应用状态.php             # 可选
 define('APP_STATUS','dev');                 // index.php
 ```
 
-就会加载以下配置: 
+就会加载以下配置:
 
 ```bash
 Application/Common/Conf/dev.php
@@ -167,7 +167,7 @@ C( ['WEB_SITE_TITLE'=>'ThinkPHP','WEB_SITE_DESCRIPTION'=>'开源PHP框架'] );
 如果在`Application/Common/Conf/config.php`中设置了以下 项目：
 
 ```php
-'LOAD_EXT_CONFIG' => 'user,db', 
+'LOAD_EXT_CONFIG' => 'user,db',
 ```
 
 则会额外加载以下配置：
@@ -181,7 +181,7 @@ Application/当前模块/Conf/db.php
 
 ## 模块化设计
 
-默认以 `PATHINFO` 模式访问应用： 
+默认以 `PATHINFO` 模式访问应用：
 
 ```bash
 http://serverName/index.php/模块/控制器/操作/[参数名/参数值...]
@@ -192,7 +192,6 @@ $ php index.php 模块/控制器/操作/[参数名/参数值...]
 模块：`APP_PATH` 下，一个 `Module` (比如`Home`) 代表一个模块，一个应用下可以有多个模块。
 控制器：`Module`下`Controller`目录下，一个控制器类，代表一个控制器
 操作：控制器类的方法，一个方法 表示 一个操作
-
 
 ## CBD 模式
 
