@@ -2,6 +2,88 @@
 
 `PHP`的反射类。
 
+![](https://img.codekissyoung.com/2020/03/03/99726caed3d4ec64c5777047e0fedc40.png)
+
+## Reflection
+
+```php
+
+class Person
+{
+    public $name;
+    public $gender;
+    public function say(){
+        echo $this->name, " is ", $this->gender, PHP_EOL;
+    }
+
+    public function __set( $name, $value ){
+        echo "Setting $name to $value" , PHP_EOL;
+        $this -> $name = $value;
+    }
+
+    public function __get( $name ) {
+        if ( !isset($this->$name) ){
+            echo "未设置";
+            $this -> $name = "默认值";
+        }
+        return $this->$name;
+    }
+
+    public function __call($name, $args){
+        echo $name, " called ", PHP_EOL;
+    }
+}
+```
+
+```php
+$s = new Person();
+$s -> name = 'Link';
+$s -> gender = 'male';
+$s -> age = 24;
+
+$reflect = new ReflectionObject($s);
+var_dump( $reflect -> getProperties() );
+var_dump( $reflect -> getMethods() );
+var_dump(get_object_vars($s));
+var_dump(get_class_vars(get_class($s)));
+var_dump(get_class_methods(get_class($s)));
+
+$obj = new ReflectionClass('Person');
+print_r( $obj -> getName() );
+print_r( $obj -> getProperties() );
+print_r( $obj -> getMethods() );
+```
+
+使用反射实现动态代理：
+
+```php
+class mysql {
+    function connect( $db ) {
+        echo "connect to db[0]", PHP_EOL;
+    }
+}
+class sqlproxy {
+    private $target;
+    function __construct($tar){
+        $this -> target[] = new $tar();
+    }
+    function __call($name, $args){
+        foreach ($this -> target as $obj) {
+            $r = new ReflectionClass($obj);
+            if( $method = $r -> getMethod($name) ){
+                if( $method -> isPublic() && !$method->isAbstract()) {
+                    echo "before invoke ...", PHP_EOL;
+                    $method->invoke($obj,$args);
+                    echo "after invoke ...", PHP_EOL;
+                }
+            }
+        }
+    }
+}
+$obj = new sqlproxy('mysql');
+$obj -> connect('member');
+```
+
 ## PHP 提供的反射类的相关知识
 
 ```php

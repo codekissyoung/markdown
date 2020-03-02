@@ -302,7 +302,7 @@ convert_uudecode($str);
 convert_uuencode($str);
 ```
 
-#### method_exists 与 is_callable
+### method_exists 与 is_callable
 
 ```php
 class Foo {
@@ -419,4 +419,30 @@ class Strings{
 }
 $str = new Strings(" I want go die");
 echo $str -> trim() -> strlen();
+```
+
+#### trait
+
+```php
+trait Hello {
+    public function sayHello() {
+        echo "get class : " , get_class($this) , PHP_EOL;
+    }
+}
+trait World {
+    public function sayWorld(){
+        echo "world";
+    }
+}
+class MyHelloWorld{
+    use Hello;
+    use World;
+    public function sayMark() {
+        echo " !";
+    }
+}
+$o = new MyHelloWorld();
+$o -> sayHello();
+$o -> sayWorld();
+$o -> sayMark();
 ```
