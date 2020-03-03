@@ -44,7 +44,6 @@ message 异常消息内容
 code 异常代码
 file 抛出异常的文件名
 line 抛出异常在该文件的行数
-
 getTrace() 获取异常追踪信息
 getTraceAsString() 获取异常追踪信息的字符串
 getMessage() 获取出错信息
@@ -99,5 +98,31 @@ try{
 }catch (Exception $e){
     echo $e->getTraceAsString();
     echo PHP_EOL, '其他情况, 统一处理';
+}
+```
+
+```php
+set_error_handler(function ($errno, $errstr, $errfile, $errline){
+    throw new \Exception( "{$errfile} line: {$errline} {$errstr} {$errno}". PHP_EOL );
+}, E_ALL | E_STRICT );
+
+set_exception_handler(function (\Exception $e){
+    echo $e -> getCode();
+    var_dump( $e -> getTrace() );
+
+});
+
+register_shutdown_function(function (){
+    print_r( error_get_last() );
+});
+
+try {
+//    $a = 5 / 0;
+    $a = [];
+    echo $a['abcd'];
+}catch (\Exception $e){
+    echo $e->getMessage();
+} finally {
+    echo "finally done", PHP_EOL;
 }
 ```
