@@ -62,7 +62,7 @@ implode( '-', ['a','b','c'] );       // 以 - 链接成字符串
 extract( $var_array, EXTR_PREFIX_SAME, "ex");
 
 // list构造器　将数组里面的值分别指定给单独变量
-list( $b, $c, $d ) =  array('apple','orange','card');
+list( $b, $c, $d ) =  ['apple','orange','card'];
 echo $b,$c,$d; // apple orange card
 ```
 

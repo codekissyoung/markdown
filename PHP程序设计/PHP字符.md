@@ -18,9 +18,6 @@ strpos($_POST['email'],'@'); // 返回找到的位置
 if(strpos($_POST['email'],'@') === false){
     print 'there was no @ in the e-mail address ';
 }
-
-strlen("codekissyoung"); // 13 字符串长度
-trim('  caokaiyan  ');   // caokaiyan 删除字符串两端空白
 ```
 
 ## 编码转换
