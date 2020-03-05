@@ -2,6 +2,27 @@
 
 本文是`PHP`常用的设计模式的梳理。
 
+## 接口 与 类
+
+```php
+interface Db_adpter{
+    public function connect($config);
+    public function query($query, $handle);
+}
+
+class Mysql implements Db_adpter{
+    private $dblink;
+    public function connect($config){}
+    public function query($query, $handle){}
+}
+
+class SQLite implements Db_adpter{
+    private $dblink;
+    public function connect($config){}
+    public function query($query, $handle){}
+}
+```
+
 ## 工厂模式
 
 使用函数或者类方法生成对象，而不是在代码中直接`new`，使用工厂模式的一个考虑就是，假如在系统中多次使用了这个类`new`对象，如果该类发生改变，那么所有`new`代码都需要改正，但是如果把`new`这一操作封装到工厂方法里，就只需要改工厂里`new`的代码就行了，所有使用到该对象的地方都不用改。
@@ -835,4 +856,158 @@ class Container {
 		$this -> con = clone $this -> contained;
 	}
 }
+```
+
+## Single Responsibiliy Priciple 单一职责原则
+
+```php
+class Cook {
+    public function meal(){ echo "meal done", PHP_EOL;}
+    public function drink(){ echo "drink done",PHP_EOL;}
+    public function ok(){echo "ok",PHP_EOL;}
+}
+
+interface Command{
+    public function execute();
+}
+
+class MealCommand implements Command {
+    private $cook;
+    public function __construct(Cook $cook){
+        $this->cook = $cook;
+    }
+    public function execute(){
+        $this->cook->meal();
+    }
+}
+
+class DrinkCommand implements Command{
+    private $cook;
+    public function __construct(Cook $cook){
+        $this->cook = $cook;
+    }
+    public function execute(){
+        $this->cook->drink();
+    }
+}
+
+class cookControl{
+    private $mealcommand;
+    private $drinkcommand;
+    public function addCommand(Command $meal, Command $drink){
+        $this->mealcommand = $meal;
+        $this->drinkcommand = $drink;
+    }
+    public function callmeal(){
+        $this->mealcommand->execute();
+    }
+    public function calldrink(){
+        $this->drinkcommand->execute();
+    }
+}
+
+$control = new cookControl();
+$cook = new Cook();
+$mealcommand = new MealCommand($cook);
+$drinkcommand = new DrinkCommand($cook);
+$control->addCommand($mealcommand,$drinkcommand);
+$control->callmeal();
+$control->calldrink();
+```
+
+## Interface Segregation Principle 接口隔离原则
+
+## Open Close Principle 开闭原则
+
+```php
+interface process {
+    public function process();
+}
+class playerencode implements process{
+    public function process(){
+        echo "encode", PHP_EOL;
+    }
+}
+class playeroutput implements process{
+    public function process(){
+        echo "output", PHP_EOL;
+    }
+}
+class playProcess{
+    private $message = null;
+    public function __construct(){}
+    public function callback(event $event){
+        $this->message = $event -> click();
+        if($this->message instanceof process){
+            $this->message->process();
+        }
+    }
+}
+class mp4{
+    public function work(){
+        $playProcess = new playProcess();
+        $playProcess -> callback(new event('encode'));
+        $playProcess -> callback(new event('output'));
+    }
+}
+class event{
+    private $m;
+    public function __construct($me){
+        $this->m = $me;
+    }
+    public function click(){
+        switch ($this->m){
+            case 'encode':
+                return new playerencode();
+                break;
+            case 'output':
+                return new playeroutput();
+                break;
+        }
+    }
+}
+$mp4 = new mp4();
+$mp4 -> work();
+```
+
+## 里氏替换原则
+
+## 依赖倒置原则
+
+```php
+interface employee {
+    public function working();
+}
+class teacher implements employee{
+    public function working(){
+        echo "teaching...", PHP_EOL;
+    }
+}
+class coder implements employee{
+    public function working(){
+        echo "coding ...", PHP_EOL;
+    }
+}
+// 依赖 teacher 类
+class workA{
+    public function work(){
+        $teacher = new teacher();
+        $teacher -> working();
+    }
+}
+// 不依赖 teacher 类
+class workB{
+    private $e;
+    public function set(employee $e){
+        $this->e = $e;
+    }
+    public function work(){
+        $this -> e -> working();
+    }
+}
+$a = new workA();
+$a -> work();
+$b = new workB();
+$b -> set(new teacher());
+$b -> work();
 ```

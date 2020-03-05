@@ -189,3 +189,19 @@ class ModuleRunner {
 $test = new ModuleRunner();
 $test -> init();
 ```
+
+### 类反射
+
+为了在不看类内部实现的情况下，深入了解一个类！
+
+```php
+class A{
+    const A = 'i am const A';
+    private $a = "aaa";
+    public function hehe(){
+        echo "heheh";
+    }
+}
+$prod_class = new ReflectionClass('A');
+Reflection::export($prod_class);
+```

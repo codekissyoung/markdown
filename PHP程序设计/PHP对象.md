@@ -2,18 +2,6 @@
 
 本文是`PHP`对象的笔记，也论述了一些`PHP`面向对象实现上的得与失。
 
-## 类常量
-
-- 在类中定义常量,`const STATUS_OUT = 1`,在类外边,使用`类名::常量名`来访问常量
-- `self::CONST_DATA;`访问本类定义的常量,`parent::CONST_DATA;`访问父类定义的常量
-
-## 类的继承
-
-- 关于继承，很重要的一点是，子类要尽量使用父类提供的常量/静态变量/函数，在此基础上拓展子类自身的功能，并且子类要尽量避免给父类传递任何信息
-- 属性一定是针对对象说的，对象内使用 `$this -> name` 访问属性，对象就只能访问自身的属性
-- 静态属性是共享的，在对象内，使用`self::$static` `parent::$static` `类名::$static`其实都是一样的
-- 父类的方法会被子类继承/重写; 在子类中,使用`$this -> func()`访问本类方法，使用`parent::func()`访问父类方法
-
 ## 迟静态绑定
 
 考虑下，子类的两个方法，都是用来实例化自身的，功能相同，只是类不同而已，能不能把它放入`Father`中，然后子类通过继承获取这种能力呢？
@@ -57,7 +45,7 @@ var_dump(Girl::create()); // Object Girl
 `$b = $a` 直接赋值的其实是引用，`$a`与`$b`指向同一个对象。
 `$b = clone $a;` 是克隆一个`$a`对象，`$a` 与 `$b` 分别指向不同的内存地址。
 
-## 魔术方法 (拦截器) (overloader)
+## 魔术方法 拦截器 overloader
 
 ```php
 class Test {
@@ -209,21 +197,7 @@ abstract class MyBaseClass(){
 }
 ```
 
-### 类反射
 
-为了在不看类内部实现的情况下，深入了解一个类！
-
-```php
-class A{
-    const A = 'i am const A';
-    private $a = "aaa";
-    public function hehe(){
-        echo "heheh";
-    }
-}
-$prod_class = new ReflectionClass('A');
-Reflection::export($prod_class);
-```
 
 ### 静态属性和静态方法
 
