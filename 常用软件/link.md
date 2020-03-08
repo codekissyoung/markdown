@@ -195,7 +195,3 @@
 - <http://www.chadvernon.com/blog/resources/directx9/> 入门
 - <https://github.com/gameKnife/Softrenderer> 进阶
 - <https://github.com/gameknife/gkEngine> 进阶
-
-## 破解软件
-
-- [jetbrains 全家桶破解](http://www.i9.org/)
