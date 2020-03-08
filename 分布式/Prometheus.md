@@ -22,7 +22,9 @@ $ prometheus --version
 ```bash
 <metric name>{<label name>=<label value>, ...}
 
-api_http_requests_total{method="POST", handler="/messages"}  // ag.
+api_http_requests_total{method="POST", handler="/messages"} 
+http_request_status{code='200',content_path='/api/path', environment='produment'} 23
+http_request_status{code='200',content_path='/api/path2', environment='produment'} 34
 ```
 
 一个指标，就代表了一个时间序列。
@@ -126,3 +128,39 @@ http_requests_latency_seconds_histogram_count{path="/",method="GET",code="200",}
 - 如果关注的是一个它的所有`Value`值的一个直方分布图，那也用`PromQL`去查询，算这个时间序列的`Histogram`
 
 纯粹是`Client`为了根据不同的目的查询，区分出来的 “指标类型”。
+
+## PromQL
+
+### 匹配标签
+
+#### 完全匹配
+
+```bash
+http_requests_total{instance="localhost:9090"}  # 完全匹配 
+http_requests_total{instance!="localhost:80"}   # 完全排除
+```
+
+#### 正则匹配
+
+```bash
+http_requests_total{environment=~"staging|testing|development"} # 正则匹配
+http_requests_total{environment!~"product"}                     # 正则排除
+```
+
+### 函数
+
+```bash
+sum(http_requests_total)      # 求多个时间序列的瞬时和
+avg(http_requests_total)      # 求多个时间序列的平均值
+rate(http_requests_total[5m]) # 求增长率
+topk(10, http_requests_total) # 访问量前 10 的 HTTP 地址
+delta(cpu_temp_celsius[2h])   # delta = value_now - value_2_hour_ago
+predict_linear(node_filesystem_free{mountpoint="/"}[1h],4 * 3600) # 磁盘在4 hour之后的剩余
+```
+
+### 分组聚合计算
+
+```bash
+# 按照主机查询各个主机的CPU使用率
+sum(sum(irate(node_cpu{mode!='idle'}[5m]))  / sum(irate(node_cpu[5m]))) by (instance)
+```
