@@ -9,6 +9,14 @@ $ rm -rf .GoLand2019.1/config/eval
 $ rm -rf .java/.userPrefs/jetbrains/goland
 ```
 
+如果是在`Windows`下
+
+```bash
+删除目录：C:\Users\<用户>\.WebStorm2019.1\config\eval
+删除文件：C:\Users\<用户>\.WebStorm2019.1\config\options\other.xml
+删除注册表项：HKEY_CURRENT_USER\Software\JavaSoft\Prefs\jetbrains\webstorm
+```
+
 ## 普通设置
 
 #### 关闭单词拼写检查
@@ -26,6 +34,14 @@ $ rm -rf .java/.userPrefs/jetbrains/goland
 ```bash
 fc-list :lang=zh-cn             # ubuntu上查看支持中文的字体有哪些
 ```
+
+## DeployMent
+
+`tools->deployment->configuration`
+
+![](https://img.codekissyoung.com/2020/03/19/fdf0beff94af9453431460f394e7737d.png)
+![](https://img.codekissyoung.com/2020/03/19/94852ab0ad451dbee8cbb6e8175493bb.png)
+![](https://img.codekissyoung.com/2020/03/19/c787b8ee162c31e93928be98d8760c9c.png)
 
 ## Goland
 

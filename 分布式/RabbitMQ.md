@@ -57,8 +57,8 @@ Setting tags for user "root" to [administrator]
 - `other`：无法登陆管理控制台，通常就是普通的生产者和消费者
 
 ```bash
-$ sudo rabbitmqctl add_vhost xxx                               # 新建virtual_host
-$ rabbitmqctl delete_vhost xxx                                   # 撤销virtual_host
+$ sudo rabbitmqctl add_vhost xxx  # 新建virtual_host
+$ rabbitmqctl delete_vhost xxx    # 撤销virtual_host
 ```
 
 ```bash
@@ -190,4 +190,58 @@ var_dump($queue_name);
 $channel->close();
 $connection->close();
 
+```
+
+`send.php`
+
+```php
+require_once __DIR__."/vendor/autoload.php";
+
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
+$conn = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest'); // 链接
+$chan = $conn -> channel(); // 信道
+$chan -> exchange_declare('logs', 'fanout', false, false, false ); // 交换机
+
+$msg = new AMQPMessage('Hello World',['delivery_mode'=>AMQPMessage::DELIVERY_MODE_PERSISTENT]); // 消息
+
+$chan -> basic_publish($msg, 'logs'); // 发送消息到交换机
+
+$chan -> close();
+$conn -> close();
+```
+
+`recv.php`
+
+```php
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
+
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+
+$conn = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest'); // 链接
+$chan = $conn->channel(); // 信道
+
+$chan -> exchange_declare('logs', 'fanout', false, false, false ); // 交换机
+
+list($queue_name, ,) = $chan -> queue_declare(""); // 队列
+
+$chan -> queue_bind($queue_name, 'logs'); // 绑定
+
+// 消费
+$chan -> basic_consume(
+    $queue_name,
+    '',
+    false,
+    true,
+    false,
+    false,
+    function ($msg){
+        echo "received" . $msg->body, PHP_EOL;
+//        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+    });
+while (count($chan->callbacks)){
+    $chan->wait();
+}
 ```
