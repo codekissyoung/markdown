@@ -56,14 +56,14 @@ mov ax, 18      ; ax = 18
 add ax, 8       ; ax = ax + 8
 mov ax, bx      ; ax = bx
 add ax, bx      ; ax = ax + bx
-jmp 2AE3:3      ; 执行后 CS = 2AE3H  IP = 0003H
+jmp 2AE3:3      ; CS = 2AE3H  IP = 0003H
 mov ax,1000H
-jmp ax          ; 执行后 CS 不变，IP = 1000H
+jmp ax          ; IP = ax
 ```
 
 指令是有长度的，一条指令可能占两个字节、三个字节。
 
-`8086 CPU`加电启动后，默认`CS=FFFFH IP=0000H`，即从`FFFF0H`开始读取指令执行，`FFFF0H`处的指令就是`8086 CPU`开机后执行的第一条指令。任意时刻，CPU 都将`CS:IP`指向的内存地址处的二进制信息，当作指令来执行。
+`8086 CPU`加电启动后，默认`CS=FFFFH IP=0000H`，即从`FFFF0H`开始读取指令执行。任意时刻，CPU 都将`CS:IP`指向的内存地址处的二进制信息，当作指令来执行。
 
 ![2019-09-10 18-26-00 的屏幕截图.png](https://img.codekissyoung.com/2019/09/10/8f4a260a2621506e114da563b8f7deb3.png)
 
@@ -89,6 +89,7 @@ mov al,[0]     ; al = ds[0] 传送一个 字节
 mov cx,[0]     ; cx = ds[0] 传送一个 字
 mov [1],al     ; ds[1] = al
 mov [1],cx     ; ds[1] = cx
+add al,[0]     ; al = al + ds[0]
 ```
 
 ### 栈机制
@@ -109,32 +110,27 @@ pop  [2]     ; 出栈，数据存入1000:2处
 - 先 `SP = SP - 2`
 - 再将 `AX` 中数据，存入`SS:SP`指向的内存中
 
-![屏幕快照 2019-09-20 下午4.20.03.png](https://img.codekissyoung.com/2019/09/20/aad5903264863ec8ea556acc3c402550.png)
-
 `POP BX` 出栈指令执行过程:
 
 - 将`SP:SP`指向的内存中的内容，拷贝到`BX`中
 - `SP = SP + 2`
 
-### 栈在哪里？栈的大小?
+`SS` 设定好时，`SP` 设置为`0x0000`时，栈的容量最大。当第一次`PUSH`时，`SP - 2` 等于 `0xFFFE`。可以推算出，可以存放 `65536 / 2 = 32768` 个字型数据，大小为 `64KB`。
 
-栈的最大空间为：`64KB`，`SP`设置为`0x0000`时，栈的容量最大。当第一次`PUSH`时，`SP - 2` 等于 `0xFFFE`。可以推算出，可以存放 `65536 / 2 = 32768` 个字型数据。
+### 代码段、数据段、栈段
 
-用一个段地址指示段，用偏移地址访问段内的存储单元，完全是我们自己的安排。
+现在我们手里可用的段寄存器有`CS` `DS` `SS`，分别代表代码段、数据段、栈段，正常的一个程序都会用到。它们的实际地址，是不做要求的，完全由程序员自行决定。
 
-`数据段`：只是编程时候的一种数据安排，段地址存于`DS`中。使用`mov`、`add`、`sub` 访问内存单元时，CPU 将这个段里的二进制信息，当作数据来使用。
+`数据段`：使用`mov`、`add`、`sub` 访问内存单元时，CPU 将这个段里的二进制信息，当作数据来使用。
 
-`代码段`：段地址存于`CS`中。将段中第一条指令的偏移地址放在`IP`中，这样 CPU 就将执行我们定义的代码段中的命令。
+`代码段`： 任意时刻，CPU 都将`CS:IP`指向的内存地址处的二进制信息，当作指令来执行。设定 `CS:IP` 就是设置程序的入口。
 
-`栈段`：段地址存于`SS`中，将栈顶单元的偏移地址放在`SP`中，这样 CPU 在进行`push`、`pop`操作时，就将我们定义的栈段当作栈空间来用。
-
-CPU 将内存中的某段内容当作代码，只是因为`CS:IP`指向了那里;
-
-CPU 将某段内存当作栈，只是因为`SS:IP`指向了那里。
+`栈段`：CPU 将某段内存当作栈，只是因为`SS:IP`指向了那里。，将栈顶单元的偏移地址放在`SP`中，这样 CPU 在进行`push`、`pop`操作时，就将我们定义的栈段当作栈空间来用。
 
 ### 第一个程序
 
 ```asm
+; test.asm
 assume cs:codesg    ; 伪指令 假设 cs 寄存器 与 codesg 段关联
 
 codesg segment      ; 伪指令 段开始
@@ -152,21 +148,34 @@ codesg ends         ; codesg 段结束
 end                 ; 伪指令 汇编代码结束
 ```
 
+```bash
+$ dosbox        # 进入 dos 模拟器
+
+C:\> masm test.asm;        # 编译
+C:\> link test;            # 链接
+C:\> test                  # 执行
+C:\> debug test.exe        # 调试，单步执行
+-r                      # 查看所有寄存器
+```
+
 为了观察程序运行，我们使用`DEBUG` 工具将程序载入内存，设置`CS:IP`指向程序的入口，但`DEBUG`又不放弃对`CPU`的控制，这样我们就可以用`DEBUG`的相关命令来单步执行程序，查看每一条指令执行的结果。
 
-DOS 系统中`exe`程序加载过程:
+![](https://img.codekissyoung.com/2020/03/22/eae01c3d7b30c2d4b2b73df2c6186ee3.png)
 
-![屏幕快照 2019-09-20 下午5.02.36.png](https://img.codekissyoung.com/2019/09/20/d82486f4a302a3714087d04098902351.png)
+然后一直按`-t`，单步调试，观察寄存器的变化。
+
+用 DEBUG 调试上面程序，通过 `-d cs:0` 可以查看程序段。
+
+#### 栈的观察
 
 ```asm
 assume cs:codesg
 
 codesg segment
-
 	mov ax,2000H
 	mov ss,ax
-	mov sp,0
-	add sp,10
+	mov sp,0H
+	add sp,10H
 	pop ax
 	pop bx
 	push ax
@@ -180,59 +189,211 @@ codesg ends
 end
 ```
 
-`PSP`的头两个字节是`CD 20`,用 DEBUG 调试上面程序，通过`-d ds:0`可以看到 `PSP`,通过`-d cs:0`可以查看程序段。
+#### 循环 loop 指令
 
-## 5. [BX]和 loop 指令
-
-`loop`指令执行过程:
+`loop` 指令执行过程:
 
 - `cx = cx - 1`
 - 判断: 如果 `cx > 0` 跳转到某个指令处执行，如果`cx = 0`则继续向下执行
 
 编程完成乘法 : `123 * 236`
 
-```
+```asm
 assume cs:code
 
 code segment
 
     mov ax,0
     mov cx,236
-
-mul: add ax,123
-     loop mul
+mul:
+    add ax,123
+    loop mul
 
     mov ax,4C00H
-	int 21H
-
+    int 21H
 code ends
+
 end
 ```
 
-PS: 汇编源程序中，数据不能以字母开头，例如`A000H` 要写成 `0A000H`。
+PS: 汇编程序中，数据不能以字母开头，例如`A000H` 要写成 `0A000H`。
 
-## 6. 包含多个段的程序
+## 使用多个段的程序
 
-随意地向内存中写入内容，如果不小心改变了系统存放在内存中的内容，会导致系统的奔溃。
+使用了数据，但是未使用段的一个程序：
 
-所以我们需要一个操作系统来为每一个程序分配内存，方式有两种:
+```asm
+assume cs:code
 
-- 操作系统在加载程序时，就为程序分配好内存空间
-- 程序在执行过程中，向操作系统申请内存
+code segment
 
-## 7. 更灵活地定位内存地址的方法
+; 16 字节 数据
+dw 1, 1, 1, 1, 1, 1, 1, 1
 
-![屏幕快照 2019-09-20 下午6.42.59.png](https://img.codekissyoung.com/2019/09/20/3eb0856e482ad50b7f9436cfdb59b1e4.png)
+start:              ; start 标记 : 链接后, CS:IP 指向的位置
 
-## 8. 数据处理的两个基本问题
+    mov bx, 0       ; 设置偏移地址
+    mov ax, 0       ; 归零
+    mov cx,8        ; 设置循环次数
+    s:
+        add ax, cs:[bx] ; 指定从 CS:bx 里读取数据
+        add bx, 2       ; 每次读取 2 字节, 所以自增 2
+        loop s
+
+    mov ax, 4c00h
+    int 21h
+code ends
+
+end start
+```
+
+加上一个数据段改造后：
+
+```asm
+assume cs:code,ds:data
+
+; 数据段 ds
+data segment
+    dw 0001H,0002H, 0003H, 0004H, 0005H, 0006H, 0007H, 0008H ; 16 字节 数据
+data ends
+
+; 代码段 cs
+code segment
+start:              ; start 标记 : 链接后, CS:IP 指向的位置
+
+    ; set ds
+    mov ax, data
+    mov ds, ax      ; ds = data
+
+    mov ax, 0       ; 归零
+    mov bx, 0       ; 设置偏移地址
+    mov cx, 8       ; 设置循环次数
+    s:
+        add ax, ds:[bx] ; 指定从 ds:bx 里读取数据
+        add bx, 2       ; 每次读取 2 字节, 所以自增 2
+        loop s
+
+    mov ax, 4c00h
+    int 21h
+code ends
+
+end start
+```
+
+再加一个栈段后：
+
+```asm
+assume cs:code,ds:data,ss:stack
+; 数据段 ds
+data segment
+    dw 0001H,0002H, 0003H, 0004H, 0005H, 0006H, 0007H, 0008H ; 16 字节 数据
+data ends
+; 栈段 ss
+stack segment
+    dw 0, 0, 0, 0, 0, 0, 0, 0 ; 程序执行后 => 0,0,0,0,1,2,3,4
+stack ends
+; 代码段 cs
+code segment
+start:              ; start 标记 : 链接后, CS:IP 指向的位置
+    mov ax, stack
+    mov ss, ax      ; ss = stack
+    mov sp, 16
+
+    mov ax, data
+    mov ds, ax      ; ds = data
+
+    push ds:[0]     ; stack[14] = ds[0]
+    push ds:[2]     ; stack[12] = ds[2]
+    push ds:[4]     ; stack[10] = ds[4]
+    push ds:[6]     ; stack[8]  = ds[6]
+
+    mov ax, 4c00h
+    int 21h
+code ends
+end start
+```
+
+## 更灵活地定位内存地址的方法
+
+`ASCII` 字符：
+
+```asm
+data segment
+    db 'unix'
+    db 'link'
+data ends
+
+code segment
+    mov al, 'a'
+    mov bl, 'x'
+code ends
+```
+
+更多的内存寻址方式：
+
+`15[si]` 表示 `ds:si +15` 处的内存地址，用于复制字符串程序：
+
+```asm
+assume cs:code,ds:data,ss:stack
+
+data segment
+    db 'welcome to masm'    ; 15 byte
+    db '...............'
+data ends
+
+stack segment
+    dw 0, 0, 0, 0, 0, 0, 0, 0
+stack ends
+
+code segment
+start:              ; start 标记 : 链接后, CS:IP 指向的位置
+
+    mov ax, data
+    mov ds, ax      ; set ds = data
+
+    mov si, 0
+    mov cx, 14          ; copy 15 times
+    s:
+        mov ax, 0[si]   ; copy byte to ax
+        mov 15[si], ax  ; copy ax to 15 offset byte
+        add si, 1
+        loop s
+
+    mov ax, 4c00h
+    int 21h
+code ends
+end start
+```
+
+## 数据处理的两个基本问题
 
 ### 处理的数据在什么地方?
 
+在`8086`中，只有`bx` `si` `di` `bp` 可以用在`[...]`寻址中，并且只允许以下固定组合：
+
+```asm
+mov ax, [num]             ; 单个 num
+mov ax, [bx + num]        ; 任意单个, num 可选
+mov ax, [bx + si + num]   ; si 可替换成 di , num 可选
+mov ax, [bp + si + num]   ; si 可替换成 di , num 可选
+
+mov ax, [bx + bp]         ; 错误示范
+mov ax, [si + di]         ; 错误示范
+```
+
+数据只可能在以下三个地方：
+
+```asm
+mov bx, [0] ; 内存 ds:0 单元中， 称为 内存中
+mov bx, ax  ; 内部寄存器中，称为 寄存器
+mov bx, 1   ; 指令的一部分，称为 立即数
+```
+
 ### 要处理的数据有多长?
 
-8086CPU 中，可以处理两种尺寸的数据`byte`和`word`，所以机器指令中要指明操作的是`byte`还是`word`。
+#### 寄存器名称表明了数据的尺寸
 
-第一种方式, 通过寄存器名称指明要处理数据的尺寸:
+8086CPU 中，可以处理两种尺寸的数据`byte`和`word`，所以机器指令中要指明操作的是`byte`还是`word`。
 
 ```asm
 mov ax,1        ; 字操作
@@ -244,23 +405,48 @@ mov bl,al
 inc al
 ```
 
-第二种方式，没有寄存器名称时，要明确指明:
+#### 使用 ptr 明确指明
 
 ```asm
-mov word ptr ds:[0],1       ; 字操作
+mov word ptr ds:[0], 1       ; 字操作
 inc word ptr [bx]
-add word ptr [bx],2
+add word ptr [bx], 2
 
-mov byte ptr ds:[0],1       ; 字节操作
+mov byte ptr ds:[0], 1       ; 字节操作
 inc byte ptr [bx]
-add byte ptr [bx],2
+add byte ptr [bx], 2
 ```
 
-第三种方式，指令类型默认操作操作数据长度
+#### 指令类型默认操作操作数据长度
 
 `PUSH` `POP` 指定操作的数据就是`word`。
 
-## 9. 转移指令的原理
+#### div 除法指令
+
+```asm
+div byte ptr ds:[0] ; 商 al = ax / ds:0 , ah = 余数
+div word ptr es:[0] ; 商 ax = (dx * 10000H + ax) / es:0 , dx = 余数
+div byte ptr [bx + si + 8] ; 商 al = ax / (ds*16 + si + 8), ah = 余数
+div word ptr [bx + si + 8] ; 商 ax = (dx * 10000H + ax) / (ds * 16 + bx + si + 8), dx = 余数
+```
+
+#### dd 、dup
+
+双字：
+
+```asm
+dd 100001               ; 定义 4 byte
+```
+
+`db 重复次数 dup (重复的db类型数据)`，里面的 `db` 可替换为`dw`、`dd`：
+
+```asm
+db 3 dup (0)            ; 定义 3 byte, 初始化为 0
+db 3 dup (0,1,2)        ; 定义 9 byte, 0、1、2，0、1、2，0、1、2
+db 3 dup ('abc','ABC')  ; abcABCabcABCabcABC
+```
+
+## 转移指令的原理
 
 8086CPU 中转移指令分为以下几类:
 
