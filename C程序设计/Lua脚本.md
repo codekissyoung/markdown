@@ -8,10 +8,8 @@
 $ sudo apt-get install lua5.3  # 安装 
 ```
 
-Hello world 程序：
-
 ```lua
-# test.lua
+-- test.lua
 print("Hello lua")
 ```
 
@@ -23,26 +21,24 @@ Hello lua
 ## 基本语法
 
 ```lua
--- 单行注释
-a = 10              -- 声明变量
-```
-
-数据类型，`lua`中每个值都携带了它自身的类型信息。
-
-```bash
+-- 数据类型, 每个声明的变量都带有 类型 信息
 nil	        
-boolean	    包含两个值：false和true。
-number	    表示双精度类型的实浮点数
-string	    字符串由一对双引号或单引号来表示
-function	由 C 或 Lua 编写的函数
-userdata	表示任意存储在变量中的C数据结构
-thread	    表示执行的独立线路，用于执行协同程序
-table	    关联数组，索引可以是number、string 或 table
-```
+boolean	    -- false true
+number	    -- 双精度类型浮点数
+string	    -- 字符串
+function	-- 由 C 或 Lua 编写的函数
+userdata	-- 表示任意存储在变量中的C数据结构
+thread	    -- 表示执行的独立线路，用于执行协同程序
+table	    -- 关联数组，索引可以是number、string 或 table
 
-遍历 ：
+a = 10 -- 声明变量
+
+print(type(true)) -- 查看类型
+print(type(nil))
+```
 
 ```lua
+-- 遍历
 tab1 = { key1 = "val1", key2 = "val2", "val3" }
 for k, v in pairs(tab1) do
     print( k .. ":" .. v) -- .. 是字符串链接符
@@ -51,12 +47,8 @@ end
 tab1.key1 = nil -- nil 可用于删除变量，或者说赋值为 nil 等同于删除
 ```
 
-条件表达式:
-
 ```lua
-print(type(true)) -- 查看类型
-print(type(nil))
-
+-- 条件表达式
 if false or nil then
     print("至少有一个是 true")
 else
@@ -71,9 +63,8 @@ else
 end
 ```
 
-函数：
-
-```bash
+```lua
+-- 函数
 function factorial1(n)
     if n == 0 then
         return 1
@@ -86,15 +77,15 @@ fn = factorial1
 print(fn(6)) -- 720
 ```
 
-匿名函数:
 
-```bash
-function testFun(tab,fun)
+```lua
+function testFun(tab, fun)
     for k ,v in pairs(tab) do
-            print(fun(k,v));
+            print(fun(k, v));
     end
 end
 
+-- 匿名函数
 tab={key1="val1",key2="val2"};
 testFun(tab, function(key,val)
     return key.."="..val;

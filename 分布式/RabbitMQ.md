@@ -2,22 +2,26 @@
 
 [RabbitMQ PHP 版](https://xiaoxiami.gitbook.io/rabbitmq_into_chinese_php/ying-yong-jiao-cheng/php-ban/3-publish_subscribe.md)
 
-## 基础
+## 安装
 
 ```bash
 $ sudo apt-get install erlang
 $ sudo apt-get install rabbitmq-server
 ```
 
+## 启动与关闭
+
 ```bash
-$ sudo rabbitmq-server -detached            # 启动 rabbitmq-server daemon
-$ sudo rabbitmqctl cluster_status           # 查看集群状态
-$ sudo rabbitmqctl status                   # 查看当前节点状态
-$ sudo rabbitmqctl stop                     # 关闭服务 连同节点上的其它应用程序一同关闭了
-$ sudo rabbitmqctl stop_app                 # 关闭服务 只关闭rabbitmq节点
-$ sudo rabbitmq-plugins enable plugin-name  # 开启插件
-$ sudo rabbitmq-plugins disable plugin-name # 关闭插件
-$ sudo rabbitmq-plugins enable rabbitmq_management   # 启用 web 管理界面插件
+$ sudo rabbitmq-server -detached                    # 启动 rabbitmq-server daemon
+$ sudo rabbitmqctl status                           # 查看当前节点状态
+$ sudo rabbitmqctl stop                             # 关闭服务 连同节点上的其它应用程序一同关闭了
+$ sudo rabbitmqctl stop_app                         # 关闭 rabbitmq app
+$ sudo rabbitmqctl start_app                        # 开启 rabootmq app
+$ sudo rabbitmqctl list_queues                      # -p 指定 vhost_name , 默认 / 
+$ sudo rabbitmqctl list_exchanges
+$ sudo rabbitmqctl list_bindings
+$ sudo rabbitmqctl list_connections
+$ sudo rabbitmqctl list_channels
 ```
 
 默认端口:
@@ -28,24 +32,27 @@ $ sudo rabbitmq-plugins enable rabbitmq_management   # 启用 web 管理界面�
 15672 (if management plugin is enabled)
 61613, 61614 (if STOMP is enabled)
 1883, 8883 (if MQTT is enabled)
-web : 15672                         # 通过浏览器访问
-api_port : 5672
+web : 15672          # 通过浏览器访问
+api_port : 5672      # amqp 协议端口
 ```
 
-添加 `root` 管理用户：
+### 插件管理
 
 ```bash
-$ sudo rabbitmqctl add_user username password               # 新增用户
-$ sudo rabbitmqctl delete_user username                     # 删除用户
-$ sudo rabbitmqctl list_users                               # 查看用户列表
-$ sudo rabbitmqctl set_user_tags User Tag [Tag2 ...]        # 设定角色
+$ sudo rabbitmq-plugins enable plugin-name          # 开启插件
+$ sudo rabbitmq-plugins disable plugin-name         # 关闭插件
+$ sudo rabbitmq-plugins enable rabbitmq_management  # 启用 web 管理界面插件
+```
 
-link3@link3:~$ sudo rabbitmqctl add_user root root
-Creating user "root"
-link3@link3:~$ sudo rabbitmqctl set_permissions -p / root ".*" ".*" ".*"
-Setting permissions for user "root" in vhost "/"
-link3@link3:~$ sudo rabbitmqctl set_user_tags root administrator
-Setting tags for user "root" to [administrator]
+### 用户管理
+
+```bash
+$ sudo rabbitmqctl add_user username password                   # 新增用户
+$ sudo rabbitmqctl delete_user username                         # 删除用户
+$ sudo rabbitmqctl list_users                                   # 查看用户列表
+$ sudo rabbitmqctl add_user root root
+$ sudo rabbitmqctl set_permissions -p / root ".*" ".*" ".*"
+$ sudo rabbitmqctl set_user_tags root administrator
 ```
 
 用户角色`Tag`:
@@ -62,17 +69,7 @@ $ rabbitmqctl delete_vhost xxx    # 撤销virtual_host
 ```
 
 ```bash
-$ sudo rabbitmqctl reset            # 清除所有队列
-```
-
-#### 查看服务器信息
-
-```bash
-$ sudo rabbitmqctl list_queues          # 默认会查看 / 下的队列, -p vhost_name 指定
-$ sudo rabbitmqctl list_exchanges
-$ sudo rabbitmqctl list_bindings
-$ sudo rabbitmqctl list_connections
-$ sudo rabbitmqctl list_channels
+$ sudo rabbitmqctl reset          # 清除所有队列
 ```
 
 #### 集群
@@ -82,166 +79,89 @@ $ sudo rabbitmqctl cluster_status                       # 查看集群内节点�
 $ sudo rabbitmqctl join_cluster 节点@主机名             # 创建集群
 ```
 
-##
+## 队列属性
 
-`Message` : `{ Label, payload }` , `Broker` 根据 `Label` 将 `Message` 分发给不同的 `Consumer`。
+声明一个已经存在的队列，假如参数都是一样的话，则返回这个队列。如果参数有不同的话，直接报错。
 
-交换器类型:
+#### exclusive 私有队列
 
-fanout
+限制本队列只有一个消费者。
 
-direct
+#### auto-delete 自动删除队列
 
-topic
+最后一个消费者取消订阅时，队列就会自杀。
 
-headers
+## 持久化消息
 
-```bash
-<?php
-return [
-    'vendor' => [
-        'path' => '../vendor'
-    ],
-    'rabbitmq' => [
-        'host' => '127.0.0.1',
-        'port' => '5672',
-        'login' => 'guest',
-        'password' => 'guest',
-        'vhost' => '/'
-    ]
-];
-```
+能从服务器意外崩溃后，重启之后自动恢复的消息称为，持久化消息。要做到这一点，需要保证
 
-```bash
-$config = require "../config.php";
-require_once $config['vendor']['path'] . '/autoload.php';
+- 交换器是持久化的 `durable = true`
+- 队列是持久化的 `durable = true`
+- 投递模式是持久化的 `delivery mode = 2`
 
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+## 消息消费者
 
-$connection = new AMQPStreamConnection(
-                                $config['rabbitmq']['host'],
-                                $config['rabbitmq']['port'],
-                                $config['rabbitmq']['login'],
-                                $config['rabbitmq']['password'],
-                                $config['rabbitmq']['vhost'] );
-$channel = $connection->channel();
+#### ack 机制
 
-$channel -> exchange_declare( 'link.logs', 'fanout', false, false, false);
-$channel -> queue_declare('error', false, true, false, false);
-$channel -> queue_bind('error', 'link.logs');
+消费者订阅到队列时 ，如果使用 `auto_ack` 自动确认参数，那么一旦消费者接收到消息，`RabbitMQ-Server`就视为消息正确被消费了，从而在队列里删除该消息。
 
-$data = implode(' ', array_slice($argv, 1));
-if(empty($data))
-    $data = "Hello World!............fuk";
+而不使用`auto_ack`的话，则需要消费者发送一条`ack`消息给`RabbitMQ-Server`，告知确实正确消费了消息。然后，`RabbitMQ-Server`从队列里删除该消息。
 
-// delivery 持久化
-$msg = new AMQPMessage($data, ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT] );
+如果出现：
 
-$channel->basic_publish( $msg, 'link.logs' );
-echo " [x] Sent ", $data, "\n";
-$channel->close();
-$connection->close();
-```
+- `RabbitMQ-Server` 链接中断：
+  - 分配给别的监听本队列的消费者
+  - 这条消息会被留着直到重连
 
-```php
-$config = require "../config.php";
+- 消费者程序有`Bug`忘记`ack`了：
+  - `RabbitMQ-Server`在接收到`ack`消息之前，不会再向该消费者发送任何消息了
+  - 这个机制可以用来控制应用程序消费速率
+  
+如果消费一条消息需要比较长时间的话，建议使用`ack`机制，这样可以防止`RabbotMQ-Server`持续不断的消息涌向消费者进程，从而导致过载。
 
-require_once $config['vendor']['path'] . '/autoload.php';
+#### reject 机制
 
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+如果某消费者进程不想再接收消息了，目前的办法是断开连接，这样消息就会发送给别的监听的消费者进程处理。
 
-$connection = new AMQPStreamConnection(
-                                    $config['rabbitmq']['host'],
-                                    $config['rabbitmq']['port'],
-                                    $config['rabbitmq']['login'],
-                                    $config['rabbitmq']['password'],
-                                    $config['rabbitmq']['vhost'] );
-$channel = $connection->channel();
+现在有了 `reject` 机制：
 
-$channel -> exchange_declare('link.logs', 'fanout', false, false, false);
-
-list($queue_name, , ) = $channel -> queue_declare("", false, false, true, false );
-
-/*
-$channel->queue_declare('task_queue', false, true, false, false);
-
-echo ' [*] Waiting for messages. To exit press CTRL+C', "\n";
-
-$callback = function($msg) {
-  echo " [x] Received ", $msg->body, "\n";
-  sleep(substr_count($msg->body, '.'));
-  echo " [x] Done", "\n";
-  $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
-};
-
-$channel->basic_qos(null, 1, null);
-$channel->basic_consume('task_queue', '', false, false, false, false, $callback);
-
-while(count($channel->callbacks)) {
-    $channel->wait();
-}
+- 消费者进程收到一条消息后，调用`reject`命令，设置`requeue = true`参数，表示自己不处理这条命令，这样`RabbitMQ-Server`就会重新将这条消息入队，交给其他消费者进程处理
+- 如果消费者进程检测到某条消息是错误消息呢？可以调用`reject`命令，设置 `requeue = false`，表示让`RabbitMQ-Server`直接丢弃该消息，如果本队列配置了死信队列的话，这丢弃的消息会堆积在死信队列，以供研发分析原因
 
 
-*/
 
-var_dump($queue_name);
-$channel->close();
-$connection->close();
 
-```
 
-`send.php`
 
-```php
-require_once __DIR__."/vendor/autoload.php";
 
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 
-$conn = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest'); // 链接
-$chan = $conn -> channel(); // 信道
-$chan -> exchange_declare('logs', 'fanout', false, false, false ); // 交换机
 
-$msg = new AMQPMessage('Hello World',['delivery_mode'=>AMQPMessage::DELIVERY_MODE_PERSISTENT]); // 消息
 
-$chan -> basic_publish($msg, 'logs'); // 发送消息到交换机
 
-$chan -> close();
-$conn -> close();
-```
 
-`recv.php`
 
-```php
-<?php
-require_once __DIR__ . '/vendor/autoload.php';
 
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 
-$conn = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest'); // 链接
-$chan = $conn->channel(); // 信道
 
-$chan -> exchange_declare('logs', 'fanout', false, false, false ); // 交换机
 
-list($queue_name, ,) = $chan -> queue_declare(""); // 队列
 
-$chan -> queue_bind($queue_name, 'logs'); // 绑定
 
-// 消费
-$chan -> basic_consume(
-    $queue_name,
-    '',
-    false,
-    true,
-    false,
-    false,
-    function ($msg){
-        echo "received" . $msg->body, PHP_EOL;
-//        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
-    });
-while (count($chan->callbacks)){
-    $chan->wait();
-}
-```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
