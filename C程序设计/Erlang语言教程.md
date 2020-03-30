@@ -210,6 +210,114 @@ $ erl
 {c,100.0}
 ```
 
+再来看两个接收高阶函数的作为参数的常用函数`lists:map()`与`lists:filter()`：
+
+```erl
+1> L = [1,2,3,4].
+[1,2,3,4]
+3> L2 = lists:map(fun(X) -> 2*X end, L).
+[2,4,6,8]
+
+5> Even = fun(X) -> (X rem 2) =:= 0 end.
+#Fun<erl_eval.6.99386804>
+6> lists:filter(Even, [1,2,3,4,5,6,7,8]).
+[2,4,6,8]
+7> lists:map(Even, [1,2,3,4,5,6,7,8]).
+[false,true,false,true,false,true,false,true]
+```
+
+再来看一下将高阶函数作为返回值的例子：
+
+```erl
+8> Fruit = [apple, pear, orange].
+[apple,pear,orange]
+9> MakeTest = fun(L) -> (fun(X) -> lists:member(X, L) end) end.
+#Fun<erl_eval.6.99386804>
+10> IsFruit = MakeTest(Fruit).
+#Fun<erl_eval.6.99386804>
+11> IsFruit(pear).
+true
+12> IsFruit(dog).
+false
+```
+
+然后我们通过高阶函数来改造下`shop`例子：
+
+```erl
+-module(shop).
+-export([cost/1, total/1]).
+
+cost(oranges) -> 5;
+cost(newspaper) -> 8;
+cost(apples) -> 2;
+cost(pears) -> 10;
+cost(milk) -> 7.
+
+sum([H|T]) -> H + sum(T);
+sum([]) -> 0.
+
+map(_, []) -> [];
+map(F, [H|T]) -> [F(H) | map(F, T)].
+
+total( L ) ->
+    sum( map( fun({What,N}) -> shop:cost(What) * N end, L ) ).
+```
+
+```erl
+6> shop:total([{oranges,6},{newspaper, 1},{milk, 2}]).
+52
+```
+
+#### 列表推导
+
+格式：
+
+```erl
+[ X || Qualifier1, Qualifier2 ... ]
+```
+
+`X` 可以是任意的表达式，而后面的`Qualifier`可以是生成器 或 过滤器。同样的功能，使用列表推导比使用 map 的高阶函数版本更简洁。
+
+```erl
+7> L = [1,2,3,4,5,6,7].
+[1,2,3,4,5,6,7]
+8> L2 = [ X * X || X <- L ].             % 生成器
+[1,4,9,16,25,36,49]
+10> L3 = [ X * X || X <- L, X > 3 ].     % 生成器, 过滤器
+[16,25,36,49]
+1> [ X || {a, X} <- [{a,1}, {b,2}, {a,4}, "hello", atom] ]. % 过滤器
+[1,4]
+```
+
+使用列表推导表达式改写的`total`版本：
+
+```erl
+total( L ) ->
+    sum( [shop:cost(A) * B || {A, B} <- L] ).
+```
+
+再来介绍一种连接列表的语法`++`：
+
+```erl
+12> [1,2,3] ++ [7,9] ++ [23,45].
+[1,2,3,7,9,23,45]
+```
+
+使用列表生成器和`++`语法写成的快速排序：
+
+```erl
+qsort( [ MidValue | T ] ) ->
+    qsort( [X || X <- T, X < MidValue])
+    ++ [MidValue] ++
+    qsort( [X || X <- T, X >= MidValue]);
+qsort( [] ) -> [].
+```
+
+```erl
+2> shop:qsort([8,7,5,2,1,45,23,45,90]).
+[1,2,5,7,8,23,45,45,90]
+```
+
 ## 命令行
 
 ```bash
