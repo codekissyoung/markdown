@@ -5,26 +5,12 @@
 ## 安装
 
 ```bash
-$ sudo apt-get install erlang
-$ sudo apt-get install rabbitmq-server
+apt-get install erlang
+apt-get install rabbitmq-server
+rabbitmq-server -detached             # 启动 rabbitmq-server daemon
 ```
 
-## 启动与关闭
-
-```bash
-$ sudo rabbitmq-server -detached                    # 启动 rabbitmq-server daemon
-$ sudo rabbitmqctl status                           # 查看当前节点状态
-$ sudo rabbitmqctl stop                             # 关闭服务 连同节点上的其它应用程序一同关闭了
-$ sudo rabbitmqctl stop_app                         # 关闭 rabbitmq app
-$ sudo rabbitmqctl start_app                        # 开启 rabootmq app
-$ sudo rabbitmqctl list_queues                      # -p 指定 vhost_name , 默认 / 
-$ sudo rabbitmqctl list_exchanges
-$ sudo rabbitmqctl list_bindings
-$ sudo rabbitmqctl list_connections
-$ sudo rabbitmqctl list_channels
-```
-
-默认端口:
+启动后默认端口:
 
 ```bash
 4369 (epmd), 25672 (Erlang distribution)
@@ -36,23 +22,32 @@ web : 15672          # 通过浏览器访问
 api_port : 5672      # amqp 协议端口
 ```
 
-### 插件管理
+## 命令行 rabbitmqctl 管理
 
 ```bash
-$ sudo rabbitmq-plugins enable plugin-name          # 开启插件
-$ sudo rabbitmq-plugins disable plugin-name         # 关闭插件
-$ sudo rabbitmq-plugins enable rabbitmq_management  # 启用 web 管理界面插件
+rabbitmqctl status                    # 查看当前节点状态
+rabbitmqctl stop                      # 关闭服务 连同节点上的其它应用程序一同关闭了
+rabbitmqctl stop_app                  # 关闭 rabbitmq app
+rabbitmqctl start_app                 # 开启 rabootmq app
+rabbitmqctl list_queues               # -p 指定 vhost_name , 默认 / 
+rabbitmqctl list_exchanges
+rabbitmqctl list_bindings
+rabbitmqctl list_connections
+rabbitmqctl list_channels
+
+rabbitmqctl add_vhost xxx           # 新建virtual_host
+rabbitmqctl delete_vhost xxx        # 撤销virtual_host
+rabbitmqctl reset                   # 清除所有队列
 ```
 
-### 用户管理
+用户管理:
 
 ```bash
-$ sudo rabbitmqctl add_user username password                   # 新增用户
-$ sudo rabbitmqctl delete_user username                         # 删除用户
-$ sudo rabbitmqctl list_users                                   # 查看用户列表
-$ sudo rabbitmqctl add_user root root
-$ sudo rabbitmqctl set_permissions -p / root ".*" ".*" ".*"
-$ sudo rabbitmqctl set_user_tags root administrator
+rabbitmqctl add_user root root                           # 新增用户 root 密码 root
+rabbitmqctl set_permissions -p / root ".*" ".*" ".*"     # 设置权限
+rabbitmqctl set_user_tags root administrator             # 设置用户类型
+rabbitmqctl list_users                                   # 查看用户列表
+rabbitmqctl delete_user username                         # 删除用户
 ```
 
 用户角色`Tag`:
@@ -63,20 +58,19 @@ $ sudo rabbitmqctl set_user_tags root administrator
 - `management`：仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理
 - `other`：无法登陆管理控制台，通常就是普通的生产者和消费者
 
-```bash
-$ sudo rabbitmqctl add_vhost xxx  # 新建virtual_host
-$ rabbitmqctl delete_vhost xxx    # 撤销virtual_host
-```
+### 插件管理
 
 ```bash
-$ sudo rabbitmqctl reset          # 清除所有队列
+rabbitmq-plugins enable plugin-name          # 开启插件
+rabbitmq-plugins disable plugin-name         # 关闭插件
+rabbitmq-plugins enable rabbitmq_management  # 启用 web 管理界面插件
 ```
 
 #### 集群
 
 ```bash
-$ sudo rabbitmqctl cluster_status                       # 查看集群内节点信息
-$ sudo rabbitmqctl join_cluster 节点@主机名             # 创建集群
+rabbitmqctl cluster_status                       # 查看集群内节点信息
+rabbitmqctl join_cluster 节点@主机名             # 创建集群
 ```
 
 ## 队列属性
@@ -127,41 +121,4 @@ $ sudo rabbitmqctl join_cluster 节点@主机名             # 创建集群
 
 - 消费者进程收到一条消息后，调用`reject`命令，设置`requeue = true`参数，表示自己不处理这条命令，这样`RabbitMQ-Server`就会重新将这条消息入队，交给其他消费者进程处理
 - 如果消费者进程检测到某条消息是错误消息呢？可以调用`reject`命令，设置 `requeue = false`，表示让`RabbitMQ-Server`直接丢弃该消息，如果本队列配置了死信队列的话，这丢弃的消息会堆积在死信队列，以供研发分析原因
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

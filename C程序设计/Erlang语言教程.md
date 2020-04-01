@@ -318,6 +318,63 @@ qsort( [] ) -> [].
 [1,2,5,7,8,23,45,45,90]
 ```
 
+勾股定理，算出`N`以内符合勾股定理的数：
+
+```erl
+pythag(N) ->
+    [ {A,B,C} ||
+        A <- lists:seq(1,N),
+        B <- lists:seq(1,N),
+        C <- lists:seq(1,N),
+        A + B + C =< N,
+        A * A + B * B =:= C * C ].
+```
+
+```erl
+9> shop:pythag(16).
+[{3,4,5},{4,3,5}]
+10> shop:pythag(30).
+[{3,4,5},{4,3,5},{5,12,13},{6,8,10},{8,6,10},{12,5,13}]
+```
+
+所有字母的排列组合：
+
+```erl
+perms( [] ) -> [[]];
+perms( L )  -> [ [H|T] || H <- L, T <- perms( L -- [H]) ].
+```
+
+```erl
+5> shop:perms("cats").
+["cats","cast","ctas","ctsa","csat","csta","acts","acst",
+ "atcs","atsc","asct","astc","tcas","tcsa","tacs","tasc",
+ "tsca","tsac","scat","scta","sact","satc","stca","stac"]
+```
+
+#### 关卡
+
+```erl
+max(X, Y) when X > Y -> X;      % 关卡结构，如果匹配这句，就直接返回
+max(X, Y) -> Y.
+
+moreThan6(X, Y)
+    when is_integer(X), X > Y, Y < 6 -> X; % 等价于 if( is_int(X) && X > Y && Y < 6 ) return X
+moreThan6(X, Y)
+    -> Y.
+```
+
+#### case 表达式
+
+#### if 表达式
+
+## 记录与映射组
+
+记录`record`就是关联数组，映射组就是`HashMap`。
+
+## 错误处理
+
+![](https://img.codekissyoung.com/2020/04/02/c83f5f4263e95c387759164ce81ff739.png)
+
 ## 命令行
 
 ```bash
