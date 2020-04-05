@@ -122,6 +122,12 @@
 - [PHP 鸟哥](http://www.laruence.com/)
 - [php-header 函数](http://www.laruence.com/2007/12/16/308.html)
 
+### CSRF
+
+[CSRF](http://www.h3c.com.cn/MiniSite/Phone_Magazine/2012/07/IT/201212/766969_97665_0.htm)
+[CSRF](http://www.moonsec.com/post-627.html)
+[CSRF](http://blog.csdn.net/stpeace/article/details/53512283)
+
 ## 在线 API 参考
 
 - [Nginx 开发 从入门到精通](http://tengine.taobao.org/book/)

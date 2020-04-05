@@ -101,11 +101,11 @@ main:
 
 ```asm
 .section .bss
-.lcomm buffer, 10000			# 只是声明，不占用硬盘空间
+.lcomm buffer, 10000			; 只是声明，不占用硬盘空间
 
 .section .data
 MY_BUFFER:
-	.fill 10000                 # 填充 10000 字节，占用了磁盘空间
+	.fill 10000                 ; 填充 10000 字节，占用了磁盘空间
 ```
 
 ## 传送数据元素
@@ -362,39 +362,11 @@ test:
 ![](https://img.codekissyoung.com/2019/10/16/96d624919813283fdbc5f3d95aa307d5.png)
 ![](https://img.codekissyoung.com/2019/10/16/44030074fc90c9f678c2972ddd5fbacf.png)
 
-# Linux 下汇编语言
-
-在`Linux`下学习汇编语言的笔记。
-
-## 背景知识
-
-不同的 CPU(`x86`、`x86-64`、`PowerPC`、`ARM`等)平台的指令集不同，针对不同的指令集，汇编器(`nasm`、`masm`、`as`、`yasm`等)可以将汇编语言编译成对应平台的目标文件。
-
-目前常用的汇编语言有两种：`intel`和`AT&T`,不同汇编器可能支持其中一种或两种。
-
-个人觉得`intel`汇编语言比较简洁易懂，学习资料比较多。但是`Unix/Linux`系统、`Gcc`编译器都是默认使用`AT&T`汇编语言的。下图可以感受下`AT&T`(红色)反人类的设计。
-
-![ATT 和 I](https://img.codekissyoung.com/2019/09/28/3e84de28b76b2b71fcf57126d196f821.png)
-
-**nasm 汇编器**
-
-```bash
-sudo apt-get install nasm                    # 安装
-nasm -hf                                     # 查看其支持的 .o 文件格式
-nasm -g                                      # 生成带调试信息的 .o
-nasm -F                                      # 调试信息格式, 常用的为 dwarf , stabs 已经过时了
-nasm -g -f elf64 -F dwarf -o hello.o hello.s # 实际案例
-```
-
 **insight 调试器**
 
 安装: [Ubuntu 16.04 安装 Insight 实现汇编的调试](https://www.cnblogs.com/EasonJim/p/7235972.html)
 
 ## 寄存器
-
-32 位寄存器:
-
-![寄存器](https://img.codekissyoung.com/2019/09/28/e3590522730d21905506a399d8453998.png)
 
 ![通用寄存器](https://img.codekissyoung.com/2019/09/28/67326c3c637b357a44092e781680c6e4.png)
 
@@ -431,25 +403,17 @@ nasm -g -f elf64 -F dwarf -o hello.o hello.s # 实际案例
 | `VIF` Virtual Interrupt Flag  | 虚拟`IF`           | `Pentium` 之后处理器有效                                 |
 | `VIP` Virtual Interrupt Pause | 虚拟中断标志       | 在多任务环境下，给操作系统提供虚拟中断标志和中断暂挂信息 |
 
-## 寻址方式
-
-在指令中,指定操作数存放位置的方法称为寻址方式。
-
-![16位](https://img.codekissyoung.com/2019/09/29/d905a317ec611edcd71ceda3bbe966a0.png)
-
 以及只有在 32 位以上才可以使用的:
 
-![2019-09-29 00-37-22 的屏幕截图.png](https://img.codekissyoung.com/2019/09/29/20bd73d552e3d492bb720d7b960e91b3.png)
+![](https://img.codekissyoung.com/2019/09/29/20bd73d552e3d492bb720d7b960e91b3.png)
 
 ```asm
-mov eax,[ebx+ebp]               ; 默认段寄存器 DS
-mov edx,ES:[eax*4 + 200H]       ; 指定段寄存器为 ES
+mov eax, [ebx+ebp]               ; 默认段寄存器 DS
+mov edx, ES:[eax*4 + 200H]       ; 指定段寄存器为 ES
 mov [esp + edx*2],eax           ; 默认 SS
 mov ebx,GS:[eax + edx*2 + 300H] ; 指定 GS
 mov ax,[esp]                    ; 默认 SS
 ```
-
-## 汇编指令
 
 ### 操作符和变量
 
@@ -479,7 +443,7 @@ mydword dq 012345678H, 0H, -1234H
 
 ## C 与 汇编
 
-#### 空函数
+### 空函数
 
 ```c
 long empty_func()

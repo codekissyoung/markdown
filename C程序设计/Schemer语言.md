@@ -27,7 +27,7 @@ $ sudo make install
 
 ## 概念预习
 
-#### 语言思想
+### 语言思想
 
 LISP 语言诞生时，就包含 9 种新思想，现代语言吸收了 7 种，还有 2 种依然是 LISP 独有。
 
@@ -40,6 +40,7 @@ LISP 语言诞生时，就包含 9 种新思想，现代语言吸收了 7 种，
 - 变量都是指针（内存地址），没有数据类型，变量指向的值有数据类型。复制变量相当于复制指针，而不是复制它们指向的数据。学过 C 语言的指针和 64 位汇编语言，查看代码应该很好理解
 
 - 程序只由表达式`expresion`组成。这和现代语言不同，现代语言由表达式和语句`statement`组成。
+
   - “表达式”是一个单纯的运算过程，总是有返回值
   - “语句” 是执行某种操作，没有返回值
 
@@ -49,7 +50,7 @@ LISP 语言诞生时，就包含 9 种新思想，现代语言吸收了 7 种，
 
 - 代码使用符号和常量组成的树形表示法
 
-- Lisp并不真正区分读取期、编译期和运行期。你可以在读取期编译或运行代码；也可以在编译期读取或运行代码；还可以在运行期读取或者编译代码。
+- Lisp 并不真正区分读取期、编译期和运行期。你可以在读取期编译或运行代码；也可以在编译期读取或运行代码；还可以在运行期读取或者编译代码。
   - 在读取期运行代码，使得用户可以重新调整 LISP 的代码
   - 在编译期运行代码，则是 LISP 宏的工作基础
   - 在运行期编译代码，使得 LISP 可以在 Emacs 这样的程序中，充当扩展语言
@@ -62,10 +63,9 @@ LISP 语言诞生时，就包含 9 种新思想，现代语言吸收了 7 种，
 举个`JS`中的例子，`print`函数的定义与使用：
 
 ```js
-var print = function( i ){
-    console.log(i);
-}
-[1,2,3].foreach( print );
+var print = function(i) {
+  console.log(i);
+}[(1, 2, 3)].foreach(print);
 ```
 
 #### 没有“副作用”
@@ -94,7 +94,7 @@ add( 1, 2 ).multiply( 3 ).substract( 4 );
 
 #### 基本类型
 
-Schemer 支持数字（整数、IEEE浮点数、复数），字符串，列表。
+Schemer 支持数字（整数、IEEE 浮点数、复数），字符串，列表。
 
 ```bash
 123456789987654321 => 123456789987654321    # 整数
@@ -110,6 +110,7 @@ Schemer 支持数字（整数、IEEE浮点数、复数），字符串，列表�
 ```bash
 ( produce arg1 arg2 ... )      # 格式
 ```
+
 ![](https://img.codekissyoung.com/2019/10/19/ab7a89a0ee611ff6245e268707053405.png)
 
 #### 列表
@@ -119,12 +120,12 @@ Schemer 支持数字（整数、IEEE浮点数、复数），字符串，列表�
 列表的表示格式为: `'(arg1 arg2 ...)`,注意 `()` 前面的单引号，这是为了与表达式`(produce arg1 ... )`区分而设计的，使用 `'` 提示编译器把`(arg1 arg2 ...)`当作一个列表整体，而不是求值表达式。
 ![](https://img.codekissyoung.com/2019/10/19/7974c24feba9b74a7e3ccdc443d4815f.png)
 
-**列表car与cdr操作**
+**列表 car 与 cdr 操作**
 
 `car` 是取列表第一个值，`cdr` 是去除第一个值后，返回剩余列表，注意`car`是返回单个数据，`cdr`是返回列表。
 ![](https://img.codekissyoung.com/2019/10/19/d97740b5e475c3e1ab6a43acff92b550.png)
 
-**列表cons与list操作**
+**列表 cons 与 list 操作**
 
 `cons`是将一个数据插入到列表的头部，而`list`则是将多个数据构成一个列表后返回。
 ![](https://img.codekissyoung.com/2019/10/19/4b66760cca6b04651fcb0b4e273a83a7.png)
@@ -145,6 +146,7 @@ Schemer 中的变量需要通过`let`表达式绑定，然后在后续的表达�
 ```lisp
 (let ( (name value) (name value-expr) ...) body1 body2 ... )
 ```
+
 ![](https://img.codekissyoung.com/2019/10/20/ac89cba367973f3707311460ffa651ce.png)
 
 Schemer 中`[]` 等价于 `()`，只要求配对使用，所以可以通过`[]`改善代码可读性。
@@ -154,10 +156,10 @@ Schemer 中`[]` 等价于 `()`，只要求配对使用，所以可以通过`[]`�
 ( let ( [x 2] [y 3] ) (+ x y) )
 ```
 
-`let`表达式是可以嵌套的，`body`还可以是另一个`let`表达式，外层定义的变量在内层`let`表达式中可见；但是，当内层`let`表达式定义了同名的变量时，外层变量会被遮蔽，此时可见的只有内层同名变量。（同C语言机制一样）
+`let`表达式是可以嵌套的，`body`还可以是另一个`let`表达式，外层定义的变量在内层`let`表达式中可见；但是，当内层`let`表达式定义了同名的变量时，外层变量会被遮蔽，此时可见的只有内层同名变量。（同 C 语言机制一样）
 ![](https://img.codekissyoung.com/2019/10/20/0a7ef4e2021a4ab63a1b0e0a2b4f790d.png)
 
-#### lambda表达式
+#### lambda 表达式
 
 `lambda` 表达式用于创建一个函数，它的返回值就是一个函数（可以放在表达式`produce`位置），接受一个参数列表，它有与`let`表达式一样的`body`,格式如下:
 
@@ -173,7 +175,7 @@ Schemer 中`[]` 等价于 `()`，只要求配对使用，所以可以通过`[]`�
 
 #### 全局变量
 
-使用`define`表达式可以定义在整个程序可见的变量与函数，但要注意，全局变量也会被同名局部变量遮蔽。（同C语言机制一样）
+使用`define`表达式可以定义在整个程序可见的变量与函数，但要注意，全局变量也会被同名局部变量遮蔽。（同 C 语言机制一样）
 
 ![](https://img.codekissyoung.com/2019/10/20/f12dde7ed319bece02474f7525b314b8.png)
 
@@ -182,15 +184,13 @@ Schemer 中`[]` 等价于 `()`，只要求配对使用，所以可以通过`[]`�
 ```lisp
 (if (operator arg1 arg2) true-value false-value)        # 格式
 ```
+
 ![](https://img.codekissyoung.com/2019/10/20/5017e2625f1e550ee5c85a781ad415cc.png)
 
 #### 递归
-
-
-
 
 ## 参考
 
 [函数式编程初探-阮一峰](http://www.ruanyifeng.com/blog/2012/04/functional_programming.html)
 
-[为什么Lisp语言如此先进？](http://www.ruanyifeng.com/blog/2010/10/why_lisp_is_superior.html)
+[为什么 Lisp 语言如此先进？](http://www.ruanyifeng.com/blog/2010/10/why_lisp_is_superior.html)
