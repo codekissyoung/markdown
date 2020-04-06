@@ -45,6 +45,7 @@ section .bss
 ```
 
 ```makefile
+# makefile
 BIN=systemcall
 
 $(BIN) : systemcall.o
@@ -288,4 +289,60 @@ hello world!
 hELLO WORLD!
 FUck you Bitch
 FUCK YOU BITCH
+```
+
+`hexdump`程序，将来自标准输入的字符全部用 16 进制打印出来。
+
+## 使用 标准 C 函数库的汇编程序
+
+![](https://img.codekissyoung.com/2020/04/07/cc4a5a65bac2693390ecc8e43cccd6e1.png)
+
+C 函数调用公约：
+
+> PS： 这里强调下，这只是 32 位 C 函数调用公约，升级到 64 位后，调用约定完全变化了！！！所以下面的编译也使用了 32 位的编译方式。
+
+- 函数必须暂存 `EBX` `ESP` `EBP` `ESI` `EDI` 寄存器，调用后恢复
+- 传递给函数的参数，以与参数顺序相反的顺序压栈，`Func(foo, bar, bas)` 的压栈顺序：`bas` `bar` `foo`
+- 参数由主调函数进行处理，一个个`POP`或则是修改`ESP`偏移
+- 返回值存储在 `eax` 中
+- 入口点从`_start:`改为`main:`
+
+```asm
+section .text
+
+extern puts
+global main
+
+main:
+    nop
+    push ebp
+    mov ebp, esp
+    push ebx
+    push esi
+    push edi
+    ;;;;;;;;;;;;;; 调用约定，保护现场
+
+    push msg        ; 将 msg 地址压入栈，作为 puts 函数的入参
+    call puts       ; 调用 glibc 中的 puts 函数
+    add esp, 4      ; 清理栈，将 esp 调回 4 个字节
+
+    ;;;;;;;;;;;;;; 调用约定，清理现场
+    pop edi         ; 恢复保存的寄存器
+    pop esi
+    pop ebx
+    mov esp, ebp    ; 返回之前销毁栈空间
+    pop ebp
+    ret             ; 将控制返回给 Linux
+
+section .data
+    msg: db "Hello world",0
+section .bss
+```
+
+```makefile
+# uselibc 32 位
+uselibc : uselibc.o
+	gcc -m32 uselibc.o -o uselibc
+uselibc.o : uselibc.asm
+	nasm -f elf32 -F dwarf uselibc.asm -l uselibc.lst
 ```
