@@ -106,9 +106,17 @@ mov edx, len    ; 长度
 int 80h         ; 发送中断，开始系统调用
 ```
 
+#### 软中断与硬件中断的区别
+
+硬件中断的中断码从`0`到`256`，直接对应操作系统内核里的中断处理程序，而软中断`80H`只算硬件中断中的一个，专门用来处理应用程序发起的系统调用，系统调用号约定号存储在`eax`中。
+
 ### 保护模式下内存寻址
 
-![](https://img.codekissyoung.com/2020/04/05/0b256aed4c1319b59d6a494c754d709d.png)
+```asm
+[BASE + ( INDEX x SCALE ) + DISP ]
+```
+
+其中`BASE` 与 `INDEX` 可以是任意常用寄存器，`SCALE`可取`2 4 8`等，`DISP` 是常数。
 
 ### 调用子过程
 
@@ -118,37 +126,166 @@ global _start
 _start:
 	nop
     call printHelloWorld
-    call exit
 
 printHelloWorld:
-    ; 保护现场
-    push rax
-    push rbx
-    push rcx
-    push rdx
-
+    push rax ; 保护现场
+    push rbx ; 保护现场
+    push rcx ; 保护现场
+    push rdx ; 保护现场
 	mov eax, 4      ; sys_write 系统调用
 	mov ebx, 1      ; 输出到 文件描述符 1
 	mov ecx, msg    ; 起时位置
 	mov edx, len    ; 长度
 	int 80h         ; 发送中断，开始系统调用
-
-    ; 恢复现场
-    pop rdx
-    pop rcx
-    pop rbx
-    pop rax
+    pop rdx ; 恢复现场
+    pop rcx ; 恢复现场
+    pop rbx ; 恢复现场
+    pop rax ; 恢复现场
     ret
-exit:
+
+section .data ; 数据段
+    msg:
+        db "Hello world", 10 , "nice to meet you !", 10 ; 10 是换行符 \n 的 assic 码
+    len equ $ - msg ; nasm编译时，计算 msg: 到本行的字节长度, 赋值给 len
+section .bss ; 保存为被初始化的数据的 .bss 段
+```
+
+## 常用汇编指令
+
+### jnz 条件跳转
+
+```asm
+; 数据段
+section .data
+    Snippet db "CODEKISSYOUNG"  ; 长度 13
+
+; 程序段
+section .text
+global _start
+_start:
+	nop
+    mov ebx, Snippet
+    mov eax, 13
+DoMore:
+    add byte [ebx], 32  ; 通过 + 32 将大写字母 修改为 小写
+    inc ebx             ; ebx 地址 ++
+    dec eax             ; eax 归零后，ZF = 0，jnz 判断为 false，不再跳转到 DoMore
+    jnz DoMore
+```
+
+### 四则运算
+
+#### 相反数（求补运算）
+
+```asm
+mov eax, 42     ; eax = 42          : 42
+neg eax         ; eax = - eax       : -42
+add eax, 42     ; eax = eax + 42    : 0
+```
+
+```asm
+; 乘法
+mov eax, 447
+mov ebx, 1739
+mul ebx         ; eax = eax * ebx
+```
+
+## 示范程序
+
+```asm
+; systemcall.asm 从标准输入读取字符，一次一个Byte，如果是小写字母，就换成大写字母
+section .text ; 程序段
+global _start
+_start:
+	nop
+Read:
+    mov eax, 3              ; 指定 sys_read 系统调用
+    mov ebx, 0              ; 文件描述符 0
+    mov ecx, Buff           ; 缓冲区地址为 Buff
+    mov edx, 1              ; 读取字符数 1 byte
+    int 80H
+    cmp eax, 0              ; 如果 eax 为0， 说明到了 EOF
+        je Exit
+    mov r15, [Buff]         ; 用 r15 查看下 Buff 内存处的值
+    cmp byte [Buff], 'a'    ; 字符 < a ，直接输出
+        jb Write
+    cmp byte [Buff], 'z'    ; 字符 > z，直接输出
+        ja Write
+    sub byte [Buff], 20H    ; a <= 字符 <= z，所以通过 - 20H 转换为大写字符，再输出
+        jmp Write
+Write:
+    mov eax, 4                  ; sys_write
+    mov ebx, 1                  ; 文件描述符
+    mov ecx, Buff               ; 缓冲地址
+    mov edx, 1                  ; 写入字节
+    int 80h
+    jmp Read
+Exit:
 	mov eax, 1      ; exit 系统调用号
 	mov ebx, 0      ; return 0
 	int 80h         ; 发送中断，开始系统调用
 
-; 数据段
-section .data
-    msg:
-        db "Hello world", 10 , "nice to meet you !", 10 ; 10 是换行符 \n 的 assic 码
-    len equ $ - msg ; nasm编译时，计算 msg: 到本行的字节长度, 赋值给 len
-; 保存为被初始化的数据的 .bss 段
-section .bss
+section .data       ; 数据段
+section .bss        ; 保存为被初始化的数据的 .bss 段
+    Buff resb 1
+```
+
+上面是缓冲区大小为`1`，读取一段字符的系统调用次数是非常多的，下面程序是将缓冲区大小设置为 1024，这样只需要一次系统调用，然后批量修改小写字母为大写字母，就可以达到目的，优化后的代码如下：
+
+```asm
+section .text ; 程序段
+global _start
+_start:
+	nop
+Read:
+    mov eax, 3              ; 指定 sys_read 系统调用
+    mov ebx, 0              ; 文件描述符 0
+    mov ecx, Buff           ; 缓冲区地址为 Buff
+    mov edx, BuffLen        ; 读取字符数 1 byte
+    int 80H
+    mov esi, eax            ; 复制系统调用返回值，保存在 esi 中
+    cmp eax, 0              ; 如果 eax 为0， 说明到了 EOF
+        je Exit
+
+;   扫描缓冲区，改写小写字符为大写
+    mov ebp, Buff           ; 基址
+    mov ecx, esi            ; 保存读入的字节数到 ecx，即为偏移量
+    dec ecx                 ; ebp + ecx 是越界地址，所以调整偏移量 ecx - 1
+Scan:
+    cmp byte [ebp + ecx], 'a'    ; 字符 < a ，直接输出
+        jb Next
+    cmp byte [ebp + ecx], 'z'    ; 字符 > z，直接输出
+        ja Next
+    sub byte [ebp + ecx], 20H    ; a <= 字符 <= z，所以通过 - 20H 转换为大写字符，再输出
+Next:
+    dec ecx
+    jnz Scan                     ; 如果还有字符，继续 Scan
+
+Write:
+    mov eax, 4                  ; sys_write
+    mov ebx, 1                  ; 文件描述符
+    mov ecx, Buff               ; 缓冲地址
+    mov edx, esi                ; 写入字节
+    int 80h
+    jmp Read
+
+Exit:
+	mov eax, 1      ; exit 系统调用号
+	mov ebx, 0      ; return 0
+	int 80h         ; 发送中断，开始系统调用
+
+section .data       ; 数据段
+section .bss        ; 保存为被初始化的数据的 .bss 段
+    BuffLen equ 1024
+    Buff resb BuffLen
+```
+
+调用效果如下：
+
+```bash
+$ systemcall
+hello world!
+hELLO WORLD!
+FUck you Bitch
+FUCK YOU BITCH
 ```
