@@ -346,3 +346,5 @@ uselibc : uselibc.o
 uselibc.o : uselibc.asm
 	nasm -f elf32 -F dwarf uselibc.asm -l uselibc.lst
 ```
+
+[inputString.asm](https://github.com/codekissyoung/linux-asm-32/blob/master/inputString.asm) 调用了 C 语言的`Scanf` `printf` `fgets`等函数。
