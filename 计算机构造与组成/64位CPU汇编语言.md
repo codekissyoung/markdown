@@ -44,7 +44,7 @@ OUTPUT:
 .text
 	.globl	main
 main:
-	pushq	%rbp
+	pushq   %rbp
 	movq	%rsp, %rbp
 	leaq	OUTPUT(%rip), %rdi
 	call	puts@PLT
