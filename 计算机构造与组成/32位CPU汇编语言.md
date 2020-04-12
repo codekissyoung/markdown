@@ -348,3 +348,115 @@ uselibc.o : uselibc.asm
 ```
 
 [inputString.asm](https://github.com/codekissyoung/linux-asm-32/blob/master/inputString.asm) 调用了 C 语言的`Scanf` `printf` `fgets`等函数。
+
+## Nasm 汇编
+
+### 常量
+
+```asm
+mov ax, 100             ; 十进制常量
+mov bx, 0xa2            ; 十六进制常量
+mov ax, 'ab'            ; 字符常量
+db 'ninechars', 0, 0, 0 ; 字符串常量
+dd 3.6525e2             ; 浮点数常量
+```
+
+### 伪指令
+
+指示`Nasm`如何生成目标程序的一种指令。
+
+```asm
+DB、DW、DD、DQ、DT              ; 定义初始化数据
+db 'Hello World'                ; eg
+
+resb、resw、resd、resq、rest    ; 定义不含初始值的数据
+Buffer resb 64                  ; 保留64个字节的内存空间
+
+incbin  "pic.dat"               ; 引用全部文件
+incbin  "pic.dat", 1024         ; 跳过前面 1024 字节
+incbin  "pic.dat", 1024, 512    ; 跳过1024, 最多引用 512 字节
+
+message db "Hello, world"       ; equ 配合标号使用，给一个符号绑定一个常量
+msglen  equ $ - message         ; $ 是当前 减去 mesage 得到的字节数，这里是 12，msglen 永远都是 12
+
+Times 次数 指令                 ; 指定指令重复执行的次数
+zerobuf: Times 64 db 0          ; 64 字节的 0
+```
+
+### 有效地址、EA、effective address
+
+有效地址为指令的一个操作数，运行时实际会映射到一个内存地址，在`Nasm`里它的表示和计算都非常简单，计算在方括号内的表达式，结果就是一个有效地址。
+
+```asm
+var db 'a', 'b', 'c', 'd'
+buf db '1', '2', '3', '4'
+mov al, [var+1]             ; 将 b 送入 al
+mov [buf], al               ; al 里的 b 送入 [buf]
+```
+
+### 表达式
+
+```asm
+$                           ; 表示此表达式源程序开始的地址
+$$                          ; 当前段地址
+$ - $$                      ; 此表达式源程序开始的地址离开段的距离（字节数）
+```
+
+### 运算符
+
+```asm
+| 与 OR
+^ 与 XOR
+& 与 AND
+<< 左移
+>> 右移
++ - * / 加 减 乘 无符号数除法
+% 无符号数余数
+// 有符号数除法
+%% 有符号数余数
+～ 取操作数反码
+-  求操作数的相反数
+seg 取操作数的段地址
+```
+
+### 局部符号
+
+以`.`开头的符号
+
+```asm
+label2:
+    .loop
+        ; 某些程序代码
+        jne .loop      ; 事实上跳转到 label2: .loop
+        ret
+label3:
+    .loop
+        ;;;;;;;;;; 其他代码
+        jne .loop       ; 事实上跳转到 label3: .loop
+        ret
+```
+
+### 预处理器
+
+以`%`开头的指令。
+
+```asm
+%include "readchr.mac"                  ; 引入别的源文件的宏
+%define sum(a,b) a+b                    ; 单行宏
+mov dl, sum(64,1)
+%undef sum                              ; 取消 sum 的定义
+```
+
+### 汇编指引
+
+```asm
+[bits 16]               ; 16位模式
+[bits 32]               ; 32位模式
+
+; unix 下目标文件格式，支持的三个标准段名
+[section .text]
+[section .data]
+[section .bbs]
+
+ORG 0100H               ; 指示程序代码必须从内存的 0100H 处开始存放
+```
