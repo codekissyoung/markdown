@@ -6,11 +6,100 @@
 
 放弃：隐式数据转换，类系统，运算符重载，默认参数，继承，泛函数，异常，宏，函数修饰，线程局部存储．
 
-[Go 语言官网](https://golang.google.cn/)
-[Go 代码包文档](http://godoc.org)
+## 参考资料
+
+[Go 语言官网 golang.org](https://golang.org/)
+[Go 代码包文档 godoc.org](http://godoc.org)
+[Go 在线运行环境 play.golang.org](https://play.golang.org/)
+[Go 在线入门教程 A tor of Go 英文版](https://tour.golang.org/list) | [中文版](https://tour.go-zh.org/welcome/1)
+[Go 官方 Package 实现代码文档](https://golang.org/pkg/)
+[Go 官方博客 英文版](https://blog.golang.org/)
+[Go 官方收录的各种报告的讲稿](https://talks.golang.org/)
 [搜索 Go 语言项目](https://gowalker.org/)
 [Go 语言入门教程](http://c.biancheng.net/golang/)
 [Go 靠谱书推荐](https://www.zhihu.com/question/30461290)
+
+```bash
+$ go get github.com/adonovan/gopl.io            # 获取 Go 语言圣经里的代码
+$ go get golang.org/x/tools/cmd/goimports       # 获取 goimports 工具
+```
+
+`echo`程序：
+
+```go
+package main
+import (
+	"fmt"
+	"os"
+)
+func main() {
+	var s, sep string
+	for i := 1; i < len(os.Args); i++ {
+		s += sep + os.Args[i]
+		sep = " "
+	}
+	fmt.Println(s)
+}
+```
+
+`echo`程序切片改良版本：
+
+```go
+package main
+import (
+	"fmt"
+	"os"
+)
+func main() {
+	var s, sep string
+	//fmt.Println(os.Args[:])
+	for _, arg := range os.Args[1:] {
+		s += sep + arg
+		sep = " "
+	}
+	fmt.Println(s)
+}
+```
+
+答应重复行的 `dup` 程序：
+
+```go
+package main
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"os"
+)
+func main() {
+	counts := make(map[string]int)
+	files := os.Args[1:]
+	if len(files) > 0 {
+		for _, fileName := range files {
+			file, err := os.Open(fileName)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "dup: %v\n", err)
+				continue
+			}
+			countLines(file, counts)
+			file.Close()
+		}
+	} else {
+		countLines(os.Stdin, counts)
+	}
+	for line, n := range counts {
+		if n > 1 {
+			fmt.Printf("%d\t%s\t\n", n, line)
+		}
+	}
+}
+func countLines(reader io.Reader, counts map[string]int) {
+	input := bufio.NewScanner(reader)
+	for input.Scan() {
+		counts[input.Text()]++
+	}
+}
+```
 
 ## 基础
 

@@ -2,6 +2,9 @@
 
 `x86`、`x86-64`、`PowerPC`、`ARM` CPU 的 32 位指令集是不同的，而目前的汇编语言有两种 `intel`和`AT&T`。`Gcc`编译器都是默认使用`AT&T`汇编语言的。汇编器 `nasm`、`masm`、`as`、`yasm` 可以将汇编语言编译成对应平台的目标文件。
 
+[ibm Nasm 文章](https://www.ibm.com/developerworks/cn/linux/l-gas-nasm.html)
+[Linux 汇编语言程序设计 (使用 NASM)](https://www.dazhuanlan.com/2019/12/05/5de86d1c77ab8/)
+
 ## 汇编器 nasm
 
 首先去[官网](https://www.nasm.us/)下载最新版本的源代码。然后：
@@ -458,5 +461,5 @@ mov dl, sum(64,1)
 [section .data]
 [section .bbs]
 
-ORG 0100H               ; 指示程序代码必须从内存的 0100H 处开始存放
+[ORG 0100H]               ; 指示程序代码必须从内存的 0100H 处开始存放
 ```

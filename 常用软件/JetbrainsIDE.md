@@ -9,6 +9,12 @@ $ rm -rf .GoLand2019.1/config/eval
 $ rm -rf .java/.userPrefs/jetbrains/goland
 ```
 
+## 快捷健
+
+```bash
+Ctrl + Alt + s                  调出 Settings 界面
+```
+
 ## 普通设置
 
 #### 关闭单词拼写检查
@@ -39,6 +45,10 @@ cky@cky-pc:~/go/src$ tree -L 2
 ![](https://img.codekissyoung.com/2020/02/06/3b9204f67a0e36aaac6ec36f4b494e7d.png)
 
 添加自动引入包 `goimports` 和 格式化代码 `go fmt` 工具
+
+```bash
+$ go get golang.org/x/tools/cmd/goimports    # go fmt 是自带 goimports 则需要安装
+```
 
 ![](https://img.codekissyoung.com/2020/02/06/ea4011e0ab5e25cfc8302aa6ccb4c191.png)
 

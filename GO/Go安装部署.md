@@ -13,10 +13,25 @@ export PATH=$PATH:$GOROOT/bin
 ```bash
 $ go version            # 查看版本
 $ go env                # 查看环境变量 编译的参数
-$ go get                # 获取第三方库 下载到 src 目录
+$ go get                # 获取第三方库 下载到 GOPATH 的 src 目录 依赖 git
+$ go run                # 直接运行程序
+$ go build              # 测试编译，检查是否有编译错误
+$ go fmt                # 格式化源码（部分IDE在保存时自动调用）
+$ go install            # 编译包文件并编译整个程序
+$ go test               # 运行测试文件
+$ go doc                # 查看文档
 ```
 
 ## 范例
+
+```go
+// hello.go
+package main
+import "fmt"
+func main() {
+    fmt.Printf("hello, world\n")
+}
+```
 
 ```bash
 $ cd $HOME/go           # 工作区
@@ -28,14 +43,9 @@ $ tree
     └── hello           # 本目录执行 go build
         ├── hello       # 可执行文件
         └── hello.go    # hello world 命令源码文件
-$ ./hello
-hello, world
 ```
 
-```go
-package main
-import "fmt"
-func main() {
-    fmt.Printf("hello, world\n")
-}
+```bash
+$ ./hello
+hello, world
 ```
