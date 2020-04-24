@@ -61,6 +61,26 @@ func main() {
 }
 ```
 
+`echo`带自定义参数版本，利用`flag`包实现：
+
+```go
+package main
+import (
+	"flag"
+	"fmt"
+	"strings"
+)
+var n = flag.Bool("n", true, "不换行")        // 默认换行
+var sep = flag.String("s", " ", "指定分割府") // 默认分割符：空格
+func main() {
+	flag.Parse()
+	fmt.Print(strings.Join(flag.Args(), *sep))
+	if *n {
+		fmt.Println()
+	}
+}
+```
+
 答应重复行的 `dup` 程序：
 
 ```go
@@ -98,6 +118,41 @@ func countLines(reader io.Reader, counts map[string]int) {
 	for input.Scan() {
 		counts[input.Text()]++
 	}
+}
+```
+
+### 变量的作用域
+
+声明一个新变量 or 引用全局变量? 对比下面两段代码：
+
+```go
+var cwd string
+func init() {
+	cwd, err := os.Getwd()
+    if err != nil {
+		log.Fatalf("os.Getwd faild: %v", err)
+	}
+	log.Printf("Working directory = %s", cwd)
+}
+func main() {
+	fmt.Printf("cwd : %s", cwd)
+}
+```
+
+```go
+var cwd string
+func init() {
+
+	var err error
+	cwd, err = os.Getwd()
+
+    if err != nil {
+		log.Fatalf("os.Getwd faild: %v", err)
+	}
+	log.Printf("Working directory = %s", cwd)
+}
+func main() {
+	fmt.Printf("cwd : %s", cwd)
 }
 ```
 
