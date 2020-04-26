@@ -7,7 +7,6 @@ $ wget https://dl.google.com/go/go1.13.4.linux-amd64.tar.gz  # 解压到 /usr/lo
 export GOROOT=/usr/local/go
 export GOPATH=~/go                  # 工作区
 export PATH=$PATH:$GOROOT/bin
-＂export GOBIN=~/bin                # go install 保存的可执行文件路径
 ```
 
 ```bash
