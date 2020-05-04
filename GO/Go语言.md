@@ -18,6 +18,7 @@
 [搜索 Go 语言项目](https://gowalker.org/)
 [Go 语言入门教程](http://c.biancheng.net/golang/)
 [Go 靠谱书推荐](https://www.zhihu.com/question/30461290)
+[Go 命令教程](https://hyper0x.github.io/go_command_tutorial/#/)
 
 ```bash
 $ go get github.com/adonovan/gopl.io            # 获取 Go 语言圣经里的代码
