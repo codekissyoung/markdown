@@ -4,7 +4,7 @@
 
 `Go` 没有类，也没有对象，但是 `object.func()` 这样的方式，又很具有表达力．所以 `Go` 采用了＂为结构体绑定方法＂这一设计．
 
-方法可以理解为一个特别的函数，该函数的默认入参是：当前结构体变量，为了和其他入参区分开，结构体入参位置在 函数名 前面 ^\_^
+方法可以理解为一个特别的函数，该函数的默认入参是：当前结构体变量，为了和其他入参区分开，结构体入参位置在 函数名 前面
 
 ```go
 type Vertex struct {
@@ -53,15 +53,17 @@ p := &v
 Scale( v, 10 )	    // cannot use v (type Vertex) as type *Vertex in argument to Scale
 Scale( &v, 10 )     // ok
 Scale( p, 10 )      // ok
+
 v.Scale( 10 )       // ok
 (&v).Scale( 10 )    // ok
 p.Scale( 10 )       // ok
+
 fmt.Println( v, p )
 ```
 
 对于 `Scale( v, 10 )` ，会因为　＂函数参数类型检查不一致＂ 而报错
 
-但是对于 `v.Scale( 10 )` `(&v).Scale( 10 )` `p.Scale( 10 )` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^\_^
+但是对于 `v.Scale( 10 )` `(&v).Scale( 10 )` `p.Scale( 10 )` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的
 
 再来观察下:
 
@@ -72,7 +74,8 @@ func main() {
     fmt.Println( Abs(v) )  // 5
 	fmt.Println( Abs(&v) ) // cannot use &v (type *Vertex) as type Vertex in argument to Abs
 	fmt.Println( Abs(p) )  // cannot use p (type *Vertex) as type Vertex in argument to Abs
-	fmt.Println( v.Abs() )   // 5
+
+    fmt.Println( v.Abs() )   // 5
 	fmt.Println( (*p).Abs() )// 5
 	fmt.Println( p.Abs() )   // 5
 }
@@ -123,4 +126,30 @@ func main() {
 
     customer(channel)               // 数据消费函数
 }
+```
+
+## 方法
+
+与某个数据类型绑定在一起的函数
+
+```go
+type myInt int;
+
+func (i myInt) add( another int ) myInt {
+    i = i + myInt(another)
+    return i
+}
+
+i1 := myInt(1)
+i2 := i1.add(2)
+fmt.Println(i1, i2) // 1 3
+
+// 指针
+func (i *myInt) add( another int ) myInt {
+    *i = *i + myInt(another)
+    return *i
+}
+i1 := myInt(1)
+i2 := i1.add(2)
+fmt.Println(i1, i2) // 3 3
 ```

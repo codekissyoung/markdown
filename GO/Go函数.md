@@ -123,32 +123,6 @@ func main() {
 }
 ```
 
-## 方法
-
-与某个数据类型绑定在一起的函数
-
-```go
-type myInt int;
-
-func (i myInt) add( another int ) myInt {
-    i = i + myInt(another)
-    return i
-}
-
-i1 := myInt(1)
-i2 := i1.add(2)
-fmt.Println(i1, i2) // 1 3
-
-// 指针
-func (i *myInt) add( another int ) myInt {
-    *i = *i + myInt(another)
-    return *i
-}
-i1 := myInt(1)
-i2 := i1.add(2)
-fmt.Println(i1, i2) // 3 3
-```
-
 ## panic 和 recover 机制
 
 ```go
