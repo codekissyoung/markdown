@@ -5,16 +5,18 @@
 ## 安装与配置
 
 ```bash
+$ sudo apt-get install linux-image-extra-virtual       
+$ sudo apt-get install apt-transport-https ca-certificates software-properties-common
 $ sudo apt-get install docker.io
-$ sudo docker version               
-$ sudo docker info 			# 展示安装配置等详细信息
+$ sudo usermod -aG docker $USER		# 免 sudo 执行 docker
+$ docker version               
+$ docker info
 ```
 
-#### 配置加速器
+### 配置加速器
 
-`/etc/docker/daemon.json` ：
-
-```bash
+```json
+// /etc/docker/daemon.json
 {
   "registry-mirrors":[
     "https://registry.docker-cn.com",
@@ -27,17 +29,37 @@ $ sudo docker info 			# 展示安装配置等详细信息
 ```bash
 $ sudo systemctl daemon-reload    # 重启 daemon
 $ sudo systemctl restart docker   # 重启 docker daemon
-$ sudo systemctl enable docker    # 设置开机启动docker
+$ sudo systemctl enable docker    # 开机启动 docker
 ```
 
-## Images
+### 服务端管理
 
 ```bash
-$ docker pull ubuntu              # 从 Registry 拉取一个 Image 到 本地
-$ docker images                   # 查看本地的 Images
+$ dockerd -D -H tcp://127.0.0.1:2376
 ```
 
-## Containers
+
+
+```json
+{
+
+}
+```
+
+
+
+
+
+
+
+## 镜像管理
+
+```bash
+$ docker images                   # 查看本地的 Images
+$ docker pull ubuntu              # 从 Registry 拉取一个 Image 到 本地
+```
+
+## 容器管理
 
 ### 作为 command 运行
 
@@ -51,9 +73,7 @@ $ docker run ubuntu:18.04 /bin/echo "hello 18.04"
 ```bash
 $ docker run -it ubuntu:18.04 /bin/bash # 起一个容器，并进入它的终端界面
 root@7f62c7880035:/# cat /proc/version
-Linux version 5.3.0-40-generic (buildd@lcy01-amd64-024) (gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1))
 root@7f62c7880035:/# ls
-bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
 root@7f62c7880035:~# exit               # 退出容器，容器也直接停止了
 ```
 
@@ -63,38 +83,42 @@ root@7f62c7880035:~# exit               # 退出容器，容器也直接停止�
 ### 作为 Daemon 运行
 
 ```bash
-# 以 Daemon 方式起一个容器
 $ docker run -d ubuntu:18.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
-$ docker ps                                     # 查看运行状态的容器
-$ docker ps -a                                  # 查看所有状态的容器
-$ docker logs e73ae1b93869                      # 查看 logs
-$ docker stop e73ae1b93869                      # 停止容器
 $ docker run -p 3306:3306                       # 端口映射
 $ docker run -v /home/mysql/data:/var/lib/mysql # 存储卷映射
 $ docker run -e VAR="xxxx"                      # 指定容器环境变量
 $ docker run --restart=always  --name web -d centos /bin/sh -c "echo helloworld"    # 自动重启
 # 退出代码非０时才重启，重启尝试次数为５次
 $ docker run --restart=on-failure:5 --name web -d ubuntu /bin/bash 
-$ docker stats                                  # 查看所有正在运行的容器的状态
 ```
 
-#### 操作实例
+### 查看容器
 
-```bash
-$ docker start 容器ID                # 重新启动已经停止的容器
-$ docker stop 容器ID                 # 停止容器
-$ docker exec -it 容器ID /bin/bash   # 附着到一个容器上,连接到容器的shell
-$ docker logs -ft 容器ID             # -f 输出容器内部的标准输出 -t 显示时间
-$ docker top 容器ID                  # 查看容器内进程
-$ docker inspect 容器ID              # 查看容器的详细状态
-$ docker rm 容器ID                   # 删除一个容器
-$ docker rm $(docker ps -aq)        # 删除所有容器
-$ docker container prune            # 将所有 exit 状态的容器清除
+```dockerfile
+# 查看
+$ docker ps                                     # 查看运行状态的容器
+$ docker ps -a                                  # 查看所有状态的容器
+$ docker stats                                  # 查看所有正在运行的容器的状态
+$ docker logs -ft e73ae1b93869                  # 查看 logs
+$ docker top e73ae1b93869          				# 查看容器内进程
+$ docker inspect e73ae1b93869              		# 查看容器的详细状态
+
+## 停止
+$ docker stop e73ae1b93869                      # 停止容器
+
+## 再启动
+$ docker start e73ae1b93869                		# 重新启动已经停止的容器
+$ docker exec -it e73ae1b93869 /bin/bash   		# 附着到一个容器上,连接到容器的shell
+
+## 销毁
+$ docker rm e73ae1b93869                   		# 删除一个容器
+$ docker container prune            			# 将所有 exit 状态的容器清除
+$ docker rm $(docker ps -aq)        			# 删除所有容器
 ```
 
 如果容器内 `PID = 1` 号进程停止运行了，那么容器也会随着退出。
 
-#### 一个WebApp应用案例
+#### WebApp应用案例
 
 ```bash
 $ docker pull training/webapp
@@ -109,33 +133,28 @@ $ curl localhost:4000
 Hello world!%
 
 $ docker logs -ft 05941fb95b13
-2020-02-20T09:35:38.040175400Z Running on http://0.0.0.0:5000/ (Press CTRL+C to 
-...
+2020-02-20T09:35:38.040175400Z Running on http://0.0.0.0:5000/
 
 $ docker top 05941fb95b13
 UID   PID    PPID   C   STIME   TTY   TIME      CMD
 root  26706  26678  0   17:35   ?     00:00:00  python app.py
 ```
 
-#### 一个数据库案例
+#### 数据库案例
 
 ```bash
-$ sudo docker pull mysql:5.6        # 获取一个 Mysql 5.6 的镜像
-
-# 将刚刚下载的镜像跑起来
-$ sudo docker run -p 3306:3306 --name mymysql -v /home/mysql/data:/var/lib/mysql \
-$ -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6
+$ docker pull mysql:5.6        # 获取一个 Mysql 5.6 的镜像
+$ docker run -p 3306:3306 -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6
 ```
 
 ## Dockerfile
 
-构建`Nginx`的简单例子：
+#### Nginx例子
 
 ```dockerfile
 FROM ubuntu:18.04
 MAINTAINER link "1162097842@qq.com"
-RUN apt-get update
-RUN apt-get install -y nginx
+RUN apt-get update && apt-get install -y nginx
 RUN echo 'Hi, I am your container' > /var/www/html/index.html
 EXPOSE 80
 ```
@@ -151,12 +170,12 @@ $ curl localhost:32776
 Hi, I am your container
 ```
 
-如何从一个实例中，创建一个 `Image` 呢，接上文：
+#### 将容器打包成镜像
 
 ```bash
 $ docker commit -m"add user link" -a"link" 容器ID link/ubuntu:18.04.v1
 $ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 tag，tag 就是 IMAGE ID 方便易于记忆的
-$ docker history image_id     # 查看一个Image的构建历史
+$ docker history image_id     				# 查看一个Image的构建历史
 ```
 
 #### Dockerfile 参考
