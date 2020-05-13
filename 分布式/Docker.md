@@ -1,4 +1,4 @@
-# Docker 教程
+# Docker
 
 ![](http://img.codekissyoung.com/2019/12/11/8fc3e024ef6ccd87fecbc06bb6e61683.png)
 
@@ -36,28 +36,45 @@ $ sudo systemctl enable docker    # 开机启动 docker
 
 ```bash
 $ dockerd -D -H tcp://127.0.0.1:2376
+$ journalctl -u docker.service 			# 查看服务日志
 ```
 
 
 
 ```json
+// /etc/docker/daemon.json
 {
-
+	"debug":true,
+    "hosts":["tcp://127.0.0.1:2376"]
 }
 ```
-
-
-
-
-
-
 
 ## 镜像管理
 
 ```bash
 $ docker images                   # 查看本地的 Images
 $ docker pull ubuntu              # 从 Registry 拉取一个 Image 到 本地
+$ docker image prune -f			  # 清理无用的镜像
+$ docker rmi 镜像ID/名字		   # 删除镜像
+$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04	# 导出镜像到本地文件
+$ docker load -i ubuntu_18.04.tar.gz 				# 导入本地镜像文件
 ```
+
+### 将容器打包成镜像
+
+```bash
+$ docker commit -m"commit msg" -a"link" 容器ID link/ubuntu:18.04.v1
+$ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 tag，tag 就是 IMAGE ID 方便易于记忆的
+$ docker history image_id     				# 查看一个Image的构建历史
+```
+
+### 利用Dockerfile创建镜像
+
+```bash
+$ docker build -t link/ubuntu.v1 .
+```
+
+
 
 ## 容器管理
 
@@ -94,7 +111,7 @@ $ docker run --restart=on-failure:5 --name web -d ubuntu /bin/bash
 
 ### 查看容器
 
-```dockerfile
+```bash
 # 查看
 $ docker ps                                     # 查看运行状态的容器
 $ docker ps -a                                  # 查看所有状态的容器
@@ -114,6 +131,15 @@ $ docker exec -it e73ae1b93869 /bin/bash   		# 附着到一个容器上,连接�
 $ docker rm e73ae1b93869                   		# 删除一个容器
 $ docker container prune            			# 将所有 exit 状态的容器清除
 $ docker rm $(docker ps -aq)        			# 删除所有容器
+```
+
+### 其他容器命令
+
+```bash
+$ docker cp data.txt test:/tmp/ # 复制文件到容器内部
+$ docker container port test # 查看容器端口映射情况
+$ docker export -o ubuntu18.04.c.tar.gz 容器ID			# 导出一个容器
+$ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1    # 导入一个容器
 ```
 
 如果容器内 `PID = 1` 号进程停止运行了，那么容器也会随着退出。
@@ -147,9 +173,21 @@ $ docker pull mysql:5.6        # 获取一个 Mysql 5.6 的镜像
 $ docker run -p 3306:3306 -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6
 ```
 
+
+
+## 数据卷
+
+```bash
+$ docker volume create -d local test
+$ docker run -d -P --mount type=bind,source=/webapp,destination=/opt/webapp training/webapp python app.py
+$ docker run -d -P -v /webapp:/opt/webapp training/webapp python app.py 
+```
+
+
+
 ## Dockerfile
 
-#### Nginx例子
+### Nginx例子
 
 ```dockerfile
 FROM ubuntu:18.04
@@ -170,13 +208,7 @@ $ curl localhost:32776
 Hi, I am your container
 ```
 
-#### 将容器打包成镜像
 
-```bash
-$ docker commit -m"add user link" -a"link" 容器ID link/ubuntu:18.04.v1
-$ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 tag，tag 就是 IMAGE ID 方便易于记忆的
-$ docker history image_id     				# 查看一个Image的构建历史
-```
 
 #### Dockerfile 参考
 
