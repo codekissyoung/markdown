@@ -8,10 +8,9 @@
 
 ## 技能清单
 
-熟悉语言：C / Shell / PHP
+熟悉语言：C / Go / PHP / JS
 数据存储：MySQL / Redis
-熟悉框架：Codeigniter / Yii2 advanced
-研发习惯：Ubuntu / Git / Vim / Tmux / VScode / Gcc
+熟悉框架：Codeigniter / Yii2 advanced / ThinkPHP
 自我评价：熟悉常用的数据结构和 TCP/IP 网络，熟悉 Linux 下基于 Ractor 模式的 C Service 开发，熟悉 LNMP 架构及 PHP 脚本，熟悉 Shell 脚本 ，了解汇编和 C++
 
 ## 2019.12 - 至今 小雨伞互联网保险 运维开发工程师
