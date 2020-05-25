@@ -39,8 +39,6 @@ $ dockerd -D -H tcp://127.0.0.1:2376
 $ journalctl -u docker.service 			# 查看服务日志
 ```
 
-
-
 ```json
 // /etc/docker/daemon.json
 {
@@ -49,15 +47,26 @@ $ journalctl -u docker.service 			# 查看服务日志
 }
 ```
 
+
+
+## 快速常用命令
+
+```bash
+$ docker build -t="link/ubuntu.v1" .									# 从Dockerfile构建镜像
+$ docker run -it ubuntu:18.04 /bin/bash 								# 交互终端
+$ docker run -d -p 3306:3306 -v /mysql_data:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=123456 --restart=always --name db01 mysql:5.6	# Daemon
+```
+
 ## 镜像管理
 
 ```bash
-$ docker images                   # 查看本地的 Images
-$ docker pull ubuntu              # 从 Registry 拉取一个 Image 到 本地
-$ docker image prune -f			  # 清理无用的镜像
-$ docker rmi 镜像ID/名字		   # 删除镜像
-$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04	# 导出镜像到本地文件
-$ docker load -i ubuntu_18.04.tar.gz 				# 导入本地镜像文件
+$ docker images                   						# 查看本地的 Images
+$ docker pull ubuntu              						# 从 Registry 拉取一个 Image 到 本地
+$ docker image prune -f			  						# 清理无用的镜像
+$ docker rmi 镜像ID/名字		   						 # 删除镜像
+$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04		# 导出镜像到本地文件
+$ docker load -i ubuntu_18.04.tar.gz 				    # 导入本地镜像文件
 ```
 
 ### 将容器打包成镜像

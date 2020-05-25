@@ -5,8 +5,8 @@
 ## 重新获取 30 天试用
 
 ```bash
-$ rm -rf .GoLand2019.1/config/eval
-$ rm -rf .java/.userPrefs/jetbrains/goland
+$ rm ~/.config/JetBrains/GoLand2020.1/eval/GoLand201.evaluation.key
+$ rm  ~/.java/.userPrefs/jetbrains/goland
 ```
 
 ## 快捷健
