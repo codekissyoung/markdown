@@ -13,15 +13,6 @@ func my_division(sum, num int) ( quotient int, remainder int ) {
 }
 a, b := my_division( 38, 10 );
 fmt.Println( "38 / 10 =  ", a, ".......", b ); // 38 / 10 =   3 ....... 8
-
-func divide(dividend int, divisor int) (result int, err error) {
-    if divisor == 0 {
-        err = errors.New("division by zero")
-        return
-    }
-    result = dividend / divisor
-    return
-}
 ```
 
 ## 匿名函数 闭包 lambda
