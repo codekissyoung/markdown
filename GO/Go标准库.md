@@ -127,3 +127,14 @@ num, err    := strconv.ParseInt("-11", 10, 0) // equal to Atoi()
 str         := strconv.FormatBool( false )    // boolen to string "false" or "true"
 str         := strconv.FormatInt( 16, 16)     // conv to string in 16th
 ```
+
+## time
+
+```go
+start := time.Now()
+// 业务代码
+end := time.Now()
+delta := end.Sub(start)
+fmt.Printf("执行时间: %s\n", delta)
+```
+

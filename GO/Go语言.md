@@ -2,23 +2,12 @@
 
 `CSP`（`communicating sequential processes` 顺序通信进程）：进程是一组中间没有共享状态的平行运行的处理过程，进程间使用 `Pipe` 进行通信和控制同步．
 
-拥有：类型系统 自动垃圾回收 `Package`系统 函数作为一等公民 词法作用域 系统调用接口 只读`utf-8`字符串
+拥有：类型系统 自动垃圾回收 `Package`系统 函数 词法作用域 系统调用接口 只读`utf-8`字符串
 
 放弃：隐式数据转换，类系统，运算符重载，默认参数，继承，泛函数，异常，宏，函数修饰，线程局部存储．
 
 ## 参考资料
 
-[Go 语言官网 golang.org](https://golang.org/)
-[Go 代码包文档 godoc.org](http://godoc.org)
-[Go 在线运行环境 play.golang.org](https://play.golang.org/)
-[Go 在线入门教程 A tor of Go 英文版](https://tour.golang.org/list) | [中文版](https://tour.go-zh.org/welcome/1)
-[Go 官方 Package 实现代码文档](https://golang.org/pkg/)
-[Go 官方博客 英文版](https://blog.golang.org/)
-[Go 官方收录的各种报告的讲稿](https://talks.golang.org/)
-[搜索 Go 语言项目](https://gowalker.org/)
-[Go 语言入门教程](http://c.biancheng.net/golang/)
-[Go 靠谱书推荐](https://www.zhihu.com/question/30461290)
-[Go 命令教程](https://hyper0x.github.io/go_command_tutorial/#/)
 
 ```bash
 $ go get github.com/adonovan/gopl.io            # 获取 Go 语言圣经里的代码
@@ -169,7 +158,25 @@ $ go run -gcflags "-m -l" cky.go        # 变量逃逸分析
 ```
 
 - `-m` 表示进行内存分配分析
-- `-l` 表示避免程序内联，也就是避免进行程序优化
+
+- `-l` 表示避免程序内联，也就是避免进行程序优化  
+```go
+package main
+var a string
+func main() {
+   a = "G"
+   print(a) // G
+   f1()
+}
+func f1() {
+   a := "O"
+   print(a) // O
+   f2()
+}
+func f2() {
+   print(a) // ?!!! 这里是多少？
+}
+```
 
 #### 多分支 switch
 
