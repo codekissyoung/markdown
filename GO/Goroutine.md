@@ -50,3 +50,22 @@ func intWorker(ch chan int) {
 	ch <- 1
 }
 ```
+
+定时器与`Goroutine`:
+
+```go
+tick := time.Tick(3 * time.Second)
+boom := time.After(10 * time.Second)
+for {
+    select {
+    case <-tick:
+        fmt.Println("tick.")
+    case <-boom:
+        fmt.Println("BOOM!")
+        return
+    default:
+        fmt.Println("    .")
+        time.Sleep(time.Second)
+    }
+}
+```
