@@ -4,19 +4,20 @@
 
 `Go` 没有类，也没有对象，但是 `object.func()` 这样的方式，又很具有表达力．所以 `Go` 采用了＂为结构体绑定方法＂这一设计．
 
-方法可以理解为一个特别的函数，该函数的默认入参是：当前结构体变量，为了和其他入参区分开，结构体入参位置在 函数名 前面
-
 ```go
 type Vertex struct {
 	X, Y float64
 }
+
 func ( v Vertex ) Abs() float64 { // 入参是 普通结构体变量, 是当前结构体的副本
 	return math.Sqrt( v.X * v.X + v.Y * v.Y)
 }
+
 func ( v *Vertex ) Scale(f float64) { // 入参 是 结构体指针，方法内部可直接修改 当前结构体
 	v.X *= f
 	v.Y *= f
 }
+
 // 等价的函数实现:
 func Abs( v Vertex ) float64 {
 	return math.Sqrt( v.X * v.X + v.Y * v.Y )
@@ -104,6 +105,8 @@ func (talk *myTalk) Talk( heard string ) (saying string, end bool, err error) {
 }
 // 实现了 Hello() 和 Talk() 两个函数后，myTalk 类型自动成为了 Talk 接口的实现
 ```
+
+
 
 ```go
 func producer(header string, channel chan<- string) {

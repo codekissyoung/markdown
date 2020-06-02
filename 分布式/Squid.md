@@ -4,5 +4,3 @@
 
 [squid-cache.org 官网](http://www.squid-cache.org/)
 [varnish-cache.org 官网](http://varnish-cache.org/) 另一个非常优秀的缓存代理服务器，比`Squid`性能要好。
-
-##

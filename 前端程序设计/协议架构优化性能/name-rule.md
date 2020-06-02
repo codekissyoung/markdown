@@ -10,8 +10,6 @@ zh-cn 简体中文
 
 extend 延伸
 
-install 安装
-
 Lang 语言包
 
 Lib 库

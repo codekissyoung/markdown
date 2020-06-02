@@ -19,7 +19,7 @@ func doSomething(id int, wg *sync.WaitGroup) {
 }
 ```
 
-范例 2：专用于`Go`通道的`Select`：
+#### 范例 2：专用于`Go`通道的`Select`：
 
 ```go
 func main() {
@@ -49,7 +49,7 @@ func intWorker(ch chan int) {
 }
 ```
 
-定时器与`Goroutine`:
+### 定时器与`Goroutine`:
 
 ```go
 tick := time.Tick(3 * time.Second)

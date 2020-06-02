@@ -57,6 +57,7 @@ mode:
 用户  : S_IRWXU(rwx) S_IRUSR(r)  S_IWUSR(w)  S_IXUSR(x)
 用户组: S_IRWXG(rwx) S_IRGRP(r)  S_IWGRP(w)  S_IXGRP(x)
 其他  : S_IRWXO(rwx) S_IROTH(r)  S_IWOTH(w)  S_IXOTH(x)
+
 特殊位:
 S_ISUID  0004000 set-user-ID bit
 S_ISGID  0002000 set-group-ID bit (see inode(7)).

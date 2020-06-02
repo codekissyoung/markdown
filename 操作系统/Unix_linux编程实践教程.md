@@ -1237,7 +1237,6 @@ void parent_code( int childpid ){
 ![shell实现流程](https://img.codekissyoung.com/2019/06/15/752075880b24d4af17f8f55eb57c60ad.png)
 
 ```c++
-
 char *makestring( char *buf );
 void excute( char *arglist[] );
 void parent_code( int childpid );
