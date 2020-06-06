@@ -7,7 +7,6 @@
 ## Reflection
 
 ```php
-
 class Person
 {
     public $name;
