@@ -7,7 +7,7 @@
 ```bash
 apt-get install erlang
 apt-get install rabbitmq-server
-rabbitmq-server -detached             # 启动 rabbitmq-server daemon
+rabbitmq-server -detached  # 启动 rabbitmq-server daemon
 ```
 
 启动后默认端口:
@@ -22,7 +22,7 @@ web : 15672          # 通过浏览器访问
 api_port : 5672      # amqp 协议端口
 ```
 
-## 命令行 rabbitmqctl 管理
+## rabbitmqctl Server 管理
 
 ```bash
 rabbitmqctl status                    # 查看当前节点状态
@@ -40,23 +40,12 @@ rabbitmqctl delete_vhost xxx        # 撤销virtual_host
 rabbitmqctl reset                   # 清除所有队列
 ```
 
-用户管理:
+#### 集群
 
 ```bash
-rabbitmqctl add_user root root                           # 新增用户 root 密码 root
-rabbitmqctl set_permissions -p / root ".*" ".*" ".*"     # 设置权限
-rabbitmqctl set_user_tags root administrator             # 设置用户类型
-rabbitmqctl list_users                                   # 查看用户列表
-rabbitmqctl delete_user username                         # 删除用户
+rabbitmqctl cluster_status                     # 查看集群内节点信息
+rabbitmqctl join_cluster 节点@主机名             # 创建集群
 ```
-
-用户角色`Tag`:
-
-- `administrator`：可登陆管理控制台，可查看所有的信息，并且可以对用户，策略(policy)进行操作
-- `monitoring`：可登陆管理控制台，同时可以查看 rabbitmq 节点的相关信息(进程数，内存使用情况，磁盘使用情况等)
-- `policymaker`：可登陆管理控制台, 同时可以对 policy 进行管理。但无法查看节点的相关信息
-- `management`：仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理
-- `other`：无法登陆管理控制台，通常就是普通的生产者和消费者
 
 ### 插件管理
 
@@ -66,12 +55,24 @@ rabbitmq-plugins disable plugin-name         # 关闭插件
 rabbitmq-plugins enable rabbitmq_management  # 启用 web 管理界面插件
 ```
 
-#### 集群
+## 用户管理
 
 ```bash
-rabbitmqctl cluster_status                       # 查看集群内节点信息
-rabbitmqctl join_cluster 节点@主机名             # 创建集群
+rabbitmqctl add_user root root                           # 新增用户 root 密码 root
+rabbitmqctl set_permissions -p / root ".*" ".*" ".*"     # 设置权限
+rabbitmqctl set_user_tags root administrator             # 设置用户类型
+rabbitmqctl list_users                                   # 查看用户列表
+rabbitmqctl delete_user username                         # 删除用户
 ```
+
+### 用户角色`Tag`:
+
+- `administrator`：可登陆管理控制台，可查看所有的信息，并且可以对用户，策略(policy)进行操作
+- `monitoring`：可登陆管理控制台，同时可以查看 rabbitmq 节点的相关信息(进程数，内存使用情况，磁盘使用情况等)
+- `policymaker`：可登陆管理控制台, 同时可以对 policy 进行管理。但无法查看节点的相关信息
+- `management`：仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理
+- `other`：无法登陆管理控制台，通常就是普通的生产者和消费者
+
 
 ## 队列属性
 
@@ -85,7 +86,7 @@ rabbitmqctl join_cluster 节点@主机名             # 创建集群
 
 最后一个消费者取消订阅时，队列就会自杀。
 
-## 持久化消息
+### 持久化消息
 
 能从服务器意外崩溃后，重启之后自动恢复的消息称为，持久化消息。要做到这一点，需要保证
 
@@ -97,20 +98,20 @@ rabbitmqctl join_cluster 节点@主机名             # 创建集群
 
 #### ack 机制
 
-消费者订阅到队列时 ，如果使用 `auto_ack` 自动确认参数，那么一旦消费者接收到消息，`RabbitMQ-Server`就视为消息正确被消费了，从而在队列里删除该消息。
+消费者订阅到队列时 ，如果使用 `auto_ack` 自动确认参数，消息进入`Server socket`开始由操作系统通过网络进行发送，`RabbitMQ-Server`就视为消息被消费了，从而在队列里删除该消息。
 
 而不使用`auto_ack`的话，则需要消费者发送一条`ack`消息给`RabbitMQ-Server`，告知确实正确消费了消息。然后，`RabbitMQ-Server`从队列里删除该消息。
 
 如果出现：
 
 - `RabbitMQ-Server` 链接中断：
-  - 分配给别的监听本队列的消费者
-  - 这条消息会被留着直到重连
-
+  - 消息被视为未消费，重新入队首进行再次投递
+  
 - 消费者程序有`Bug`忘记`ack`了：
   - `RabbitMQ-Server`在接收到`ack`消息之前，不会再向该消费者发送任何消息了
   - 这个机制可以用来控制应用程序消费速率
   
+
 如果消费一条消息需要比较长时间的话，建议使用`ack`机制，这样可以防止`RabbotMQ-Server`持续不断的消息涌向消费者进程，从而导致过载。
 
 #### reject 机制
@@ -122,3 +123,4 @@ rabbitmqctl join_cluster 节点@主机名             # 创建集群
 - 消费者进程收到一条消息后，调用`reject`命令，设置`requeue = true`参数，表示自己不处理这条命令，这样`RabbitMQ-Server`就会重新将这条消息入队，交给其他消费者进程处理
 - 如果消费者进程检测到某条消息是错误消息呢？可以调用`reject`命令，设置 `requeue = false`，表示让`RabbitMQ-Server`直接丢弃该消息，如果本队列配置了死信队列的话，这丢弃的消息会堆积在死信队列，以供研发分析原因
 
+#### nack机制
