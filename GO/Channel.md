@@ -24,7 +24,7 @@ type hchan struct {
 
 ![](https://static.bookstack.cn/projects/GoExpertProgramming/chapter01/images/chan-01-circle_queue.png)
 
-##### 挂载的Goroutine示意图
+##### 挂载的`Goroutine`示意图
 
 ![](https://static.bookstack.cn/projects/GoExpertProgramming/chapter01/images/chan-02-wait_queue.png)
 
