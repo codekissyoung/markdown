@@ -1,12 +1,5 @@
 # Go 类型系统
 
-### float 的坑
-
-```go
-var f float32 = 167777216
-fmt.Println(f == f+1)           // true !!!!!
-```
-
 ### 字符串
 
 ```go
@@ -32,27 +25,6 @@ fmt.Println(r)               // [72 101 108 108 111 44 32 19990 30028]
 fmt.Println(string(30028))   // 界
 fmt.Println(string(1234566)) // � 不符合utf8规范的值，默认会转化成 \uFFFD 即 �
 ```
-
-#### 结构体
-
-```go
-type Vertex struct { // 定义
-    X int
-    Y int
-}
-
-v2 := Vertex {X: 1}             // Y 成员为 零值
-v3 := Vertex {}                 // X 与 Y 都是 零值
-
-v.Y = 100                       // 访问 成员
-
-p := &v                         // 指向结构体 指针
-p.X = 23                        // 指针 访问 成员
-
-p := &Vertex {1, 2}            // 指针 直接指向 字面量
-```
-
-PS: 变量 与 指针 都是通过 `.` 访问结构体成员，这样设计是 好？还是不好？
 
 #### Map
 
