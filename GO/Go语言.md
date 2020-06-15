@@ -12,6 +12,7 @@
 ```bash
 $ go get github.com/adonovan/gopl.io            # 获取 Go 语言圣经里的代码
 $ go get golang.org/x/tools/cmd/goimports       # 获取 goimports 工具
+$ go get -u golang.org/x/lint/golint			# 代码静态检查工具
 ```
 
 `echo`程序：

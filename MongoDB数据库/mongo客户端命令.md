@@ -45,7 +45,7 @@ mongo --nodb               # 启动 mongo shell 而不连接到任何服务器
   - `connectTimeoutMS=ms`可以打开连接的时间
   - `socketTimeoutMS=ms`发送和接受sockets的时间
 
-## 关闭服务器
+## `关闭服务器`
 
 ```bash
 > use admin;           # 先切换到 admin

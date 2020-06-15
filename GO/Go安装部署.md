@@ -66,3 +66,158 @@ go get -u -v github.com/sqs/goreturns
 go get -u -v github.com/cweill/gotests/gotests
 go get -u -v golang.org/x/lint/golint
 ```
+
+## Go项目
+
+```bash
+├── LICENSE.md
+├── Makefile
+├── README.md
+├── api
+├── assets
+├── build
+├── cmd
+├── configs
+├── deployments
+├── docs
+├── examples
+├── githooks
+├── init
+├── internal
+├── pkg
+├── scripts
+├── test
+├── third_party
+├── tools
+├── vendor
+├── web
+└── website
+```
+
+#### 不好的代码：
+
+```go
+var grpcClient *grpc.Client
+
+func init() {
+    var err error
+    grpcClient, err = grpc.Dial(...)
+    if err != nil {
+        panic(err)
+    }
+}
+
+func GetPost(postID int64) (*Post, error) {
+    post, err := grpcClient.FindPost(context.Background(), &pb.FindPostRequest{PostID: postID})
+    if err != nil {
+        return nil, err
+    }
+    
+    return post, nil
+}
+```
+
+#### 好的代码：
+
+```go
+// pkg/post/client.go
+type Client struct {
+    grpcClient *grpc.ClientConn    
+}
+func NewClient(grpcClient *grpcClientConn) Client {
+    return &Client{
+        grpcClient: grpcClient,
+    }
+}
+func (c *Client) GetPost(postID int64) (*Post, error) {
+    post, err := c.grpcClient.FindPost(context.Background(), &pb.FindPostRequest{PostID: postID})
+    if err != nil {
+        return nil, err
+    }
+    
+    return post, nil
+}
+```
+
+```go
+// cmd/grpc/main.go
+func main() {
+    grpcClient, err := grpc.Dial(...)
+    if err != nil {
+        panic(err)
+    }
+    
+    postClient := post.NewClient(grpcClient)
+    // ...
+}
+```
+
+
+
+#### 不好的代码:
+
+```go
+package post
+
+var client *grpc.ClientConn
+
+func init() {
+    var err error
+    client, err = grpc.Dial(...）
+    if err != nil {
+        panic(err)
+    }
+}
+
+func ListPosts() ([]*Post, error) {
+    posts, err := client.ListPosts(...)
+    if err != nil {
+        return []*Post{}, err
+    }
+    
+    return posts, nil
+}
+```
+
+#### 好的代码:
+
+```go
+package post
+type Service interface {
+    ListPosts() ([]*Post, error)
+}
+type service struct {
+    conn *grpc.ClientConn
+}
+func NewService(conn *grpc.ClientConn) Service {
+    return &service{
+        conn: conn,
+    }
+}
+func (s *service) ListPosts() ([]*Post, error) {
+    posts, err := s.conn.ListPosts(...)
+    if err != nil {
+        return []*Post{}, err
+    }   
+    return posts, nil
+}
+```
+
+```go
+package main
+func main() {
+    conn, err = grpc.Dial(...）
+    if err != nil {
+        panic(err)
+    }
+    svc := post.NewService(conn)
+    posts, err := svc.ListPosts()
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println(posts)
+}
+```
+
+
+

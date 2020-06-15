@@ -13,7 +13,6 @@ sql.Register位于database/sql，用来注册数据库驱动当第三方开发�
 
 我们来看一下mysql、sqlite3的驱动里面都是怎么调用的：
 ```Go
-
 //https://github.com/mattn/go-sqlite3驱动
 func init() {
 	sql.Register("sqlite3", &SQLiteDriver{})
