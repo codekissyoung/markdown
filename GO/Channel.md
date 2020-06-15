@@ -24,7 +24,7 @@ type hchan struct {
 
 ![](https://static.bookstack.cn/projects/GoExpertProgramming/chapter01/images/chan-01-circle_queue.png)
 
-##### 挂载的Goroutine示意图
+##### 挂载的`Goroutine`示意图
 
 ![](https://static.bookstack.cn/projects/GoExpertProgramming/chapter01/images/chan-02-wait_queue.png)
 
@@ -40,11 +40,47 @@ type hchan struct {
 
 ![](https://static.bookstack.cn/projects/GoExpertProgramming/chapter01/images/chan-03-send_data.png)
 
-to be continue : 
+##### 从Channel中读取数据
 
-https://www.bookstack.cn/read/GoExpertProgramming/chapter01-1.1-chan.md
+![](https://static.bookstack.cn/projects/GoExpertProgramming/chapter01/images/chan-04-recieve_data.png)
+
+#### 关闭Channel
+
+以下两种情况，会报`panic`
+
+- 关闭值为nil的channel
+- 关闭已经被关闭的channel
+
+关闭channel时:
+
+- 会把recvq中的G全部唤醒，本该写入G的数据位置为`nil`
+- sendq中的G全部会`panic`，即向已经关闭的channel写数据会`panic`
 
 
 
+## Select
+
+```go
+type scase struct {
+    c           *hchan 						// 当前case语句所操作的channel指针
+    kind        uint16 						// 类型，分为读channel、写channel和default
+    elem        unsafe.Pointer // 读出/写入channel的数据存放地址(缓冲区地址)
+}
+```
 
 
+
+## range for channel
+
+```go
+// range channel 底层实现
+for {
+    value_temp, ok = <-range
+    if !ok{
+        break
+    }
+    value = value_temp
+}
+```
+
+- `range channel`时，没有数据，会发生阻塞
