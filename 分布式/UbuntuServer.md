@@ -427,10 +427,34 @@ $ sudo ufw allow 3306
 $ sudo ufw allow 22
 ```
 
-## 安装中文输入法
+## 中文输入法
 
-使用开源的`Rime`输入法:
+使用开源的[`Rime`输入法](https://github.com/rime/home/wiki/RimeWithIBus):
 
-https://github.com/rime/home/wiki/RimeWithIBus
+```bash
+sudo apt-get install ibus-rime # 安装
+```
 
-https://mogeko.me/2018/031/
+设置：
+
+![](https://img.codekissyoung.com/2020/06/18/6d8bf71b420bf0475e0820e3b7aca923.png)
+
+```bash
+$ ibus-setup   # 设置水平显示词语
+$ ibus restart # 配置生效
+```
+
+![](https://img.codekissyoung.com/2020/06/18/db8b562d6155ce96e4f6450000d727c0.png)
+
+```
+Super + space 组合键来切换输入法
+```
+
+改改默认配置：只留下中文简体、每页词语数为10
+
+```bash
+vim .config/ibus/rime/default.yaml 
+```
+
+![](https://img.codekissyoung.com/2020/06/18/d9f9cf1f79f723e4c5b1956ab2950e36.png)
+
