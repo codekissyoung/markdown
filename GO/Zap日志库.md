@@ -143,5 +143,57 @@ Similarly, package authors can use the high-performance Encoder and Core impleme
 
 
 
+日志有两个概念：字段和消息。字段用来结构化输出错误相关的上下文环境，而消息简明扼要的阐述错误本身
 
+```go
+log.Error("User does not exist", zap.Int("uid", uid))
+```
+
+
+
+```go
+// zap.Logger
+type Logger struct {
+	core        zapcore.Core
+	development bool
+	name        string
+	errorOutput zapcore.WriteSyncer
+	addCaller   bool
+	addStack    zapcore.LevelEnabler
+	callerSkip  int
+}
+
+// zapcore.Field
+type Field struct {
+	Key       string
+	Type      FieldType
+	Integer   int64
+	String    string
+	Interface interface{}
+}
+
+// zapcore.Level
+type Level int8
+
+// zapcore.Entry
+// 一条日志生成一个Entry
+type Entry struct {
+	Level      Level
+	Time       time.Time
+	LoggerName string
+	Message    string
+	Caller     EntryCaller
+	Stack      string
+}
+
+// zapcore.CheckedEntry
+// 经过级别检查后的生成
+type CheckedEntry struct {
+	Entry
+	ErrorOutput WriteSyncer
+	dirty       bool // best-effort detection of pool misuse
+	should      CheckWriteAction
+	cores       []Core
+}
+```
 

@@ -426,3 +426,11 @@ $ sudo ufw allow 443
 $ sudo ufw allow 3306
 $ sudo ufw allow 22
 ```
+
+## 安装中文输入法
+
+使用开源的`Rime`输入法:
+
+https://github.com/rime/home/wiki/RimeWithIBus
+
+https://mogeko.me/2018/031/
