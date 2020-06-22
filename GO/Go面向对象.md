@@ -1,15 +1,17 @@
 # Go 面向对象
 
-`Go` 没有类，也没有对象，但是 `object.func()` 这样的方式，又很具有表达力．所以 `Go` 采用了＂为结构体绑定方法＂这一设计．
+## 方法
+
+`Go` 没有类，也没有对象，但是 `object.func()` 这样的方式，又很具有表达力．所以 `Go` 采用了**为结构体绑定方法**这一设计
 
 ```go
 type Vertex struct {
 	X, Y float64
 }
-func ( v Vertex ) Abs() float64 { // 入参是 普通结构体变量, 是当前结构体的副本
-	return math.Sqrt( v.X * v.X + v.Y * v.Y)
+func ( v Vertex ) Abs() float64 {
+	  return math.Sqrt( v.X * v.X + v.Y * v.Y)
 }
-func ( v *Vertex ) Scale(f float64) { // 入参 是 结构体指针，方法内部可直接修改 当前结构体
+func ( v *Vertex ) Scale(f float64) {
 	v.X *= f
 	v.Y *= f
 }
@@ -21,11 +23,7 @@ func main() {
 }
 ```
 
-通过 `Scale( &v, 10 )` 我能明确知道，`v` 是通过指针传递的，`Scale()` 内部是可以直接修改 `v`
 
-而通过 `v.Scale( 2 )` 我在不知道 `Scale` 的 声明/实现 的情况下，无法确认 `Scale()` 会不会直接修改 `v`
-
-再看下 结构体指针 调用方法的情况：
 
 ```go
 v := Vertex{3, 4}
@@ -67,4 +65,32 @@ func main() {
 而`v.Abs()` `(*p).Abs()` `p.Abs()` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^\_^
 
 PS: 这种为了方便而牺牲 "一致性" 和 ＂类型检查＂ 的做法是 **利大于弊** 的么？
+
+## 继承
+
+```go
+
+type user struct {
+	name string
+	age  int8
+}
+
+func (u user) ToString() string {
+	return fmt.Sprintf("%+v %T", u, u)
+}
+
+type manager struct {
+	user
+	title string
+}
+
+func main() {
+	var m manager
+	m.name = "Link"
+	m.age = 29
+	// m 是 manager , 更是 user, 所以能调用 ToString()
+	// 并且 ToString() 的 Reciver 的取值是 m.user
+	println(m.ToString())
+}
+```
 

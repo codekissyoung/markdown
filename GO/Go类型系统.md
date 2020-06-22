@@ -25,11 +25,3 @@ fmt.Println(r)               // [72 101 108 108 111 44 32 19990 30028]
 fmt.Println(string(30028))   // 界
 fmt.Println(string(1234566)) // � 不符合utf8规范的值，默认会转化成 \uFFFD 即 �
 ```
-
-#### Map
-
-#### 类型断言
-
-```go
-i1, ok := interface{}(v1).(I1)
-```

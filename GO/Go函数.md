@@ -2,19 +2,6 @@
 
 `Go`语言有三种类型的函数：普通带名字的函数、匿名`lambda`函数、方法。
 
-## 普通函数
-
-```go
-// 如果给返回值命名，则可以直接在函数内部赋值，作为返回．非常好用的设计 ^_^
-func my_division(sum, num int) ( quotient int, remainder int ) {
-	quotient  = sum / num;
-	remainder = sum % num;
-	return
-}
-a, b := my_division( 38, 10 );
-fmt.Println( "38 / 10 =  ", a, ".......", b ); // 38 / 10 =   3 ....... 8
-```
-
 ## 匿名函数 闭包 lambda
 
 函数也是值，也可以作为 参数 和 返回值。
