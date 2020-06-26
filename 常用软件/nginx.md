@@ -217,11 +217,6 @@ http {
     default_type  application/octet-stream;
     #设定日志格式
     access_log    /var/log/nginx/access.log;
-
-    #省略上文有的一些配置节点
-
-    #。。。。。。。。。。
-
     #设定负载均衡的服务器列表
      upstream mysvr {
     #weigth参数表示权值，权值越高被分配到的几率越大
