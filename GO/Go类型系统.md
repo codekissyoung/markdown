@@ -78,13 +78,32 @@ fmt.Println(ch1 == ch2)  // false
 fmt.Println(ch1 == ch3)  // true
 ```
 
-
-
-
-
-
-
 ### 字符串
+
+```go
+type stringStruct struct{
+    str unsafe.Pointer // 存储空间的起始地址
+    len int            // 字节数
+} // 字符串的实现结构
+```
+
+
+
+字符串存储以`utf8`编码，存储的是`unicode`字符串，零值为`""`
+
+
+
+支持`!=` `==` `>` `<` `+` `+=` 操作符号，支持这样`s[3]`读取单个字节，支持切片语法`s1 = s[1:4]` `s1`切片底层引用的是`s`数组
+
+
+
+`range`操作对字符串做了优化，默认是按字符取值，而不是按字节
+
+
+
+要修改字符串内容，必须转成`[]rune`或`[]byte`类型，完成后再转换回来。这种转换要重新分配内存，复制数据。
+
+
 
 ```go
 s := "Hello, 世界"
@@ -109,3 +128,60 @@ fmt.Println(r)               // [72 101 108 108 111 44 32 19990 30028]
 fmt.Println(string(30028))   // 界
 fmt.Println(string(1234566)) // � 不符合utf8规范的值，默认会转化成 \uFFFD 即 �
 ```
+
+
+
+## 命名类型 与 未命名类型
+
+具有同样结构的`命名类型`与`未命名类型`的赋值：
+
+```go
+type Person struct {
+	name string
+	age  int
+}
+
+type PersonCopy struct {
+	name string
+	age  int
+}
+
+func main() {
+	link := struct {
+		name string
+		age  int
+	}{
+		"link",
+		18,
+	}
+
+	var linkCopy Person
+	var linkCopyCopy PersonCopy
+
+	// 1. 命名类型 = 未命名类型 ok
+	linkCopy = link
+
+	// 2. 命名类型 = 命名类型
+	//  cannot use linkCopy (type Person) as type PersonCopy in assignment
+	linkCopyCopy = linkCopy
+
+	// 3. 未命名类型 = 命名类型 ok
+	linkCopyCopy.name = "linkCopyCopy"
+	link = linkCopyCopy
+
+	fmt.Println("link:", link, "\nlinkCopy:", linkCopy, "\nlinkCopyCopy:", linkCopyCopy)
+}
+```
+
+`通道`的赋值：
+
+```go
+	a := make(chan int, 2) // 双向通道 转 单向通道, b 为未命名类型
+	fmt.Printf("%#v\n", a) // (chan int)(0xc0000c2000)
+
+	var b chan<- int = a
+	fmt.Printf("%#v\n", b) // (chan<- int)(0xc0000c2000)
+
+	b <- 2
+```
+
