@@ -145,49 +145,21 @@ log.Error("User does not exist", zap.Int("uid", uid))
 
 
 
-```go
-// zap.Logger
-type Logger struct {
-	core        zapcore.Core
-	development bool
-	name        string
-	errorOutput zapcore.WriteSyncer
-	addCaller   bool
-	addStack    zapcore.LevelEnabler
-	callerSkip  int
-}
+在`zap`的设计理念中，`Logger`虽然是结构体，但`Logger`中的`core`却是接口，这个接口可以有不同的实现，`core`中的方法才是真正实现日志的编码和输出的地方。
 
-// zapcore.Field
-type Field struct {
-	Key       string
-	Type      FieldType
-	Integer   int64
-	String    string
-	Interface interface{}
-}
 
-// zapcore.Level
-type Level int8
 
-// zapcore.Entry
-// 一条日志生成一个Entry
-type Entry struct {
-	Level      Level
-	Time       time.Time
-	LoggerName string
-	Message    string
-	Caller     EntryCaller
-	Stack      string
-}
 
-// zapcore.CheckedEntry
-// 经过级别检查后的生成
-type CheckedEntry struct {
-	Entry
-	ErrorOutput WriteSyncer
-	dirty       bool // best-effort detection of pool misuse
-	should      CheckWriteAction
-	cores       []Core
-}
-```
+
+
+
+
+
+
+
+
+
+
+
+
 
