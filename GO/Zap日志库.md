@@ -10,16 +10,12 @@ logger.Info("failed to fetch URL",
 )
 ```
 
-
-
 ```go
 logger := zap.NewExample()
 defer logger.Sync()
 sugar := logger.Sugar()
 plain := sugar.Desugar()
 ```
-
-
 
 ```go
 logger, err := zap.NewProduction() // NewProduction() NewDevelopment() NewExample()
@@ -28,8 +24,6 @@ if err != nil {
 }
 defer logger.Sync()
 ```
-
-
 
 简单配置：
 

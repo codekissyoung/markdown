@@ -70,7 +70,6 @@ fmt.Println( *p );  // 通过 p 访问 i
 #### `Defer` 对命名的函数返回值的影响：
 
 ```go
-
 // f1() = 1
 func f1() (r int) {
 	defer func() {

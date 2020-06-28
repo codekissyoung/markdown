@@ -5,7 +5,7 @@
 
 ```go
 type Mutex struct {
-    state int32 		// 表示互斥锁的状态，比如是否被锁定等
+    state int32    // 表示互斥锁的状态，比如是否被锁定等
     sema  uint32   // 信号量，协程阻塞等待该信号量，解锁的协程释放信号量从而唤醒等待信号量的协程
 }
 ```
@@ -260,7 +260,6 @@ func worker(taskChan chan string, worker int) {
 		fmt.Println("worker ", worker, " Complete task ", task)
 	}
 }
-
 ```
 
 关闭的通道，读取它直接返回零值 `ok` 为 `false`; 未关闭，则是阻塞等待
