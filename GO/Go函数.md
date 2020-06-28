@@ -2,37 +2,196 @@
 
 `Go`语言有三种类型的函数：普通带名字的函数、匿名`lambda`函数、方法。
 
+
+
+## 指针入参
+
+尽管`实参`和`形参`都指向同一目标，但传递指针时依然是复制。
+
+```go
+func main() {
+
+	a := 0x100
+	p := &a
+  // pointer : 0xc00000e028, target: (*int)(0xc00001e0b8)
+	fmt.Printf("pointer : %p, target: %#v\n", &p, p)
+	
+  test(p)
+}
+
+func test(x *int) {
+  // pointer : 0xc00000e030, target: (*int)(0xc00001e0b8)
+	fmt.Printf("pointer : %p, target: %#v\n", &x, x)
+}
+```
+
+#### 传指针性能一定好么？
+
+指针指向那个的内存空间，只有在所有指针都释放的时候，才会使用`GC`。指针被拷贝多份后，会延长内存对象的生命周期。
+
+复制小对象一般在栈上，指令少而快，未必会比指针慢。
+
+并发编程提倡使用不可变对象（只读或者复制），可以消除数据同步的麻烦。
+
+总之，指针在`传递大对象` `修改原对象状态`时，使用比较好，其他时候不作考虑。
+
+
+
 ## 匿名函数 闭包 lambda
+
+
+
+函数在`Go`里面是`First Class Object`第一类对象，什么意思？
+
+- 可在运行期创建
+- 可以存入变量实体，只能与`nil`比较
+- 可以作为函数的入参以及返回值
 
 函数也是值，也可以作为 参数 和 返回值。
 
 ```go
 func compute(fn func(float64, float64) float64) float64 {
-	return fn(3, 4)
+    return fn(3, 4)
 }
+
 func main() {
-	hypot := func(x, y float64) float64 {
-		return math.Sqrt(x*x + y*y)
-	}
-	fmt.Println(hypot(5, 12))
-	fmt.Println(compute(hypot))
-	fmt.Println(compute(math.Pow))
+    
+    	// 1. 直接执行
+    func(s string) {
+        println(s)
+    }("hello , world")
+    
+    // 2. 赋值给变量
+    hypot := func(x, y float64) float64 {
+        return math.Sqrt(x*x + y*y)
+    }
+ 
+    fmt.Println(hypot(5, 12))
+    
+    // 3. 作为参数
+    fmt.Println(compute(hypot))
+    fmt.Println(compute(math.Pow))
 }
+
+// 4. 作为返回值
+func getOperation() func(int, int) int {
+	return func(x, y int) int {
+		return x + y
+	}
+}
+
 ```
+
+
 
 ```go
-type binaryOperation func(op1 int, op2 int) (result int, err error)
+type calc struct {
+		mul func(x, y int) int
+}
+// 5. 作为结构体成员
+x := calc{
+    mul: func(x, y int) int {
+        return x * y
+    },
+}
 
-func operate(op1 int, op2 int, bop binaryOperation) (result int, err error){
-    if bop == nil {
-        err = errors.New("invalid binary operation function");
-        return
+// 6. 通道里传匿名函数
+c := make(chan func(int, int) int, 2)
+
+c <- func(x, y int) int {
+    return x + y
+}
+
+c <- func(x, y int) int {
+    return x * y
+}
+
+fmt.Println((<-c)(2, 3)) // 5
+fmt.Println((<-c)(2, 3)) // 6
+```
+
+在不使用`闭包`特性的情况下，匿名函数最重要的作用是：
+
+- 作用域隔离，不会有变量污染
+- 没有定义顺序限制，必要时可以抽离
+- 将大函数分解为多个相对独立的匿名函数块，再用简洁的调用完成逻辑流程，实现框架与细节分离
+
+
+
+### 闭包
+
+`闭包`特性是指：引用了其匿名函数体之外的变量。匿名函数内可以操作外部变量，换句话说，该函数被这些变量“绑定”在一起。
+
+```go
+func main() {
+    f := test(123)
+    f() // 123
+}
+
+func test(x int) func() {
+    y := 12
+    println(&x, &y) // 0xc000124010 0xc000124018
+    return func() {
+        println(&x, &y, x, y) // 0xc000124010 0xc000124018 123 12
     }
-    return bop(op1, op2)
 }
 ```
 
-闭包是一个函数，它引用了其函数体之外的变量。该函数可以访问并赋予其引用的变量的值，换句话说，该函数被这些变量“绑定”在一起。
+#### 延迟求值效应
+
+```go
+func main() {
+	for _, f := range test() {
+		f()
+		//0xc00001e0b8 2
+		//0xc00001e0b8 2
+	}
+}
+
+func test() []func() {
+	var s []func()
+	for i := 0; i < 2; i++ {
+		println(&i) // 0xc00001e0b8
+		s = append(s, func() {
+			println(&i, i) // 这里的 i 与func()外部的 i 是同一个
+		})
+	}
+	return s
+}
+```
+
+`延迟求值`效应是由 `多个匿名函数共享变量` 引起的，这是个坑，因为任意匿名函数对共享变量的修改，都会影响到其他匿名函数，这会带来竞争状态，往往需要做同步处理。
+
+`闭包`特性让我们不用传递参数就能读取和修改外部函数的状态，但是要特别小心的使用。
+
+
+
+
+### 避免延迟求值效应
+
+```go
+func main() {
+	for _, f := range test() {
+		f()
+		//0xc00001e0b8 0
+		//0xc00001e0b8 1
+	}
+}
+
+func test() []func() {
+	var s []func()
+	for i := 0; i < 2; i++ {
+		var x int = i // 每次循环都重新创建一个局部变量
+		println(&x)   // 0xc00001e0b8 0xc00001e0d0
+		s = append(s, func() {
+			println(&x, x) // 这里的 i 与func()外部的 i 是同一个
+		})
+	}
+	return s
+}
+```
+
+
 
 ```go
 func adder() func(int) int {
