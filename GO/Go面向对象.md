@@ -291,6 +291,140 @@ type D struct {
 
 
 
+## 方法退化成函数
+
+#### 从类型退化
+
+`Recevier`是`T`
+
+```go
+type N int
+
+func (n N) test() {
+	fmt.Printf("test.n: %p, %d\n", &n, n)
+}
+
+func main() {
+
+	var n N = 25
+	fmt.Printf("main.n: %p, %d\n", &n, n) // main.n: 0xc00001e0b8, 25
+
+	f1 := N.test
+	N.test(n) // test.n: 0xc00001e0e0, 25
+	f1(n)     // test.n: 0xc00001e0f0, 25
+
+	f2 := (*N).test
+	(*N).test(&n) // test.n: 0xc00001e100, 25
+	f2(&n)        // test.n: 0xc00001e110, 25
+}
+```
+
+`Recevier`是`*T`
+
+```go
+type N int
+
+func (n *N) test() {
+	fmt.Printf("test.n: %p, %d\n", n, *n)
+}
+
+func main() {
+
+	var n N = 25
+	fmt.Printf("main.n: %p, %d\n", &n, n) // main.n: 0xc00001e0b8, 25
+
+	// 只有这种
+	f2 := (*N).test
+	(*N).test(&n) // test.n: 0xc00001e0b8, 25
+	f2(&n)        // test.n: 0xc00001e0b8, 25
+}
+```
+
+
+
+#### 从实例退化
+
+```go
+type N int
+
+func (n N) test() {
+	fmt.Printf("test.n: %p, %d\n", &n, n)
+}
+
+func main() {
+	var n N = 100
+	p := &n
+
+	n++
+	f1 := n.test
+
+	n++
+	f2 := p.test
+
+	n++
+
+	fmt.Printf("main.n: %p, %v\n", p, n) // main.n: 0xc0000b6010, 103
+	f1()                                 // test.n: 0xc0000b6028, 101
+	f2()                                 // test.n: 0xc0000b6038, 102
+}
+```
+
+```go
+type N int
+
+func (n N) test() {
+	fmt.Printf("test.n: %p, %d\n", &n, n)
+}
+
+func call(m func()) {
+	m()
+}
+
+func main() {
+	var n N = 100
+	p := &n
+
+	n++
+	call(n.test) // test.n: 0xc0000b6018, 101
+
+	n++
+	call(p.test) // test.n: 0xc0000b6030, 102
+
+	n++
+	fmt.Printf("main.n :%p, %v\n", p, n) // main.n :0xc0000b6010, 103
+
+}
+```
+
+`Recevier`是`*T`
+
+```go
+type N int
+
+func (n *N) test() {
+	fmt.Printf("test.n: %p, %d\n", n, *n)
+}
+
+func main() {
+	var n N = 100
+	p := &n
+
+	n++
+	f1 := n.test
+
+	n++
+	f2 := p.test
+
+	n++
+
+	fmt.Printf("main.n: %p, %v\n", p, n) // main.n: 0xc0000b6010, 103
+	f1()                                 // main.n: 0xc0000b6010, 103
+	f2()                                 // main.n: 0xc0000b6010, 103
+}
+```
+
+
+
 ## Go的编程思路
 
 将模块分解成相互独立的更小单元，分别处理不同方面的需求，最后以匿名嵌入的方式，组合到一个结构体中，共同实现对外接口。
