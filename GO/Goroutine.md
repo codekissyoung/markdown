@@ -67,3 +67,35 @@ for {
     }
 }
 ```
+
+### runtime.Goexit()退出协程
+
+- 立即中止当前`goroutine`
+- 不会引发`pannic`
+- 所有的`defer()`正常执行
+
+```go
+	exit := make(chan struct{})
+
+	go func() {
+		defer close(exit)
+		defer println("a")
+
+		func() {
+			defer func() {
+				println("b", recover() == nil)
+			}()
+
+			func() {
+				println("c")
+				runtime.Goexit()
+				println("c done.")
+			}()
+			println("b done. ")
+		}()
+		println("a done")
+	}()
+
+	<-exit
+```
+

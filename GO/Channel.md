@@ -1,5 +1,16 @@
 # Channel
 
+
+
+### 性质
+
+- 向已经关闭的通道发送数据,会引发`panic`
+- `close`已经关闭的`channel`或值为`nil`的`channel`，会引发`panic`
+- 从已关闭接收数据，返回已缓冲数据或零值
+- 无论收发，`nil`通道都会阻塞
+
+
+
 ```go
 type hchan struct {
     buf      unsafe.Pointer // 环形队列指针
