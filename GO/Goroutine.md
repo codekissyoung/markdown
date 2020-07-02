@@ -49,6 +49,157 @@ func intWorker(ch chan int) {
 }
 ```
 
+
+
+`select`可以随机`收`，也可以随机`发`
+
+
+
+```go
+package main
+
+import (
+	"sync"
+	"time"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	a, b := make(chan int), make(chan int)
+
+	// 接收端
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for {
+			var name string
+			var x int
+			var ok bool
+			// 只会从未阻塞的通道中，随机读取数据
+			select {
+			case x, ok = <-a:
+				name = "from a : "
+			case x, ok = <-b:
+				name = "from b : "
+			}
+			if !ok {
+				return // 只要有一个通道关闭，就退出
+			} else {
+				println(name, x)
+			}
+		}
+	}()
+
+	// 发送端
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		defer close(a)
+		defer close(b)
+		for i := 0; i < 10; i++ {
+			// 随机写入 a 或 b，每次selec只能写入一次
+			select {
+			case a <- i: // 写入 a
+				time.Sleep(time.Second)
+			case b <- i * 10: // 写入b
+			}
+			//time.Sleep(time.Second)
+		}
+	}()
+
+	wg.Wait()
+}
+```
+
+
+
+- 通过`break`可以跳出`select`
+- 设置为`nil`的管道，将永远堵塞，不会再参与`select`随机选取执行
+
+```go
+package main
+
+import (
+	"sync"
+	"time"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	a, b := make(chan int), make(chan int)
+
+	// 接收端
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var x int
+		var ok bool
+		for {
+			// 只会从未阻塞的通道中，随机读取数据
+			select {
+			case x, ok = <-a:
+				if !ok {
+					a = nil
+					println("a closed")
+					break // 跳出这次select
+				}
+				println("from a : ", x)
+			case x, ok = <-b:
+				if !ok {
+					b = nil
+					println("b closed")
+					break
+				}
+				println("from b : ", x)
+    default: // defalt 的加入，可以使 select 避免陷入阻塞，但注意不要引起没必要的空转
+				println("default : no channel ready")
+				time.Sleep(time.Second / 5)
+			}
+
+			if a == nil && b == nil {
+				println("all closed")
+				break
+			}
+		}
+	}()
+
+	// 发送端 a
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		defer close(a)
+		for i := 0; i < 10; i++ {
+			a <- i
+			time.Sleep(time.Second / 3)
+		}
+	}()
+
+	// 发送端 b
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		defer close(b)
+		for i := 10; i < 20; i++ {
+			b <- i
+			time.Sleep(time.Second / 2)
+		}
+	}()
+
+	wg.Wait()
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
 ### 定时器与`Goroutine`:
 
 ```go
