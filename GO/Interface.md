@@ -15,26 +15,20 @@ type tester interface {
 	test()
 	string() string
 }
-
 type data struct {
 	name string
 }
-
 func (d *data) test() {
 	fmt.Println("test " + d.name)
 }
-
 func (d data) string() string {
 	return d.name
 }
-
 func main() {
 	d := data{"link"}
-
 	// cannot use d (type data) as type tester in assignment:
 	// data does not implement tester (test method has pointer receiver)
 	// var t tester = d
-
 	var t tester = &d
 	t.test()
 	fmt.Println(t.string())
@@ -51,7 +45,6 @@ func main() {
 type T struct {
 	String()
 }
-
 type S struct {
 	T
 	Name()
@@ -68,7 +61,6 @@ type iface struct {
     tab *itab								// 类型信息
     data unsafe.Pointer  // 实际对象指针
 }
-
 type itab struct {
     inter *interfacetype // 接口类型
     _type *_type					 // 实际对象类型
@@ -76,24 +68,18 @@ type itab struct {
 }
 ```
 
-
-
 ## 自定义函数类型实现接口
 
 ```go
 type FuncString func() string
-
 func (f FuncString) String() string {
 	return f()
 }
-
 func main() {
-
 	var t fmt.Stringer = FuncString(func() string {
 		return "Hello World"
 	}) // 相同签名函数，强转为 FunString 就实现了 Stringer 接口
 	fmt.Println(t)
-
 }
 ```
 

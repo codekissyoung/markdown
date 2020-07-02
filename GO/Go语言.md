@@ -28,7 +28,6 @@ func init() {
 func main() {
 	fmt.Printf("cwd : %s", cwd)
 }
-
 ```
 
 ```bash

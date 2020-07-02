@@ -10,8 +10,6 @@ type Mutex struct {
 
 ![](https://static.bookstack.cn/projects/GoExpertProgramming/chapter02/images/mutex-01-structure.png)
 
-
-
 ```go
 type RWMutex struct {
     w           Mutex  //用于控制多个写锁，获得写锁首先要获取该锁，如果有一个写锁在进行，那么再到来的写锁将会阻塞于此

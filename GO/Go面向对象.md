@@ -80,12 +80,10 @@ type d struct {
 type file struct {
 	name string
 }
-
 type data struct {
 	file
 	name string
 }
-
 func main() {
 	d := data{
 		name: "data",
@@ -96,8 +94,6 @@ func main() {
 	fmt.Printf("%#v", d)
 }
 ```
-
-
 
 ## 方法
 

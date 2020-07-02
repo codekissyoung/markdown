@@ -9,8 +9,6 @@
 - 从已关闭接收数据，返回已缓冲数据或零值
 - 无论收发，`nil`通道都会阻塞
 
-
-
 ```go
 type hchan struct {
     buf      unsafe.Pointer // 环形队列指针
@@ -95,3 +93,21 @@ for {
 ```
 
 - `range channel`时，没有数据，会发生阻塞
+
+## 将通道限定为单向的
+
+一般用这个限定通道方向来获得更严谨的逻辑，并且这个限定是不可逆的。
+
+```go 
+var wg sync.WaitGroup
+wg.Add(2)
+
+c := make(chan int)
+var send chan<- int = c // 限定为只写
+var recv <-chan int = c // 限定为只读
+
+close(send) 							 // 只能close发送端
+```
+
+
+

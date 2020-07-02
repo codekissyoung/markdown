@@ -35,11 +35,7 @@ func test(x *int) {
 
 总之，指针在`传递大对象` `修改原对象状态`时，使用比较好，其他时候不作考虑。
 
-
-
 ## 匿名函数 闭包 lambda
-
-
 
 函数在`Go`里面是`First Class Object`第一类对象，什么意思？
 
@@ -55,19 +51,15 @@ func compute(fn func(float64, float64) float64) float64 {
 }
 
 func main() {
-    
     	// 1. 直接执行
     func(s string) {
         println(s)
     }("hello , world")
-    
     // 2. 赋值给变量
     hypot := func(x, y float64) float64 {
         return math.Sqrt(x*x + y*y)
     }
- 
     fmt.Println(hypot(5, 12))
-    
     // 3. 作为参数
     fmt.Println(compute(hypot))
     fmt.Println(compute(math.Pow))
@@ -79,7 +71,6 @@ func getOperation() func(int, int) int {
 		return x + y
 	}
 }
-
 ```
 
 
