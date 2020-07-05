@@ -336,10 +336,6 @@ make
 sudo checkinstall # 构建debian包并且安装
 ```
 
-## 安装 QT
-
-- [QT5.9.5 安装包](http://download.qt.io/official_releases/qt/5.9/5.9.5/)
-
 ### 截图工具
 
 自带的截图软件，使用 `shift + printscreen` 截图，自动保存到指定文件夹，也挺好的！
@@ -347,9 +343,7 @@ sudo checkinstall # 构建debian包并且安装
 [Linux 上好用的截图工具 flameshot](https://blog.csdn.net/qq_34347375/article/details/83589772)，这一款是带画笔工具的，非常好用，唯一就是每次都需要选定保存的文件夹。
 [Flameshot 一个简洁但功能丰富的截图工具](https://linux.cn/article-10180-1.html)
 
-### 安装企业微信
 
-[Ubuntu16.04/18.04 安装企业微信教程](https://blog.svenhetin.com/ubuntu16-04an-zhuang-qi-ye-wei-xin-jiao-cheng/)
 
 ## 解决软件包版本太高问题
 
@@ -362,7 +356,7 @@ sudo checkinstall # 构建debian包并且安装
 
 ## linux 用于完成特定任务的用户
 
-- `nobody` `admin` `ftp` ，无密码,无 home 目录，无 shell,主要就是为了运行某些特定的进程，比如 nginx 使用 nobody 用户来运行
+`nobody` `admin` `ftp` ，无密码,无 home 目录，无 shell,主要就是为了运行某些特定的进程，比如 nginx 使用 nobody 用户来运行
 
 ## 特殊权限
 

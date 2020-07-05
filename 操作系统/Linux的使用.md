@@ -83,9 +83,9 @@ ps aux | grep  apache2
 
 ## 命令链接符
 
-```
+```bash
 ls  -l  /etc/hosts;ls -l /etc/host;   命令依次执行
-sudo service apache2  stop&&sudo  service apache2  start   前面命令执行成功后，才执行后面命令
+sudo service apache2  stop && sudo  service apache2 start   前面命令执行成功后，才执行后面命令
 service apache2 restart || sudo service apache2 restart  前面命令执行失败后，后面命令才执行
 ```
 
@@ -98,8 +98,6 @@ ls  -l  `which touch`  将which touch的输入作为 ls -l 的参数
 ## 目录与文件管理命令
 
 ```
-ls  -ald  /root  显示/root下所有文件
-pwd   显示当前目录
 touch  test.c   创建一个新文件test.c
 mkdir  test   创建一个新目录 test
 cp  test.c   /root    复制 test.c 到 /root
@@ -107,11 +105,10 @@ cp   -R   test   /root     复制test 文件夹到 /root
 mv  test.c  /root   移动 test.c 到/root
 mv  test.c  /root/test2.c     移动并且改名
 rm    -rf    /mydir 不询问 y/n，强制删除/mydir 目录和里面的文件
-cat Myfile 查看文件
 more  Myfile 分页查看文件内容，空格：下一页，enter：下一行，q：退出
 tail -num log.txt 实时查看文件前num行内容
-ln source.txt  /var/source.txt   创建硬链接（相当于copy + 实时更新）
-ln -s  source.txt  /var/source.txt  创建软连接（相当于快捷方式）
+ln source.txt  /var/source.txt 创建硬链接
+ln -s  source.txt  /var/source.txt 创建软连接
 sudo chmod -R 777 /sh
 ```
 
@@ -191,12 +188,12 @@ uname    -a 所用的linux 版本号
 
 ## linux 环境配置
 
-```
+```bash
 Locale    查看当前语言环境
 LANG=zh_CN.UTF-8   设置当前语言 ，LANG 是环境变量
 可以使用配置环境变量，而不用去修改对应的配置文件
 env    列出所有的环境变量
-date    显示当前时间
+date   显示当前时间
 cal    显示当前日历
 ```
 
@@ -247,23 +244,23 @@ linux 中只有`root`用户和`非root`用户两种用户
 
 是针对`文件所有者` `用户组` `其它用户`三者设立的
 
-## /etc/passwd 系统所有用户文件
+/etc/passwd 系统所有用户文件
 
 ```bash
 用户名：密码(x代替)：UID：GID：用户全名：home目录：shell
 ```
 
-## /etc/shadow 所有用户的密码(加密过后的)
+/etc/shadow 所有用户的密码(加密过后的)
 
-## /etc/group 组文件
+/etc/group 组文件
 
 ```bash
 组名：用户组密码(x代替)：GID：用户名1,用户名2
 ```
 
-## /etc/gshadow 组密码文件
+/etc/gshadow 组密码文件
 
-## 给用户 sudo 权限(centOs 系统)
+## 给用户sudo权限
 
 `su`切换到 root 用户
 `visudo` 编辑 sudo 文件
@@ -332,12 +329,12 @@ COMMAND：该程序的实际指令
 
 ## `top`
 
-- http://www.2cto.com/os/201209/157960.html
-  实时监控进程，监控服务器的健康情况
-  交互命令
-  `[shift] P` 按 cpu 使用率从大到小排序
-  `[shift] M` 按内存从大到小排序
-  `[shift] N` 按 pid 从小到大排序
+http://www.2cto.com/os/201209/157960.html
+实时监控进程，监控服务器的健康情况
+交互命令
+`[shift] P` 按 cpu 使用率从大到小排序
+`[shift] M` 按内存从大到小排序
+`[shift] N` 按 pid 从小到大排序
 
 `buffer` 缓冲,用于加速数据的写入,每次代码写操作不是直接写硬盘,而是写在内存里,等积累到一定数量了,一次性全部写入磁盘
 `cache` 缓存,用于加速数据的读出,从磁盘或者数据库中取出到数据暂时存在内存里,若下次使用相同数据,就可以直接使用内存了

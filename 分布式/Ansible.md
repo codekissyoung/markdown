@@ -119,8 +119,6 @@ $ ansible-playbook webservers.yml -b -K # 以当前用户登录，并且在执�
 
 当然，一个`yml`文件里可以包含多个`play`。
 
-
-
 ### 改进版本
 
 ```bash
