@@ -1,6 +1,6 @@
 # RabbitMQ
 
-[RabbitMQ PHP 版](https://xiaoxiami.gitbook.io/rabbitmq_into_chinese_php/ying-yong-jiao-cheng/php-ban/3-publish_subscribe.md)
+[RabbitMQ Client PHP 版](https://xiaoxiami.gitbook.io/rabbitmq_into_chinese_php/ying-yong-jiao-cheng/php-ban/3-publish_subscribe.md)
 
 ## 安装
 
@@ -13,38 +13,63 @@ rabbitmq-server -detached  # 启动 rabbitmq-server daemon
 启动后默认端口:
 
 ```bash
-4369 (epmd), 25672 (Erlang distribution)
-5672, 5671 (AMQP 0-9-1 without and with TLS)
-15672 (if management plugin is enabled)
+4369 (epmd)
+25672 (Erlang distribution)
+5672 (AMQP 0-9-1 without TLS) amqp 协议访问
+5671 (AMQP 0-9-1 with TLS) 
+15672 web  # http 协议访问
 61613, 61614 (if STOMP is enabled)
 1883, 8883 (if MQTT is enabled)
-web : 15672          # 通过浏览器访问
-api_port : 5672      # amqp 协议端口
 ```
 
 ## rabbitmqctl Server 管理
 
 ```bash
 rabbitmqctl status                    # 查看当前节点状态
+
 rabbitmqctl stop                      # 关闭服务 连同节点上的其它应用程序一同关闭了
-rabbitmqctl stop_app                  # 关闭 rabbitmq app
 rabbitmqctl start_app                 # 开启 rabootmq app
-rabbitmqctl list_queues               # -p 指定 vhost_name , 默认 / 
+rabbitmqctl stop_app                  # 关闭 rabbitmq app
+
+rabbitmqctl list_queues -p vhost      # 列出 vhost 下的队列
 rabbitmqctl list_exchanges
 rabbitmqctl list_bindings
 rabbitmqctl list_connections
 rabbitmqctl list_channels
 
-rabbitmqctl add_vhost xxx           # 新建virtual_host
-rabbitmqctl delete_vhost xxx        # 撤销virtual_host
-rabbitmqctl reset                   # 清除所有队列
+rabbitmqctl reset                     # 清除所有队列
 ```
+
+## 用户管理
+
+```bash
+rabbitmqctl list_vhosts										  # 列出vhost
+rabbitmqctl add_vhost linktest      						   # 新建vhost
+rabbitmqctl delete_vhost linktest   						   # 撤销vhost
+rabbitmqctl list_permissions [-p {vhost}]					   #　查看 vhost 的权限
+
+rabbitmqctl add_user {user} {pwd}                        		# 新增用户
+rabbitmqctl delete_user {user}                          		# 删除用户
+rabbitmqctl set_permissions [-p {vhost}] {user} ".*" ".*" ".*"	# 设置权限，RegExp : {conf} {write} {read}
+rabbitmqctl set_user_tags {user} {tag}             				# 设置用户类型
+rabbitmqctl list_users                                   		# 查看用户列表
+rabbitmqctl list_user_permissions {user}					   # 查看某用户的所有权限
+rabbitmqctl clear_permissions [-p {vhost}] {username}			# 清理权限
+```
+
+##### 用户角色`Tag`:
+
+- `administrator`：拥有以下所有权限
+- `monitoring`：可登陆管理控制台，同时可以查看节点的相关信息(进程数，内存使用情况，磁盘使用情况等)
+- `policymaker`：可登陆管理控制台, 同时可以对 policy 进行管理。但无法查看节点的相关信息
+- `management`：仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理
+- `other`：无法登陆管理控制台，通常就是普通的生产者和消费者
 
 #### 集群
 
 ```bash
 rabbitmqctl cluster_status                     # 查看集群内节点信息
-rabbitmqctl join_cluster 节点@主机名             # 创建集群
+rabbitmqctl join_cluster 节点@主机名            # 创建集群
 ```
 
 ### 插件管理
@@ -55,26 +80,7 @@ rabbitmq-plugins disable plugin-name         # 关闭插件
 rabbitmq-plugins enable rabbitmq_management  # 启用 web 管理界面插件
 ```
 
-## 用户管理
-
-```bash
-rabbitmqctl add_user root root                           # 新增用户 root 密码 root
-rabbitmqctl set_permissions -p / root ".*" ".*" ".*"     # 设置权限
-rabbitmqctl set_user_tags root administrator             # 设置用户类型
-rabbitmqctl list_users                                   # 查看用户列表
-rabbitmqctl delete_user username                         # 删除用户
-```
-
-### 用户角色`Tag`:
-
-- `administrator`：可登陆管理控制台，可查看所有的信息，并且可以对用户，策略(policy)进行操作
-- `monitoring`：可登陆管理控制台，同时可以查看 rabbitmq 节点的相关信息(进程数，内存使用情况，磁盘使用情况等)
-- `policymaker`：可登陆管理控制台, 同时可以对 policy 进行管理。但无法查看节点的相关信息
-- `management`：仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理
-- `other`：无法登陆管理控制台，通常就是普通的生产者和消费者
-
-
-## 队列属性
+### 队列属性
 
 声明一个已经存在的队列，假如参数都是一样的话，则返回这个队列。如果参数有不同的话，直接报错。
 

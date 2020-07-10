@@ -1,41 +1,20 @@
 # 友情链接
 
-## 博客推荐
-
-- [椰子皮 Yezipi](https://www.yezipi.net) : `VUE` `WeexPlus` `Web` `Node`
-
-## 在线工具
-
 ### PHP 网站
 
-- [泊学-个人博客](https://boxueio.com/)
+- [泊学](https://boxueio.com/)
 - [php the right way](http://laravel-china.github.io/php-the-right-way)
 - [awsome-php](https://github.com/ziadoz/awesome-php)
-- [李炎恢](https://www.ycku.com/)
 - [PHP 设计模式范例](https://designpatternsphp.readthedocs.io/zh_CN/latest/README.html)
 
-### 技术网站
-
-- [PHP 杜江的 21cto](http://www.21cto.com)
 - [运维派](http://www.yunweipai.com/)
 - [SDNLAB 专注网络创新技术](https://www.sdnlab.com/)
 
-### 电子书搜索
-
 - [鸠摩搜索电子书](https://www.jiumodiary.com)
-- [ncckl 云盘搜索](http://so.ncckl.cn/)
-- [小不点网盘搜索](https://www.xiaoso.net/)
-- [胖次网盘搜索](https://www.panc.cc/)
-- [盘搜](http://www.pansou.com/)
-- [ePUBee 电子书库 还支持在线转换格式](http://cn.epubee.com/books)
-- [读秀](http://www.duxiu.com/login.jsp)
-- [我的小书屋 个人站](http://mebook.cc/)
-- [众里寻书千百度](https://hotbaidu.com/)
-- [精品电子书 免费下载](https://bookset.me/)
-- [书语者](https://book.shuyuzhe.com/)
-- [调试正则表达式工具](http://regexpal.com/)
 
-### 代码工具
+  [小不点网盘搜索](https://www.xiaoso.net/)
+- [盘搜](http://www.pansou.com/)
+- [调试正则表达式工具](http://regexpal.com/)
 
 - [PHP 正则表达式 测试网站](http://regex.larsolavtorvik.com/)
 - [十大经典排序算法实现仓库](https://github.com/hustcc/JS-Sorting-Algorithm)
@@ -43,7 +22,7 @@
 - [linux 命令查询 非常全面](https://www.linuxcool.com/)
 - [自测代码练习平台](https://exercism.io/)
 - [Mikutools 工具集合](https://miku.tools)
-- [代码在线运行工具](https://tool.lu/)
+- [代码在线工具](https://tool.lu/)
 - [Json 格式化工具](http://json.awesomes.cn/)
 - [学习有关的友链都在这儿了](http://www.bewindoweb.com/dwg.php)
 - [捷径社区](https://sharecuts.cn/shortcuts)
