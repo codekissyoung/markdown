@@ -219,7 +219,3 @@ END{print $1,register_day,last_login_day,login_days,amount;}
 # 特点
 - 内置字段: sed 只有行 而没有内置的字段模型
 - 自动读取文件 和 分割字段
-
-# 缺点
-- 各种复杂的数据结构难以实现
-- 对 Unicode 支持不好
