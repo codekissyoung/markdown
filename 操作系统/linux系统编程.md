@@ -989,7 +989,7 @@ int mkfifo(char *pathname, mode_t mode);
 
 文件锁定: 防止其他进程读取或者更新内容, 允许进程对文件的部分区域加以锁定
 
-## 56. SOCKET 介绍
+56. SOCKET 介绍
 
 套接字: 不同主机上运行的进程之间传递数据
 

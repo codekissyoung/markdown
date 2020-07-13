@@ -373,7 +373,6 @@ class Army extends Unit {
 	}
 }
 
-
 // army 对象
 $main_army = new Army();
 $main_army -> addUnit( new Archer() );
