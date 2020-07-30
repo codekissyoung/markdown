@@ -440,8 +440,14 @@ $ ibus restart # 配置生效
 
 ![](https://img.codekissyoung.com/2020/06/18/db8b562d6155ce96e4f6450000d727c0.png)
 
+如果上面的没有生效，请尝试在`~/.config/ibus/rime/build/ibus_rime.yaml`,添加下面内容：
+```yaml
+style:
+  horizontal: true
 ```
-Super + space 组合键来切换输入法
+
+```
+Ctrl + space 组合键来切换输入法
 ```
 
 改改默认配置：只留下中文简体、每页词语数为10

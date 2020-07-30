@@ -9,7 +9,7 @@ $ sudo apt-get install linux-image-extra-virtual
 $ sudo apt-get install apt-transport-https ca-certificates software-properties-common
 $ sudo apt-get install docker.io
 $ sudo usermod -aG docker $USER		# 免 sudo 执行 docker
-$ docker version               
+$ docker version  
 $ docker info
 ```
 
@@ -47,13 +47,10 @@ $ journalctl -u docker.service 			# 查看服务日志
 }
 ```
 
-
-
 ## 快速常用命令
 
 ```bash
-$ docker build -t="link/ubuntu.v1" .									# 从Dockerfile构建镜像
-$ docker run -it ubuntu:18.04 /bin/bash 								# 交互终端
+$ docker build -t="link/ubuntu.v1" .	# 从Dockerfile构建镜像
 $ docker run -d -p 3306:3306 -v /mysql_data:/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD=123456 --restart=always --name db01 mysql:5.6	# Daemon
 ```
@@ -77,13 +74,11 @@ $ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 tag，tag 就是 IMAG
 $ docker history image_id     				# 查看一个Image的构建历史
 ```
 
-### 利用Dockerfile创建镜像
+### 利用`Dockerfile`创建镜像
 
 ```bash
 $ docker build -t link/ubuntu.v1 .
 ```
-
-
 
 ## 容器管理
 
