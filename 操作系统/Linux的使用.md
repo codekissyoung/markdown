@@ -37,11 +37,6 @@ sudo swapoff swapfile      # 卸载这个 swap文件
 
 ## 定时任务
 
-```bash
-$ crontab -e    # 设置定时任务
-$ crontab -l    # 列出已经设定的定时任务列表
-```
-
 五个`*`含义的口诀`分 时 日 月 周`，`*`代表“每”，`/`代表“隔”，`-`代表“范围”，`,` 代表离散集合。
 
 ```c
@@ -72,21 +67,7 @@ $ crontab -l    # 列出已经设定的定时任务列表
 ls  -l  /tmp > /tmp.msg   不再屏幕显示，而是输入到/tmp.msg 这个文件
 date >> /tep.msg    >>表示在末尾追加
 grep 127 < /etc/hosts   输入重定向
-cp -R /usr   /backup/usr.bak  2> /bak.error   错误输出重定向
-```
-
-## 管道：将一个命令的输入作为另一个命令的输入
-
-```
-ps aux | grep  apache2
-```
-
-## 命令链接符
-
-```bash
-ls  -l  /etc/hosts;ls -l /etc/host;   命令依次执行
-sudo service apache2  stop && sudo  service apache2 start   前面命令执行成功后，才执行后面命令
-service apache2 restart || sudo service apache2 restart  前面命令执行失败后，后面命令才执行
+cp -R /usr   /backup/usr.bak  2> /bak.error   错误输出重定
 ```
 
 ## 命令替换符
@@ -98,8 +79,6 @@ ls  -l  `which touch`  将which touch的输入作为 ls -l 的参数
 ## 目录与文件管理命令
 
 ```
-touch  test.c   创建一个新文件test.c
-mkdir  test   创建一个新目录 test
 cp  test.c   /root    复制 test.c 到 /root
 cp   -R   test   /root     复制test 文件夹到 /root
 mv  test.c  /root   移动 test.c 到/root
@@ -166,17 +145,6 @@ traceroute  +域名/主机 IP ：追踪路由
 route -n：显示本机路由表
 ```
 
-## 关机
-
-```
-shutdown  -h [now/等待时间]
-shutdown    -r    [now/等待时间] 重启
-reboot    快速重启（跳过sync数据同步过程）
-init    0    关机
-init    6    重启
-halt    系统停机
-```
-
 ## 查看硬盘分区情况
 
 ```
@@ -208,7 +176,7 @@ killall  8323   杀死它和它的子进程
 top   实时监控进程
 ```
 
-- 在单个 shell 登录终端如何进行多个任务
+在单个 shell 登录终端如何进行多个任务
 
 ```bash
 ctrl + z  # 将当前执行的程序放入后台,程序是暂停的
@@ -220,9 +188,6 @@ fg %工作号 # 恢复指定后台任务到前台
 nohup 命令 &  # 后台命令脱离终端运行
 ```
 
-## 用户类型
-
-linux 中只有`root`用户和`非root`用户两种用户
 `nobody` `adm` `ftp` 等系统预设用户是不分配密码和 shell 的 一般作为进程指定用户使用 比如 nginx 指定 nobody 为运行用户
 `whoami` 当前用户
 `useradd caokaiyan` 向系统添加一个用户
@@ -262,7 +227,7 @@ linux 中只有`root`用户和`非root`用户两种用户
 
 ## 给用户sudo权限
 
-`su`切换到 root 用户
+
 `visudo` 编辑 sudo 文件
 下面是 sudo 文件的配置
 `root ALL=(ALL) ALL` 这一行下面，再加入一行
@@ -272,29 +237,17 @@ linux 中只有`root`用户和`非root`用户两种用户
 上面命令限制 admin 用户组只能使用`/sbin/mount /mnt/cdrom`,`/sbin/umount /mnt/cdrom`两个命令
 `%admin ALL=(ALL) ALL,!/usr/sbin/adduser,!/usr/sbin/useradd` `!`表示 admin 禁用的命令
 建议：明文禁止 su 命令被 sudo 特权执行,原因是 `sudo su anyone`这样可以切换到任意一个 linux 用户的目录
-保存退出
 
 ## 查看当前在线的所有用户
 
 ```bash
-[root@iZ252e1zy6zZ ~]# w
- 06:16:14 up  5:24,  2 users,  load average: 0.02, 0.03, 0.05
+$ w
+06:16:14 up  5:24,  2 users,  load average: 0.02, 0.03, 0.05
 USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU WHAT
 cky      pts/0    183.37.226.20    02:53   28.00s  0.98s  0.98s -zsh
 root     pts/1    183.37.226.20    06:16    0.00s  0.00s  0.00s w
+$ pkill -9 -t pts/1   # 强制踢出 pts/1 登录的用户
 ```
-
-## 强制踢出 pts/1 登录的用户
-
-```bash
-pkill -9 -t pts/1
-```
-
-## 进程管理
-
-程序运行产生进程,同一个程序能产生`n`个进程
-进程管理：判断服务器健康状态,查看系统中所有进程,杀死异常进程
-如果发现某个进程是病毒,应该先删除它的文件,再杀死它的进程
 
 ## `ps aux`
 
@@ -391,11 +344,6 @@ COMMAND 进程名称（命令名/命令行）
 `killall -1 pid` 平滑重启某一类进程
 `Kill -9 8935` 通过 PID 强制杀死进程
 `killall -9 8323` 杀死它和它的子进程
-
-## 进程优先级
-
-就是决定 cpu 先执行哪个进程
-除非做内核裁剪或者嵌入式开发,否则没有多大意义
 
 ## 按 16 进制 对照查看文件
 
@@ -586,12 +534,12 @@ tmpfs          tmpfs     105M     0  105M    0% /run/user/1000
 
 主要目的是写入特定文件系统，首先将分区指定区域分成等大小的储存块,再将分区中另一指定区域做成文件分配表，目录表，它们纪录了该分区下所有文件实际存储的块以及用于文件管理。
 
-# 使用分区
+### 使用分区
 
 > **windows** : 分区 ----> 分配盘符 -----> 格式化
 > **linux** : 分区 -----> 格式化 -----> 取个设备文件名 ---> 挂载
 
-# 批量安装日志
+### 批量安装日志
 
 安装完系统后，在`root`的 home 目录下
 `/root/install.log` 储存了安装在系统中的软件包及其版本信息

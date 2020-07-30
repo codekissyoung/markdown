@@ -64,7 +64,7 @@ exec("ls -l");			// 直接执行系统命令的函数
 
 ```php
 $urlstr = urlencode("我是codekissyoung");
- urldecode($urlstr);
+urldecode($urlstr);
 ```
 
 ## JSON 字符串
