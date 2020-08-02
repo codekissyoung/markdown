@@ -163,7 +163,5 @@ a instanceof Array // true
 
 ### 对象
 
-
-
 ## 事件驱动和非阻塞式设计
 

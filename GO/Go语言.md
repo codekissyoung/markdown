@@ -10,20 +10,16 @@
 
 ```go
 var cwd string
-
 func init() {
 	// 写法1
 	cwd, err := os.Getwd() // 这里的 cwd 是新建的，就不是全局变量
-
 	// 写法2
 	var err error
 	cwd, err = os.Getwd() // 这里的 cwd 就是全局变量
-
 	if err != nil {
 		log.Fatalf("os.Getwd faild: %v", err)
 	}
 	log.Printf("Working directory = %s", cwd)
-
 }
 func main() {
 	fmt.Printf("cwd : %s", cwd)

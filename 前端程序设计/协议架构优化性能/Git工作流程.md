@@ -33,8 +33,6 @@
 git(master): git checkout -b qqm-feature1-new # 以master为基础，切出新分支，并切换到该分支
 ```
 
-> `git(master):` 为`oh my zsh`为`git`配置的标识，可以显示当前`git`处于哪个分支上
-
 ```shell
 git push --set-upstream origin caokaiyan-feature2-new
 ```

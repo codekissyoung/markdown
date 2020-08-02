@@ -24,7 +24,7 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 201            Created              创建服务器对象的请求(如PUT) ，创建成功
 202            Accepted             请求已经被接受，但服务器暂时还未采取动作。
 301            Moved  Permanently   请求的资源被移除，响应的Location中应该包含资源现在在的URL
-302            Found                请求的资源被移除，响应的Location中应该包含资源现在在的URL,但这个URL只作为临时使用，以后还是用旧的
+302            Found                请求的资源被移除，但这个URL只作为临时使用，以后还是用旧的
 304            Not  Modified        请求的资源未更新，服务器响应不会返回主体
 401            Unauthorized         未授权，需要输入用户名和密码
 403            Forbidden            请求被服务器拒绝

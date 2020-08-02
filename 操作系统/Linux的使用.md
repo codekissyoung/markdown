@@ -39,15 +39,11 @@ sudo swapoff swapfile      # 卸载这个 swap文件
 
 五个`*`含义的口诀`分 时 日 月 周`，`*`代表“每”，`/`代表“隔”，`-`代表“范围”，`,` 代表离散集合。
 
-```c
+```bash
 30 21 * * * /usr/local/etc/rc.d/lighttpd restart       # 每天 21:30
-
 45 4 1,10,22 * * /usr/local/etc/rc.d/lighttpd restart  # 每月的 1、10、22 号，在 4:45 分 执行
-
 10 1 * * 6,0  /usr/local/etc/rc.d/lighttpd restart     # 每周六、周日，在 1:10 分执行
-
 0,30 18-23 * * * /usr/local/etc/rc.d/lighttpd restart  # 每天的18:00-23:00，每隔30分钟执行
-
 */2 * * * * /home/cky/clear-log                        # 每隔 2 分钟,清理日志
 ```
 
