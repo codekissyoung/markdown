@@ -85,23 +85,13 @@ type stringStruct struct{
 } // 字符串的实现结构
 ```
 
-
-
 字符串存储以`utf8`编码，存储的是`unicode`字符串，零值为`""`
-
-
 
 支持`!=` `==` `>` `<` `+` `+=` 操作符号，支持这样`s[3]`读取单个字节，支持切片语法`s1 = s[1:4]` `s1`切片底层引用的是`s`数组
 
-
-
 `range`操作对字符串做了优化，默认是按字符取值，而不是按字节
 
-
-
 要修改字符串内容，必须转成`[]rune`或`[]byte`类型，完成后再转换回来。这种转换要重新分配内存，复制数据。
-
-
 
 ```go
 s := "Hello, 世界"
@@ -174,12 +164,34 @@ func main() {
 `通道`的赋值：
 
 ```go
-	a := make(chan int, 2) // 双向通道 转 单向通道, b 为未命名类型
-	fmt.Printf("%#v\n", a) // (chan int)(0xc0000c2000)
+a := make(chan int, 2) // 双向通道 转 单向通道, b 为未命名类型
+fmt.Printf("%#v\n", a) // (chan int)(0xc0000c2000)
 
-	var b chan<- int = a
-	fmt.Printf("%#v\n", b) // (chan<- int)(0xc0000c2000)
+var b chan<- int = a
+fmt.Printf("%#v\n", b) // (chan<- int)(0xc0000c2000)
 
-	b <- 2
+b <- 2
+```
+
+## 常数Const是没有类型的
+
+```go
+const (
+        MaxInt64 = int(^uint64(0) >> 1)
+        MinInt64 = -MaxInt64 - 1
+        Big      = 1 << 100
+        Small    = Big >> 99
+)
+func needInt(x int) int { return x*10 + 1 }
+func needFloat(x float64) float64 {
+	return x * 0.1
+}
+func main() {
+    fmt.Println(needInt(Small))
+    fmt.Println(needFloat(Small))
+    fmt.Println(needFloat(Big))
+    fmt.Printf("Max int64 : %v\n ", MaxInt64)
+    fmt.Printf("Min int64 : %v\n ", MinInt64)
+}
 ```
 

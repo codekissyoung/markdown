@@ -226,18 +226,17 @@ func fa(a int) func(i int) int {
 
 ```go
 func fibonacci() func() int {
-	n1, n2, cnt := 0, 1, 0
+	time, pre, next := 0, 0, 1
 	return func() int {
-		cnt ++;
-		switch cnt {
-			case 1:
-				return n1
-			case 2:
-				return n2
-			default:
-				sum := n1 + n2
-				n1, n2 = n2, sum
-				return sum
+		time++
+		switch time {
+		case 1:
+			return pre
+		case 2:
+			return next
+		default:
+			pre, next = next, pre+next
+			return next
 		}
 	}
 }
