@@ -47,26 +47,28 @@ int func1(int a, int b){
 
 方法是与`对象实例`绑定的`特殊函数`。
 
-普通函数专注于算法流程，传入参数，返回结果。而方法相比函数，是有关联对象的，有的方法的调用结果取决于当时`关联对象`的状态。
-
-方法非常主要的一个作用是：维护和展示对象的状态。
+普通函数专注于算法流程，传入参数，返回结果。而方法相比函数，是有关联对象的，有的方法的调用结果取决于当时`关联对象`的状态。方法非常主要的一个作用是：维护和展示对象的状态。
 
 ```go
 type Vertex struct {
 	X, Y float64
 }
-func ( v Vertex ) Abs() float64 {
-	  return math.Sqrt( v.X * v.X + v.Y * v.Y)
+func (v Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }
-func ( v *Vertex ) Scale(f float64) {
-	v.X *= f
-	v.Y *= f
+func (v *Vertex) Scale(f float64) {
+	v.X = v.X * f
+	v.Y = v.Y * f
 }
 func main() {
-    v := Vertex{ 3, 4 }
-    fmt.Println( v.Abs() ) // 5
-    Scale( &v, 10 )
-    fmt.Println(Abs(v))    // 50
+	v := Vertex{3, 4}
+	p := &Vertex{3, 4}
+
+	println(v.Abs())
+	println(p.Abs()) // 编译时实际是 (*p).Abs()
+
+	v.Scale(10) // 编译时实际是 (&v).Scale(10)
+	p.Scale(3)
 }
 ```
 
