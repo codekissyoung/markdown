@@ -117,7 +117,7 @@ function aton(char_ip, int_ip, arr){
 
 # 输出函数
 ```awk
-print  在标准输出输出 $0
+print 在标准输出输出 $0
 print expression1,expression2
 printf(format,expression1, expression2,)
 ```
@@ -152,7 +152,7 @@ gsub(r,s,t) sub(r,s) sub(r,s,t) split(s,a) split(s,a,fs)
 字符串较短的会定义为小于较长的那个,"A"< "AA" 的值为真
 ```
 
-- 例子
+
 
 ```awk
 // 字符串转数字：变量通过 + 连接运算，自动强制将字符串转为整型，非数字变成0
