@@ -14,8 +14,8 @@ export PATH=$PATH:$GOROOT/bin               # go本身二进制文件的环境�
 export PATH=$PATH:$GOPATH/bin               # go第三方二进制文件的环境便令
 export GO111MODULE=on                       # 开启go mod模式
 export GOPROXY=https://goproxy.cn,direct    # golang包的下载代理
-export GOPRIVATE=gitlab.xinhulu.com						 # 不使用 GOPROXY 代理的包
-export GIT_TERMINAL_PROMPT=1			          	 # 使得go命令可以读取git的参数
+export GOPRIVATE=gitlab.xinhulu.com		    # 不使用 GOPROXY 代理的包
+export GIT_TERMINAL_PROMPT=1			   # 使得go命令可以读取git的参数
 ```
 
 ### GO命令

@@ -8,15 +8,12 @@
 
 ```go
 func main() {
-
 	a := 0x100
 	p := &a
-  // pointer : 0xc00000e028, target: (*int)(0xc00001e0b8)
+    // pointer : 0xc00000e028, target: (*int)(0xc00001e0b8)
 	fmt.Printf("pointer : %p, target: %#v\n", &p, p)
-	
-  test(p)
+    test(p)
 }
-
 func test(x *int) {
   // pointer : 0xc00000e030, target: (*int)(0xc00001e0b8)
 	fmt.Printf("pointer : %p, target: %#v\n", &x, x)
@@ -105,8 +102,6 @@ fmt.Println((<-c)(2, 3)) // 6
 - 没有定义顺序限制，必要时可以抽离
 - 将大函数分解为多个相对独立的匿名函数块，再用简洁的调用完成逻辑流程，实现框架与细节分离
 
-
-
 ### 闭包
 
 `闭包`特性是指：引用了其匿名函数体之外的变量。匿名函数内可以操作外部变量，换句话说，该函数被这些变量“绑定”在一起。
@@ -116,7 +111,6 @@ func main() {
     f := test(123)
     f() // 123
 }
-
 func test(x int) func() {
     y := 12
     println(&x, &y) // 0xc000124010 0xc000124018
@@ -154,8 +148,6 @@ func test() []func() {
 `闭包`特性让我们不用传递参数就能读取和修改外部函数的状态，但是要特别小心的使用。
 
 
-
-
 ### 避免延迟求值效应
 
 ```go
@@ -166,7 +158,6 @@ func main() {
 		//0xc00001e0b8 1
 	}
 }
-
 func test() []func() {
 	var s []func()
 	for i := 0; i < 2; i++ {
