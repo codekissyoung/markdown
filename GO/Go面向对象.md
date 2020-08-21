@@ -84,28 +84,21 @@ func main() {
 
 - 其他无法确定的情况，都用`*T`
 
-
-
-### 匿名字段
-
 #### 结构体匿名字段
 
 ```go
 type attr struct {
 	perm int
 }
-
 type file struct {
 	name string
 	attr // 匿名字段
 }
-
 type data struct {
 	os.File // 作为匿名字段时，包名被自动去掉了
 }
 
 func main() {
-
 	f := file{
 		name: "test.dat",
 		attr: attr{
@@ -122,27 +115,7 @@ func main() {
 }
 ```
 
-#### 基础类型匿名字段
-
-```go
-type data struct {
-	*int   // 使用 int 作为字段名
-	string // 使用 string 作为字段名
-}
-
-func main() {
-	x := 100
-	d := data{
-		int:    &x, // 使用基础类型作为字段名
-		string: "abc",
-	}
-	println(*d.int)   // 100
-	println(d.string) // abc
-	fmt.Printf("%#v\n", d)
-}
-```
-
-#### 命名类型的指针不能作为匿名字段
+#### 命名类型的**指针**不能作为匿名字段
 
 ```go
 type a *int
@@ -203,23 +176,18 @@ func main() {
 type user struct {
 	name string
 }
-
 type manager struct {
 	user
 }
-
 func (u user) show() string {
 	return u.name
 }
-
 func (m manager) show() string {
 	return "manager " + m.user.show()
 }
-
 func main() {
 	m := &manager{}
 	m.name = "link"
-
 	println(m.show())      // manager link
 	println(m.user.show()) // link
 }
@@ -271,21 +239,17 @@ PS: 这种为了方便而牺牲 "一致性" 和 ＂类型检查＂ 的做法是 
 ## 继承
 
 ```go
-
 type user struct {
 	name string
 	age  int8
 }
-
 func (u user) ToString() string {
 	return fmt.Sprintf("%+v %T", u, u)
 }
-
 type manager struct {
 	user
 	title string
 }
-
 func main() {
 	var m manager
 	m.name = "Link"
@@ -445,27 +409,19 @@ type N int
 func (n *N) test() {
 	fmt.Printf("test.n: %p, %d\n", n, *n)
 }
-
 func main() {
 	var n N = 100
 	p := &n
-
 	n++
 	f1 := n.test
-
 	n++
 	f2 := p.test
-
 	n++
-
 	fmt.Printf("main.n: %p, %v\n", p, n) // main.n: 0xc0000b6010, 103
 	f1()                                 // main.n: 0xc0000b6010, 103
 	f2()                                 // main.n: 0xc0000b6010, 103
 }
 ```
 
-## Go的编程思路
 
-将模块分解成相互独立的更小单元，分别处理不同方面的需求，最后以匿名嵌入的方式，组合到一个结构体中，共同实现对外接口。
 
-接口是多态的一种实现形式，要于基于继承体系的多态分别对待，两者在解决问题的套路上还是有些区别的。

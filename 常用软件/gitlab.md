@@ -14,7 +14,6 @@ $ sudo EXTERNAL_URL="http://gitlab.cky.com" apt-get install gitlab-ce
 ```ruby
 # 访问URL配置
 external_url 'http://gitlab.cky.com'
-
 # 邮箱设置
 gitlab_rails['smtp_enable'] = true 
 gitlab_rails['smtp_address'] = "smtp.qq.com"

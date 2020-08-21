@@ -17,9 +17,7 @@ rabbitmq-server -detached  # 启动 rabbitmq-server daemon
 25672 (Erlang distribution)
 5672 (AMQP 0-9-1 without TLS) amqp 协议访问
 5671 (AMQP 0-9-1 with TLS) 
-15672 web  # http 协议访问
-61613, 61614 (if STOMP is enabled)
-1883, 8883 (if MQTT is enabled)
+15672 web Http协议
 ```
 
 ## rabbitmqctl Server 管理

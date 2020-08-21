@@ -38,7 +38,7 @@ $ sudo apt-get install php7.2-fpm           # 直接安装 php-fpm ，就不会�
 link@link2:/etc/nginx/sites-available$ sudo cp default db.link.com.conf # 新建 Virtual Server
 ```
 
-```conf
+```nginx
 server {
     listen 80;
     listen [::]:80;

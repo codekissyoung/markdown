@@ -78,7 +78,6 @@ for( i in array)
 {
 
 }
-
 // 判断是否在数组内
 if( var in array )
 ```
@@ -160,7 +159,7 @@ gsub(r,s,t) sub(r,s) sub(r,s,t) split(s,a) split(s,a,fs)
 3
 
 // 如果只是显示/etc/passwd的账户
-cat /etc/passwd |awk  -F:  '{print $1}'
+cat /etc/passwd | awk  -F: '{print $1}'
 
 // 对匹配到了 root 的行执行 action
 ➜  ~ awk -F: '/root/' /etc/passwd
