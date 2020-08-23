@@ -68,8 +68,6 @@ func getOperation() func(int, int) int {
 }
 ```
 
-
-
 ```go
 type calc struct {
 		mul func(x, y int) int
@@ -170,8 +168,6 @@ func test() []func() {
 	return s
 }
 ```
-
-
 
 ```go
 func adder() func(int) int {

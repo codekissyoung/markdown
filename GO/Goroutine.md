@@ -190,16 +190,6 @@ func main() {
 
 ```
 
-
-
-
-
-
-
-
-
-
-
 ### 定时器与`Goroutine`:
 
 ```go
@@ -249,4 +239,49 @@ for {
 
 	<-exit
 ```
+
+
+
+## Feature 模式 并行执行
+
+```go
+
+func main() {
+	// 下面两句 并行执行
+	retCh := AsyncService()
+	otherTask()
+
+	// 等待 第一句的结果
+	fmt.Println(<-retCh)
+	time.Sleep(time.Second)
+}
+
+// 50 ms 执行完的一个Service
+func service() string {
+	time.Sleep(time.Millisecond * 50)
+	return "Done"
+}
+
+// 100ms 执行完的一个 Task
+func otherTask() {
+	fmt.Println("otherTask start")
+	time.Sleep(time.Millisecond * 100)
+	fmt.Println("otherTask done.")
+}
+
+// 使用协程将它包装成一个异步操作
+func AsyncService() chan string {
+	retCh := make(chan string, 1) // 思考下，有 buffer 和 无buffer 的区别 ?
+	fmt.Println("Async Service Goroutine Start")
+	go func() {
+		fmt.Println("service start.")
+		ret := service()
+		retCh <- ret // 如果是无 buffer ,则主调函数未取数据之前，回阻塞在此
+		fmt.Println("service end.")
+	}()
+	return retCh
+}
+```
+
+
 
