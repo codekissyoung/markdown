@@ -12,7 +12,8 @@ $ rm  ~/.java/.userPrefs/jetbrains/goland
 ## 快捷健
 
 ```bash
-Ctrl + Alt + s                  调出 Settings 界面
+Ctrl + Alt + s                 调出 Settings 界面
+Ctrl + Alt + l				  对齐选中代码
 ```
 
 ## 普通设置
