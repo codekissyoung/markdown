@@ -351,8 +351,6 @@ func AsyncService() chan string {
 #### 情况2：多个 sender 一个 receiver
 
 ```go
-
-// 如何优雅地关闭Go channel
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	log.SetFlags(0)
@@ -376,7 +374,6 @@ func main() {
 			}
 		}()
 	}
-
 	// one receiver
 	go func() {
 		for value := range dataCh {
@@ -388,7 +385,6 @@ func main() {
 			}
 		}
 	}()
-
 	time.Sleep(1000 * time.Second)
 }
 ```
