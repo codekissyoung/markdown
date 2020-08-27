@@ -283,5 +283,195 @@ func AsyncService() chan string {
 }
 ```
 
+### 带有超时机制的并行调用
 
+```go
+func main() {
+	// 下面两句 并行执行
+	retCh := AsyncService()
+	otherTask()
+
+	// 等待 第一句的结果，并且有超时机制
+	select {
+	case ret := <-retCh:
+		fmt.Println("get from retCh : ", ret)
+	case <-time.After(time.Millisecond * 200): // 200 ms 超时
+		fmt.Println("time out")
+	}
+
+	time.Sleep(time.Second)
+}
+
+// 50 ms 执行完的一个Service
+func service() string {
+	time.Sleep(time.Millisecond * 100) // 修改这里，改变服务运行时间，验证超时
+	return "Done"
+}
+
+// 100ms 执行完的一个 Task
+func otherTask() {
+	fmt.Println("otherTask start")
+	time.Sleep(time.Millisecond * 100)
+	fmt.Println("otherTask done.")
+}
+
+// 使用协程将它包装成一个异步操作
+func AsyncService() chan string {
+	retCh := make(chan string) // 思考下，有 buffer 和 无buffer 的区别 ?
+	fmt.Println("Async Service Goroutine Start")
+	go func() {
+		fmt.Println("service start.")
+		ret := service()
+		retCh <- ret // 如果是无 buffer ,则主调函数未取数据之前，回阻塞在此
+		fmt.Println("service end.")
+	}()
+	return retCh
+}
+```
+
+### 优雅的关闭Channel
+
+**The Channel Closing Principle**
+
+1. 不要从接收端关闭 channel
+1. 不要关闭有多个并发发送者的channel
+1. sender是唯一 或者是channel最后一个活跃的sender，那么你应该在sender的goroutine关闭channel，从而通知 receivers 已经没有值可以读了
+
+维持这些原则保证了:
+
+- 永远不会发生向一个已经关闭的channel发送值(会导致panic)
+- 关闭一个已经关闭的channel(会导致panic)
+
+> Golang甚至禁止关闭 receive-only 类型的channel
+
+#### 情况1: 一个 sender 多个 receiver 
+
+这种情况下，直接在 sender 处，关闭就好
+
+#### 情况2：多个 sender 一个 receiver
+
+```go
+
+// 如何优雅地关闭Go channel
+func main() {
+	rand.Seed(time.Now().UnixNano())
+	log.SetFlags(0)
+	const MaxRandomNumber = 1000
+	const NumSenders = 10
+
+	dataCh := make(chan int, 100)
+	stopCh := make(chan struct{}) // 额外的一个Channel
+
+	// senders
+	for i := 0; i < NumSenders; i++ {
+		go func() {
+			for {
+				value := rand.Intn(MaxRandomNumber)
+				select {
+				case <-stopCh:
+					fmt.Println("got from stop, returned")
+					return
+				case dataCh <- value:
+				}
+			}
+		}()
+	}
+
+	// one receiver
+	go func() {
+		for value := range dataCh {
+			if value == MaxRandomNumber-1 {
+				fmt.Println("close stopCh")
+				close(stopCh) // 这个命令让所有的sender都 return 了
+				fmt.Println("receiver returned")
+				return // 自己再退出，这样就没有引用 dataCh 和 stopCh 的 Goroutine 了
+			}
+		}
+	}()
+
+	time.Sleep(1000 * time.Second)
+}
+```
+
+#### 情况3：多个 sender 多个 receiver
+
+通过一个主持人`moderator`携程，可以优雅的退出所有使用到 dataChan 的协程，从而将Channel回收
+
+```go
+
+func main() {
+	const (
+		MaxRandomNumber = 100000
+		NumSenders      = 20
+		NumReceivers    = 10
+	)
+
+	dataCh := make(chan int, 100) // senders 写入 receviers 接收
+	stopCh := make(chan struct{}) // senders 与 receviers 监听, 收到后退出协程
+	// moderator 监听，senders 与 receviers 都可以写入
+	// 收到后，关闭所有 senders 和 receviers
+	toStop := make(chan string, 1)
+
+	// moderator
+	go func() {
+		<-toStop
+		close(stopCh)
+	}()
+
+	// senders
+	for i := 0; i < NumSenders; i++ {
+		go func(id string) {
+			for {
+				value := rand.Intn(MaxRandomNumber)
+				if value == 0 {
+					select {
+					case toStop <- "sender#" + id:
+					default:
+					}
+					return
+				}
+				select {
+				case <-stopCh:
+					return
+				default:
+				}
+
+				select {
+				case <-stopCh:
+					return
+				case dataCh <- value:
+				}
+			}
+		}(strconv.Itoa(i))
+	}
+
+	// receivers
+	for i := 0; i < NumReceivers; i++ {
+		go func(id string) {
+			for {
+				select {
+				case <-stopCh:
+					return
+				default:
+				}
+
+				select {
+				case <-stopCh:
+					return
+				case value := <-dataCh:
+					if value == MaxRandomNumber-1 {
+						select {
+						case toStop <- "receiver#" + id:
+						default:
+						}
+						return
+					}
+				}
+			}
+		}(strconv.Itoa(i))
+	}
+
+	time.Sleep(1000 * time.Second)
+}
+```
 
