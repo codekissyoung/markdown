@@ -6,7 +6,7 @@
 
 ```php
 ini_get("allow_url_fopen");         // 获取 php.ini 中 allow_url_fopen 的设置
-array get_loaded_extensions();            // 获取所有加载的 模块
+array get_loaded_extensions();      // 获取所有加载的 模块
 ```
 
 ## Bool 判断
@@ -20,16 +20,11 @@ array get_loaded_extensions();            // 获取所有加载的 模块
 4. $a = new A(); 空对象 class A{}
 5. $a = 其他值
 
+is_null($a);        // 1, 2 为 true
 isset($a);          // 3, 4, 5 为 true
 empty($a);          // 1, 2, 3 为 true
 if( $a );           // 4, 5    为 true
 ```
-
-坑爹的`isset`和`empty`判断：
-
-![](https://img.codekissyoung.com/2020/02/25/7caca23bd2a077dfe6041027864ecc55.png)
-
-## 魔术变量
 
 ```php
 // http://www.dadishe.com/test/checkbox.php?a[]=b&a[]=c
@@ -53,11 +48,10 @@ is_string();
 is_object();
 is_array();
 is_resource();
-is_null();
 is_callable( [$obj, $method] );
 ```
 
-## 啥玩意?
+
 
 ```php
 __LINE__            # 文件中的当前行号
@@ -73,49 +67,33 @@ __NAMESPACE__       # 当前命名空间的名称
 ## 如何调试和分析类
 
 ```php
-get_declared_classes();        // 获取当前所有已定义的类名
-get_class_methods( $obj );     // 获取所有的方法名
-get_object_vars( $obj );       // 获取所有属性名
-get_parent_class( $sub_obj );  // 获取一个对象的父类
-is_subclass_of( $sub_obj, 'Think\Parent_class' ); // 检查对象是否是一个类的子类
-
-class_implements( $obj );         // 获取该对象实现的所有接口
-$obj instanceof interface_name ; // 判断 $obj 是否实现了某个接口
-```
-
-## exists 系列
-
-```php
 file_exists( $file_name );
 class_exists( $classname );
 method_exists( $obj , $method ); // 方法是否存在
-```
 
-## 类相关
-
-```php
-get_declared_classes(); // 获取脚本运行到当前行时，所有已经定义的类的数组
-get_class($obj);        // 获取对象的 类名
-
+get_declared_classes();         // 获取脚本运行到当前行时，所有已经定义的类的数组
+get_class_methods( $obj );      // 获取一个类中所有的方法名
+get_object_vars( $obj );        // 获取一个类中的所有属性名
+get_parent_class( $sub_obj );   // 获取一个对象的父类
+get_class($obj);        		// 获取对象的 类名
+is_subclass_of( $sub_obj, 'Think\Parent_class' ); // 检查对象是否是一个类的子类
+class_implements( $obj );         // 获取该对象实现的所有接口
 $obj instanceof interface_name ; // 判断 $obj 是否实现了某个接口
 
-get_class_methods($class_name); // 获取一个类中所有的方法名
-
-get_class_vars($class_name); // 获取一个类中的所有属性名
-
-get_parent_class($sub_obj); // 获取一个类的父类
-
-is_subclass_of($sub_obj,'Parent_class'); // 检查是否是一个类的子类
-
-class_implements($obj); // 获取该对象实现的所有接口
-
+// 调用方法
 call_user_func('myFunction');
-call_user_func( [ $myObj, 'method_name'], 20 ); // 调用用户函数 / 方法
+
+// 调用方法
+call_user_func( [ $myObj, 'method_name'], 20 );
 // 等价于
 $myObj -> method_name(20);
 
-call_user_func_array([$obj,'method'],$args); // 等价于 $obj -> method($args); $args 为不定个数的数组
+call_user_func_array([$obj,'method_name'],$args);
+// 等价于
+$obj -> method($arr); // $arr 参数数组
 ```
+
+
 
 ## 写 http 头
 
