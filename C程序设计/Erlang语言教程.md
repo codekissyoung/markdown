@@ -14,7 +14,6 @@ $ sudo apt-get install erlang
 
 ```bash
 $ erl                       # 进入 erl shell
-Erlang/OTP 20 [erts-9.2] [source] [64-bit] [smp:6:6] [ds:6:6:10] [async-threads:10] [kernel-poll:false]
 Eshell V9.2  (abort with ^G)
 1> q().                     # 退出 erl shell
 ok

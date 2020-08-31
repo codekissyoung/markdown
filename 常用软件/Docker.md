@@ -62,8 +62,8 @@ $ docker images                   						# 查看本地的 Images
 $ docker pull ubuntu              						# 从 Registry 拉取一个 Image 到 本地
 $ docker image prune -f			  						# 清理无用的镜像
 $ docker rmi 镜像ID/名字		   						 # 删除镜像
-$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04		# 导出镜像到本地文件
-$ docker load -i ubuntu_18.04.tar.gz 				    # 导入本地镜像文件
+$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04		  # 导出镜像到本地文件
+$ docker load -i ubuntu_18.04.tar.gz 				     # 导入本地镜像文件
 ```
 
 ### 将容器打包成镜像
@@ -94,7 +94,6 @@ $ docker run ubuntu:18.04 /bin/echo "hello 18.04"
 ```bash
 $ docker run -it ubuntu:18.04 /bin/bash # 起一个容器，并进入它的终端界面
 root@7f62c7880035:/# cat /proc/version
-root@7f62c7880035:/# ls
 root@7f62c7880035:~# exit               # 退出容器，容器也直接停止了
 ```
 
@@ -140,10 +139,10 @@ $ docker rm $(docker ps -aq)        			# 删除所有容器
 ### 其他容器命令
 
 ```bash
-$ docker cp data.txt test:/tmp/ # 复制文件到容器内部
-$ docker container port test # 查看容器端口映射情况
-$ docker export -o ubuntu18.04.c.tar.gz 容器ID			# 导出一个容器
-$ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1    # 导入一个容器
+$ docker cp data.txt test:/tmp/ 				# 复制文件到容器内部
+$ docker container port test 					# 查看容器端口映射情况
+$ docker export -o ubuntu18.04.c.tar.gz 容器ID		# 导出一个容器
+$ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1 # 导入一个容器
 ```
 
 如果容器内 `PID = 1` 号进程停止运行了，那么容器也会随着退出。
@@ -177,8 +176,6 @@ $ docker pull mysql:5.6        # 获取一个 Mysql 5.6 的镜像
 $ docker run -p 3306:3306 -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6
 ```
 
-
-
 ## 数据卷
 
 ```bash
@@ -186,8 +183,6 @@ $ docker volume create -d local test
 $ docker run -d -P --mount type=bind,source=/webapp,destination=/opt/webapp training/webapp python app.py
 $ docker run -d -P -v /webapp:/opt/webapp training/webapp python app.py 
 ```
-
-
 
 ## Dockerfile
 
@@ -211,8 +206,6 @@ $ docker run -itd -P --name test7 link/ubuntu:0.6 nginx -g "daemon off;" # 运�
 $ curl localhost:32776
 Hi, I am your container
 ```
-
-
 
 #### Dockerfile 参考
 

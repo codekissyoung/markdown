@@ -5,9 +5,9 @@
 ## 安装
 
 ```bash
-apt-get install erlang
-apt-get install rabbitmq-server
-rabbitmq-server -detached  # 启动 rabbitmq-server daemon
+$ apt-get install erlang
+$ apt-get install rabbitmq-server
+$ rabbitmq-server -detached  		# 启动 rabbitmq-server daemon
 ```
 
 启动后默认端口:
@@ -82,13 +82,9 @@ rabbitmq-plugins enable rabbitmq_management  # 启用 web 管理界面插件
 
 声明一个已经存在的队列，假如参数都是一样的话，则返回这个队列。如果参数有不同的话，直接报错。
 
-#### exclusive 私有队列
+exclusive 私有队列 : 限制本队列只有一个消费者。
 
-限制本队列只有一个消费者。
-
-#### auto-delete 自动删除队列
-
-最后一个消费者取消订阅时，队列就会自杀。
+auto-delete 自动删除队列 : 最后一个消费者取消订阅时，队列就会自杀。
 
 ### 持久化消息
 
