@@ -104,11 +104,9 @@ func fillBySettings(s interface{}, m map[string]interface{}) error {
 		}
 	}
 	return nil
-
 }
 
 func main() {
-
 	setting := map[string]interface{}{
 		"Name": "Link",
 		"Age":  20,
@@ -121,7 +119,6 @@ func main() {
 	if err := fillBySettings(&c, setting); err != nil {
 		fmt.Println(err)
 	}
-
 	fmt.Println(e, c)
 }
 ```
