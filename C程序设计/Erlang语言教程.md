@@ -20,7 +20,7 @@ ok
 2> help().                  # 展示 erl shell 中所有可以调用的命令
 ```
 
-`Erlang`里面将大写字母开头的标识符（`Name` `X` `Age`）作为变量名。
+大写字母开头的单词是变量名：`Name` `X` `Age`
 
 ```erl
 1> Name.                            % unbond variable
