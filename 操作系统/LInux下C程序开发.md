@@ -182,27 +182,27 @@ int msgsnd( int msqid,  void* prt, size_t nbytes, int flags ); // 将一个新�
 ssize_t msgrcv( int msqid ,void* prt, size_t nbytes, long type, int flag ); // 从消息队列中读取消息
 ```
 
-# SOCK_STREAM
+#### SOCK_STREAM
 
 - 表示面向连接的数据传输方式数据 可以准确无误地到达另一台计算机，如果损坏或丢失，可以重新发送，但效率相对较慢常见的 http 协议就使用 SOCK_STREAM 传输数据，因为要确保数据的正确性，否则网页不能正常解析
 
-# SOCK_DGRAM
+#### SOCK_DGRAM
 
 - 表示无连接的数据传输方式 计算机只管传输数据，不作数据校验，如果数据在传输中损坏，或者没有到达另一台计算机，是没有办法补救的也就是说，数据错了就错了，无法重传因为 SOCK_DGRAM 所做的校验工作少，所以效率比 SOCK_STREAM 高
 
-# AF_INET
+#### AF_INET
 
 - 表示 IPv4 地址，例如 `127.0.0.1`
 
-# AF_INET6
+#### AF_INET6
 
 - 表示 IPv6 地址，例如 `1030::C9B4:FF12:48AA:1A2B`
 
-# IPPROTO_TCP
+#### IPPROTO_TCP
 
 - TCP 传输协议
 
-# IPPTOTO_UDP
+#### IPPTOTO_UDP
 
 - UDP 传输协议
 
@@ -211,7 +211,7 @@ int tcp_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); // TCP 套接字
 int udp_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);  // UDP 套接字
 ```
 
-# 链接
+### 链接
 
 ```c
 int connect(int sock, struct sockaddr *serv_addr, socklen_t addrlen);
@@ -511,23 +511,19 @@ kill    向进程或进程组发信号
 sigvec  为兼容BSD而设的信号处理函数,作用类似sigaction
 ssetmask    ANSI C的信号处理函数,作用类似sigaction
 
-
 2、消息
 msgctl  消息控制操作
 msgget  获取消息队列
 msgsnd  发消息
 msgrcv  取消息
 
-
 3、管道
 pipe    创建管道
-
 
 4、信号量
 semctl  信号量控制
 semget  获取一组信号量
 semop   信号量操作
-
 
 5、共享内存
 shmctl  控制共享内存
@@ -647,8 +643,6 @@ rprnt = ^R; werase = ^W; lnext = ^V; discard = ^O; min = 1; time = 0;
 -ignbrk -brkint -ignpar -parmrk -inpck -istrip -inlcr -igncr icrnl ixon -ixoff -iuclc ixany imaxbel -iutf8
 opost -olcuc -ocrnl onlcr -onocr -onlret -ofill -ofdel nl0 cr0 tab0 bs0 vt0 ff0
 isig icanon iexten echo echoe -echok -echonl -noflsh -xcase -tostop -echoprt echoctl echoke -flusho -
-
-
 $ stty srase X      # 将删除键改为 X
 $ stty - echo       # 关闭按键回显，这样输密码就看不到了
 $ stty erase @ echo # 将删除键设置为 @ , 同时开启回显模式
@@ -1552,23 +1546,23 @@ int readlink( char ＊pathname, char ＊buf, int bufsize) ;
 int utime( char* path, struct utimbuf *new_time );
 ```
 
-# Linux 时间编程
+## Linux 时间编程
 
 - 在执行流中加入时延
 - 调度一个将来要做的任务
 
-# sleep() 原理
+## sleep()原理
 
 - 每个进程都有一个私有的闹钟 `alarm clock`, 这个闹钟是一个定时器，设置为 一定秒数后，时钟发送一个信号 `SIGALRM`到进程
 - 除非为`SIGALRM`设置了处理函数`handler`, 否则信号将杀死这个进程
 - `sleep()`实现 ： 1. 为`SIGALRM`设置`handler`，`handler`设置为唤醒程序 2. 调用 `alarm( seconds )`，设置一个超时调用时间 3. 调用`pause()`暂停程序
 - `alarm()`用来设置信号 SIGALRM 在经过参数 seconds 指定的秒数后传送给目前的进程。如果参数 seconds 为 0，则之前设置的闹钟会被取消，并将剩下的时间返回。要注意的是，一个进程只能有一个闹钟时间，如果在调用 alarm 之前已设置过闹钟时间，则任何以前的闹钟时间都被新值所代替
 
-# 更高精度的计时器
+## 更高精度的计时器
 
 - `usleep( n )` 将当前进程挂起 n 微秒，或者直到有一个不能忽略的信号到达。
 
-# 三种计时器
+## 三种计时器
 
 - ITIMER_REAL : 真实系统走过的时间，就如同手表记录的时间，不管进程工作在 用户态 还是 核心态，用了多少处理器时间 它都记录，这个计时器用尽，发送`SIGALRM`信号到进程
 - ITIMER_VIRTUAL : 只有进程在 用户态 运行时才计时, 计时器用尽，发送 `SIGVTALRM` 信号

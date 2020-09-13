@@ -125,8 +125,7 @@ func main() {
 
 	time.Sleep(time.Second)
 	conn.Close()				// 主动关闭套接字，触发err
-
 }
 ```
- 
+
  
