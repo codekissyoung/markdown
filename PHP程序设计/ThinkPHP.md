@@ -16,8 +16,8 @@
 │   │   ├── Controller      # 控制器目录
 │   │   ├── Model           # 模型目录
 │   │   └── View            # 视图目录
-│   │   └── Logic           # 逻辑层目录 （可选）
-│   │   └── Service         # Service 层目录 （可选）
+│   │   └── Logic           # 逻辑层目录（可选）
+│   │   └── Service         # Service 层目录（可选）
 │   └── Admin               # 后台模块目录（可选）
 │   └── Runtime             # 缓存、日志等运行数据
 ├── index.php               # 入口
@@ -57,9 +57,7 @@ require './ThinkPHP/ThinkPHP.php';
 
 ```php
 namespace Home\Controller;
-
 use Think\Controller;
-
 class IndexController extends Controller{
     public function index(){
         echo "<h1> Hello ThinkPHP</h1>";

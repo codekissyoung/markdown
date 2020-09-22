@@ -197,8 +197,6 @@ abstract class MyBaseClass(){
 }
 ```
 
-
-
 ### 静态属性和静态方法
 
 ```php

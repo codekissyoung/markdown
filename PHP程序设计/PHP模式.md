@@ -280,7 +280,7 @@ DI 是 IoC 的一种设计模式，是一种套路，按照 DI 的套路，就�
 
 是 IoC 的另一种实现方式， 其核心是把所有可能用到的依赖单元交由 Service Locator 进行实例化和创建、配置， 把类对依赖单元的依赖，转换成类对 Service Locator 的依赖。 DI 与 Service Locator 并不冲突，两者可以结合使用。 目前，Yii2.0 把这 DI 和 Service Locator 这两个东西结合起来使用，或者说通过 DI 容器，实现了 Service Locator。
 
-# 组合模式 Composite
+## 组合模式 Composite
 
 - 组合比继承提供更多的灵活性
 - 将一组对象组合为单个对象
@@ -389,7 +389,7 @@ $main_army -> addArmy( $sub_army );
 print "攻击强度: {$main_army -> bombardStrength() } \n";
 ```
 
-# 装饰模式 Decorator
+## 装饰模式 Decorator
 
 - 通过在运行时，合并对象来拓展功能的一种灵活机制
 
@@ -576,7 +576,7 @@ $product = $facade -> getProduct('234');
 var_dump($product);
 ```
 
-# Single 单例模式
+## Single 单例模式
 
 - 该对象可以被系统中任何对象使用
 - 该对象不会存储在全局变量中
@@ -721,7 +721,7 @@ print $blog -> encode();
 
 ```
 
-# Abstract Factory 抽象工厂模式
+## Abstract Factory 抽象工厂模式
 
 ```php
 <?php
@@ -781,7 +781,7 @@ class BloggsCommsManager extends CommsManager {
 }
 ```
 
-# Prototype 原型模式
+## Prototype 原型模式
 
 ```php
 <?php
@@ -836,7 +836,7 @@ print_r( $factory -> getForest() );
 
 ```
 
-# 深复制 和 浅复制
+## 深复制 和 浅复制
 
 ```php
 <?php
