@@ -51,8 +51,6 @@ is_resource();
 is_callable( [$obj, $method] );
 ```
 
-
-
 ```php
 __LINE__            # 文件中的当前行号
 __FILE__            # 文件的完整路径和文件名
