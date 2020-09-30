@@ -55,16 +55,16 @@ func main() {
 ## 深度比较
 
 ```go
-	a := map[int]string{1: "one", 2: "two", 3: "threee"}
-	b := map[int]string{1: "one", 2: "two", 4: "threee"}
+a := map[int]string{1: "one", 2: "two", 3: "threee"}
+b := map[int]string{1: "one", 2: "two", 4: "threee"}
 
-	fmt.Println(reflect.DeepEqual(a, b)) // false
+fmt.Println(reflect.DeepEqual(a, b)) // false
 
-	s1 := []int{1, 2, 3}
-	s2 := []int{1, 2, 3}
-	s3 := []int{3, 2, 1}
-	fmt.Println(reflect.DeepEqual(s1, s2)) // true
-	fmt.Println(reflect.DeepEqual(s2, s3)) // false
+s1 := []int{1, 2, 3}
+s2 := []int{1, 2, 3}
+s3 := []int{3, 2, 1}
+fmt.Println(reflect.DeepEqual(s1, s2)) // true
+fmt.Println(reflect.DeepEqual(s2, s3)) // false
 ```
 
 ## 万能程序
