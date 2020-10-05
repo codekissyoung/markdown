@@ -6,6 +6,8 @@
 - 只能声明方法，没有实现
 - 可以嵌入其他接口
 
+接口赋值并不要求两个接口必须等价(方法列表相等)。如果接口 `A`的方法列表是接口`B`的子集，那么`A = B`就是有效的。
+
 ## 怎么才算实现接口？
 
 ```go
@@ -80,6 +82,51 @@ func main() {
 	fmt.Println(t)
 }
 ```
+
+### 类型查询
+
+```go
+var v1 interface{} = ...
+switch v := v1.(type) {
+case int: // 现在 v 的类型是 int
+case string: // 现在 v 的类型是 string
+    ...
+}
+```
+
+```go
+type Stringer interface{
+    String() string
+}
+
+func Println(args ...interface{}){
+    for _, arg := range args {
+        switch v := arg.(type){
+        case int :
+        case string:
+        default:
+            if v,ok := arg.(Stringer); ok {
+                val := v.String()
+                // ...
+            }else{
+                // ...
+            }
+        }
+    }
+}
+```
+
+### Any 类型 interface{}
+
+```go
+var v1 interface{} = 1 // 将 int 类型赋值给 Any 变量
+var v2 interface{} = "abc" // 将 string 类型赋值给 Any 变量
+var v3 interface{} = &v2 // 将 *interface{} 类型赋值给 Any 变量
+var v4 interface{} = struct{ X int }{1}
+var v5 interface{} = &struct{ X int }{1}
+```
+
+
 
 
 

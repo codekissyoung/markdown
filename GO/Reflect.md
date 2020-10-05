@@ -1,5 +1,131 @@
 # 反射机制 reflect
 
+
+
+关于反射的概念：
+
+- 通过反射，可以获取丰富的类型信息，并可以利用这些类型信息做非常灵活的工作
+
+- Java的反射可以做到`读取配置，并且根据类型名称，创建对象`，Java内置了类型工厂
+
+  
+
+- `Go`无法像Java那样，通过`类型字符串`创建对象实例(内置了类型工厂)。在`Java`中，通过读取配置，并根据类型名称创建对象，是常见的编程手法。
+- 反射最常用的场景是做对象的序列化
+
+
+
+### 反射的 Type 和 Value
+
+对任何接口进行反射，都可以得到一个包含`Type`和`Value`的信息结构。
+
+- `Type` 主要表达的是被反射的这个变量本身的类型信息。
+
+- `Value` 则为该变量实例本身的信息。
+
+
+
+```go
+var x float64 = 3.4
+fmt.Println(reflect.TypeOf(x)) // float64
+```
+
+
+
+```go
+var x float64 = 3.4
+v := reflect.ValueOf(x)
+fmt.Println(v.Type()) // float64
+fmt.Println(v.Kind() == reflect.Float64) // true
+fmt.Println(v.Float()) // 3.4
+```
+
+
+
+### 修改值
+
+`v`是`x`的副本，所以无法调用 `Set` 系列方法:
+
+```go
+var x float64 = 3.4
+v := reflect.ValueOf(x)
+v.SetFloat(4.1) // panic: reflect: reflect.Value.SetFloat using unaddressable value
+```
+
+我们通过对指针进行反射，达到修改原始值的目的：
+
+```go
+var x float64 = 3.4
+fmt.Println(&x) // 0xc00001e0d8
+
+v := reflect.ValueOf(x)
+p := reflect.ValueOf(&x) // 对指针进行反射
+
+fmt.Println(v.CanSet())        // false
+fmt.Println(p.CanSet())        // false
+fmt.Println(p.Elem().CanSet()) // true
+
+p.Elem().SetFloat(4.1)
+
+fmt.Println(p.Interface())        // 0xc00001e0d8
+fmt.Println(p.Elem().Interface()) // 4.1
+fmt.Println(p.Elem().Float())     // 4.1
+fmt.Println(x)                    // 4.1
+```
+
+
+
+### 对结构体进行反射
+
+```go
+type User struct {
+    Age  int
+    Name string
+}
+
+user := User{203, "link"}
+
+p := reflect.ValueOf(&user)
+
+t := p.Elem().Type() // 返回 类型对象
+v := p.Elem()        // 返回 值对象
+
+fmt.Println(t) // main.User
+fmt.Println(v) // {203 link}
+
+fmt.Println(t.NumField()) // 2
+fmt.Println(v.NumField()) // 2
+
+fmt.Println(t.Field(0).Name, v.Field(0).Type(), v.Field(0).Interface()) // Age int 203
+fmt.Println(t.Field(1).Name, v.Field(1).Type(), v.Field(1).Interface()) // Name string link
+```
+
+
+
+## 字段类型 名字 值
+
+```go
+type Bird struct {
+	Name           string
+	LifeExpectance int
+}
+
+func main() {
+	s := &Bird{"link", 3}
+	rs := reflect.ValueOf(s).Elem()
+	for i := 0; i < rs.NumField(); i++ {
+		fmt.Println(
+			rs.Field(i).Type(),      // 字段类型
+			rs.Type().Field(i).Name, // 字段名字
+			rs.Field(i),             // 字段值
+			rs.Field(i).Interface(),
+		)
+	}
+}
+```
+
+
+
 ## TypeOf 与 ValueOf
 
 ```go
@@ -125,7 +251,7 @@ func main() {
 
 
 
-
+### 
 
 
 
