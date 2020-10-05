@@ -1,3 +1,5 @@
+# PHP 函数 
+
 ## 传参不定
 
 ```php
@@ -50,7 +52,6 @@ $func = function($arg)
 {
     print $arg;
 };
-
 $func("Hello World");
 ```
 

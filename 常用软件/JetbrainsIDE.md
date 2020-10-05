@@ -12,8 +12,9 @@ $ rm  ~/.java/.userPrefs/jetbrains/goland
 ## 快捷健
 
 ```bash
-Ctrl + Alt + s                 调出 Settings 界面
-Ctrl + Alt + l				  对齐选中代码
+Ctrl + Alt + s 				# 调出 Settings 界面
+Ctrl + Alt + l 				# 对齐选中代码
+Ctrl + Alt + shift + l 		# 选中的代码块格式化，如果没有选中代码，则默认是全局。
 ```
 
 ## 普通设置
@@ -36,15 +37,6 @@ fc-list :lang=zh-cn             # ubuntu上查看支持中文的字体有哪些
 
 ## Goland
 
-```bash
-cky@cky-pc:~/go/src$ tree -L 2
-.
-├── hello
-│   ├── main.go
-```
-
-![](https://img.codekissyoung.com/2020/02/06/3b9204f67a0e36aaac6ec36f4b494e7d.png)
-
 添加自动引入包 `goimports` 和 格式化代码 `go fmt` 工具
 
 ```bash
@@ -53,6 +45,5 @@ $ go get golang.org/x/tools/cmd/goimports    # go fmt 是自带 goimports 则需
 
 ![](https://img.codekissyoung.com/2020/02/06/ea4011e0ab5e25cfc8302aa6ccb4c191.png)
 
-## 快捷健
 
-`Ctrl + Alt + shift + l`选中的代码块格式化，如果没有选中代码，则默认是全局。
+
