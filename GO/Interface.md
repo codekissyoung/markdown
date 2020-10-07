@@ -1,5 +1,159 @@
 # Interface
 
+## 接口主要用法
+
+#### 从类型赋值到接口
+
+- 当我们使用结构体实现接口时，指针类型和结构体类型都会实现该接口
+- 当我们使用指针实现接口时，只有指针类型的变量才会实现该接口！！！也就是说，接口变量只能接受指针类型的变量。
+
+```go
+type Echoer interface {
+	Echo()
+}
+
+type User struct {
+	Age  int
+	Name string
+}
+
+func (u *User) Echo() {
+	fmt.Println("My Name is ", u.Name)
+}
+
+func main() {
+    // cannot use User literal (type User) as type Echoer in assignment:
+    // User does not implement Echoer (Echo method has pointer receiver)
+    var v Echoer = User{19, "link"} 
+    v.Echo()
+}
+```
+
+
+
+```go
+type User struct {
+	Age  int
+	Name string
+}
+
+func NilOrNot(v interface{}) bool {
+	return v == nil
+}
+
+func main() {
+
+	var u *User
+	fmt.Println(u == nil) // true
+	// 类型会转换成 interface{} 类型
+	// 转换后的变量不仅包含转换前的变量，还包含变量的类型信息 User
+	// 所以转换后的变量与 nil 不相等
+	fmt.Println(NilOrNot(u)) // false
+
+}
+```
+
+
+
+
+
+#### 接口之间相互赋值
+
+#### 接口查询
+
+
+
+Go 语言只会在传递参数、返回参数以及变量赋值时才会对某个类型是否实现接口进行检查，Go 语言会编译期间对代码进行类型检查。从类型检查的过程来看，编译器仅在需要时才对类型进行检查，类型实现接口时只需要实现接口中的全部方法。
+
+```go
+func main() {
+    var rpcErr error = NewRPCError(400, "unknown err") // typecheck1: RPCError 类型 赋值给 error 接口类型
+    err := AsErr(rpcErr) // typecheck2: error 接口类型 赋值给 error 接口类型
+    println(err) 
+}
+
+func NewRPCError(code int64, msg string) error {
+    return &RPCError{ // typecheck3:  RPCError 结构体类型 赋值给 error 接口类型
+        Code:    code,
+        Message: msg,
+    }
+}
+
+func AsErr(err error) error {
+    return err
+}
+```
+
+
+
+## 两种接口类型
+
+两种接口虽然都使用 `interface` 声明，但`interface{}`在实现时使用了特殊的类型。
+
+### iface
+
+带一组方法的接口。
+
+```go
+type iface struct { // 16 bytes
+    tab  *itab          // 接口类型和具体类型的组合
+    data unsafe.Pointer // 指向底层数据
+}
+
+type itab struct { // 32 bytes
+    inter *interfacetype
+    _type *_type // 类型结构体指针
+    hash  uint32 // _type.hash 的拷贝, 将 接口变量 转换成具体类型时，该字段快速判断目标类型和具体类型 _type 是否一致
+    _     [4]byte
+    fun   [1]uintptr  // 是一个动态大小的数组，它是一个用于动态派发的虚函数表，存储了一组函数指针，虽然该变量被声明成大小固定的数组，但是在使用时会通过原始指针获取其中的数据，所以 fun 数组中保存的元素数量是不确定的
+}
+
+type _type struct {
+    size       uintptr		// 类型占用的内存空间
+    ptrdata    uintptr		 		
+    hash       uint32 		// 帮助我们快速确定类型是否相等
+    tflag      tflag
+    align      uint8
+    fieldAlign uint8
+    kind       uint8
+    equal      func(unsafe.Pointer, unsafe.Pointer) bool // 用于判断当前类型的多个对象是否相等
+    gcdata     *byte
+    str        nameOff
+    ptrToThis  typeOff
+}
+```
+
+### eface
+
+不带任何方法的`interface{}`
+
+```go
+type eface struct { // 16 bytes
+    _type *_type         // 类型结构体指针 见 iface
+    data  unsafe.Pointer // 指向底层数据
+}
+```
+
+
+
+```go
+func main() {
+    type User struct {
+        Age  int
+        Name string
+    }
+    v := User{19, "link"}
+    println(v) // ./main.go:59:9: illegal types for operand: print User
+     Print(v) // (0x495f00,0xc00006ef60)
+}
+// 在接收值时，变量在运行期间的类型也发生了变化，获取变量类型时就会得到 interface{}
+func Print(v interface{}) {
+	println(v)
+}
+```
+
+
+
 ## 接口变量特性
 
 - 没有字段
