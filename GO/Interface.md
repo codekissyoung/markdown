@@ -96,7 +96,7 @@ func AsErr(err error) error {
 
 ```go
 type iface struct { // 16 bytes
-    tab  *itab          // 接口类型和具体类型的组合
+    tab  *itab          // 表示接口和结构体关系的字段
     data unsafe.Pointer // 指向底层数据
 }
 

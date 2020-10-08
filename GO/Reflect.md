@@ -1,5 +1,64 @@
 # 反射机制 reflect
 
+反射包中的所有方法基本都是围绕着 Type 和 Value 这两个类型设计的。我们通过 reflect.TypeOf、reflect.ValueOf 可以将一个普通的变量转换成『反射』包中提供的 Type 和 Value，随后就可以使用反射包中的方法对它们进行复杂的操作。
+
+反射是程序在运行期间检查其自身结构的一种方式。反射带来的灵活性是一把双刃剑，反射作为一种元编程方式可以减少重复代码
+
+- reflect.TypeOf 能获取类型信息
+
+- reflect.ValueOf 能获取数据的运行时表示
+
+```go
+// Type 类型
+type Type interface {
+    Align() int
+    FieldAlign() int
+    Method(int) Method
+    MethodByName(string) (Method, bool)  // 获取当前类型对应方法的引用
+    NumMethod() int
+    Implements(u Type) bool // 判断当前类型是否实现了某个接口
+}
+
+// Value 类型
+type Value struct {
+    // contains filtered or unexported fields
+}
+
+func (v Value) Addr() Value
+func (v Value) Bool() bool
+func (v Value) Bytes() []byte
+```
+
+
+
+```go
+	author := "link"
+	fmt.Println(reflect.TypeOf(author))  // string 拿到了类型
+	fmt.Println(reflect.ValueOf(author)) // link 拿到了值
+```
+
+
+
+
+
+### 三大法则
+
+#### 从 `interface{}` 变量可以获取到反射对象
+
+#### 从反射对象可以获取 `interface{}` 变量
+
+从接口值到反射对象：
+
+- 从基本类型到接口类型的类型转换
+- 从接口类型到反射对象的转换
+
+从反射对象到接口值：
+
+- 反射对象转换成接口类型 `i := v.Interface()`
+- 再强转成原始类型 `i.(int)`
+
+#### 要修改反射对象，其值必须可设置
+
 
 
 关于反射的概念：
@@ -99,6 +158,76 @@ fmt.Println(v.NumField()) // 2
 fmt.Println(t.Field(0).Name, v.Field(0).Type(), v.Field(0).Interface()) // Age int 203
 fmt.Println(t.Field(1).Name, v.Field(1).Type(), v.Field(1).Interface()) // Name string link
 ```
+
+
+
+### 判断结构体是否实现了接口
+
+
+
+```go
+type CustomError struct{}
+
+func (*CustomError) Error() string {
+	return ""
+}
+
+func main() {
+
+	// 拿到 error 接口的 reflect.Type 对象
+	typeOfError := reflect.TypeOf((*error)(nil)).Elem()
+
+	// 拿到 CustomError 结构体类型的　reflect.Type 对象
+	customErrorPtr := reflect.TypeOf(&CustomError{})
+	customError := reflect.TypeOf(CustomError{})
+
+	// 判断结构体是否继承接口
+	fmt.Println(customErrorPtr.Implements(typeOfError)) // #=> true
+	fmt.Println(customError.Implements(typeOfError))    // #=> false
+
+}
+```
+
+
+
+### 通过反射动态调用函数
+
+```go
+func Add(a, b int) int {
+	return a + b
+}
+
+func main() {
+
+	v := reflect.ValueOf(Add) // 1. 获取函数 Add 对应的反射对象
+	if v.Kind() != reflect.Func {
+		return
+	}
+	t := v.Type()
+
+	// 2. 准备指定个数的函数入参
+	argv := make([]reflect.Value, t.NumIn())
+	for i := range argv {
+		if t.In(i).Kind() != reflect.Int {
+			return
+		}
+		argv[i] = reflect.ValueOf(i)
+	}
+
+	// 3. 使用 reflect.Value.Call 方法调用函数，参数为 argv
+	result := v.Call(argv)
+	if len(result) != 1 || result[0].Kind() != reflect.Int {
+		return
+	}
+
+	// 4. 获取返回值数组、验证数组的长度以及类型并打印其中的数据
+	fmt.Println(result[0].Int()) // #=> 1
+}
+```
+
+
+
+
 
 
 
