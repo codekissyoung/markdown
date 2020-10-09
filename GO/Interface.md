@@ -110,16 +110,16 @@ type itab struct { // 32 bytes
 
 type _type struct {
     size       uintptr		// 类型占用的内存空间
-    ptrdata    uintptr		 		
+    ptrdata    uintptr		// size of memory prefix holding all pointers 		
     hash       uint32 		// 帮助我们快速确定类型是否相等
-    tflag      tflag
-    align      uint8
-    fieldAlign uint8
-    kind       uint8
+    tflag      tflag　　 // extra type information flags
+    align      uint8　　	// alignment of variable with this type
+    fieldAlign uint8		　// alignment of struct field with this type
+    kind       uint8　　　// enumeration for C
     equal      func(unsafe.Pointer, unsafe.Pointer) bool // 用于判断当前类型的多个对象是否相等
-    gcdata     *byte
-    str        nameOff
-    ptrToThis  typeOff
+    gcdata     *byte　　　// garbage collection data
+    str        nameOff　　// string form
+    ptrToThis  typeOff　　// type for pointer to this type, may be zero
 }
 ```
 
