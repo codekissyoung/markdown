@@ -13,9 +13,7 @@ func isCancelled(ctx context.Context) bool {
 }
 
 func main() {
-
 	ctx, cancel := context.WithCancel(context.Background())
-
 	for i := 0; i < 5; i++ {
 		go func(i int, ctx context.Context) {
 			for {

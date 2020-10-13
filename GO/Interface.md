@@ -282,5 +282,60 @@ var v5 interface{} = &struct{ X int }{1}
 
 
 
+显式地将 nil 赋值给接口时，接口的 type 和 data 都将为 nil。此时，接口与 nil 值判断是相等的。
 
+但如果将一个带有类型的 nil 赋值给接口时，只有 data 为 nil，而 type 为 nil，此时，接口与 nil 判断将不相等。
+
+```go
+type MyImplement struct {
+}
+func (m *MyImplement) String() string {
+	return "hi"
+}
+func GetStringer() fmt.Stringer {
+	var s *MyImplement = nil
+	// 返回值为 nil 的变量，与直接返回 nil 是不同的
+	if s == nil {
+		return nil
+	}
+	return s
+}
+
+func main() {
+	if GetStringer() == nil {
+		fmt.Println("GetStringer() == nil")
+	} else {
+		fmt.Println("GetStringer() != nil")
+	}
+}
+```
+
+
+
+```go
+func main() {
+	getType(User{
+		19,
+		"link",
+	})
+	getType(1)
+	getType(89.32)
+	getType("string")
+}
+
+func getType(a interface{}) {
+	switch a.(type) {
+	case int:
+		fmt.Println("the type of a is int")
+	case string:
+		fmt.Println("the type of a is string")
+	case float64, float32:
+		fmt.Println("the type of a is float")
+	case User:
+		fmt.Println("the type of a is User")
+	default:
+		fmt.Println("unknown type")
+	}
+}
+```
 
