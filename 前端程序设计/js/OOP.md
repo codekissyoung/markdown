@@ -168,39 +168,30 @@ new PrimaryStudent()---- >
 
 # 使用 class ES6
 
-- class
-
-  ```js
-  class Student {
-    constructor(name) {
-      this.name = name;
-    }
-
-    hello() {
-      alert("Hello, " + this.name + "!");
-    }
-  }
-  var xiaoming = new Student("小明");
-  xiaoming.hello();
-  ```
-
-- extends
-
-  ````js
-  class PrimaryStudent extends Student {
-  constructor(name, grade) {
-  super(name); // 记得用 super 调用父类的构造方法!
-  this.grade = grade;
+```js
+class Student {
+  constructor(name) {
+    this.name = name;
   }
 
-          myGrade() {
-              alert('I am at grade ' + this.grade);
-          }
-      }
-  ```
+  hello() {
+    alert("Hello, " + this.name + "!");
+  }
+}
+var xiaoming = new Student("小明");
+xiaoming.hello();
+```
 
-  就需要一个工具把 class 代码转换为传统的 prototype 代码，可以试试**Babel**这个工具
-  
-  ````
-  
-  ````
+
+
+````js
+class PrimaryStudent extends Student {
+    constructor(name, grade) {
+        super(name); // 记得用 super 调用父类的构造方法!
+        this.grade = grade;
+    }
+    myGrade() {
+        alert('I am at grade ' + this.grade);
+    }
+}
+```

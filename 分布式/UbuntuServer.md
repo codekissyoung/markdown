@@ -458,3 +458,4 @@ vim .config/ibus/rime/default.yaml
 
 ![](https://img.codekissyoung.com/2020/06/18/d9f9cf1f79f723e4c5b1956ab2950e36.png)
 
+![](img/a034227fc7c372baa7a9e496312b27b6.png)
