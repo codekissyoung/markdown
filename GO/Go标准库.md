@@ -128,6 +128,59 @@ str         := strconv.FormatBool( false )    // boolen to string "false" or "tr
 str         := strconv.FormatInt( 16, 16)     // conv to string in 16th
 ```
 
+
+
+```go
+	// int => string
+	str := strconv.Itoa(100)
+	fmt.Printf("type: %T value: %#v\n", str, str) // type: string value: "100"
+
+	// string => int
+	num1, err := strconv.Atoi("110")
+	if err != nil {
+		fmt.Printf("%v 转换失败！", "110")
+	}
+	fmt.Printf("type:%T value:%#v\n", num1, num1) // type:int value:110
+
+	// string (1、0、t、f、T、F、true、false、True、False、TRUE、FALSE) => bool
+	str1 := "t"
+	boo1, err := strconv.ParseBool(str1)
+	if err != nil {
+		fmt.Printf("str1: %v\n", err)
+	}
+	fmt.Println(boo1)  // true
+
+	// string => int64
+	str = "-11"
+	num, err := strconv.ParseInt(str, 10, 64) //　字符串、进制、溢出判断位数
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("type:%T value:%#v \n", num, num) // type:int64 value:-11
+
+	// string => uint
+	str = "11"
+	unum, err := strconv.ParseUint(str, 10, 0)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("type:%T value:%d\n", unum, unum) // type:uint64 value:11
+
+	// string => float
+	fstr := "3.1415926"
+	f, err := strconv.ParseFloat(fstr, 64)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("type:%T value:%f\n ", f, f) // type:float64 value:3.141593
+```
+
+
+
+
+
+
+
 ## time
 
 ```go

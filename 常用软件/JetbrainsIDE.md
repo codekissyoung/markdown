@@ -12,9 +12,14 @@ $ rm  ~/.java/.userPrefs/jetbrains/goland
 ## 快捷健
 
 ```bash
-Ctrl + Alt + s 				# 调出 Settings 界面
-Ctrl + Alt + l 				# 对齐选中代码
-Ctrl + Alt + shift + l 		# 选中的代码块格式化，如果没有选中代码，则默认是全局。
+Ctrl Alt  s # 调出 Settings 界面
+Ctrl Alt  l # 对齐选中代码
+Ctrl Alt  shift  l # 选中的代码块格式化，如果没有选中代码，则默认是全局
+Ctrl [+|-] # 可以将当前（光标所在位置）的方法进行展开或折叠
+Shift F6 # 重命名文件夹、文件、方法、变量名等
+Ctrl R # 替换文本
+Ctrl Shift F # 全局查找
+F2 # 快速定位错误或警告的行
 ```
 
 ## 普通设置
