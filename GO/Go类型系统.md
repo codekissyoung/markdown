@@ -202,3 +202,36 @@ func main() {
 }
 ```
 
+### type 与 type = 的区别
+
+```go
+type Brand struct {
+}
+func (t Brand) Show() {
+	fmt.Println("Brand Show")
+}
+
+type FakeBrand = Brand // 这里去掉 = 看看
+func (t FakeBrand) Show2(){
+	fmt.Println("FakerBrand Show")
+}
+
+type Vehicle struct {
+	FakeBrand
+	Brand
+}
+
+func main() {
+	var a Vehicle
+	a.Show2() // ambiguous selector a.Show2
+	a.Show() // ambiguous selector a.Show
+	a.Brand.Show2()
+	a.FakeBrand.Show()
+	ta := reflect.TypeOf(a)
+	for i := 0; i < ta.NumField(); i++ {
+		f := ta.Field(i)
+		fmt.Printf("FieldName: %v, FieldType: %v\n", f.Name, f.Type.Name())
+	}
+}
+```
+

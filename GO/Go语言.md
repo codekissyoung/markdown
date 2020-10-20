@@ -125,3 +125,29 @@ func f5() int {
 
 - 闭包内部直接对闭包外部的数据是引用，如果想要拿副本，还需要通过入参的方式，拷贝进入里面，参考`f3()`
 - `defer`执行时机：`return`之后 -> `defer` -> 调用处拿到返回值。所以采用`f1() f2() f3()`等命名返回值写法，如果有 `defer`闭包，则有闭包里面修改到返回值的风险,参考`f1()`。当然这种风险可以避免，参考`f2()` `f3()`。
+
+### 模拟枚举
+
+```go
+type ChipType int // 声明芯片类型
+const (
+    None ChipType = iota
+    CPU    // 中央处理器
+    GPU    // 图形处理器
+)
+func (c ChipType) String() string {
+    switch c {
+    case None:
+        return "None"
+    case CPU:
+        return "CPU"
+    case GPU:
+        return "GPU"
+    }
+    return "N/A"
+}
+func main() {
+    fmt.Printf("%s %d", CPU, CPU) // 输出CPU的值并以整型格式显示
+}
+```
+
