@@ -235,3 +235,44 @@ func main() {
 }
 ```
 
+## nil标识符
+
+`nil` 是一个预定义好的标识符
+
+```go
+// nil 是 map、slice、pointer、channel、func、interface 的零值
+var arr []int
+var ptr *int
+var m map[int]string
+var c chan int
+var fn func()
+var iface interface{}
+var p *struct{}
+
+// 1. nil 与 nil 无法比较
+// invalid operation: nil == nil (operator == not defined on nil)
+// fmt.Println(nil==nil)
+
+// 2. 两个相同类型的 nil 值也可能无法比较
+//invalid operation: s1 == s2 (slice can only be compared to nil)
+//var arr2 []int
+//fmt.Printf(arr == arr2)
+
+// 3. 不同类型的 nil 是不能比较的
+//invalid operation: m == ptr (mismatched types map[int]string and *int)
+//fmt.Printf(m == ptr)
+
+// 4. 可以将 nil 与任意变量比较
+fmt.Println(arr == nil) // true
+
+// 5. 即便值是nil 但类型与占用的字节数是不一样的
+fmt.Printf("%p %T %#v \n", nil, nil, nil) // %!p(<nil>) <nil> <nil> %!d(MISSING)
+fmt.Printf("%p %T %#v %d \n", arr, arr, arr, unsafe.Sizeof(arr)) // 0x0 []int []int(nil) 24
+fmt.Printf("%p %T %#v %d \n", ptr, ptr, ptr, unsafe.Sizeof(ptr)) // 0x0 *int (*int)(nil) 8
+fmt.Printf("%p %T %#v %d \n",m,m,m,unsafe.Sizeof( m )) // 0x0 map[int]string map[int]string(nil) 8
+fmt.Printf("%p %T %#v %d \n", p,p,p,unsafe.Sizeof(p)) // 0x0 *struct {} (*struct {})(nil) 8
+fmt.Printf("%p %T %#v %d \n", c,c,c,unsafe.Sizeof(c)) // 0x0 chan int (chan int)(nil) 8
+fmt.Printf("%p %T %#v %d \n", fn, fn, fn,unsafe.Sizeof(fn)) // 0x0 func() (func())(nil) 8
+fmt.Printf("%p %T %#v %d \n", iface, iface, iface,unsafe.Sizeof(iface)) // %!p(<nil>) <nil> <nil> 16
+```
+
