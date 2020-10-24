@@ -1,8 +1,8 @@
-# 函数
+# Go函数详解
 
 `Go`语言有三种类型的函数：普通带名字的函数、匿名`lambda`函数、方法。
 
-## 传参
+## 1. 传参
 
 ```go
 type InnerData struct {
@@ -34,7 +34,7 @@ func main(){
 }
 ```
 
-#### 传指针性能一定好么？
+### 1.1 传指针性能一定好么？
 
 只有在所有指针都释放的时候，指针指向那个的内存空间，才会使用`GC`。指针被拷贝多份后，会延长内存对象的生命周期。
 
@@ -44,7 +44,43 @@ func main(){
 
 总之，指针在`传递大对象` `修改原对象状态`时，使用比较好，其他时候不作考虑。
 
-## 函数是 First Class Object
+### 1.2 可变参数类型
+
+```go
+func sum(args []int) int {
+	var sum int
+	for _, arg := range args {
+		sum += arg
+	}
+	return sum
+}
+// 实际上可变参数就是　切片　的一个语法糖写法
+func sum2(args ...int) int {
+	var sum int
+	for _, arg := range args {
+		sum += arg
+	}
+	return sum
+}
+func scale10(args ...int) []int {
+	for i, arg := range args {
+		args[i] = arg * 10
+	}
+	return args
+}
+func main() {
+	fmt.Println(sum([]int{2, 3, 4})) // 9
+	fmt.Println(sum2(2, 3, 4))       // 9
+
+	list := []int{2, 3, 4}
+	list = scale10(list...)    // 将切片作为可变参数，完整传递给下一个函数的语法糖写法
+	fmt.Println(sum2(list...)) // 90
+}
+```
+
+
+
+## 2. 函数是一等公民
 
 函数在`Go`里面是`First Class Object`第一类对象，什么意思？
 
@@ -112,7 +148,7 @@ fmt.Println((<-c)(2, 3)) // 6
 - 没有定义顺序限制，必要时可以抽离
 - 将大函数分解为多个相对独立的匿名函数块，再用简洁的调用完成逻辑流程，实现框架与细节分离
 
-### 函数作为值
+### 2.1 函数作为值
 
 ```go
 func main(){
@@ -147,7 +183,7 @@ func removePrefix(str string) string {
 }
 ```
 
-### 字符串映射到函数
+### 2.2 字符串映射到函数
 
 ```go
 var skillParam = flag.String("skill", "", "skill to perform")
@@ -174,25 +210,107 @@ func main(){
 
 
 
-### 闭包
-
-`闭包`特性是指：引用了其匿名函数体之外的变量。匿名函数内可以操作外部变量，换句话说，该函数被这些变量“绑定”在一起。
+### 2.3 函数类型也能实现接口
 
 ```go
-func main() {
-    f := test(123)
-    f() // 123
+type Invoker interface {
+	Call(interface{})
 }
-func test(x int) func() {
-    y := 12
-    println(&x, &y) // 0xc000124010 0xc000124018
-    return func() {
-        println(&x, &y, x, y) // 0xc000124010 0xc000124018 123 12
-    }
+type Struct struct {
+}
+func (s *Struct) Call(p interface{}) {
+	fmt.Println("from struct", p)
+}
+
+type FuncCaller func(interface{})
+func (f FuncCaller) Call(p interface{}) {
+	f(p) // 调用f函数本体
+}
+
+func main() {
+	var invoker Invoker
+
+	s := new(Struct)
+	invoker = s
+	invoker.Call("hello")
+
+	var f FuncCaller = func(v interface{}) {
+		fmt.Println("from function", v)
+	}
+	invoker = f
+	invoker.Call("hello")
 }
 ```
 
-#### 延迟求值效应
+
+
+## 3. 闭包
+
+解释: Go语言中　**闭包**　是引用了自由变量的函数．被引用的自由变量和函数一同存在，即使已经离开了自由变量的环境也不会被释放或，在闭包中可以继续使用这个自由变量．
+
+> 函数 + 引用环境 = 闭包
+
+一个函数类型就像结构体一样，可以被实例化，函数本身不存储任何信息，只有与引用环境结合后形成的闭包才具有**“记忆性”**，函数是编译期静态的概念，而闭包是运行期动态的概念。
+
+闭包对环境中变量的引用过程也可以被称为　**“捕获”**。捕获有两种类型，可以改变引用的原值叫做　**“引用捕获”**，捕获的过程值被复制到闭包中使用叫做　**“复制捕获”**。
+
+### 3.1 内部修改引用的变量
+
+```go
+str := "hello world"
+foo := func() {
+    fmt.Println("in foo : ", str) // hello world
+    str = "hello dude"
+}
+foo()
+fmt.Println(str) // hello dude
+
+str = "改回去了"
+foo() // in foo :  改回去了
+```
+
+### 3.2 记忆效应
+
+```go
+func Accumulate(value int) func() int {
+	return func() int {
+		value++
+		return value
+	}
+}
+func main() {
+	accumulator := Accumulate(1)
+	fmt.Println(accumulator())       // 2
+	fmt.Println(accumulator())       // 3
+	fmt.Printf("%p\n", &accumulator) // 0xc00000e028
+
+	accumulator2 := Accumulate(10)
+	fmt.Println(accumulator2())       // 11
+	fmt.Printf("%p\n", &accumulator2) // 0xc00000e038
+}
+```
+
+### 3.3 生成器
+
+```go
+func playerGen(name string) func() (string, int) {
+	hp := 150 // 血量一直为150
+	return func() (string, int) {
+		return name, hp
+	} // 返回创建的闭包
+}
+
+func main() {
+	generator := playerGen("jack Ma")
+	name, hp := generator()
+	fmt.Println(name, hp) // jack Ma 150
+}
+
+```
+
+闭包还具有一定的封装性，`hp` 是 playerGen 的局部变量，playerGen 的外部无法直接访问及修改这个变量，这种特性也与面向对象中强调的封装性类似。
+
+### 3.4 延迟求值效应
 
 ```go
 func main() {
@@ -217,9 +335,6 @@ func test() []func() {
 `延迟求值`效应是由 `多个匿名函数共享变量` 引起的，这是个坑，因为任意匿名函数对共享变量的修改，都会影响到其他匿名函数，这会带来竞争状态，往往需要做同步处理。
 
 `闭包`特性让我们不用传递参数就能读取和修改外部函数的状态，但是要特别小心的使用。
-
-
-### 避免延迟求值效应
 
 ```go
 func main() {
@@ -282,7 +397,7 @@ func fa(a int) func(i int) int {
 }
 ```
 
-闭包实现 斐波纳契数列
+### 3.5 斐波纳契数列
 
 ```go
 func fibonacci() func() int {
@@ -308,7 +423,7 @@ func main() {
 }
 ```
 
-## panic 和 recover 机制
+## 4. panic 和 recover 机制
 
 ```go
 func main() {
