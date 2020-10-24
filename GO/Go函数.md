@@ -2,27 +2,41 @@
 
 `Go`语言有三种类型的函数：普通带名字的函数、匿名`lambda`函数、方法。
 
-## 指针入参
-
-尽管`实参`和`形参`都指向同一目标，但传递指针时依然是复制。
+## 传参
 
 ```go
-func main() {
-	a := 0x100
-	p := &a
-    // pointer : 0xc00000e028, target: (*int)(0xc00001e0b8)
-	fmt.Printf("pointer : %p, target: %#v\n", &p, p)
-    test(p)
+type InnerData struct {
+	a int
 }
-func test(x *int) {
-  // pointer : 0xc00000e030, target: (*int)(0xc00001e0b8)
-	fmt.Printf("pointer : %p, target: %#v\n", &x, x)
+type Data struct {
+	complax []int
+	instance InnerData
+	ptr *InnerData
+}
+func passByValue(inFunc Data) Data {
+	fmt.Printf("fn value: %+v ptr : %p \n", inFunc, &inFunc )
+	return inFunc
+}
+func main(){
+	in := Data{
+		complax: []int{1, 2, 3},
+		instance: InnerData{
+			5,
+		},
+		ptr: &InnerData{1},
+	}
+	// in : value: {complax:[1 2 3] instance:{a:5} ptr:0xc000110000} ptr: 0xc00010c000
+	fmt.Printf("in : value: %+v ptr: %p \n", in, &in)
+	// fn value: {complax:[1 2 3] instance:{a:5} ptr:0xc00001e0d8} ptr : 0xc000022210
+	out := passByValue(in)
+	// out value: {complax:[1 2 3] instance:{a:5} ptr:0xc00001e0d8} ptr : 0xc0000221e0 
+	fmt.Printf("out value: %+v ptr : %p \n", out, &out)
 }
 ```
 
 #### 传指针性能一定好么？
 
-指针指向那个的内存空间，只有在所有指针都释放的时候，才会使用`GC`。指针被拷贝多份后，会延长内存对象的生命周期。
+只有在所有指针都释放的时候，指针指向那个的内存空间，才会使用`GC`。指针被拷贝多份后，会延长内存对象的生命周期。
 
 复制小对象一般在栈上，指令少而快，未必会比指针慢。
 
@@ -30,36 +44,34 @@ func test(x *int) {
 
 总之，指针在`传递大对象` `修改原对象状态`时，使用比较好，其他时候不作考虑。
 
-## 匿名函数 闭包 lambda
+## 函数是 First Class Object
 
 函数在`Go`里面是`First Class Object`第一类对象，什么意思？
 
 - 可在运行期创建
-- 可以存入变量实体，只能与`nil`比较
+- 是值,可以存入变量实体，只能与`nil`比较
 - 可以作为函数的入参以及返回值
-
-函数也是值，也可以作为 参数 和 返回值。
 
 ```go
 func compute(fn func(float64, float64) float64) float64 {
     return fn(3, 4)
 }
-
 func main() {
     	// 1. 直接执行
     func(s string) {
         println(s)
     }("hello , world")
+    
     // 2. 赋值给变量
     hypot := func(x, y float64) float64 {
         return math.Sqrt(x*x + y*y)
     }
     fmt.Println(hypot(5, 12))
+    
     // 3. 作为参数
     fmt.Println(compute(hypot))
     fmt.Println(compute(math.Pow))
 }
-
 // 4. 作为返回值
 func getOperation() func(int, int) int {
 	return func(x, y int) int {
@@ -100,6 +112,68 @@ fmt.Println((<-c)(2, 3)) // 6
 - 没有定义顺序限制，必要时可以抽离
 - 将大函数分解为多个相对独立的匿名函数块，再用简洁的调用完成逻辑流程，实现框架与细节分离
 
+### 函数作为值
+
+```go
+func main(){
+	list := []string{
+		"go scanner",
+		"go parser",
+		"go compiler",
+		"go printer",
+		"go formater",
+	}
+	chain := []func(string) string{
+		removePrefix,
+		strings.TrimSpace,
+		strings.ToUpper,
+	}
+	StringProccess(list, chain)
+	for _, str := range list {
+		fmt.Println(str)
+	}
+}
+func StringProccess(list []string, chain []func(string) string) {
+	for index, str := range list {
+		result := str
+		for _, proc := range chain {
+			result = proc(result)
+		}
+		list[index] = result
+	}
+}
+func removePrefix(str string) string {
+	return strings.TrimPrefix(str, "go")
+}
+```
+
+### 字符串映射到函数
+
+```go
+var skillParam = flag.String("skill", "", "skill to perform")
+func main(){
+	flag.Parse()
+	var skill = map[string]func(){
+		"fire": func() {
+			fmt.Println("chicken fire")
+		},
+		"run": func() {
+			fmt.Println("soldier run")
+		},
+		"fly": func() {
+			fmt.Println("angel fly")
+		},
+	}
+	if f, ok := skill[*skillParam]; ok {
+		f()
+	} else {
+		fmt.Println("skill not found")
+	}
+}
+```
+
+
+
 ### 闭包
 
 `闭包`特性是指：引用了其匿名函数体之外的变量。匿名函数内可以操作外部变量，换句话说，该函数被这些变量“绑定”在一起。
@@ -128,7 +202,6 @@ func main() {
 		//0xc00001e0b8 2
 	}
 }
-
 func test() []func() {
 	var s []func()
 	for i := 0; i < 2; i++ {
