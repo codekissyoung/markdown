@@ -216,3 +216,32 @@ delta := end.Sub(start)
 fmt.Printf("执行时间: %s\n", delta)
 ```
 
+
+
+## md5 / sha1
+
+```go
+TestString := "http://blog.codekissyoung.com"
+
+Md5Inst := md5.New()
+Md5Inst.Write([]byte(TestString))
+Result := Md5Inst.Sum([]byte(""))
+fmt.Printf("%x\n\n", Result) // c9d937a5e1d082db8a26df824b97d274
+
+Sha1Inst := sha1.New()
+Sha1Inst.Write([]byte(TestString))
+Result = Sha1Inst.Sum([]byte(""))
+fmt.Printf("%x\n\n", Result) // a43a08350f00e4185f7fe59ee8bd284e94c13320
+
+// 对文件计算
+TestFile := "123.txt"
+infile, _ := os.Open(TestFile)
+md5h := md5.New()
+io.Copy(md5h, infile)
+fmt.Printf("%x %s\n", md5h.Sum([]byte("")), TestFile)
+
+sha1h := sha1.New()
+io.Copy(sha1h, infile)
+fmt.Printf("%x %s\n", sha1h.Sum([]byte("")), TestFile)
+```
+

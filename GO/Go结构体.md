@@ -10,14 +10,11 @@
 int src = 10;
 int sum = 0;
 ... // 所有参与计算的变量
-    
 int main (){
     func1();
     func2();
-    // ...
     show();
 }
-
 int func1(){ ... }
 int func2(){ ... }
 int show(){ ... }
@@ -28,7 +25,6 @@ int show(){ ... }
 ```c
 int func1(){
    int local = 10;
-   // ...
 }
 ```
 
@@ -326,16 +322,12 @@ func main() {
 
 ```go
 type N int
-
 func (n *N) test() {
 	fmt.Printf("test.n: %p, %d\n", n, *n)
 }
-
 func main() {
-
 	var n N = 25
 	fmt.Printf("main.n: %p, %d\n", &n, n) // main.n: 0xc00001e0b8, 25
-
 	// 只有这种
 	f2 := (*N).test
 	(*N).test(&n) // test.n: 0xc00001e0b8, 25
@@ -403,7 +395,6 @@ func main() {
 
 ```go
 type N int
-
 func (n *N) test() {
 	fmt.Printf("test.n: %p, %d\n", n, *n)
 }
@@ -423,3 +414,157 @@ func main() {
 
 
 
+```go
+func main() {
+	var delegate func(int)
+
+	delegate = funcDo // 签名一致,就可以赋值
+	delegate(100)     // call function do: 100
+
+	c := new(class)
+	delegate = c.Do // 签名一致,就可以赋值
+	delegate(100)   // call method do: 100
+}
+type class struct {
+}
+func (c *class) Do(v int) {
+	fmt.Println("call method do:", v)
+}
+func funcDo(v int) {
+	fmt.Println("call function do:", v)
+}
+```
+
+
+
+#### 简单实现事件机制
+
+```go
+var eventByName = make(map[string][]func(interface{}))
+
+func RegisterEvent(name string, callback func(interface{})) {
+	list := eventByName[name]
+	list = append(list, callback) // 签名相同就可以赋值
+	eventByName[name] = list
+}
+func CallEvent(name string, param interface{}) {
+	list := eventByName[name]
+	for _, callback := range list {
+		callback(param) // 签名相同就可以调用
+	}
+}
+
+type Actor struct {
+}
+func (a *Actor) OnEvent(param interface{}) {
+	fmt.Println("actor event:", param)
+}
+
+func GlobalEvent(param interface{}) {
+	fmt.Println("global event:", param)
+}
+
+func main() {
+	a := new(Actor)
+	RegisterEvent("OnSkill", a.OnEvent)   // 注册　OnSkill　actor事件
+	RegisterEvent("OnSkill", GlobalEvent) // 注册　OnSkill　全局事件
+	CallEvent("OnSkill", 100)             // 调用事件，所有注册的同名函数都会被调用
+}
+
+```
+
+## 序列化
+
+```go
+
+type Screen struct {
+	Size       float32 // 屏幕尺寸
+	ResX, ResY int     // 屏幕水平和垂直分辨率
+}
+
+type Battery struct {
+	Capacity int // 容量
+}
+
+func genJsonData() []byte {
+	// 完整数据结构
+	raw := &struct {
+		Screen
+		Battery
+		HasTouchID bool // 序列化时添加的字段：是否有指纹识别
+	}{
+		Screen: Screen{
+			Size: 5.5,
+			ResX: 1920,
+			ResY: 1080,
+		},
+		Battery: Battery{
+			2910,
+		},
+		HasTouchID: true,
+	}
+	jsonData, _ := json.Marshal(raw) // 将数据序列化为json
+	return jsonData
+}
+
+func main() {
+	jsonData := genJsonData()
+
+	fmt.Println(string(jsonData))
+
+	// 只需要屏幕和指纹识别信息的结构和实例
+	screenAndTouch := struct {
+		Screen
+		HasTouchID bool
+	}{}
+	_ = json.Unmarshal(jsonData, &screenAndTouch)
+	fmt.Printf("%+v\n", screenAndTouch)
+
+	// 只需要电池和指纹识别信息的结构和实例
+	batteryAndTouch := struct {
+		Battery
+		HasTouchID bool
+	}{}
+	_ = json.Unmarshal(jsonData, &batteryAndTouch)
+	fmt.Printf("%+v\n", batteryAndTouch)
+}
+```
+
+
+
+```go
+// 声明技能结构体
+type Skill struct {
+    Name  string `json:"name"`
+    Level int    `json:"level"`
+}
+// 声明角色结构体
+type Actor struct {
+    Name   string `json:"name,omitempty"`
+    Age    int
+    Skills []Skill
+}
+// 填充基本角色数据
+a := Actor{
+    Name: "cow boy",
+    Age:  37,
+    Skills: []Skill{
+        {Name: "", Level: 1},
+        {Name: "Flash your dog eye", Level: 2},
+        {Name: "Time to have Lunch", Level: 3},
+    },
+}
+result, err := json.Marshal(a)
+if err != nil {
+    fmt.Println(err)
+}
+jsonStringData := string(result)
+fmt.Println(jsonStringData)
+```
+
+``json:" "` 标签的使用总结为以下几点：
+
+- json:"-"：表示该字段被本包忽略；
+- json:"myName"：表示该字段在 JSON 里使用“myName”作为键名；
+- json:"myName,omitempty"``：表示该字段在 JSON 里使用“myName”作为键名，并且如果该字段为空时将其省略掉；
+- json:",omitempty"：该字段在json里的键名使用默认值，但如果该字段为空时会被省略掉，注意 omitempty 前面的逗号不能省略。

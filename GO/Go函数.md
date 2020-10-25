@@ -425,6 +425,67 @@ func main() {
 
 ## 4. panic 和 recover 机制
 
+panic 和 recover 的组合有如下特性：
+
+- 有 panic 没 recover，程序宕机。
+- 有 panic 也有 recover，程序不会宕机，执行完对应的 defer 后，从宕机点退出当前函数后继续执行
+- 在 panic 触发的 defer 函数内，可以继续调用 panic，进一步将错误外抛，直到程序整体崩溃
+- 如果想在捕获错误时设置当前函数的返回值，可以使用`命名返回值`方式直接进行设置
+
+```go
+
+// 崩溃时需要传递的上下文信息
+type panicContext struct {
+	function string // 所在函数
+}
+
+// 保护方式运行一个函数
+func ProtectRun(entry func()) {
+	defer func() {
+		err := recover() // 发生宕机时，获取panic传递的上下文并打印
+		switch err.(type) {
+		case runtime.Error: // 运行时错误
+			fmt.Println("runtime error:", err)
+		default: // 非运行时错误
+			fmt.Println("error:", err)
+		}
+	}()
+	entry()
+}
+
+func main() {
+	fmt.Println("运行前")
+	// 允许一段手动触发的错误
+	ProtectRun(func() {
+		fmt.Println("手动宕机前")
+		// 使用panic传递上下文
+		panic(&panicContext{
+			"手动触发panic",
+		})
+		fmt.Println("手动宕机后") // Unreachable code
+	})
+
+	// 故意造成空指针访问错误 运行时错误
+	ProtectRun(func() {
+		fmt.Println("赋值宕机前")
+		var a *int
+		*a = 1               // 从宕机点退出当前函数后，继续执行
+		fmt.Println("赋值宕机后") // 这句不会执行
+	})
+	fmt.Println("运行后")
+}
+//运行前
+//手动宕机前
+//error: &{手动触发panic}
+//赋值宕机前
+//runtime error: runtime error: invalid memory address or nil pointer dereference
+//运行后
+```
+
+
+
+
+
 ```go
 func main() {
 	defer func() { fmt.Println("clean main resources") }()
