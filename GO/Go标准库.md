@@ -43,7 +43,7 @@ func countLines(f *os.File, m map[string]int) {
 
 ## io
 
-## io/ioutil
+### ioutil
 
 计算重复行，`ioutil.ReadFile()`读取整个文件的数据，`strings.Split()`将数据拆分成`[]String`。
 
@@ -64,7 +64,7 @@ for line, n := range counts {
 }
 ```
 
-## bufio
+### bufio
 
 `bufio.Scanner`读取输入，按换行符(或自定义)断开，依次读取输入文本。
 
@@ -81,6 +81,169 @@ for line, n := range counts {
     fmt.Printf("%d \t %s \n", n, line)
 }
 ```
+
+
+
+```go
+data := []byte("Go 语言中文网")
+rd := bytes.NewReader(data)
+
+r := bufio.NewReader(rd) // 包装下，具有缓存功能
+
+// 读取并返回一个字节
+c, err := r.ReadByte()
+fmt.Println(string(c), err) // G <nil>
+
+var buf [128]byte
+// 读取数据，并存放到字节切片 p 中
+n, err := r.Read(buf[:])             // 当字节流结束时，n 为 0，err 为 io. EOF
+fmt.Println(string(buf[:n]), n, err) // o 语言中文网 17 <nil>
+```
+
+
+
+```go
+data := []byte("C语言中文网, Go语言入门教程")
+rd := bytes.NewReader(data)
+r := bufio.NewReader(rd)
+
+// 读取数据直到遇到第一个分隔符
+var delim byte = ','
+line, err := r.ReadBytes(delim) // C语言中文网, <nil>
+fmt.Println(string(line), err)
+```
+
+
+
+```go
+// 读取一行数据
+data := []byte("Golang is a beautiful language. \r\n I like it!")
+rd := bytes.NewReader(data)
+r := bufio.NewReader(rd)
+
+line, prefix, err := r.ReadLine()
+// Golang is a beautiful language.  false <nil>
+fmt.Println(string(line), prefix, err)
+```
+
+
+
+```go
+// 读取一个 UTF-8 编码的字符，并返回其 Unicode 编码和字节数
+data := []byte("语言中文网")
+rd := bytes.NewReader(data)
+r := bufio.NewReader(rd)
+
+ch, size, err := r.ReadRune()
+fmt.Println(string(ch), size, err) // 语 3 <nil>
+```
+
+
+
+```go
+// 读取数据直到分隔符“delim”处，并返回读取数据的字节切片
+data := []byte("C语言中文网, Go语言入门教程")
+rd := bytes.NewReader(data)
+r := bufio.NewReader(rd)
+var delim byte = ','
+
+line, err := r.ReadSlice(delim)
+fmt.Println(line, err)
+line, err = r.ReadSlice(delim)
+fmt.Println(line, err)
+line, err = r.ReadSlice(delim)
+fmt.Println(line, err)
+```
+
+
+
+```go
+// 读取数据直到分隔符“delim”第一次出现，并返回一个包含“delim”的字符串
+data := []byte("C语言中文网, Go语言入门教程")
+rd := bytes.NewReader(data)
+r := bufio.NewReader(rd)
+var delim byte = ','
+
+line, err := r.ReadString(delim)
+fmt.Println(line, err) // C语言中文网, <nil>
+```
+
+#### 将读取到的字节放回去
+
+```go
+func (b *Reader) UnreadByte() error
+func (b *Reader) UnreadRune() error
+```
+
+#### 还可以从缓冲区读出数据的字节数
+
+```go
+data := []byte("Go语言入门教程")
+rd := bytes.NewReader(data)
+r := bufio.NewReader(rd)
+
+var buf [1]byte
+n, err := r.Read(buf[:])
+fmt.Println(string(buf[:n]), n, err) // G 1 <nil>
+
+// 返回还可以从缓冲区读出数据的字节数
+rn := r.Buffered()
+fmt.Println(rn) // 19
+
+n, err = r.Read(buf[:])
+fmt.Println(string(buf[:n]), n, err) // o 1 <nil>
+
+rn = r.Buffered()
+fmt.Println(rn) // 18
+```
+
+#### 读取指定字节数的数据 不清理缓存
+
+```go
+data := []byte("Go语言入门教程")
+rd := bytes.NewReader(data)
+r := bufio.NewReader(rd)
+
+bl, err := r.Peek(8)
+fmt.Println(string(bl), err) // Go语言 <nil>
+
+bl, err = r.Peek(14)
+fmt.Println(string(bl), err) // Go语言入门 <nil>
+
+bl, err = r.Peek(20)
+fmt.Println(string(bl), err) // Go语言入门教程 <nil>
+```
+
+
+
+### 写入
+
+```go
+p := []byte("C语言中文网")
+wr := bytes.NewBuffer(nil)
+w := bufio.NewWriter(wr)
+
+fmt.Println("写入前缓冲区为：", w.Available()) // 写入前缓冲区为： 4096
+
+w.Write(p)
+// 写入"C语言中文网"后，缓冲区为：4080
+fmt.Printf("写入%q后，缓冲区为：%d\n", string(p), w.Available())
+
+w.Flush()
+// flush后，缓冲区为：4096
+fmt.Printf("flush后，缓冲区为：%d\n", w.Available())
+```
+
+```go
+wr := bytes.NewBuffer(nil)
+w := bufio.NewWriter(wr)
+s := "C语言中文网"
+n, err := w.WriteString(s)
+w.Flush()
+fmt.Println(string(wr.Bytes()), n, err) // C语言中文网 16 <nil>
+```
+
+
 
 ## net/http
 
