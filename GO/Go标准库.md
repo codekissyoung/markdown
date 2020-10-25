@@ -214,8 +214,6 @@ bl, err = r.Peek(20)
 fmt.Println(string(bl), err) // Go语言入门教程 <nil>
 ```
 
-
-
 ### 写入
 
 ```go
@@ -238,7 +236,7 @@ fmt.Printf("flush后，缓冲区为：%d\n", w.Available())
 wr := bytes.NewBuffer(nil)
 w := bufio.NewWriter(wr)
 s := "C语言中文网"
-n, err := w.WriteString(s)
+n, err := w.WriteString(s) // 写入一个字符串，并返回写入的字节数和错误信息
 w.Flush()
 fmt.Println(string(wr.Bytes()), n, err) // C语言中文网 16 <nil>
 ```
