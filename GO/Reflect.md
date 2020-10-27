@@ -227,10 +227,6 @@ func main() {
 
 
 
-
-
-
-
 ## 字段类型 名字 值
 
 ```go
@@ -326,9 +322,9 @@ fmt.Println(reflect.DeepEqual(s2, s3)) // false
 
 ```go
 type Employee struct {
-	EmployeeID string
-	Name       string `format:"normal"`
-	Age        int
+    EmployeeID string
+    Name       string `format:"normal"`
+    Age        int
 }
 
 type Customer struct {
@@ -339,7 +335,6 @@ type Customer struct {
 
 func fillBySettings(s interface{}, m map[string]interface{}) error {
 	if reflect.TypeOf(s).Kind() != reflect.Ptr {
-		// Elem() 获取指针指向的值
 		if reflect.TypeOf(s).Elem().Kind() != reflect.Struct {
 			return errors.New("第一个参数必须是结构体的指针")
 		}
@@ -377,12 +372,6 @@ func main() {
 	fmt.Println(e, c)
 }
 ```
-
-
-
-### 
-
-
 
 
 
