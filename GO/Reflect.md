@@ -266,7 +266,7 @@ fmt.Println(reflect.DeepEqual(s1, s2)) // true
 fmt.Println(reflect.DeepEqual(s2, s3)) // false
 ```
 
-## 万能程序
+## 11. 万能程序
 
 ```go
 type Employee struct {
