@@ -1,47 +1,53 @@
-# Go 面向对象
+# Go结构体
 
-程序等于 数据 + 算法。算法是一个计算步骤，数据是生产资料，也是生产结果。
 
-**如何安排数据？**
 
-如果只是写一段几百行的小程序，直接存在全局变量里，谁都可以访问，函数也不需要传参。
+## 查找与遮蔽
 
-```c
-int src = 10;
-int sum = 0;
-... // 所有参与计算的变量
-int main (){
-    func1();
-    func2();
-    show();
+
+
+## 字段
+
+```go
+type attr struct { rm int 
+type file struct {
+	name string
+	attr
 }
-int func1(){ ... }
-int func2(){ ... }
-int show(){ ... }
-```
-
-如果有些中间的临时数据，只想在某些计算过程中可见，而不是像全局变量一样，谁都可以用。于是就出现了**局部变量**。
-
-```c
-int func1(){
-   int local = 10;
+          
+// 1. 接访问 attr 里的 perm !!!                 
+f.perm = 0644
+                  
+type data struct {
+	file
+	name string // 2. 同名遮蔽 file.name
+  os.File // 3. 作为匿名字段时，包名 os 去掉了
 }
+
+d.name = "data2"      // 这里的是 data 下的 name
+d.file.name = "file2" // 使用 类型名 + 字段名 访问 里面被遮蔽的字段
 ```
+## 方法
 
-计算过程之间的值交换，也希望是私密的，不想通过全局变量(因为任何地方都可以访问到)，于是加入 **传参机制** **返回值机制**。
+方法是与`实例`绑定的`特殊函数`。
 
-```c
-int func1(int a, int b){
-    return c;
-}
-```
+普通函数专注于算法流程，传入参数，返回结果；方法是有关联对象的，有的方法的调用结果取决于当时`关联对象`的状态。
 
+方法非常主要的一个作用是：维护和展示对象的状态。
 
-## 结构体方法
+### Recevier 是 T 或 *T
 
-方法是与`对象实例`绑定的`特殊函数`。
+- 要修改对象状态，用 `*T`
 
-普通函数专注于算法流程，传入参数，返回结果。而方法相比函数，是有关联对象的，有的方法的调用结果取决于当时`关联对象`的状态。方法非常主要的一个作用是：维护和展示对象的状态。
+- 大对象，用`*T`，小对象用`T`
+
+- 切片、字符串、函数等指针包装对象，直接用`T`
+
+- 包含`Mutex`等同步字段，用`*T`,避免因复制造成锁操作无效
+
+- 其他无法确定的情况，都用`*T`
+
+### v 与 &v 等价
 
 ```go
 type Vertex struct {
@@ -54,100 +60,19 @@ func (v *Vertex) Scale(f float64) {
 	v.X = v.X * f
 	v.Y = v.Y * f
 }
-func main() {
-	v := Vertex{3, 4}
-	p := &Vertex{3, 4}
 
-	println(v.Abs())
-	println(p.Abs()) // 编译时实际是 (*p).Abs()
-
-	v.Scale(10) // 编译时实际是 (&v).Scale(10)
-	p.Scale(3)
-}
+v := Vertex{3, 4}
+p := &Vertex{3, 4}
+println(v.Abs())
+println(p.Abs()) // 编译时实际是 (*p).Abs()
+v.Scale(10) 			// 编译时实际是 (&v).Scale(10)
+p.Scale(3)
 ```
 
-#### 如何选择`receiver`的类型？
-
-- 要修改对象状态，用 `*T`
-
-- 大对象，用`*T`,小对象用`T`
-
-- 切片、字符串、函数等指针包装对象，直接用`T`
-
-- 包含`Mutex`等同步字段，用`*T`,避免因复制造成锁操作无效
-
-- 其他无法确定的情况，都用`*T`
-
-#### 结构体匿名字段
-
-```go
-type attr struct {
-	perm int
-}
-type file struct {
-	name string
-	attr // 匿名字段
-}
-type data struct {
-	os.File // 作为匿名字段时，包名被自动去掉了
-}
-
-func main() {
-	f := file{
-		name: "test.dat",
-		attr: attr{
-			perm: 0755,
-		},
-	}
-	f.perm = 0644  // 可以直接访问 attr 里的 perm !!!
-	println(f.perm)
-
-	d := data{
-		File: os.File{},
-	}
-	fmt.Printf("%#v", d)
-}
-```
-
-#### 命名类型的**指针**不能作为匿名字段
-
-```go
-type a *int
-type b **int
-type c interface{}
-
-type d struct {
-	*int // ok
-	a    // embedded type cannot be a pointer
-	b    // embedded type cannot be a pointer
-	c    // ok
-	*c   // embedded type cannot be a pointer to interface
-}
-```
-
-#### 匿名字段遮蔽
-
-```go
-type file struct {
-	name string
-}
-type data struct {
-	file
-	name string
-}
-func main() {
-	d := data{
-		name: "data",
-		file: file{"file"},
-	}
-	d.name = "data2"      // 这里的是 data 下的 name
-	d.file.name = "file2" // 使用 类型名 + 字段名 访问 里面被遮蔽的字段
-	fmt.Printf("%#v", d)
-}
-```
+PS: 这种为了方便而牺牲 "一致性" 和 ＂类型检查＂ 的做法是 **利大于弊** 的么？
 
 
-#### 匿名字段的方法
+### 匿名字段的方法
 
 ```go
 type data struct {
@@ -162,75 +87,24 @@ func main() {
 }
 ```
 
-### 匿名字段的方法的同名遮蔽
+### 同名遮蔽
 
 这个`同名遮蔽`特性反而可以用作`override`覆盖功能，类似于`OO`里的子类重写父类方法。
 
 ```go
-type user struct {
-	name string
-}
-type manager struct {
-	user
-}
-func (u user) show() string {
-	return u.name
-}
-func (m manager) show() string {
-	return "manager " + m.user.show()
-}
-func main() {
-	m := &manager{}
-	m.name = "link"
-	println(m.show())      // manager link
-	println(m.user.show()) // link
-}
+type user struct { name string }
+func (u user) show() string { return u.name }
+
+type manager struct { user}
+func (m manager) show() string { return "manager " + m.user.show() }  // override
+
+m := &manager{}
+m.name = "link"
+println(m.show())      // manager link
+println(m.user.show()) // link
 ```
 
 
-
-```go
-v := Vertex{3, 4}
-p := &v
-
-fmt.Println( v, p )
-
-Scale( v, 10 )	     // cannot use v (type Vertex) as type *Vertex in argument to Scale
-Scale( &v, 10 )     // ok
-Scale( p, 10 )      // ok
-
-v.Scale( 10 )       // ok
-(&v).Scale( 10 )    // ok
-p.Scale( 10 )       // ok
-```
-
-对于 `Scale( v, 10 )` ，会因为　＂函数参数类型检查不一致＂ 而报错
-
-但是对于 `v.Scale( 10 )` `(&v).Scale( 10 )` `p.Scale( 10 )` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的
-
-再来观察下:
-
-```go
-func main() {
-    v := Vertex{3, 4}
-    fmt.Println( Abs(v) )  // 5
-    fmt.Println( Abs(&v) ) // cannot use &v (type *Vertex) as type Vertex ...
-    fmt.Println( Abs(p) )  // cannot use p (type *Vertex) as type Vertex ...
-
-    p := &v
-    fmt.Println( v.Abs() ) 			// 5
-    fmt.Println( (*p).Abs() ) 	// 5
-    fmt.Println( p.Abs() )   	// 5
-}
-```
-
-对于 `Abs( &v )` `Abs( p )` 会因为　＂函数参数类型检查不一致＂ 而报错
-
-而`v.Abs()` `(*p).Abs()` `p.Abs()` 在 `Go` 语言中都是正确的调用写法，并且`Go`内部将它们视为相同的操作，是等价的 ^\_^
-
-PS: 这种为了方便而牺牲 "一致性" 和 ＂类型检查＂ 的做法是 **利大于弊** 的么？
-
-## 继承
 
 ```go
 type user struct {
@@ -245,50 +119,27 @@ type manager struct {
 	title string
 }
 func main() {
-	var m manager
-	m.name = "Link"
-	m.age = 29
-	// m 是 manager , 更是 user, 所以能调用 ToString()
-	// 并且 ToString() 的 Reciver 的取值是 m.user
-	println(m.ToString())
+    var m manager
+    m.name = "Link"
+    m.age = 29
+    println(m.ToString()) // 等价于 m.user.ToString()
 }
 ```
 
-## 方法集、方法提升
+## 方法集与接口
 
-类型有一个称之为`方法集`的东西，就是该类型可以使用的所有方法的集合，这些方法包含它`自己实现`的，也包含它的`匿名字段实现`的。
+类型有一个称之为`方法集`的东西，就是该类型可以使用的所有方法的集合，这些方法包含它`自己实现`的，也包含它的`匿名字段实现`的。规则如下：
 
-`方法提升`是指:结构体能否拿到它的匿名字段的方法，能拿到就是`方法提升`了。规则如下：
+- 类型 T 拥有所有 receiver T 方法
+- 类型 *T 拥有所有 receiver T + receiver *T 方法
 
+嵌入匿名结构体：
 
-```go
-type T struct {}
-type S struct {
-    T
-}
-type D struct {
-    *T
-}
-```
-
-| T struct 方法接收者类型 | S      | *S   | D    | *D   |
-| :---------------------- | :----- | ---- | ---- | ---- |
-| T                       | 提升   | 提升 | 提升 | 提升 |
-| *T                      | 不提升 | 提升 | 提升 | 提升 |
-
-**提升**:即`S` `*S`可以使用`T`的方法。
-
-- 对于 `S` 类型，方法集由接收者为`S`类型的全部方法构成。
-
-- 而对于`*S` 类型，方法集包括`S`类型的全部方法，以及`*S`的全部方法。
+- 嵌入 S，类型 T 新增所有 receiver S 方法
+- 嵌入 *S，类型 T 新增所有 receiver S + recevier *S 方法
+- 嵌入 S 或者 *S，类型 *T 新增所有 receiver S + recevier *S 方法
 
 **只有一个类型的方法集完全涵盖了接口的方法集后，这个类型才会被认为是接口的实现类型。**
-
-综上所述，只有一种情况要注意：
-
-当外部结构体为`type S struct { T }` 时，`T` 的某个方法是使用`func (*T)notify(){}` 这样实现的时，`S`是无法拿到`notify()`方法的。 
-
-
 
 ## 方法退化成函数
 
@@ -304,7 +155,6 @@ func (n N) test() {
 }
 
 func main() {
-
 	var n N = 25
 	fmt.Printf("main.n: %p, %d\n", &n, n) // main.n: 0xc00001e0b8, 25
 
@@ -437,7 +287,7 @@ func funcDo(v int) {
 
 
 
-#### 简单实现事件机制
+### 简单实现事件机制
 
 ```go
 var eventByName = make(map[string][]func(interface{}))
@@ -470,101 +320,4 @@ func main() {
 	RegisterEvent("OnSkill", GlobalEvent) // 注册　OnSkill　全局事件
 	CallEvent("OnSkill", 100)             // 调用事件，所有注册的同名函数都会被调用
 }
-
 ```
-
-## 序列化
-
-```go
-
-type Screen struct {
-	Size       float32 // 屏幕尺寸
-	ResX, ResY int     // 屏幕水平和垂直分辨率
-}
-
-type Battery struct {
-	Capacity int // 容量
-}
-
-func genJsonData() []byte {
-	// 完整数据结构
-	raw := &struct {
-		Screen
-		Battery
-		HasTouchID bool // 序列化时添加的字段：是否有指纹识别
-	}{
-		Screen: Screen{
-			Size: 5.5,
-			ResX: 1920,
-			ResY: 1080,
-		},
-		Battery: Battery{
-			2910,
-		},
-		HasTouchID: true,
-	}
-	jsonData, _ := json.Marshal(raw) // 将数据序列化为json
-	return jsonData
-}
-
-func main() {
-	jsonData := genJsonData()
-
-	fmt.Println(string(jsonData))
-
-	// 只需要屏幕和指纹识别信息的结构和实例
-	screenAndTouch := struct {
-		Screen
-		HasTouchID bool
-	}{}
-	_ = json.Unmarshal(jsonData, &screenAndTouch)
-	fmt.Printf("%+v\n", screenAndTouch)
-
-	// 只需要电池和指纹识别信息的结构和实例
-	batteryAndTouch := struct {
-		Battery
-		HasTouchID bool
-	}{}
-	_ = json.Unmarshal(jsonData, &batteryAndTouch)
-	fmt.Printf("%+v\n", batteryAndTouch)
-}
-```
-
-
-
-```go
-// 声明技能结构体
-type Skill struct {
-    Name  string `json:"name"`
-    Level int    `json:"level"`
-}
-// 声明角色结构体
-type Actor struct {
-    Name   string `json:"name,omitempty"`
-    Age    int
-    Skills []Skill
-}
-// 填充基本角色数据
-a := Actor{
-    Name: "cow boy",
-    Age:  37,
-    Skills: []Skill{
-        {Name: "", Level: 1},
-        {Name: "Flash your dog eye", Level: 2},
-        {Name: "Time to have Lunch", Level: 3},
-    },
-}
-result, err := json.Marshal(a)
-if err != nil {
-    fmt.Println(err)
-}
-jsonStringData := string(result)
-fmt.Println(jsonStringData)
-```
-
-``json:" "` 标签的使用总结为以下几点：
-
-- json:"-"：表示该字段被本包忽略；
-- json:"myName"：表示该字段在 JSON 里使用“myName”作为键名；
-- json:"myName,omitempty"``：表示该字段在 JSON 里使用“myName”作为键名，并且如果该字段为空时将其省略掉；
-- json:",omitempty"：该字段在json里的键名使用默认值，但如果该字段为空时会被省略掉，注意 omitempty 前面的逗号不能省略。

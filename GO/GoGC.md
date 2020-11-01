@@ -1,6 +1,4 @@
-# Go GC
-
-
+# GoGC
 
 ```go
 type Road int
