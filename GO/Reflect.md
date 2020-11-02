@@ -256,7 +256,6 @@ func main() {
 ```go
 a := map[int]string{1: "one", 2: "two", 3: "threee"}
 b := map[int]string{1: "one", 2: "two", 4: "threee"}
-
 fmt.Println(reflect.DeepEqual(a, b)) // false
 
 s1 := []int{1, 2, 3}
@@ -266,7 +265,7 @@ fmt.Println(reflect.DeepEqual(s1, s2)) // true
 fmt.Println(reflect.DeepEqual(s2, s3)) // false
 ```
 
-## 万能程序
+## 11. 万能程序
 
 ```go
 type Employee struct {
