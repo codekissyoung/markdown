@@ -19,7 +19,7 @@ func doSomething(id int, wg *sync.WaitGroup) {
 }
 ```
 
-#### 范例 2：专用于`Go`通道的`Select`：
+### 范例 2：专用于`Go`通道的`Select`：
 
 ```go
 func main() {
