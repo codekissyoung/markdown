@@ -51,9 +51,7 @@ vType := vValue.Type() // 获取 reflect.Type 对象
 
 所以，我们才可以写出非常简洁的代码。
 
-
-
-
+![](https://img.codekissyoung.com/2020/11/05/84dbcf7ad1cf3a40a0ea6a48903a7571.png)
 
 ## 2. 类型信息
 
