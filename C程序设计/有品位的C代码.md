@@ -252,7 +252,7 @@ char *cp = &ch;
 | `ch` | ![](https://img.codekissyoung.com/2019/11/15/f42fe19d42234f67fd0cf590fd41d162.png) | ![](https://img.codekissyoung.com/2019/11/15/5a1be89e1c93ad69a52142451ec33abe.png) |
 | `&ch` | 非法 | ![](https://img.codekissyoung.com/2019/11/15/ac209a2cc8cf3701f6c256026f31b007.png) |
 | `cp` |![](https://img.codekissyoung.com/2019/11/15/a9c8e95f121106cb1b999571f21eef57.png)|![](https://img.codekissyoung.com/2019/11/15/70e2a246e30b558b8e5570e5cd9d513c.png)|
-| `&cp`|非法|![](https://img.codekissyoung.com/2019/11/15/02368464b1237071a9d06bc25102e250.png)
+|`&cp`|非法|![](https://img.codekissyoung.com/2019/11/15/02368464b1237071a9d06bc25102e250.png)|
 |`*cp + 1`|非法|![](https://img.codekissyoung.com/2019/11/15/4754fa131e4095cdcddbd07dabfc897d.png)|
 |`*(cp+1)`|![](https://img.codekissyoung.com/2019/11/15/76838fae3d52f6200242f2eca7bbbf09.png)|![](https://img.codekissyoung.com/2019/11/15/c56ad0d3ef218bbce5a29845f3359353.png)|
 |`++cp`|非法|![](https://img.codekissyoung.com/2019/11/15/1a3fe2f7f5a6ebc7f94304882893c07f.png)|
@@ -308,7 +308,7 @@ x.d    = &y;
 |`px->a`    | `a`所在空间 |![](https://img.codekissyoung.com/2019/11/15/a269271354023dc276f38a15e6e3bcca.png)|
 |`&px->a`|非法|![](https://img.codekissyoung.com/2019/11/15/471a461abb366acef5270c147aab09e7.png)|
 |`px->b`|非法|![](https://img.codekissyoung.com/2019/11/15/f23ad920ed4f7089182513f03f298f06.png)|
-|`px->b[1]`| `i`所在空间 | ![](https://img.codekissyoung.com/2019/11/15/72251174c03d4136ff7292c863f65a59.png) | 
+|`px->b[1]`| `i`所在空间 | ![](https://img.codekissyoung.com/2019/11/15/72251174c03d4136ff7292c863f65a59.png) |
 |`px->c`| `c`所在空间 | ![](https://img.codekissyoung.com/2019/11/15/d919f19666749b2ca4f7a429481b362f.png) |
 |`px->c.a`|`5`所在空间|![](https://img.codekissyoung.com/2019/11/15/f86ff0dc3bd90a3f5b5a4301c2d075b9.png)|
 |`*px->c.b` `px->c.b[0]`|`-1`所在空间|![](https://img.codekissyoung.com/2019/11/15/77984dc8f90da954bba4966a535d8bfd.png)|

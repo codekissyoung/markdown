@@ -2,7 +2,7 @@
 
 ## 1. 概念
 
-编译型语言在编译时，变量的名称以及类型信息都会被抹去，只留下操作的内存地址，运行时变量是无法获取到自身信息的。但是通过`reflect`包，可以让编译器在编译期将变量的类型信息写入到可执行文件中，并且提供专门的接口函数，用于访问这些信息。
+传统编译型语言 C/C++ 在编译时，变量的名称以及类型信息都会被抹去，只留下操作的内存地址，运行时变量是无法获取到自身信息的。但是通过反射机制，可以让编译器在编译期将变量的类型信息写入到可执行文件中，并且提供专门的接口函数，用于访问这些信息。
 
 通过这些信息，程序可以在运行期间：
 
@@ -15,20 +15,6 @@
 - 直接调用变量（函数类型）
 
 这个机制称为反射。
-
-`reflect`中的所有方法基本都是围绕着 `reflect.Type` 和 `reflect.Value` 这两个类型设计的。
-
-```go
-var v = "link"
-
-// 主要表达的是被反射的这个变量本身的类型信息
-vType := reflect.TypeOf(v) // 获取 reflect.Type 对象
-
-// 该变量实例本身的信息
-vValue := reflect.ValueOf(v) // 获取　reflect.Value 对象
-vType := vValue.Type() // 获取 reflect.Type 对象
-```
-
 
 
 ### 反射存在的意义？
@@ -52,6 +38,48 @@ vType := vValue.Type() // 获取 reflect.Type 对象
 所以，我们才可以写出非常简洁的代码。
 
 ![](https://img.codekissyoung.com/2020/11/05/84dbcf7ad1cf3a40a0ea6a48903a7571.png)
+
+### Go反射对象
+
+`reflect`中的所有方法基本都是围绕着 `reflect.Type` 和 `reflect.Value` 这两个类型设计的。
+
+```go
+var v = "link"
+
+// 主要表达的是被反射的这个变量本身的类型信息
+vType := reflect.TypeOf(v) // 获取 reflect.Type 对象
+
+// 该变量实例本身的信息
+vValue := reflect.ValueOf(v) // 获取　reflect.Value 对象
+vType := vValue.Type() // 获取 reflect.Type 对象
+```
+
+### Go反射三大法则
+
+#### 1. 反射对象是 `interface{}` 变量转换而来
+
+```go
+func ValueOf(i interface{}) Value { return Value }
+func TypeOf(i interface{}) Type { return Type }
+```
+
+#### 2. 反射对象转换回 `interface{}` 变量
+
+从接口值到反射对象：
+
+- 从基本类型到接口类型的类型转换
+- 从接口类型到反射对象的转换
+
+从反射对象到接口值：
+
+- 反射对象转换成接口类型 `i := rv.Interface()`
+
+- 再强转成原始类型 `i.(int)`
+
+![](img/9829786d987decc6c2fef09d83c00940.png)
+
+#### 3. 要修改反射对象，其值必须可设置
+
 
 ## 2. 类型信息
 
@@ -207,7 +235,6 @@ func (e *Employee) UpdateAge(newVal int) {
 }
 
 func main() {
-
 	e := &Employee{"1", "Link", 30}
 	fmt.Println(reflect.ValueOf(*e).FieldByName("Name")) // link
 	if nameField, ok := reflect.TypeOf(*e).FieldByName("Name"); !ok {
@@ -304,6 +331,22 @@ type Customer struct {
 	Age      int
 }
 
+func main() {
+	setting := map[string]interface{}{
+		"Name": "Link",
+		"Age":  20,
+	}
+	e := Employee{}
+	if err := fillBySettings(&e, setting); err != nil {
+		fmt.Println(err)
+	}
+	c := Customer{}
+	if err := fillBySettings(&c, setting); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(e, c)
+}
+
 func fillBySettings(s interface{}, m map[string]interface{}) error {
 	if reflect.TypeOf(s).Kind() != reflect.Ptr {
 		if reflect.TypeOf(s).Elem().Kind() != reflect.Struct {
@@ -326,39 +369,6 @@ func fillBySettings(s interface{}, m map[string]interface{}) error {
 	}
 	return nil
 }
-
-func main() {
-	setting := map[string]interface{}{
-		"Name": "Link",
-		"Age":  20,
-	}
-	e := Employee{}
-	if err := fillBySettings(&e, setting); err != nil {
-		fmt.Println(err)
-	}
-	c := Customer{}
-	if err := fillBySettings(&c, setting); err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(e, c)
-}
 ```
 
-## 12. 三大法则
-
-#### 从 `interface{}` 变量可以获取到反射对象
-
-#### 从反射对象可以获取 `interface{}` 变量
-
-从接口值到反射对象：
-
-- 从基本类型到接口类型的类型转换
-- 从接口类型到反射对象的转换
-
-从反射对象到接口值：
-
-- 反射对象转换成接口类型 `i := v.Interface()`
-- 再强转成原始类型 `i.(int)`
-
-#### 要修改反射对象，其值必须可设置
 
