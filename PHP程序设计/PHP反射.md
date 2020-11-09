@@ -1,11 +1,5 @@
 # 反射
 
-`PHP`的反射类。
-
-![](https://img.codekissyoung.com/2020/03/03/99726caed3d4ec64c5777047e0fedc40.png)
-
-## Reflection
-
 ```php
 class Person
 {

@@ -107,7 +107,7 @@ header('Pragma:no-cache');
 
 header('Refresh:10;url=http://www.baidu.com/'); //页面重定向,十秒钟后跳到　url
 header('location:http://www.baidu.com'); // 向浏览器发送一条Http头信息，告诉它重定向到莫个网址
-header("Access-Control-AllowOrigin:http://dev.kanjiebao.com"); // 允许 ajax 的跨域请求
+header("Access-Control-AllowOrigin:*"); // 允许 ajax 的跨域请求
 ```
 
 ## 加载所有配置文件
@@ -122,8 +122,8 @@ foreach (glob(ROOT_PATH.'config/*') as $file){
 ## 变量方法
 
 ```php
-function ($method,$param){
-    $this ->input ->$method($param);
+function ($method, $param){
+    $this ->input -> $method($param);
 }
 ```
 
@@ -137,8 +137,8 @@ isset($page_size) or exit("未设置page_size");
 ## 数字处理
 
 ```php
-ceil(1243648.43464); // 向上取整 1243649
-round(1243648.43464); // 四舍五入1243648
+ceil(1243648.43464);   // 向上取整 1243649
+round(1243648.43464);  // 四舍五入1243648
 intval(1243648.43464); // 强制转换为整型1243648
 ```
 
@@ -147,19 +147,31 @@ intval(1243648.43464); // 强制转换为整型1243648
 ```php
 $urlstr = urlencode("我是codekissyoung");
 echo  urldecode($urlstr); // 汉字加密 解密，为了解决传输时，汉字符会丢失的问题
+
 // 不可逆加密
 md5("hehexiix23"); // md5散列值
 
 crypt($some_string,'keyvalue'); // 使用秘钥加密
 $str = 'apple';
 echo sha1($str); // sha1 散列值
+
 // 可逆加密
+
 //  base64加解密
 base64_encode($string);
 base64_decode($string);
+
 // convert_uudecode加解密
 convert_uudecode($str);
 convert_uuencode($str);
+
+// 不可逆加密 md5 散列值，sha1 散列值
+echo  md5("hehexiix23");
+echo crypt($some_string,'keyvalue');
+$str = 'apple';
+if (sha1($str) === 'd0be2dc421be4fcd0172e5afceea3970e2f3d940') {
+    echo "Would you like a green or red apple?";
+}
 ```
 
 ## 时间函数
@@ -193,26 +205,18 @@ $end_time=microtime();
 $execute_time=$end_time-$start_time;
 ```
 
-## 脚本执行完注册函数
+## PHP意外退出处理函数
 
 ```php
-register_shutdown_function( ['core', 'handleShutdown'] );
+register_shutdown_function( ['core', 'handleShutdown'] ); // 脚本退出处理函数
+set_exception_handler(array('core', 'handleException'));  // 异常处理函数
+set_error_handler(array('core', 'handleError')); 　　　　　// 错误处理函数
 ```
 
-当我们的脚本执行完成或意外死掉导致 PHP 执行即将关闭时,我们的这个函数将会 被调用.所以,我们可以使用在脚本开始处设置一个变量为 false,然后在脚本末尾将之设置为 true 的方法,让 PHP 关闭回调函数检查脚本完成与否. 如果我们的变量仍旧是 false,我们就知道脚本的最后一行没有执行,因此它肯定在程序执行到某处死掉了
+当我们的脚本执行完成或意外死掉导致 PHP 执行即将关闭时,我们的这个`register_shutdown_function`将会被调用.
+
+Tips : 我们可以使用在脚本开始处设置一个变量为 false,然后在脚本末尾将之设置为 true 的方法,让 PHP 关闭回调函数检查脚本完成与否. 如果我们的变量仍旧是 false,我们就知道脚本的最后一行没有执行,因此它肯定在程序执行到某处死掉了
 http://www.blogdaren.com/post-2030.html
-
-## 设置异常处理函数
-
-```php
-set_exception_handler(array('core', 'handleException'));
-```
-
-## 设置错误处理函数
-
-```php
-set_error_handler(array('core', 'handleError'));
-```
 
 ## 防止 SQL 注入
 
@@ -258,27 +262,7 @@ function expectMyclass(Myclass $obj){
 }
 ```
 
-## 不可逆加密 md5 散列值，sha1 散列值
-
-```php
-echo  md5("hehexiix23");
-echo crypt($some_string,'keyvalue');
-$str = 'apple';
-if (sha1($str) === 'd0be2dc421be4fcd0172e5afceea3970e2f3d940') {
-    echo "Would you like a green or red apple?";
-}
-```
-
-## 可逆加密
-
-```php
-base64_encode($string);
-base64_decode($string);
-convert_uudecode($str);
-convert_uuencode($str);
-```
-
-### method_exists 与 is_callable
+## method_exists 与 is_callable
 
 ```php
 class Foo {
@@ -320,7 +304,7 @@ var_dump( $out );
 
 #### ORM
 
-```bash
+```php
 abstract class ActiveRecord{
     protected static $table;
     protected $fieldvalues;
@@ -397,7 +381,7 @@ $str = new Strings(" I want go die");
 echo $str -> trim() -> strlen();
 ```
 
-#### trait
+## trait
 
 ```php
 trait Hello {
