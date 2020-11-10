@@ -54,7 +54,7 @@ xdebug.idekey=PHPSTORM
 
 #### 5. 浏览器 Xdebug helper 拓展
 
-https://chrome.google.com/webstore/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc
+[Xdebug helper 拓展](https://chrome.google.com/webstore/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc)
 
 ![](https://img.codekissyoung.com/2020/11/10/0c2812190679a7ec9cc38291c628c209.png)
 
