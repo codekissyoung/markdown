@@ -576,7 +576,6 @@ panic 和 recover 的组合有如下特性：
 - 如果想在捕获错误时设置当前函数的返回值，可以使用`命名返回值`方式直接进行设置
 
 ```go
-
 // 崩溃时需要传递的上下文信息
 type panicContext struct {
 	function string // 所在函数

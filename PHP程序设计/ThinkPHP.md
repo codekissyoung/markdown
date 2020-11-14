@@ -35,15 +35,15 @@ define('BUILD_DIR_SECURE', false);          # don't generate index.html
 define('APP_DEBUG', TRUE);                  # debug mode
 define('APP_PATH','./Application/');        # apps dir, only one
 define('RUNTIME_PATH', '/tmp/tp-runtime');  # runtime dir, need writable
-define('BIND_CONTROLLER','控制器名称');     # 入口文件绑定默认访问控制器
-define('BIND_ACTION', '动作名称');          # 入口文件绑定默认访问动作
+define('BIND_CONTROLLER','控制器名称');      # 入口文件绑定默认访问控制器
+define('BIND_ACTION', '动作名称');           # 入口文件绑定默认访问动作
 require './ThinkPHP/ThinkPHP.php';
 ```
 
 配置文件`Application/Common/Conf/config.php`
 
 ```php
-'SHOW_PAGE_TRACE' => true,                  # 开启Trace调试工具
+'SHOW_PAGE_TRACE' => true,                  # 开启 Trace 调试工具
 'URL_CASE_INSENSITIVE' => true,             # 忽略大小写
 'DB_TYPE' => 'mysql',                       # mysql数据库类型
 'DB_HOST' => 'localhost',                   # 数据库 host
@@ -119,13 +119,13 @@ return  array(
 ```bash
 ThinkPHP/Conf/convention.php
 Application/Common/Conf/config.php
-Application/Common/Conf/config_应用模式名称.php      # 可选
+Application/Common/Conf/config_应用模式名称.php       # 可选
 ThinkPHP/Conf/debug.php                              # 可选
 Application/Common/Conf/debug.php                    # 可选
 Application/Common/Conf/dev.php                      # 状态配置，用于划分 生产 和 测试
-Application/当前模块名/Conf/config.php               # 模块配置
-Application/当前模块名/Conf/config_应用模式名称.php  # 可选
-Application/当前模块名/Conf/应用状态.php             # 可选
+Application/当前模块名/Conf/config.php                # 模块配置
+Application/当前模块名/Conf/config_应用模式名称.php    # 可选
+Application/当前模块名/Conf/应用状态.php               # 可选
 ```
 
 关于应用状态配置，需要与 `APP_STATUS` 常量配合使用，比如：
@@ -193,7 +193,7 @@ $ php index.php 模块/控制器/操作/[参数名/参数值...]
 
 ## CBD 模式
 
-```bash
+```php
 ./TinkPHP                                       # 框架系统
 ├── ThinkPHP.php                                # 框架入口文件
 ├── Common                                      # 核心公共函数
@@ -233,7 +233,7 @@ $ php index.php 模块/控制器/操作/[参数名/参数值...]
 
 ## 调试
 
-```bash
+```php
 dump( C() );                                        # 获取 ThinkPHP 中定义的所有配置
 dump( get_defined_constants(true)['user'] );        # 获取 ThinkPHP 中定义的所有常量
 ```

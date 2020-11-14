@@ -4,8 +4,8 @@
 
 ```php
 function more_args(){
-    $args=func_get_args();//将所有传递进来的参数封装成一个数组
-    echo $args[0];//输出第一个变量
+    $args=func_get_args(); // 将所有传递进来的参数封装成一个数组
+    echo $args[0];         // 输出第一个变量
 }
 ```
 
