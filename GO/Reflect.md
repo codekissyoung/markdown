@@ -29,17 +29,13 @@
 - 修改当前对象
 - 调用当前对象的方法
 
-### 元编程的能力
+#### 元编程的能力
 
 元编程：生成可执行代码的能力。
 
 实际编译时，只有 `接口.A方法()` 的二进制代码，但实际运行时，却可以根据对象当前上下文，同一段代码(编译前)会展开，能够准确的生成 `当前对象.A方法()` 这段代码，并执行。
 
 所以，我们才可以写出非常简洁的代码。
-
-![](https://img.codekissyoung.com/2020/11/05/84dbcf7ad1cf3a40a0ea6a48903a7571.png)
-
-### Go反射对象
 
 `reflect`中的所有方法基本都是围绕着 `reflect.Type` 和 `reflect.Value` 这两个类型设计的。
 
@@ -75,8 +71,6 @@ func TypeOf(i interface{}) Type { return Type }
 - 反射对象转换成接口类型 `i := rv.Interface()`
 
 - 再强转成原始类型 `i.(int)`
-
-![](img/9829786d987decc6c2fef09d83c00940.png)
 
 #### 3. 要修改反射对象，其值必须可设置
 
@@ -162,6 +156,8 @@ fmt.Println(x) // 4.1
 
 ### 4.1 字段
 
+结构中只有被导出字段才是可设置的.
+
 ```go
 type User struct {
     Age  int
@@ -171,6 +167,7 @@ type User struct {
 user := User{203, "link"}
 
 p := reflect.ValueOf(&user)
+
 t := p.Elem().Type() // 返回 类型对象
 v := p.Elem()        // 返回 值对象
 
@@ -316,7 +313,7 @@ fmt.Println(reflect.DeepEqual(s1, s2)) // true
 fmt.Println(reflect.DeepEqual(s2, s3)) // false
 ```
 
-## 11. 万能程序
+## 11. 赋值程序
 
 ```go
 type Employee struct {
@@ -374,3 +371,43 @@ func fillBySettings(s interface{}, m map[string]interface{}) error {
 ## 13. 实现原理
 
 https://draveness.me/golang/docs/part2-foundation/ch04-basic/golang-reflect/
+
+
+
+## 通用Print函数
+
+```go
+type Celsius float64
+
+func (c Celsius) String() string {
+	return strconv.FormatFloat(float64(c),'f', 1, 64) + " °C"
+}
+
+type Day int
+
+var dayName = []string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}
+
+func (day Day) String() string {
+	return dayName[day]
+}
+
+func print(args ...interface{}) {
+	for i, arg := range args {
+		if i > 0 {os.Stdout.WriteString(" ")}
+		switch a := arg.(type) { // type switch
+			case Stringer:	os.Stdout.WriteString(a.String())
+			case int:		os.Stdout.WriteString(strconv.Itoa(a))
+			case string:	os.Stdout.WriteString(a)
+			// more types
+			default:		os.Stdout.WriteString("???")
+		}
+	}
+}
+
+func main() {
+	print(Day(1), "was", Celsius(18.36))  // Tuesday was 18.4 °C
+}
+```
+
+
+

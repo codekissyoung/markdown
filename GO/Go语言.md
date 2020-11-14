@@ -74,57 +74,7 @@ p = &i              // p 指向 i
 fmt.Println( *p );  // 通过 p 访问 i
 ```
 
-#### `Defer` 对命名的函数返回值的影响：
 
-```go
-// f1() = 1
-func f1() (r int) {
-	defer func() {
-		r++
-	}()
-	return 0
-}
-
-// f2() = 5
-func f2() (r int) {
-	t := 5
-	defer func() {
-		t += 5
-	}()
-	return t
-}
-
-// f3() = 1
-func f3() (r int) {
-	defer func(r int) {
-		r = r + 5
-	}(r)
-	return 1
-}
-
-// f4() = 0
-func f4() int {
-	r := 0
-	defer func() {
-		r++
-	}()
-	return r
-}
-
-// f5() = 0
-func f5() int {
-	r := 0
-	defer func(i int) {
-		i++
-	}(r)
-	return 0
-}
-```
-
-总结下：
-
-- 闭包内部直接对闭包外部的数据是引用，如果想要拿副本，还需要通过入参的方式，拷贝进入里面，参考`f3()`
-- `defer`执行时机：`return`之后 -> `defer` -> 调用处拿到返回值。所以采用`f1() f2() f3()`等命名返回值写法，如果有 `defer`闭包，则有闭包里面修改到返回值的风险,参考`f1()`。当然这种风险可以避免，参考`f2()` `f3()`。
 
 ### 模拟枚举
 

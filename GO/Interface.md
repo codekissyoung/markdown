@@ -1,4 +1,85 @@
-# Interface
+# 接口
+
+接口提供了一种方式来 **说明** 对象的行为：如果谁能搞定这件事，它就可以用在这儿。接口定义了一组方法（方法集），但是这些方法不包含（实现）代码：它们没有被实现（它们是抽象的）。接口里也不能包含变量。
+
+不像大多数面向对象编程语言，在 Go 语言中接口可以有值，一个接口类型的变量或一个 **接口值** ：`var ai Namer`，`ai` 是一个多字（multiword）数据结构，它的值是 `nil`。它本质上是一个指针，虽然不完全是一回事。指向接口值的指针是非法的，它们不仅一点用也没有，还会导致代码错误。
+
+即使接口在类型之后才定义，二者处于不同的包中，被单独编译：只要类型实现了接口中的方法，它就实现了此接口。
+
+多态是面向对象编程中一个广为人知的概念：根据当前的类型选择正确的方法，或者说：同一种类型在不同的实例上似乎表现出不同的行为。
+
+
+
+## 类型断言
+
+一个接口类型的变量 `varI` 中可以包含任何类型的值，必须有一种方式来检测它的 **动态** 类型，即运行时在变量中存储的值的实际类型。在执行过程中动态类型可能会有所不同，但是它总是可以分配给接口变量本身的类型。通常我们可以使用 **类型断言** 来测试在某个时刻 `varI` 是否包含类型 `T` 的值。
+
+类型断言可能是无效的，虽然编译器会尽力检查转换是否有效，但是它不可能预见所有的可能性。如果转换在程序运行时失败会导致错误发生。更安全的方式是使用以下形式来进行类型断言：
+
+```go
+if v, ok := varI.(T); ok {  // checked type assertion
+    Process(v)
+    return
+}
+// varI is not of type T
+```
+
+**varI 必须是一个接口变量**，否则编译器会报错：`invalid type assertion: varI.(T) (non-interface type (type of varI) on left)` 。
+
+### Type Switch
+
+```go
+switch t := areaIntf.(type) {
+case *Square:
+	fmt.Printf("Type Square %T with value %v\n", t, t)
+case *Circle:
+	fmt.Printf("Type Circle %T with value %v\n", t, t)
+case nil:
+	fmt.Printf("nil value: nothing to check?\n")
+default:
+	fmt.Printf("Unexpected type %T\n", t)
+}
+```
+
+如果仅仅是测试变量的类型，不用它的值，那么就可以不需要赋值语句，比如：
+
+```go
+switch areaIntf.(type) {
+case *Square:
+	// TODO
+case *Circle:
+	// TODO
+...
+default:
+	// TODO
+}
+```
+
+## 测试一个值是否实现了某个接口
+
+假定 `v` 是一个值，然后我们想测试它是否实现了 `Stringer` 接口，可以这样做：
+
+```go
+type Stringer interface {
+    String() string
+}
+
+if sv, ok := v.(Stringer); ok {
+    fmt.Printf("v implements String(): %s\n", sv.String()) // note: sv, not v
+}
+```
+
+`Print` 函数就是如此检测类型是否可以打印自身的。
+
+接口是一种契约，实现类型必须满足它，它描述了类型的行为，规定类型可以做什么。接口彻底将类型能做什么，以及如何做分离开来，使得相同接口的变量在不同的时刻表现出不同的行为，这就是多态的本质。
+
+编写参数是接口变量的函数，这使得它们更具有一般性。
+
+**使用接口使代码更具有普适性。**
+
+标准库里到处都使用了这个原则，如果对接口概念没有良好的把握，是不可能理解它是如何构建的。
+
+
 
 ### reflect.TypeOf(a).Kind()
 
@@ -287,7 +368,9 @@ case string: // 现在 v 的类型是 string
 
 ```go
 type Stringer interface{
-    String() string
+    String() string显式地将 nil 赋值给接口时，接口的 type 和 data 都将为 nil。此时，接口与 nil 值判断是相等的。
+
+
 }
 
 func Println(args ...interface{}){
@@ -376,3 +459,40 @@ func getType(a interface{}) {
 }
 ```
 
+## 接口的继承
+
+当一个类型包含（内嵌）另一个类型（实现了一个或多个接口）的指针时，这个类型就可以使用（另一个类型）所有的接口方法。
+
+```go
+type Task struct {
+	Command string
+	*log.Logger
+}
+```
+
+这个类型的工厂方法像这样：
+
+```go
+func NewTask(command string, logger *log.Logger) *Task {
+	return &Task{command, logger}
+}
+```
+
+当 `log.Logger` 实现了 `Log()` 方法后，Task 的实例 task 就可以调用该方法：
+
+```go
+task.Log()
+```
+
+类型可以通过继承多个接口来提供像 `多重继承` 一样的特性：
+
+```go
+type ReaderWriter struct {
+	*io.Reader
+	*io.Writer
+}
+```
+
+上面概述的原理被应用于整个 Go 包，多态用得越多，代码就相对越少。这被认为是 Go 编程中的重要的最佳实践。
+
+有用的接口可以在开发的过程中被归纳出来。添加新接口非常容易，因为已有的类型不用变动（仅仅需要实现新接口的方法）。已有的函数可以扩展为使用接口类型的约束性参数：通常只有函数签名需要改变。对比基于类的 OO 类型的语言在这种情况下则需要适应整个类层次结构的变化。

@@ -8,8 +8,6 @@ mongo 101.200.144.41:10246 # 链接到远程的mongod服务器
 mongo --nodb               # 启动 mongo shell 而不连接到任何服务器
 
 > mongodb://[username:password@]host1[:port1],...[,hostN[:portN]]][/[database][?options]]
-
-# 示例
 > mongodb://admin:123456@localhost/  # 使用用户 admin 使用密码 123456 连接到本地的 MongoDB 服务
 > mongodb://admin:123456@localhost/test # 顺便指定了数据库
 > mongodb://example1.com:27017,example2.com:27017 # 连接 replica pair

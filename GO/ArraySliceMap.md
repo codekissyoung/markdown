@@ -116,7 +116,13 @@ m["Bell Labs"] = Vertex{ 40.68433, -74.39967 }
 m[key] = elem           // 新增 or 修改
 a = m[key]              // 获取
 b, ok = m[key]          // 如果 key 在 m 中，则 ok 为 true；否则 ok 为 false, b 为零值
-
+key is: 3 - value is: 3.000000
+2
+key is: 1 - value is: 1.000000
+3
+key is: 4 - value is: 4.000000
+4
+key is: 2 - value is: 2.000000
 fmt.Println( map[string]bool{"192.168.0.101":true} )  // 字面量 map[192.168.0.1:true]
 var ipSwitches = map[string]bool{}
 ipSwitchs["192.168.0.1"] = true
@@ -256,9 +262,60 @@ func main() {
 }
 ```
 
+map 也可以用函数作为自己的值，这样就可以用来做分支结构（详见第 5 章）：key 用来选择要执行的函数。
+
+key 可以是任意可以用 == 或者 != 操作符比较的类型，比如 string、int、float。所以数组、切片和结构体不能作为 key (译者注：含有数组切片的结构体不能作为 key，只包含内建类型的 struct 是可以作为 key 的），但是指针和接口类型可以。如果要用结构体作为 key 可以提供 `Key()` 和 `Hash()` 方法，这样可以通过结构体的域计算出唯一的数字或者字符串的 key。
+
+value 可以是任意类型的；通过使用空接口类型（详见第 11.9 节），我们可以存储任意值，但是使用这种类型作为值时需要先做一次类型断言（详见第 11.3 节）。
+
+```go
+func main() {
+	mf := map[int]func() int{
+		1: func() int { return 10 },
+		2: func() int { return 20 },
+		5: func() int { return 50 },
+	}
+	fmt.Println(mf) // map[1:0x10903be0 5:0x10903ba0 2:0x10903bc0]
+}
+```
 
 
 
+既然一个 key 只能对应一个 value，而 value 又是一个原始类型，那么如果一个 key 要对应多个值怎么办？例如，当我们要处理unix机器上的所有进程，以父进程（pid 为整形）作为 key，所有的子进程（以所有子进程的 pid 组成的切片）作为 value。通过将 value 定义为 `[]int` 类型或者其他类型的切片，就可以优雅的解决这个问题。
+
+```go
+mp1 := make(map[int][]int)
+mp2 := make(map[int]*[]int)
+```
+
+#### Map类型的切片
+
+假设我们想获取一个 map 类型的切片，我们必须使用两次 `make()` 函数，第一次分配切片，第二次分配 切片中每个 map 元素。
+
+```go
+// Version A:
+items := make([]map[int]int, 5)
+for i:= range items {
+    items[i] = make(map[int]int, 1)
+    items[i][1] = 2
+}
+fmt.Printf("Version A: Value of items: %v\n", items)
+// Version A: Value of items: [map[1:2] map[1:2] map[1:2] map[1:2] map[1:2]]
+
+// Version B: NOT GOOD!
+items2 := make([]map[int]int, 5)
+for _, item := range items2 {
+    item = make(map[int]int, 1) // item is only a copy of the slice element.
+    item[1] = 2 // This 'item' will be lost on the next iteration.
+}
+fmt.Printf("Version B: Value of items: %v\n", items2)
+// Version B: Value of items: [map[] map[] map[] map[] map[]]
+```
 
 
 
+#### map 默认是无序的
+
+不管是按照 key 还是按照 value 默认都不排序（详见第 8.3 节）。
+
+如果你想为 map 排序，需要将 key（或者 value）拷贝到一个切片，再对切片排序（使用 sort 包，详见第 7.6.6 节），然后可以使用切片的 for-range 方法打印出所有的 key 和 value。

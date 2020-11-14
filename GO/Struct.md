@@ -1,12 +1,21 @@
-# Go结构体
-
-
-
-## 查找与遮蔽
+# 结构体
 
 
 
 ## 字段
+
+1. 在一个结构体中对于每一种数据类型只能有一个匿名字段。
+
+1. 当两个字段拥有相同的名字（可能是继承来的名字）时该怎么办呢？
+
+   - 外层名字会覆盖内层名字，但是两者的内存空间都保留，这提供了一种重载字段或方法的方式；
+
+   - 如果相同的名字在同一级别出现了两次，如果这个名字被程序使用了，将会引发一个错误（不使用没关系）。没有办法来解决这种问题引起的二义性，必须由程序员自己修正。
+
+
+**并发访问对象**
+
+对象的字段（属性）不应该由 2 个或 2 个以上的不同线程在同一时间去改变。如果在程序发生这种情况，为了安全并发访问，可以使用包 `sync` 中的方法。
 
 ```go
 type attr struct { rm int 
@@ -27,13 +36,22 @@ type data struct {
 d.name = "data2"      // 这里的是 data 下的 name
 d.file.name = "file2" // 使用 类型名 + 字段名 访问 里面被遮蔽的字段
 ```
+## Tag
+
+一个附属于字段的字符串，可以是文档或其他的重要标记。标签的内容不可以在一般的编程中使用，只有包 `reflect` 能获取它。
+
+
+
 ## 方法
 
-方法是与`实例`绑定的`特殊函数`。
+方法是作用在接收者 Receiver 上的一个函数。
 
-普通函数专注于算法流程，传入参数，返回结果；方法是有关联对象的，有的方法的调用结果取决于当时`关联对象`的状态。
+- 任何类型都可以有方法，甚至可以是函数类型
 
-方法非常主要的一个作用是：维护和展示对象的状态。
+- 接收者不能是一个接口类型，因为接口是一个抽象定义，但是方法却是具体实现
+- 接收者不能是一个指针类型，但是它可以是任何其他允许类型的指针
+
+
 
 ### Recevier 是 T 或 *T
 
@@ -300,7 +318,7 @@ func RegisterEvent(name string, callback func(interface{})) {
 func CallEvent(name string, param interface{}) {
 	list := eventByName[name]
 	for _, callback := range list {
-		callback(param) // 签名相同就可以调用
+		callbacTagk(param) // 签名相同就可以调用
 	}
 }
 
@@ -321,3 +339,107 @@ func main() {
 	CallEvent("OnSkill", 100)             // 调用事件，所有注册的同名函数都会被调用
 }
 ```
+
+## 如何在类型中嵌入功能
+
+```go
+type Log struct {
+	msg string
+}
+func (l *Log) Add(s string) {
+	l.msg += "\n" + s
+}
+func (l *Log) String() string {
+	return l.msg
+}
+```
+
+
+
+### 通过组合
+
+```go
+type Customer struct {
+	Name string
+	log  *Log
+}
+func (c *Customer) Log() *Log {
+	return c.log
+}
+
+func main() {
+	c := &Customer{"Barak Obama", &Log{"1 - Yes we can!"}}
+	c.Log().Add("2 - After me the world will be a better place!")
+	fmt.Println(c.Log())
+}
+```
+
+### 通过嵌入
+
+```go
+type Customer struct {
+	Name string
+	Log
+}
+func (c *Customer) String() string {
+	return c.Name + "\nLog:\n" + c.Log.String()
+}
+
+func main() {
+	c := &Customer{"Barak Obama", Log{"1 - Yes we can!"}}
+	c.Add("2 - After me the world will be a better place!")
+	fmt.Println(c)
+}
+```
+
+## 多重继承
+
+多重继承指的是类型获得多个父类型行为的能力，它在传统的面向对象语言中通常是不被实现的（C++ 和 Python 例外）。因为在类继承层次中，多重继承会给编译器引入额外的复杂度。但是在 Go 语言中，通过在类型中嵌入所有必要的父类型，可以很简单的实现多重继承。
+
+作为一个例子，假设有一个类型 `CameraPhone`，通过它可以 `Call()`，也可以 `TakeAPicture()`，但是第一个方法属于类型 `Phone`，第二个方法属于类型 `Camera`。
+
+只要嵌入这两个类型就可以解决这个问题。
+
+
+
+## 和其他面向对象语言比较 Go 的类型和方法
+
+
+
+在如 C++、Java、C# 和 Ruby 这样的面向对象语言中，方法在类的上下文中被定义和继承：在一个对象上调用方法时，运行时会检测类以及它的超类中是否有此方法的定义，如果没有会导致异常发生。
+
+在 Go 语言中，这样的继承层次是完全没必要的：如果方法在此类型定义了，就可以调用它，和其他类型上是否存在这个方法没有关系。在这个意义上，Go 具有更大的灵活性。
+
+Go 不需要一个显式的类定义，如同 Java、C++、C# 等那样，相反地，“类”是通过提供一组作用于一个共同类型的方法集来隐式定义的。类型可以是结构体或者任何用户自定义类型。
+
+我们想定义自己的 `Integer` 类型，并添加一些类似转换成字符串的方法，在 Go 中可以如下定义：
+
+```go
+type Integer int
+func (i *Integer) String() string {
+    return strconv.Itoa(int(*i))
+}
+```
+
+在 Java 或 C# 中，这个方法需要和类 `Integer` 的定义放在一起，在 Ruby 中可以直接在基本类型 int 上定义这个方法。
+
+在 Go 中，类型就是类（数据和关联的方法）。Go 不知道类似面向对象语言的类继承的概念。继承有两个好处：代码复用和多态。
+
+在 Go 中，代码复用通过组合和委托实现，多态通过接口的使用来实现：有时这也叫 **组件编程（Component Programming）**。
+
+许多开发者说相比于类继承，Go 的接口提供了更强大、却更简单的多态行为。
+
+如果真的需要更多面向对象的能力，看一下 [`goop`](https://github.com/losalamos/goop) 包（Go Object-Oriented Programming），它由 Scott Pakin 编写: 它给 Go 提供了 JavaScript 风格的对象（基于原型的对象），并且支持多重继承和类型独立分派，通过它可以实现你喜欢的其他编程语言里的一些结构。
+
+## String方法的递归问题
+
+不要在 `String()` 方法里面调用涉及 `String()` 方法的方法，它会导致意料之外的错误，比如下面的例子，它导致了一个无限递归调用（`TT.String()` 调用 `fmt.Sprintf`，而 `fmt.Sprintf` 又会反过来调用 `TT.String()`...），很快就会导致内存溢出：
+
+```go
+type TT float64
+func (t TT) String() string {
+    return fmt.Sprintf("%v", t)
+}
+t.String()
+```
+
