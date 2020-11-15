@@ -1,6 +1,53 @@
-# Goroutine 并发
+# Goroutine 与 Channel
 
-### 示范 1 ：`main goroutin`同步阻塞等待 3 个 `goroutine` 结束：
+
+
+`Channel` 是用于发送类型化数据的管道，由其负责协程之间的通信，从而避开所有由共享内存导致的陷阱；这种通过通道进行通信的方式保证了同步性。数据在通道中进行传递：在任何给定时间，一个数据被设计为只有一个协程可以对其访问，所以不会发生数据竞争。数据的所有权（可以读写数据的能力）也因此被传递。
+
+`Channel` 的实质是类型化消息的队列：使数据得以传输。它是先进先出（FIFO）的结构所以可以保证发送给他们的元素的顺序。
+
+`Channel` 是第一类对象：可以存储在变量中，作为函数的参数传递，从函数返回以及通过通道发送它们自身。另外它们是类型化的，允许类型检查。
+
+```go
+ch := make(chan float64)　// 创建通道
+defer close(ch) 					　// 关闭通道
+
+ch <- int1   				// 流向通道（发送）
+int2 = <- ch 				// 从通道流出（接收）
+<- ch 									// 单独调用获取通道的（下一个）值，当前值会被丢弃
+if <- ch != 1000 { 	// 取出值，然后和 1000 比较
+}
+
+// 带判断通道是否关闭的循环读取
+for {
+    v, ok := <-ch
+    if !ok {
+        break
+    }
+    process(v)
+}
+
+// 使用 range 则会自动检测通道是否关闭 
+for input := range ch {
+  	process(input)
+}
+```
+
+只有在当需要告诉接收者不会再提供新的值的时候，才需要关闭通道。只有发送者需要关闭通道，接收者永远不会需要。
+
+
+
+## 无缓冲Channel
+
+Channel通信是同步且无缓冲的：在有接受者接收数据之前，发送不会结束。可以想象一个无缓冲的通道在没有空间来保存数据的时候：必须要一个接收者准备好接收通道的数据然后发送者可以直接把数据发送给接收者。所以通道的发送/接收操作在对方准备好之前是阻塞的：
+
+1）对于同一个通道，发送操作（协程或者函数中的），在接收者准备好之前是阻塞的：如果ch中的数据无人接收，就无法再给通道传入其他数据：新的输入无法在通道非空的情况下传入。所以发送操作会等待 ch 再次变为可用状态：就是通道值被接收时（可以传入变量）。
+
+2）对于同一个通道，接收操作是阻塞的（协程或函数中的），直到发送者可用：如果通道中没有数据，接收者就阻塞了。
+
+
+
+#### 示范 1 ：`main goroutin`同步阻塞等待 3 个 `goroutine` 结束：
 
 ```go
 func main() {
@@ -19,7 +66,9 @@ func doSomething(id int, wg *sync.WaitGroup) {
 }
 ```
 
-### 范例 2：专用于`Go`通道的`Select`：
+## Select
+
+`select`可以随机`收`，也可以随机`发`
 
 ```go
 func main() {
@@ -51,18 +100,7 @@ func intWorker(ch chan int) {
 
 
 
-`select`可以随机`收`，也可以随机`发`
-
-
-
 ```go
-package main
-
-import (
-	"sync"
-	"time"
-)
-
 func main() {
 	var wg sync.WaitGroup
 	a, b := make(chan int), make(chan int)
@@ -113,17 +151,11 @@ func main() {
 
 
 
-- 通过`break`可以跳出`select`
-- 设置为`nil`的管道，将永远堵塞，不会再参与`select`随机选取执行
+通过`break` `return` 可以跳出`select`
+
+设置为`nil`的管道，将永远堵塞，不会再参与`select`随机选取执行
 
 ```go
-package main
-
-import (
-	"sync"
-	"time"
-)
-
 func main() {
 	var wg sync.WaitGroup
 	a, b := make(chan int), make(chan int)
@@ -190,7 +222,7 @@ func main() {
 
 ```
 
-### 定时器与`Goroutine`:
+## 定时器
 
 ```go
 tick := time.Tick(3 * time.Second)
@@ -216,28 +248,28 @@ for {
 - 所有的`defer()`正常执行
 
 ```go
-	exit := make(chan struct{})
+exit := make(chan struct{})
 
-	go func() {
-		defer close(exit)
-		defer println("a")
+go func() {
+    defer close(exit)
+    defer println("a")
 
-		func() {
-			defer func() {
-				println("b", recover() == nil)
-			}()
+    func() {
+        defer func() {
+            println("b", recover() == nil)
+        }()
 
-			func() {
-				println("c")
-				runtime.Goexit()
-				println("c done.")
-			}()
-			println("b done. ")
-		}()
-		println("a done")
-	}()
+        func() {
+            println("c")
+            runtime.Goexit()
+            println("c done.")
+        }()
+        println("b done. ")
+    }()
+    println("a done")
+}()
 
-	<-exit
+<-exit
 ```
 
 
@@ -245,7 +277,6 @@ for {
 ## Feature 模式 并行执行
 
 ```go
-
 func main() {
 	// 下面两句 并行执行
 	retCh := AsyncService()
@@ -394,7 +425,6 @@ func main() {
 通过一个主持人`moderator`携程，可以优雅的退出所有使用到 dataChan 的协程，从而将Channel回收
 
 ```go
-
 func main() {
 	const (
 		MaxRandomNumber = 100000
@@ -470,4 +500,34 @@ func main() {
 	time.Sleep(1000 * time.Second)
 }
 ```
+
+#### 通道工厂模式
+
+不将通道作为参数传递给协程，而用函数来生成一个通道并返回（工厂角色）；函数内有个匿名函数被协程调用。
+
+```go
+func main() {
+	stream := pump()
+	go suck(stream)
+	time.Sleep(1e9)
+}
+
+func pump() chan int {
+	ch := make(chan int)
+	go func() {
+		for i := 0; ; i++ {
+			ch <- i
+		}
+	}()
+	return ch
+}
+
+func suck(ch chan int) {
+	for {
+		fmt.Println(<-ch)
+	}
+}
+```
+
+
 
