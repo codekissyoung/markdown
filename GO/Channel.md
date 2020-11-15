@@ -77,35 +77,7 @@ type scase struct {
 
 
 
-## range for channel
 
-```go
-// range channel 底层实现
-for {
-    value_temp, ok = <-range
-    if !ok{
-        break
-    }
-    value = value_temp
-}
-```
-
-- `range channel`时，没有数据，会发生阻塞
-
-## 将通道限定为单向的
-
-一般用这个限定通道方向来获得更严谨的逻辑，并且这个限定是不可逆的。
-
-```go 
-var wg sync.WaitGroup
-wg.Add(2)
-
-c := make(chan int)
-var send chan<- int = c // 限定为只写
-var recv <-chan int = c // 限定为只读
-
-close(send) 							 // 只能close发送端
-```
 
 
 

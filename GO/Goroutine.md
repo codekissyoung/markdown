@@ -1,10 +1,33 @@
 # Goroutine 与 Channel
 
+## Goroutine生命周期
 
+- 不会引发`pannic`
+- 所有的`defer()`正常执行
+
+```go
+exit := make(chan struct{})
+go func() {
+    defer close(exit)
+    func() {
+        defer func() {
+            println("b", recover() == nil)
+        }()
+        func() {
+            runtime.Goexit() // 主动退出
+        }()
+    }()
+}()
+<-exit
+```
+
+
+
+## Channel
 
 `Channel` 是用于发送类型化数据的管道，由其负责协程之间的通信，从而避开所有由共享内存导致的陷阱；这种通过通道进行通信的方式保证了同步性。数据在通道中进行传递：在任何给定时间，一个数据被设计为只有一个协程可以对其访问，所以不会发生数据竞争。数据的所有权（可以读写数据的能力）也因此被传递。
 
-`Channel` 的实质是类型化消息的队列：使数据得以传输。它是先进先出（FIFO）的结构所以可以保证发送给他们的元素的顺序。
+`Channel` 的实质是类型化消息的队列：使数据得以传输。它是 FIFO 结构所以可以保证发送给他们的元素的顺序。
 
 `Channel` 是第一类对象：可以存储在变量中，作为函数的参数传递，从函数返回以及通过通道发送它们自身。另外它们是类型化的，允许类型检查。
 
@@ -35,19 +58,26 @@ for input := range ch {
 
 只有在当需要告诉接收者不会再提供新的值的时候，才需要关闭通道。只有发送者需要关闭通道，接收者永远不会需要。
 
+### 将通道限定为单向的
 
+一般用这个限定通道方向来获得更严谨的逻辑，并且这个限定是不可逆的。
+
+```go 
+c := make(chan int)
+var send chan<- int = c // 限定为只写
+var recv <-chan int = c // 限定为只读
+
+close(send) 							 // 只能close发送端
+```
 
 ## 无缓冲Channel
 
-Channel通信是同步且无缓冲的：在有接受者接收数据之前，发送不会结束。可以想象一个无缓冲的通道在没有空间来保存数据的时候：必须要一个接收者准备好接收通道的数据然后发送者可以直接把数据发送给接收者。所以通道的发送/接收操作在对方准备好之前是阻塞的：
+一个无缓冲的通道在没有空间来保存数据的时候：必须要一个接收者准备好接收通道的数据然后发送者可以直接把数据发送给接收者。所以通道的发送/接收操作在对方准备好之前是阻塞的：
 
-1）对于同一个通道，发送操作（协程或者函数中的），在接收者准备好之前是阻塞的：如果ch中的数据无人接收，就无法再给通道传入其他数据：新的输入无法在通道非空的情况下传入。所以发送操作会等待 ch 再次变为可用状态：就是通道值被接收时（可以传入变量）。
-
-2）对于同一个通道，接收操作是阻塞的（协程或函数中的），直到发送者可用：如果通道中没有数据，接收者就阻塞了。
-
+1. 对于同一个通道，发送操作（协程或者函数中的），在接收者准备好之前是阻塞的：如果ch中的数据无人接收，就无法再给通道传入其他数据：新的输入无法在通道非空的情况下传入。所以发送操作会等待 ch 再次变为可用状态：就是通道值被接收时（可以传入变量）。
+1. 对于同一个通道，接收操作是阻塞的（协程或函数中的），直到发送者可用：如果通道中没有数据，接收者就阻塞了。
 
 
-#### 示范 1 ：`main goroutin`同步阻塞等待 3 个 `goroutine` 结束：
 
 ```go
 func main() {
@@ -68,165 +98,64 @@ func doSomething(id int, wg *sync.WaitGroup) {
 
 ## Select
 
-`select`可以随机`收`，也可以随机`发`
+`select`可以随机`收`，也可以随机`发`，在任何一个 case 中执行 `break` 或者 `return`，select 就结束了。
+
+`select` 做的就是：选择处理列出的多个通信情况中的一个。
+
+- 如果都阻塞了，会等待直到其中一个可以处理
+- 如果多个可以处理，随机选择一个
+- 如果没有通道操作可以处理并且写了 `default` 语句，它就会执行：`default` 永远是可运行的（这就是准备好了，可以执行）。
+> 设置为`nil`的管道，将永远堵塞，不会再参与`select`随机选取执行。
 
 ```go
-func main() {
-	chStr := make(chan string)
-	chInt := make(chan int)
-	go strWorker(chStr)
-	go intWorker(chInt)
-	for {
-		select {
-		case <-chStr:
-			fmt.Println("get value from strWorker")
-		case <-chInt:
-			fmt.Println("get value from intWorker")
-		}
-		fmt.Println("one worker catched")
-	}
-}
-func strWorker(ch chan string) {
-	for i := 0; i < 10; i++ {
-		time.Sleep(3 * time.Second)
-		ch <- "str" + strconv.Itoa(i)
-	}
-}
-func intWorker(ch chan int) {
-	time.Sleep(5 * time.Second)
-	ch <- 1
-}
+a, b := make(chan int), make(chan int)
+go func() {　// 接收端
+    for {
+        var name string
+        var x int
+        var ok bool
+        select { // 从准备好数据的通道中，随机选取一条进行读取
+            case x, ok = <-a:
+            name = "from a : "
+            
+            case x, ok = <-b:
+            name = "from b : "
+            if !ok {
+                b = nil
+										println("b closed")
+                break // 跳出这次select
+            }
+            
+            // defalt 的加入，可以使 select 避免陷入阻塞，但注意不要引起没必要的空转
+            default: 
+            println("default : no channel ready")
+            time.Sleep(time.Second / 5)
+        }
+        if !ok {
+            return
+        }
+        println(name, x)
+    }
+}()
+
+// 发送端
+go func() {
+    for i := 0; i < 10; i++ {
+        select { // 随机写入 a 或 b，每次selec只能写入一次
+            case a <- i:
+            time.Sleep(time.Second)
+            case b <- i * 10:
+            time.Sleep(time.Second)
+        }
+    }
+}()
 ```
 
-
-
-```go
-func main() {
-	var wg sync.WaitGroup
-	a, b := make(chan int), make(chan int)
-
-	// 接收端
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for {
-			var name string
-			var x int
-			var ok bool
-			// 只会从未阻塞的通道中，随机读取数据
-			select {
-			case x, ok = <-a:
-				name = "from a : "
-			case x, ok = <-b:
-				name = "from b : "
-			}
-			if !ok {
-				return // 只要有一个通道关闭，就退出
-			} else {
-				println(name, x)
-			}
-		}
-	}()
-
-	// 发送端
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		defer close(a)
-		defer close(b)
-		for i := 0; i < 10; i++ {
-			// 随机写入 a 或 b，每次selec只能写入一次
-			select {
-			case a <- i: // 写入 a
-				time.Sleep(time.Second)
-			case b <- i * 10: // 写入b
-			}
-			//time.Sleep(time.Second)
-		}
-	}()
-
-	wg.Wait()
-}
-```
-
-
-
-通过`break` `return` 可以跳出`select`
-
-设置为`nil`的管道，将永远堵塞，不会再参与`select`随机选取执行
+## 超时器与间时器
 
 ```go
-func main() {
-	var wg sync.WaitGroup
-	a, b := make(chan int), make(chan int)
-
-	// 接收端
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var x int
-		var ok bool
-		for {
-			// 只会从未阻塞的通道中，随机读取数据
-			select {
-			case x, ok = <-a:
-				if !ok {
-					a = nil
-					println("a closed")
-					break // 跳出这次select
-				}
-				println("from a : ", x)
-			case x, ok = <-b:
-				if !ok {
-					b = nil
-					println("b closed")
-					break
-				}
-				println("from b : ", x)
-    default: // defalt 的加入，可以使 select 避免陷入阻塞，但注意不要引起没必要的空转
-				println("default : no channel ready")
-				time.Sleep(time.Second / 5)
-			}
-
-			if a == nil && b == nil {
-				println("all closed")
-				break
-			}
-		}
-	}()
-
-	// 发送端 a
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		defer close(a)
-		for i := 0; i < 10; i++ {
-			a <- i
-			time.Sleep(time.Second / 3)
-		}
-	}()
-
-	// 发送端 b
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		defer close(b)
-		for i := 10; i < 20; i++ {
-			b <- i
-			time.Sleep(time.Second / 2)
-		}
-	}()
-
-	wg.Wait()
-}
-
-```
-
-## 定时器
-
-```go
-tick := time.Tick(3 * time.Second)
-boom := time.After(10 * time.Second)
+tick := time.Tick(3 * time.Second) // 每隔 3s，向通道中发送数据
+boom := time.After(10 * time.Second) // 在10s后，向通道中发送数据
 for {
     select {
     case <-tick:
@@ -241,126 +170,27 @@ for {
 }
 ```
 
-### runtime.Goexit()退出协程
-
-- 立即中止当前`goroutine`
-- 不会引发`pannic`
-- 所有的`defer()`正常执行
+取消耗时很长的同步调用
 
 ```go
-exit := make(chan struct{})
-
-go func() {
-    defer close(exit)
-    defer println("a")
-
-    func() {
-        defer func() {
-            println("b", recover() == nil)
-        }()
-
-        func() {
-            println("c")
-            runtime.Goexit()
-            println("c done.")
-        }()
-        println("b done. ")
-    }()
-    println("a done")
-}()
-
-<-exit
+ch := make(chan error, 1) // 缓冲大小设置为 1 是必要的，可以避免协程死锁以及确保超时的通道可以被垃圾回收
+go func() { ch <- client.Call("Service.Method", args, &reply) } ()
+select {
+case resp := <-ch
+    // use resp and reply
+case <-time.After(timeoutNs):
+    // call timed out
+    break
+}
 ```
 
 
 
-## Feature 模式 并行执行
 
-```go
-func main() {
-	// 下面两句 并行执行
-	retCh := AsyncService()
-	otherTask()
 
-	// 等待 第一句的结果
-	fmt.Println(<-retCh)
-	time.Sleep(time.Second)
-}
 
-// 50 ms 执行完的一个Service
-func service() string {
-	time.Sleep(time.Millisecond * 50)
-	return "Done"
-}
 
-// 100ms 执行完的一个 Task
-func otherTask() {
-	fmt.Println("otherTask start")
-	time.Sleep(time.Millisecond * 100)
-	fmt.Println("otherTask done.")
-}
-
-// 使用协程将它包装成一个异步操作
-func AsyncService() chan string {
-	retCh := make(chan string, 1) // 思考下，有 buffer 和 无buffer 的区别 ?
-	fmt.Println("Async Service Goroutine Start")
-	go func() {
-		fmt.Println("service start.")
-		ret := service()
-		retCh <- ret // 如果是无 buffer ,则主调函数未取数据之前，回阻塞在此
-		fmt.Println("service end.")
-	}()
-	return retCh
-}
-```
-
-### 带有超时机制的并行调用
-
-```go
-func main() {
-	// 下面两句 并行执行
-	retCh := AsyncService()
-	otherTask()
-
-	// 等待 第一句的结果，并且有超时机制
-	select {
-	case ret := <-retCh:
-		fmt.Println("get from retCh : ", ret)
-	case <-time.After(time.Millisecond * 200): // 200 ms 超时
-		fmt.Println("time out")
-	}
-
-	time.Sleep(time.Second)
-}
-
-// 50 ms 执行完的一个Service
-func service() string {
-	time.Sleep(time.Millisecond * 100) // 修改这里，改变服务运行时间，验证超时
-	return "Done"
-}
-
-// 100ms 执行完的一个 Task
-func otherTask() {
-	fmt.Println("otherTask start")
-	time.Sleep(time.Millisecond * 100)
-	fmt.Println("otherTask done.")
-}
-
-// 使用协程将它包装成一个异步操作
-func AsyncService() chan string {
-	retCh := make(chan string) // 思考下，有 buffer 和 无buffer 的区别 ?
-	fmt.Println("Async Service Goroutine Start")
-	go func() {
-		fmt.Println("service start.")
-		ret := service()
-		retCh <- ret // 如果是无 buffer ,则主调函数未取数据之前，回阻塞在此
-		fmt.Println("service end.")
-	}()
-	return retCh
-}
-```
-
-### 优雅的关闭Channel
+## 优雅的关闭Channel
 
 **The Channel Closing Principle**
 
@@ -373,13 +203,13 @@ func AsyncService() chan string {
 - 永远不会发生向一个已经关闭的channel发送值(会导致panic)
 - 关闭一个已经关闭的channel(会导致panic)
 
-> Golang甚至禁止关闭 receive-only 类型的channel
+- Golang甚至禁止关闭 receive-only 类型的channel
 
-#### 情况1: 一个 sender 多个 receiver 
+#### 一发多收
 
 这种情况下，直接在 sender 处，关闭就好
 
-#### 情况2：多个 sender 一个 receiver
+#### 多发一收
 
 ```go
 func main() {
@@ -420,7 +250,7 @@ func main() {
 }
 ```
 
-#### 情况3：多个 sender 多个 receiver
+#### 多发多收
 
 通过一个主持人`moderator`携程，可以优雅的退出所有使用到 dataChan 的协程，从而将Channel回收
 
@@ -501,7 +331,7 @@ func main() {
 }
 ```
 
-#### 通道工厂模式
+## 通道工厂模式
 
 不将通道作为参数传递给协程，而用函数来生成一个通道并返回（工厂角色）；函数内有个匿名函数被协程调用。
 
@@ -529,5 +359,38 @@ func suck(ch chan int) {
 }
 ```
 
+## Feature 模式
+
+```go
+func main() {
+    retCh := AsyncService() // 下面两句 并行执行
+    otherTask()
+    
+    select { // 等待 第一句的结果，并且有超时机制
+        case ret := <-retCh:
+        fmt.Println("get from retCh : ", ret)
+        case <-time.After(time.Millisecond * 200): // 200 ms 超时
+        fmt.Println("time out")
+    }
+}
+
+func service() string {
+	time.Sleep(time.Millisecond * 50) // 50 ms 执行完的一个Service
+	return "Done"
+}
+
+func AsyncService() chan string { // 使用协程将它包装成一个异步操作
+	retCh := make(chan string, 1) // 思考下，有 buffer 和 无buffer 的区别 ?
+	go func() {
+		ret := service()
+		retCh <- ret // 如果是无 buffer ,则主调函数未取数据之前，回阻塞在此
+	}()
+	return retCh
+}
+
+func otherTask() {
+	time.Sleep(time.Millisecond * 100) // 100ms 执行完的一个 Task
+}
+```
 
 
