@@ -23,6 +23,27 @@ go func() {
 
 
 
+停掉了服务器内部一个失败的协程而不影响其他协程的工作。因为加入了恢复模式，函数 `do`（以及它调用的任何东西）可以通过调用 `panic` 来摆脱不好的情况。但是恢复是在 `panicking` 的协程内部的：不能被另外一个协程恢复。
+
+```go
+func server(workChan <-chan *Work) {
+    for work := range workChan {
+        go safelyDo(work)   // start the goroutine for that work
+    }
+}
+
+func safelyDo(work *Work) {
+    defer func() {
+        if err := recover(); err != nil {
+            log.Printf("Work failed with %s in %v", err, work)
+        }
+    }()
+    do(work)
+}
+```
+
+
+
 ## Channel
 
 `Channel` 是用于发送类型化数据的管道，由其负责协程之间的通信，从而避开所有由共享内存导致的陷阱；这种通过通道进行通信的方式保证了同步性。数据在通道中进行传递：在任何给定时间，一个数据被设计为只有一个协程可以对其访问，所以不会发生数据竞争。数据的所有权（可以读写数据的能力）也因此被传递。
@@ -170,7 +191,7 @@ for {
 }
 ```
 
-取消耗时很长的同步调用
+#### 取消耗时很长的同步调用
 
 ```go
 ch := make(chan error, 1) // 缓冲大小设置为 1 是必要的，可以避免协程死锁以及确保超时的通道可以被垃圾回收
@@ -184,7 +205,22 @@ case <-time.After(timeoutNs):
 }
 ```
 
+#### 并行请求每一个数据库并返回收到的第一个响应
 
+```go
+func Query(conns []Conn, query string) Result {
+    ch := make(chan Result, 1) // 必须是带缓冲的：以保证第一个发送进来的数据有地方可以存放
+    for _, conn := range conns {
+        go func(c Conn) {
+            select {
+            case ch <- c.DoQuery(query):
+            default:
+            }
+        }(conn)
+    }
+    return <- ch
+}
+```
 
 
 
@@ -393,4 +429,65 @@ func otherTask() {
 }
 ```
 
+## 使用锁还是通道？
+
+对于任何可以建模为 Master-Worker 范例的问题，一个类似于 worker 使用通道进行通信和交互、Master进行整体协调的方案都能完美解决。如果系统部署在多台机器上，各个机器上执行 Worker 协程，Master 和 Worker 之间使用 netchan 或者 RPC 进行通信。
+
+使用锁的情景：
+
+- 访问共享数据结构中的缓存信息
+- 保存应用程序上下文和状态信息数据
+
+使用通道的情景：
+
+- 与异步操作的结果进行交互
+- 分发任务
+- 传递数据所有权
+
+当你发现你的锁使用规则变得很复杂时，可以反省使用通道会不会使问题变得简单些。
+
+## 惰性求值器
+
+```go
+type Any interface{}
+type EvalFunc func(Any) (Any, Any)
+
+func main() {
+    evenFunc := func(state Any) (Any, Any) {
+        os := state.(int)
+        ns := os + 2
+        return os, ns
+    }
+    
+    even := BuildLazyIntEvaluator(evenFunc, 0)
+    
+    for i := 0; i < 10; i++ {
+        fmt.Printf("%vth even: %v\n", i, even())
+    }
+}
+
+func BuildLazyEvaluator(evalFunc EvalFunc, initState Any) func() Any {
+    retValChan := make(chan Any)
+    loopFunc := func() {
+        var actState Any = initState
+        var retVal Any
+        for {
+            retVal, actState = evalFunc(actState)
+            retValChan <- retVal
+        }
+    }
+    retFunc := func() Any {
+        return <- retValChan
+    }
+    go loopFunc()
+    return retFunc
+}
+
+func BuildLazyIntEvaluator(evalFunc EvalFunc, initState Any) func() int {
+    ef := BuildLazyEvaluator(evalFunc, initState)
+    return func() int {
+        return ef().(int)
+    }
+}
+```
 
