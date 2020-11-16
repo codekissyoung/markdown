@@ -57,19 +57,16 @@ $a = null;
 try {
     $a = 5 / 0;
     echo $a, PHP_EOL;
-}catch (\exception $e){
+}catch (\throwable $e){
     $e -> getMessage();
     $a = -1;
 }
 echo $a;
 ```
 
-![](https://img.codekissyoung.com/2020/03/03/15627246c3364a4165751a3ce65c384f.png)
-![](https://img.codekissyoung.com/2020/03/03/c29b8cb38251dba707b52f6d42bd5471.png)
-
 正确的异常使用方式:
 
-```bash
+```php
 class emailException extends exception { }
 class pwdException extends exception{
     function __toString(){

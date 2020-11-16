@@ -1,8 +1,8 @@
 # SSH 远程登录
 
-关于`SSH`远程登录服务器的所有相关知识。
+[SSH原理与运用（一）：远程登录](http://www.ruanyifeng.com/blog/2011/12/ssh_remote_login.html)
 
-
+[SSH原理与运用（二）：远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html)
 
 `SSH`整个过程是这样的：
 
