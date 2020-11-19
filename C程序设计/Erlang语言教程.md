@@ -2,27 +2,29 @@
 
 面向消息、面向并发的语言`Erlang`!!!
 
-## 安装与部署
+## 1. 安装与部署
 
 ```bash
 $ sudo apt-get install erlang
 ```
 
-我们通过`erl shell`交互式命令行来学习`Erlang`语言。
-
-## 变量与数据类型
+## 2. 变量与数据类型
 
 ```bash
 $ erl                       # 进入 erl shell
-Eshell V9.2  (abort with ^G)
 1> q().                     # 退出 erl shell
-ok
 2> help().                  # 展示 erl shell 中所有可以调用的命令
 ```
 
-大写字母开头的单词是变量名：`Name` `X` `Age`
+#### 变量
 
-```erl
+大写字母开头的单词是变量 (Name X Age)
+
+在命令式的语言(C Go JAVA)里，变量名其实是伪装起来的内存地址，`X = 12`　表达的将该内存地址处的值修改为 `12`.
+
+而在 Erlang 中，`X = 12` 表示 X 本身就是 12，两者绑定在一起了，不可更改。
+
+```erlang
 1> Name.                            % unbond variable
 * 1: variable 'Name' is unbound
 1> Name = "Link".                   % bind "Link" to Name
@@ -31,22 +33,22 @@ ok
 ** exception error: no match of right hand side value "codekissyoung"
 ```
 
-`Erlang`变量最重要的一个概念就是一旦绑定到某个值后，它就不可以再重新绑定到其他值。
+#### 原子值
 
-另外一种非常地道的理解思路是，将`=`作为一种相等匹配模式：假如要使`=`两边的东西相等，那么`Erlang`要做啥操作呢？答案是：让 `Name` 的实际内容存储为`Link`。
+而小写字母开头（`name` `friend`）作为原子值
 
-而小写字母开头（`name` `friend`）作为原子值，所谓原子值就是没有具体含义，只需要知道这个值，而不关心它具体是啥。类似于 C 语言中的`#define age 10`中的`age`。
+所谓原子值就是没有具体含义，只需要知道这个值，而不关心它具体是啥。类似于 C 语言中的`#define age 10`中的`age`。
 
-```erl
+```erlang
 2> name.                            % atom variable
 name
 ```
 
 #### 元组
 
-`Erlang`提供了元组，用来组合多个值。并且提供了一种相等匹配模式，用来非常方便的取出元组里的值。
+元组用来组合多个值。并且提供了一种相等匹配模式，用来非常方便的取出元组里的值。
 
-```erl
+```erlang
 14> P = {10, 45}.                                          % P表示一个点
 {10,45}
 15> Person = {person, {name, "codekissyoung"}, {age, 24}}. % Person 表示一个人
@@ -59,9 +61,9 @@ name
 {{person,{name,"codekissyoung"},{age,24}},{10,45}}
 ```
 
-如何从元组定位取值呢?假如是 OOP 系列语言的话，可能有`PersonLocation[2].name`这样的方法，但是`Erlang`是完全不一样的，它用的是相等匹配。
+如何从元组定位取值呢? 通过匹配
 
-```erl
+```erlang
 32> PersonLocation.                                 % 先查看下 PersonLocation 的值
 {{person,{name,"codekissyoung"},{age,24}},{10,45}}
 33> {{_,{_,Name},_},_} = PersonLocation.            % 写匹配等式
@@ -72,13 +74,13 @@ name
 
 `_`是占位符，用来接收不需要的值。我们再来复述一遍相等匹配模式：假如要使`=`两边的东西相等，那么`Erlang`要做啥操作呢？答案是：让 `Name` 的实际内容存储为`codekissyoung`。
 
-### 列表
+#### 列表
 
 如果想要表示一个可以增长的组合呢?
 
-`Erlang`还提供了列表，用来容纳多个值，并且提供了一种相等匹配模式`[H|T]`（`H`表示列表的第一个，`T`表示剩下的），用来非常方便的存入和取出操作。
+列表用来容纳多个值，并且提供了一种相等匹配模式`[H|T]`（`H`表示列表的第一个，`T`表示剩下的），用来非常方便的存入和取出操作。
 
-```erl
+```erlang
 22> ThingsToBuy = [{apple, 10}, {pear, 6}, {milk, 3}].    % 声明列表
 42> [Buy|ThingsLeft] = ThingsToBuy.                       % 通过 [H|T] 模式匹配取数据
 [{apple,10},{pear,6},{milk,3}]
@@ -92,11 +94,11 @@ name
 [{orange,4},{apple,10},{pear,6},{milk,3}]
 ```
 
-### 字符串
+#### 字符串
 
 `Erlang`字符串本质为`Unicode`数字列表。
 
-```erl
+```erlang
 48> [83,117,114,112,114,105,115,101].
 "Surprise"
 51> "中国汉语".
@@ -107,7 +109,7 @@ name
 
 `Erlang`的函数可以顺序/并行执行，而模块则是包含了多个函数，是组织代码的基本单元。
 
-```erl
+```erlang
 % geometry.erl
 -module(geometry).                      % 声明本文件是 geometry 模块
 -export([test/0, area/1]).              % 导出 test area 函数，0 1 是参数数目
@@ -128,7 +130,7 @@ test() ->
 
 代码的编译和执行过程：
 
-```erl
+```erlang
 $ erl                                   % 进入 erlang shell
 1> c(geometry).                         % 编译
 {ok,geometry}
@@ -143,7 +145,7 @@ tests_passed
 
 如果要加上求圆形面积，只需要增加：
 
-```erl
+```erlang
 % 实现3 求圆形面积
 area({circle, Radius})
     -> 3.14159 * Radius * Radius;
@@ -159,7 +161,7 @@ area({circle, Radius})
 
 再来看一个例子，体会下参数的变化
 
-```erl
+```erlang
 -module(shop).
 -export([cost/1, total/1]).
 
@@ -175,7 +177,7 @@ total( [] ) -> 0.
 
 运行结果如下，应该很容易就能看懂，不用解释了：
 
-```erl
+```erlang
 $ erl
 1> c(shop).
 {ok,shop}
@@ -189,7 +191,7 @@ $ erl
 
 通过下面的`fun`直观的来感受下高阶函数：
 
-```erl
+```erlang
 4> Double = fun(X) -> 2 * X end.
 #Fun<erl_eval.6.99386804>
 5> Double(2).
@@ -211,7 +213,7 @@ $ erl
 
 再来看两个接收高阶函数的作为参数的常用函数`lists:map()`与`lists:filter()`：
 
-```erl
+```erlang
 1> L = [1,2,3,4].
 [1,2,3,4]
 3> L2 = lists:map(fun(X) -> 2*X end, L).
@@ -227,7 +229,7 @@ $ erl
 
 再来看一下将高阶函数作为返回值的例子：
 
-```erl
+```erlang
 8> Fruit = [apple, pear, orange].
 [apple,pear,orange]
 9> MakeTest = fun(L) -> (fun(X) -> lists:member(X, L) end) end.
@@ -242,7 +244,7 @@ false
 
 然后我们通过高阶函数来改造下`shop`例子：
 
-```erl
+```erlang
 -module(shop).
 -export([cost/1, total/1]).
 
@@ -262,7 +264,7 @@ total( L ) ->
     sum( map( fun({What,N}) -> shop:cost(What) * N end, L ) ).
 ```
 
-```erl
+```erlang
 6> shop:total([{oranges,6},{newspaper, 1},{milk, 2}]).
 52
 ```
@@ -271,13 +273,13 @@ total( L ) ->
 
 格式：
 
-```erl
+```erlang
 [ X || Qualifier1, Qualifier2 ... ]
 ```
 
 `X` 可以是任意的表达式，而后面的`Qualifier`可以是生成器 或 过滤器。同样的功能，使用列表推导比使用 map 的高阶函数版本更简洁。
 
-```erl
+```erlang
 7> L = [1,2,3,4,5,6,7].
 [1,2,3,4,5,6,7]
 8> L2 = [ X * X || X <- L ].             % 生成器
@@ -290,21 +292,21 @@ total( L ) ->
 
 使用列表推导表达式改写的`total`版本：
 
-```erl
+```erlang
 total( L ) ->
     sum( [shop:cost(A) * B || {A, B} <- L] ).
 ```
 
 再来介绍一种连接列表的语法`++`：
 
-```erl
+```erlang
 12> [1,2,3] ++ [7,9] ++ [23,45].
 [1,2,3,7,9,23,45]
 ```
 
 使用列表生成器和`++`语法写成的快速排序：
 
-```erl
+```erlang
 qsort( [ MidValue | T ] ) ->
     qsort( [X || X <- T, X < MidValue])
     ++ [MidValue] ++
@@ -319,7 +321,7 @@ qsort( [] ) -> [].
 
 勾股定理，算出`N`以内符合勾股定理的数：
 
-```erl
+```erlang
 pythag(N) ->
     [ {A,B,C} ||
         A <- lists:seq(1,N),
@@ -329,7 +331,7 @@ pythag(N) ->
         A * A + B * B =:= C * C ].
 ```
 
-```erl
+```erlang
 9> shop:pythag(16).
 [{3,4,5},{4,3,5}]
 10> shop:pythag(30).
@@ -338,12 +340,12 @@ pythag(N) ->
 
 所有字母的排列组合：
 
-```erl
+```erlang
 perms( [] ) -> [[]];
 perms( L )  -> [ [H|T] || H <- L, T <- perms( L -- [H]) ].
 ```
 
-```erl
+```erlang
 5> shop:perms("cats").
 ["cats","cast","ctas","ctsa","csat","csta","acts","acst",
  "atcs","atsc","asct","astc","tcas","tcsa","tacs","tasc",
@@ -352,7 +354,7 @@ perms( L )  -> [ [H|T] || H <- L, T <- perms( L -- [H]) ].
 
 #### 关卡
 
-```erl
+```erlang
 max(X, Y) when X > Y -> X;      % 关卡结构，如果匹配这句，就直接返回
 max(X, Y) -> Y.
 
