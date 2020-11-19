@@ -497,17 +497,17 @@ find . -name '*.sh'  -exec cp {} copy.sh \;  # 将查询到的所有文件都拷
 #### 压缩/解压
 
 ```bash
-bzip2 -k cky              # 压缩cky文件为.bz2文件，-k 保留源文件
-bunzip2 cky.bz2           # 解压文件
+bzip2 -k cky              	# 压缩cky文件为.bz2文件，-k 保留源文件
+bunzip2 cky.bz2           	# 解压文件
 
-gzip cky                  # 压缩cky文件为.gz文件
-gzip -d cky.gz            # 解压文件
+gzip cky                  	# 压缩cky文件为.gz文件
+gzip -d cky.gz            	# 解压文件
 
-zip -r src.zip src/       # 递归压缩 src/ 目录下的文件 为 src.zip
-unzip src.zip             # 解压
+zip -r src.zip ./src       	# 递归压缩 src/ 目录下的文件 为 src.zip
+unzip src.zip             	# 解压
 
-tar -zcvf cky.tar.gz cky  # 归档压缩
-tar -zxvf cky.tar.gz      # 解压到当前目录
+tar -zcvf cky.tar.gz ./cky  # 归档压缩
+tar -zxvf cky.tar.gz      	# 解压到当前目录
 ```
 
 ## 其他命令
