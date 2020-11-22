@@ -16,7 +16,7 @@ $ erl                       # 进入 erl shell
 2> help().                  # 展示 erl shell 中所有可以调用的命令
 ```
 
-#### 变量
+### 变量
 
 大写字母开头的单词是变量 (Name X Age)
 
@@ -33,7 +33,7 @@ $ erl                       # 进入 erl shell
 ** exception error: no match of right hand side value "codekissyoung"
 ```
 
-#### 原子值
+### 原子值 atom
 
 而小写字母开头（`name` `friend`）作为原子值
 
@@ -44,7 +44,7 @@ $ erl                       # 进入 erl shell
 name
 ```
 
-#### 元组
+### 元组 tuple
 
 元组用来组合多个值。并且提供了一种相等匹配模式，用来非常方便的取出元组里的值。
 
@@ -74,7 +74,7 @@ name
 
 `_`是占位符，用来接收不需要的值。我们再来复述一遍相等匹配模式：假如要使`=`两边的东西相等，那么`Erlang`要做啥操作呢？答案是：让 `Name` 的实际内容存储为`codekissyoung`。
 
-#### 列表
+### 列表 list
 
 如果想要表示一个可以增长的组合呢?
 
@@ -94,7 +94,7 @@ name
 [{orange,4},{apple,10},{pear,6},{milk,3}]
 ```
 
-#### 字符串
+### 字符串 string
 
 `Erlang`字符串本质为`Unicode`数字列表。
 
@@ -104,6 +104,66 @@ name
 51> "中国汉语".
 [20013,22269,27721,35821]
 ```
+
+
+
+### Record
+
+```erlang
+% records.hrl
+-record(todo, {status=reminder,who=joe,text}). % 定义 名为 todo 的 record 类型
+
+% 在函数 records 的模式匹配
+clear_status(#todo{status = S, who = W} = R) ->
+  R#todo{text="Finished",status=finished}.
+
+% 匹配某个类型的 records
+do_something(X) when is_record(X, todo) ->
+  X#todo{status = finished}.
+```
+
+```erlang
+3> rr("records.hrl").  % 载入头文件
+[todo]
+
+4> #todo{}. % 实例化一个 todo
+#todo{status = reminder,who = joe,text = undefined}
+
+5> X = #todo{status=urgent, text="Fix errata in book"}. % 实例化一个 todo 绑定到 X
+#todo{status = urgent,who = joe,text = "Fix errata in book"}
+
+7> X2 = X#todo{status=done, who=joe, text="gone with Wind"}. % 修改 X 后，绑定到 X2
+#todo{status = done,who = joe,text = "gone with Wind"}
+
+8> #todo{who=W, text=Txt} = X2. % 模式匹配
+#todo{status = done,who = joe,text = "gone with Wind"}
+9> W.
+joe
+10> Txt.
+"gone with Wind"
+
+11> X2#todo.text. % 直接访问 record 里字段的值
+"gone with Wind"
+12> X2#todo.who. 
+```
+
+### Map
+
+```erlang
+1> F1 = #{ a => 1, b => 2 }. # 创建一个 Map 绑定到 F1
+#{a => 1,b => 2}
+
+2> Facts = #{ {wife,fred} => "Sue", {age, fred} => 45 }. % 键值可以是任何 Erlang 类型
+#{{age,fred} => 45,{wife,fred} => "Sue"}
+
+3> F2 = F1#{ c => xx }. # 新增键后，绑定到 F2
+#{a => 1,b => 2,c => xx}
+
+4> F3 = F2#{ c := ok }. # 修改键后，绑定到 F3
+#{a => 1,b => 2,c => ok}
+```
+
+
 
 ## 模块与函数
 
@@ -187,7 +247,7 @@ $ erl
 69
 ```
 
-### 高阶函数
+### 高阶函数 fun
 
 通过下面的`fun`直观的来感受下高阶函数：
 
@@ -214,32 +274,38 @@ $ erl
 再来看两个接收高阶函数的作为参数的常用函数`lists:map()`与`lists:filter()`：
 
 ```erlang
-1> L = [1,2,3,4].
-[1,2,3,4]
-3> L2 = lists:map(fun(X) -> 2*X end, L).
-[2,4,6,8]
+# lists:map(F, L) L 函数
+6> L = [1,2,3,4,5,6].
+[1,2,3,4,5,6]
+7> lists:map(fun(X) -> 2 * X end, L).
+[2,4,6,8,10,12]
 
-5> Even = fun(X) -> (X rem 2) =:= 0 end.
-#Fun<erl_eval.6.99386804>
-6> lists:filter(Even, [1,2,3,4,5,6,7,8]).
-[2,4,6,8]
-7> lists:map(Even, [1,2,3,4,5,6,7,8]).
+# lists:filter(F, L) L 函数
+8> Even = fun(X) -> (X rem 2) =:= 0 end.
+#Fun<erl_eval.7.126501267>
+10> lists:map(Even, [1,2,3,4,5,6,7,8]).
 [false,true,false,true,false,true,false,true]
+11> lists:filter(Even, [1,2,3,4,5,6,7,8]).
+[2,4,6,8]
 ```
 
 再来看一下将高阶函数作为返回值的例子：
 
 ```erlang
-8> Fruit = [apple, pear, orange].
+# 返回 Fun 类型
+# lists:member(X, L) Bool  X 是否在 L 内
+12> Fruit = [apple,pear,orange].
 [apple,pear,orange]
-9> MakeTest = fun(L) -> (fun(X) -> lists:member(X, L) end) end.
-#Fun<erl_eval.6.99386804>
-10> IsFruit = MakeTest(Fruit).
-#Fun<erl_eval.6.99386804>
-11> IsFruit(pear).
-true
-12> IsFruit(dog).
+13> MakeTest = fun(L) -> (fun(X) -> lists:member(X, L) end ) end.
+#Fun<erl_eval.7.126501267>
+14> IsFruit = MakeTest(Fruit).
+#Fun<erl_eval.7.126501267>
+15> IsFruit(dog).  
 false
+16> IsFruit(apple).
+true
+17> lists:filter(IsFruit, [dog,orange,cat,apple,bear]).
+[orange,apple]
 ```
 
 然后我们通过高阶函数来改造下`shop`例子：
@@ -269,17 +335,64 @@ total( L ) ->
 52
 ```
 
-#### 列表推导
+
+
+### 自定义控制抽象
+
+Erlang 没有 If Switch for while 语句，但是使用模式匹配和高阶函数，却可以创造自己的＂控制抽象＂，一则可以根据实际问题创建出精确的控制结构，二来不受语言自带的少量固定控制结构的束缚．
+
+```erlang
+-module(lib).
+-export([for/3]).
+
+for(Max, Max, F) -> % 这句一定要在前面，是终止条件
+  [ F(Max) ];
+for(I, Max, F) ->
+  [ F(I) | for(I+1, Max, F) ].
+
+%% 20> c("lib.erl").
+%% {ok,lib}
+%% 21> lib:for(1, 10, fun(X) -> X end).
+%% [1,2,3,4,5,6,7,8,9,10]
+%% 22> lib:for(1, 10, fun(X) -> X * 2 end).
+%% [2,4,6,8,10,12,14,16,18,20]
+```
+
+### 可重入解析代码 reentrant parsing code
+### 解析组合器 parser combinator
+### 惰性求值器 lazy evaluator
+
+### 列表推导 list comprehension
 
 格式：
 
 ```erlang
-[ X || Qualifier1, Qualifier2 ... ]
+[ X || 生成器, 过滤器, 位串] % || 左边是想要的结果，|| 右边的表达式执行顺序是 从左到右
 ```
 
 `X` 可以是任意的表达式，而后面的`Qualifier`可以是生成器 或 过滤器。同样的功能，使用列表推导比使用 map 的高阶函数版本更简洁。
 
 ```erlang
+# 使用高阶函数
+1> L = [1,2,3,4,5].
+[1,2,3,4,5]
+2> lists:map(fun(X) -> 2 * X end, L).
+[2,4,6,8,10]
+
+# 等价的列表推导
+4> [ 2 * X || X <- L ]. %  X <- L 是生成器表达式
+[2,4,6,8,10]
+
+5> Buy = [{oranges,4},{newspaper,1},{apples,10},{pears,5}].
+[{oranges,4},{newspaper,1},{apples,10},{pears,5}]
+
+6> [{Name, 2 * Number} || {Name, Number} <- Buy].
+[{oranges,8},{newspaper,2},{apples,20},{pears,10}]
+
+# 生成表达式也起到了过滤器作用
+7> [X || {a, X} <- [{a,1}, {b,2}, {c,3}, {a, 4}, hello, "link"] ].
+[1,4]
+
 7> L = [1,2,3,4,5,6,7].
 [1,2,3,4,5,6,7]
 8> L2 = [ X * X || X <- L ].             % 生成器
@@ -307,14 +420,15 @@ total( L ) ->
 使用列表生成器和`++`语法写成的快速排序：
 
 ```erlang
-qsort( [ MidValue | T ] ) ->
-    qsort( [X || X <- T, X < MidValue])
-    ++ [MidValue] ++
-    qsort( [X || X <- T, X >= MidValue]);
-qsort( [] ) -> [].
+% 快速排序　生成表达式 + 过滤表达式
+qsort([]) -> [];
+qsort([Piv | T]) ->
+  qsort([ X || X <-T, X < Piv])
+  ++ [Piv] ++
+  qsort([ X || X <-T, X >= Piv]).
 ```
 
-```erl
+```erlang
 2> shop:qsort([8,7,5,2,1,45,23,45,90]).
 [1,2,5,7,8,23,45,45,90]
 ```
@@ -364,13 +478,21 @@ moreThan6(X, Y)
     -> Y.
 ```
 
-#### case 表达式
+### case Expr
 
-#### if 表达式
+```erlang
+% case 表达式实现 filter
+filter(F, [H|T] ) ->
+  case F(H) of
+    true -> [H|filter(F,T)];
+    false -> filter(F,T)
+  end;
+filter(F,[]) -> [].
+```
 
-## 记录与映射组
+### if Expr
 
-记录`record`就是关联数组，映射组就是`HashMap`。
+
 
 ## 错误处理
 
