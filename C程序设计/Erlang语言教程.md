@@ -6,6 +6,9 @@
 
 ```bash
 $ sudo apt-get install erlang
+$ erlc hello.erl
+$ erl -noshell -s hello start -s init stop
+Hello world
 ```
 
 ## 2. 变量与数据类型
@@ -13,7 +16,9 @@ $ sudo apt-get install erlang
 ```bash
 $ erl                       # 进入 erl shell
 1> q().                     # 退出 erl shell
-2> help().                  # 展示 erl shell 中所有可以调用的命令
+2> b() 					   # 打印当前变量绑定
+2> f() 				       # 删除所有当前变量绑定,　f(X) 删除指定变量绑定
+3> help().                  # 展示 erl shell 中所有可以调用的命令
 ```
 
 ### 变量
@@ -33,15 +38,113 @@ $ erl                       # 进入 erl shell
 ** exception error: no match of right hand side value "codekissyoung"
 ```
 
+### 整数
+
+```erlang
+格式 : Base#Value
+-234      % 十进制 -234
+2#1010    % 二进制表示的  10
+-16#EA    % 十六进制表示的 -234
+$a $A $\n % ASCII 字符表示的整数 97 65 10
+```
+
+算术运算符：
+
+```erlang
++	增加了两个操作数				1 + 2　  将给出3
+−	从第一个减去第二个操作数		　1 - 2　  将给-1
+*	两个操作数的乘法				2 * 2　  将给4
+/	由分母划分的分子				2/2      会给1
+rem	将第一个数除以第二个数的余数		3 rem 2　将给出1
+div　将执行除法并返回整数组件　　	　　3 div 2　将给出1
+```
+
+关系运算符：
+
+```erlang
+==	测试两个对象之间的相等性		   2 = 2  将给出真实
+=:= 精确等于 会比较类型
+/=	测试两个对象之间的差异			    3 /= 2 将给出真实
+=/= 精确不等于
+<	检查左对象是否小于右操作数。		  2 <  3 将给出真实
+=<	检查左对象是否小于或等于右操作数。	2 =< 3 将给出真实
+>	检查左对象是否大于右操作数。		  3 >  2 将给出真实
+>=	检查左对象是否大于或等于右操作数。	3> = 2 将给出真实
+```
+
+逻辑运算符
+
+```erlang
+and andalso 等价于 && 
+or orelse 等价 ||  
+xor 异或 
+not 非
+```
+
+位运算符
+
+```erlang
+band   	binary and
+bor 	binary or
+bxor 	binary xor
+bnot 	binary not 按位否定运算符
+```
+
 ### 原子值 atom
 
-而小写字母开头（`name` `friend`）作为原子值
+而小写字母开头（`name` `friend`）后可接　`字母`　`数字` `@` `.` `_` 作为原子值
 
-所谓原子值就是没有具体含义，只需要知道这个值，而不关心它具体是啥。类似于 C 语言中的`#define age 10`中的`age`。
+所谓原子值就是没有具体含义，只需要知道这个值，而不关心它具体是啥。类似于 C 语言中的`#define age 10`中的`age`。最大作用在于标识 匹配 和 比较．
 
 ```erlang
 2> name.                            % atom variable
 name
+
+```
+
+### Boolean
+
+两个保留的原子值　`true` `false` 被当作布尔值使用
+
+```erlang
+4> {1,2} < {1,3}.
+true
+5> {1,2} == {2,3}.
+false
+6> {1,2} /= {2, 3}.
+true
+7> 
+```
+
+### Bit String 位串
+
+```erlang
+4> <<5,10,20>>.
+<<5,10,20>>
+5> <<65,66,67>>.
+<<"ABC">>
+6> <<"hello">>. 
+<<"hello">>
+
+% list_to_binary(L) -> B
+7> Bin1 = <<1,2,3>>.
+<<1,2,3>>
+8> Bin2 = <<4,5>>.
+<<4,5>>
+9> Bin3 = <<6>>.
+<<6>>
+10> list_to_binary([ Bin1, 1, [2, 3, Bin2], 4 | Bin3 ]).
+<<1,2,3,1,2,3,4,5,4,6>>
+
+% term_to_binary(Term) -> Bin  把任何数据类型转换成一个二进制类型
+% binary_to_term(Bin) -> Term
+11> B = term_to_binary( {binaries, "are", useful } ).
+<<131,104,3,100,0,8,98,105,110,97,114,105,101,115,107,0,3,
+  97,114,101,100,0,6,117,115,101,102,117,108>>
+12> X = binary_to_term(B).
+{binaries,"are",useful}
+13> X.
+{binaries,"are",useful}
 ```
 
 ### 元组 tuple
@@ -59,6 +162,10 @@ name
 {person,{name,"codekissyoung"},{age,24}}
 18> PersonLocation = {Person, P}.                          % 组合 Person 与 P 成为 PersonLocation
 {{person,{name,"codekissyoung"},{age,24}},{10,45}}
+1> tuple_size({abc, {def, 123}, ghi}). 
+3
+2> element(2, {abc, {def, 123}, ghi}). % 索引从 1 开始
+{def,123}
 ```
 
 如何从元组定位取值呢? 通过匹配
@@ -150,6 +257,11 @@ joe
 ### Map
 
 ```erlang
+#{Key1 Op Val1, Key2 Op Val2 ... }
+% Op 可以是 => 新增 和 := 修改 
+```
+
+```erlang
 1> F1 = #{ a => 1, b => 2 }. # 创建一个 Map 绑定到 F1
 #{a => 1,b => 2}
 
@@ -163,9 +275,14 @@ joe
 #{a => 1,b => 2,c => ok}
 ```
 
+#### 操作map的内置函数
+
+#### 与json的互转
 
 
-## 模块与函数
+
+
+## 3. 模块与函数
 
 `Erlang`的函数可以顺序/并行执行，而模块则是包含了多个函数，是组织代码的基本单元。
 
@@ -492,16 +609,49 @@ filter(F,[]) -> [].
 
 ### if Expr
 
+## 4. 错误处理
 
+```erlang
+% f(X) 里面可能抛出错误
+case f(X) of
+	{ok, Val} -> do_some_thing_with(Val);
+	{error, Why} -> fix_this_error(Val)
+end.
 
-## 错误处理
+try my_func(X)
+    catch
+		throw:{thisError, X} -> ...
+		throw:{someOtherError, X} -> ...
+	end
 
-![](https://img.codekissyoung.com/2020/04/02/c83f5f4263e95c387759164ce81ff739.png)
-
-## 命令行
-
-```bash
-$ erlc hello.erl
-$ erl -noshell -s hello start -s init stop
-Hello world
+my_func(X) -> 
+    case ... of
+		... -> ... throw({thisError, ...})
+		... -> ... throw({someOtherError, ...})
 ```
+
+捕捉所有的错误：
+
+```erlang
+try Expr
+    catch 
+		_:_ -> ...处理所有异常错误的代码...
+	end
+try Expr
+    catch 
+    _ -> ...处理所有异常错误的代码...
+	end
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

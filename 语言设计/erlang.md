@@ -26,6 +26,42 @@ X1 = X + 1
 
 Erlang 里一切都是表达式，而表达式最终都会产生一个值。
 
+
+
+### 声明性语言
+
+声明性质的语言原则是：描述应该计算什么，而不是去解释这个值是如何计算出来的．
+
+使用＂模式匹配＂从不同的情况中去选择要执行的函数：
+
+```erlang
+% 传一个元组进来，匹配上了，就执行计算面积的代码
+area({rectangle,Width,Height}) -> Width * Height;
+area({circle,Radius})-> 3.14159 * Radius * Radius;
+area({square,Side}) -> Side * Side.
+```
+
+从复杂的数据结构中抽取数据时：
+
+```erlang
+-define(IP_VERSION, 4).
+-define(IP_MIN_HDR_LEN, 5). 
+DgramSize = size(Dgram), 
+case Dgram of  
+    <<?IP_VERSION:4, HLen:4, SrvcType:8, TotLen:16,  
+      ID:16, Flgs:3, FragOff:13, 
+      TTL:8, Proto:8, HdrChkSum:16, 
+      SrcIP:32, 
+      DestIP:32, RestDgram/binary>> when HLen>=5, 4*HLen=<DgramSize -> 
+        OptsLen = 4*(HLen - ?IP_MIN_HDR_LEN), 
+        <<Opts:OptsLen/binary,Data/binary>> = RestDgram, 
+end.
+```
+
+
+
+
+
 ### 关卡
 
 关卡是对模式匹配的一种补充．

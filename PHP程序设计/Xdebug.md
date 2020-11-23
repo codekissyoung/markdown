@@ -22,8 +22,6 @@ echo php_ini_loaded_file();   # 查看加载的 php.ini 位置
 echo php_ini_scanned_files();
 ```
 
-
-
 ## PHPStorm Xdebug 远程调试
 
 #### 1. Server 的 Xdebug 配置
