@@ -643,6 +643,38 @@ try Expr
 	end
 ```
 
+## 5. 并发
+
+发送数据
+
+```erlang
+Pid ! {a, 12} % 向 Pid 发送消息 {a, 12} 
+
+foo(12) ! area({square, 5}) % foo(12) 必须返回一个 Pid , area(...) 将表达式计算出的值，发送给 Pid
+```
+
+接收数据
+
+```erlang
+receive
+	Msg1 -> ....;   % 匹配模式一一验证
+	Msg2 -> ...;
+	...
+end
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
