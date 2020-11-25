@@ -6,7 +6,7 @@
 
 ```bash
 $ sudo apt-get install erlang
-$ erlc hello.erl
+$ erlc -d hello.erl 
 $ erl -noshell -s hello start -s init stop
 Hello world
 ```
@@ -14,18 +14,19 @@ Hello world
 ## 2. 变量与数据类型
 
 ```bash
-$ erl                       # 进入 erl shell
-1> q().                     # 退出 erl shell
-2> b() 					   # 打印当前变量绑定
-2> f() 				       # 删除所有当前变量绑定,　f(X) 删除指定变量绑定
-3> help().                  # 展示 erl shell 中所有可以调用的命令
+$ erl # 进入 erl shell
+> q(). # 退出 erl shell
+> b(). # 打印当前变量绑定
+> f(). # 删除所有当前变量绑定,　f(X) 删除指定变量绑定
+> cd("目录"). # 进入目录, erlang shell 可以查找到,当前目录下的 *.beam 里的函数,直接调用它们
+> c("xxx.erl", [debug_info]). # 编译
+> help(). # 展示 erl shell 中所有可以调用的命令
+> xxmodule:module_info().  # 打印该模块所有信息，module_info("xxx") 打印指定属性
 ```
 
 ### 变量
 
-大写字母开头的单词是变量 (Name X Age)
-
-在命令式的语言(C Go JAVA)里，变量名其实是伪装起来的内存地址，`X = 12`　表达的将该内存地址处的值修改为 `12`.
+大写字母开头的单词是变量 (Name X Age),在命令式的语言(C Go JAVA)里，变量名其实是伪装起来的内存地址，`X = 12`　表达的将该内存地址处的值修改为 `12`.
 
 而在 Erlang 中，`X = 12` 表示 X 本身就是 12，两者绑定在一起了，不可更改。
 
@@ -99,7 +100,6 @@ bnot 	binary not 按位否定运算符
 ```erlang
 2> name.                            % atom variable
 name
-
 ```
 
 ### Boolean
@@ -143,9 +143,45 @@ true
   97,114,101,100,0,6,117,115,101,102,117,108>>
 12> X = binary_to_term(B).
 {binaries,"are",useful}
-13> X.
-{binaries,"are",useful}
 ```
+
+#### 位语法
+
+```erlang
+12> Pixels = <<213,35,23,64,78,12,34,12,234>>.
+<<213,35,23,64,78,12,34,12,234>>
+
+% 数字表示匹配的 bit 数
+14> <<Pix1:24,Pix2:24,Pix:24>> = Pixels.
+<<213,35,23,64,78,12,34,12,234>>
+
+17> <<R:8,G:8,B:8>> = <<Pix1:24>>.
+<<213,35,23>>
+
+18> R.
+213
+
+% /binary 匹配剩下的所有 bit
+21> <<R:8, Rest/binary>> = Pixels.
+<<213,35,23,64,78,12,34,12,234>>
+
+23> Rest.
+<<35,23,64,78,12,34,12,234>>
+
+% 二进制推导式
+24> << <<X>> || <<X>> <= <<1,2,3,4,5>> , X rem 2 == 0 >>.
+<<2,4>>
+
+% 二进制 到 列表
+26> RGB = [ {R, G, B} || << R:8, G:8, B:8>> <= Pixels ].
+[{213,35,23},{64,78,12},{34,12,234}]
+
+% 列表 到 二进制
+27> << <<R:8, G:8, B:8>> || {R,G,B} <- RGB >>.
+<<213,35,23,64,78,12,34,12,234>>
+```
+
+
 
 ### 元组 tuple
 
@@ -281,19 +317,26 @@ joe
 
 
 
-
 ## 3. 模块与函数
+
+```erlang
+% 函数格式: Body 必须是一个或者多个用 , 分割的 Erlang 表达式, 最后一个表达式的值作为返回值
+Name(Args) -> Body.
+```
 
 `Erlang`的函数可以顺序/并行执行，而模块则是包含了多个函数，是组织代码的基本单元。
 
 ```erlang
 -module(geometry).                      % 声明本文件是 geometry 模块
+-define(PI, 3.14159). % 定义宏
+-define(sub(X,Y), X - Y).
 -export([test/0, area/1]).              % 导出 test area 函数，0 1 是参数数目
 
 % 实现1 求正方形面积
 area({rectangle, Width, Height})
     -> Width * Height;
-% 实现2 求圆形面积
+area({circle, Radius})
+    -> 3.14159 * Radius * Radius;
 area({square, Side})
     -> Side * Side.
 % 测试用例
@@ -318,19 +361,9 @@ tests_passed
 5>
 ```
 
-如果要加上求圆形面积，只需要增加：
-
-```erlang
-% 实现3 求圆形面积
-area({circle, Radius})
-    -> 3.14159 * Radius * Radius;
-```
-
-如果用 C 或 JAVA 实现同样的功能代码，可以对比下代码行数，以及表达意图的清晰程度。`Erlang` 很明显地只包含了表达意图的必要的代码，而把所有罗嗦的语法全部去掉了。
-
 再来解释下标点符号的使用：
 
-- `,` 用于分隔开函数调用、数据构造、和模式中的参数、表达式
+- `,` 用于分隔开函数调用参数、数据构造、和模式中的参数、表达式
 - `;` 用于分隔函数子句
 - `.` 是句号，分隔函数整体
 
@@ -476,13 +509,9 @@ for(I, Max, F) ->
 
 #### 列表推导 list comprehension
 
-格式：
-
 ```erlang
-[ X || 生成器, 过滤器, 位串] % || 左边是想要的结果，|| 右边的表达式执行顺序是 从左到右
+[ Expression || Generator ... , filter ... ] % || 左边是想要的结果，|| 右边的表达式执行顺序是 从左到右
 ```
-
-`X` 可以是任意的表达式，而后面的`Qualifier`可以是生成器 或 过滤器。同样的功能，使用列表推导比使用 map 的高阶函数版本更简洁。
 
 ```erlang
 # 使用高阶函数
@@ -495,31 +524,26 @@ for(I, Max, F) ->
 4> [ 2 * X || X <- L ]. %  X <- L 是生成器表达式
 [2,4,6,8,10]
 
+% 使用列表推导表达式改写的 total 版本
+total( L ) ->
+    sum( [shop:cost(A) * B || {A, B} <- L] ).
+
 5> Buy = [{oranges,4},{newspaper,1},{apples,10},{pears,5}].
 [{oranges,4},{newspaper,1},{apples,10},{pears,5}]
 
 6> [{Name, 2 * Number} || {Name, Number} <- Buy].
 [{oranges,8},{newspaper,2},{apples,20},{pears,10}]
 
-# 生成表达式也起到了过滤器作用
+10> L3 = [ X * X || X <- [1,2,3,4,5,6,7], X > 3 ].     % 生成器, 过滤器
+[16,25,36,49]
+
+% 生成表达式也起到了过滤器作用
 7> [X || {a, X} <- [{a,1}, {b,2}, {c,3}, {a, 4}, hello, "link"] ].
 [1,4]
 
-7> L = [1,2,3,4,5,6,7].
-[1,2,3,4,5,6,7]
-8> L2 = [ X * X || X <- L ].             % 生成器
-[1,4,9,16,25,36,49]
-10> L3 = [ X * X || X <- L, X > 3 ].     % 生成器, 过滤器
-[16,25,36,49]
-1> [ X || {a, X} <- [{a,1}, {b,2}, {a,4}, "hello", atom] ]. % 过滤器
-[1,4]
-```
-
-使用列表推导表达式改写的`total`版本：
-
-```erlang
-total( L ) ->
-    sum( [shop:cost(A) * B || {A, B} <- L] ).
+% 多个Generator, 注意是全排列
+11> [X + Y || X <- [1,2], Y <- [3,4]].
+[4,5,5,6]
 ```
 
 再来介绍一种连接列表的语法`++`：
@@ -578,19 +602,45 @@ perms( L )  -> [ [H|T] || H <- L, T <- perms( L -- [H]) ].
  "tsca","tsac","scat","scta","sact","satc","stca","stac"]
 ```
 
-#### 保护式
+### 保护式/卫式/关卡
 
 ```erlang
-max(X, Y) when X > Y -> X;      % 关卡结构，如果匹配这句，就直接返回
+max(X, Y) when X > Y -> X; % 如果匹配这句，就直接返回
 max(X, Y) -> Y.
 
-moreThan6(X, Y)
-    when is_integer(X), X > Y, Y < 6 -> X; % 等价于 if( is_int(X) && X > Y && Y < 6 ) return X
-moreThan6(X, Y)
-    -> Y.
+% , 等价 andalso ; 等价 orelse
+% if( is_int(X) && X > Y && Y < 6 ) return X
+moreThan6(X, Y) when is_integer(X), X > Y, Y < 6 -> X; 
+moreThan6(X, Y) -> Y.
 ```
 
-### case Expr
+### if Expr
+
+if 的表现与 "函数+卫式" 的构造一样：
+
+```erlang
+% 使用 if 改写 cost
+%%2> shop:cost2(orange).
+%%5
+%%3> shop:cost2(milk).
+%%7
+%%4> shop:cost2(aaaa).
+%%unkown
+%%5>
+cost2(X) ->
+  if
+    X == orange -> 5;
+    X == newspaper -> 8;
+    X == apples -> 2;
+    X == pears -> 9;
+    X == milk -> 7;
+    true -> unkown
+  end.
+```
+
+### case of Expr
+
+case of 的表达式就像是整个函数头，可以对函数的每个参数使用复杂的匹配模式，以及卫式
 
 ```erlang
 % case 表达式实现 filter
@@ -600,9 +650,17 @@ filter(F, [H|T] ) ->
     false -> filter(F,T)
   end;
 filter(F,[]) -> [].
+
+% 根据温度决定去不去海滩玩耍
+beach(Temprature) ->
+  case Temprature of
+    {celsius, N } when N >= 20, N =< 45 -> 'favorable';
+    {kelvin, N} when N >= 293, N =< 318 -> 'favorable';
+    _ -> 'avoid beach'
+  end.
 ```
 
-### if Expr
+
 
 ## 4. 错误处理
 
@@ -659,6 +717,13 @@ end
 ```
 
 
+
+## BIF
+
+```erlang
+1> element(2, {a,b,c}).
+b
+```
 
 
 
