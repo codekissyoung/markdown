@@ -698,7 +698,30 @@ try Expr
 
 ## 5. 并发
 
-发送数据
+### 5.1 产生新进程
+
+```erlang
+16> F = fun() -> io:format("new process~n") end.              
+#Fun<erl_eval.21.126501267>
+17> spawn(F). % 产生一个新进程
+new process
+<0.126.0>
+
+13> G = fun(X) -> timer:sleep(10), io:format("~p~n", [X]) end.
+#Fun<erl_eval.7.126501267>
+
+% 产生多个新进程，并且通过闭包，传递的值 X 
+15> [spawn(fun() -> G(X) end) || X <- lists:seq(1,10)]. 
+[<0.114.0>,<0.115.0>,<0.116.0>,<0.117.0>,<0.118.0>,
+ <0.119.0>,<0.120.0>,<0.121.0>,<0.122.0>,<0.123.0>]
+1   
+2 ...
+
+% 运行一个模块里的函数作为进程
+spawn(模块名，函数名，参数list).
+```
+
+### 5.2 发送数据
 
 ```erlang
 Pid ! {a, 12} % 向 Pid 发送消息 {a, 12} 
@@ -706,14 +729,56 @@ Pid ! {a, 12} % 向 Pid 发送消息 {a, 12}
 foo(12) ! area({square, 5}) % foo(12) 必须返回一个 Pid , area(...) 将表达式计算出的值，发送给 Pid
 ```
 
-接收数据
+```erlang
+6> self() ! hello. % 向 erlang shell 发送数据
+hello
+7> self() ! world. 
+world
+8> self() ! "how are you". 
+"how are you"
+9> flush(). % 由于 erlang shell 一直没有接收（暂时存在进程邮箱里），可以通过　flush 将它们冲刷出来
+Shell got hello
+Shell got world
+Shell got "how are you"
+ok
+```
+
+### 5.3 接收数据
 
 ```erlang
 receive
-	Msg1 -> ....;   % 匹配模式一一验证
-	Msg2 -> ...;
+	Pattern1 when Guard1 -> Expr1;   % 匹配模式一一验证
 	...
 end
+```
+
+海豚例子：
+
+```erlang
+dolphin() ->
+  receive
+    {From, do_a_flip} ->
+      From ! "Nice to meet you, give me fish ~",
+      dolphin();
+    {From, fish} ->
+      From ! "thanks"; % 没有递归了，进程或直接退出
+    _ ->
+      io:format("do nothing ~n"),
+      dolphin()
+  end.
+```
+
+```erlang
+1> c("concurence.erl").
+{ok,concurence}
+2> D1 = spawn(concurence, dolphin, []).
+<0.85.0>
+3> D1 ! {self(),fish}.
+{<0.78.0>,fish}
+4> flush()>
+4> flush().
+Shell got "thanks"
+false
 ```
 
 
