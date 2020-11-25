@@ -781,6 +781,46 @@ Shell got "thanks"
 false
 ```
 
+保存状态：
+
+```erlang
+fridge(FoodList) ->
+  receive
+    {From, {store, Food}} ->
+      From ! {self(), ok},
+      fridge([Food|FoodList]);
+    {From, {take, Food}} ->
+      case lists:member(Food, FoodList) of
+        true ->
+          From ! {self(), {ok, Food}},
+          fridge(lists:delete(Food, FoodList));
+        false ->
+          From ! {self(), {ok, not_found}},
+          fridge(FoodList)
+      end;
+    terminate -> ok
+  end.
+```
+
+```erlang
+1> Pid = spawn(concurence, fridge, [[baking_soda]]).
+<0.62.0>
+2> Pid ! {self(), {store, milk}}.
+{<0.60.0>,{store,milk}}
+3> flush().
+Shell got {<0.62.0>,ok}
+4> Pid ! {self(), {store, bacon}}.
+{<0.60.0>,{store,bacon}}
+5> Pid ! {self(), {take, bacon}}.
+{<0.60.0>,{take,bacon}}
+6> Pid ! {self(), {take, turkey}}.
+{<0.60.0>,{take,turkey}}
+7> flush().
+Shell got {<0.62.0>,ok}
+Shell got {<0.62.0>,{ok,bacon}}
+Shell got {<0.62.0>,{ok,not_found}}
+```
+
 
 
 ## BIF
