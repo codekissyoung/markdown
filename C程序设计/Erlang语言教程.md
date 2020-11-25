@@ -287,7 +287,6 @@ joe
 `Erlang`的函数可以顺序/并行执行，而模块则是包含了多个函数，是组织代码的基本单元。
 
 ```erlang
-% geometry.erl
 -module(geometry).                      % 声明本文件是 geometry 模块
 -export([test/0, area/1]).              % 导出 test area 函数，0 1 是参数数目
 
@@ -297,7 +296,6 @@ area({rectangle, Width, Height})
 % 实现2 求圆形面积
 area({square, Side})
     -> Side * Side.
-
 % 测试用例
 test() ->
     12 = area({rectangle, 3, 4}),       % 用例1
@@ -332,9 +330,9 @@ area({circle, Radius})
 
 再来解释下标点符号的使用：
 
-- `,` 用于分隔开函数调用、数据构造、和模式中的参数
-- `;` 用于分隔子句
-- `.` 是句号，分隔函数整体，以及 erl shell 里的表达式
+- `,` 用于分隔开函数调用、数据构造、和模式中的参数、表达式
+- `;` 用于分隔函数子句
+- `.` 是句号，分隔函数整体
 
 再来看一个例子，体会下参数的变化
 
@@ -352,19 +350,16 @@ total( [{What,N}|T] ) -> shop:cost(What) * N + total(T);
 total( [] ) -> 0.
 ```
 
-运行结果如下，应该很容易就能看懂，不用解释了：
+运行结果如下:
 
 ```erlang
-$ erl
-1> c(shop).
-{ok,shop}
 2> BuyList = [{oranges,4}, {newspaper,1}, {milk,3}, {apples, 10}].
 [{oranges,4},{newspaper,1},{milk,3},{apples,10}]
 4> shop:total(BuyList).
 69
 ```
 
-### 高阶函数 fun
+#### 高阶函数 fun
 
 通过下面的`fun`直观的来感受下高阶函数：
 
@@ -454,7 +449,7 @@ total( L ) ->
 
 
 
-### 自定义控制抽象
+#### 自定义控制抽象
 
 Erlang 没有 If Switch for while 语句，但是使用模式匹配和高阶函数，却可以创造自己的＂控制抽象＂，一则可以根据实际问题创建出精确的控制结构，二来不受语言自带的少量固定控制结构的束缚．
 
@@ -475,11 +470,11 @@ for(I, Max, F) ->
 %% [2,4,6,8,10,12,14,16,18,20]
 ```
 
-### 可重入解析代码 reentrant parsing code
-### 解析组合器 parser combinator
-### 惰性求值器 lazy evaluator
+#### 可重入解析代码 reentrant parsing code
+#### 解析组合器 parser combinator
+#### 惰性求值器 lazy evaluator
 
-### 列表推导 list comprehension
+#### 列表推导 list comprehension
 
 格式：
 
@@ -583,7 +578,7 @@ perms( L )  -> [ [H|T] || H <- L, T <- perms( L -- [H]) ].
  "tsca","tsac","scat","scta","sact","satc","stca","stac"]
 ```
 
-#### 关卡
+#### 保护式
 
 ```erlang
 max(X, Y) when X > Y -> X;      % 关卡结构，如果匹配这句，就直接返回
