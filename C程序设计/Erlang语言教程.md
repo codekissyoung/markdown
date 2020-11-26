@@ -5,8 +5,10 @@
 ## 1. 安装与部署
 
 ```bash
-$ sudo apt-get install erlang
-$ erlc -d hello.erl 
+# 去下面这个网址下载最新的安装包　各大系统都有
+https://www.erlang-solutions.com/resources/download.html
+
+$ erlc -d hello.erl 编译成 *.beam 文件
 $ erl -noshell -s hello start -s init stop
 Hello world
 ```
@@ -56,8 +58,8 @@ $a $A $\n % ASCII 字符表示的整数 97 65 10
 −	从第一个减去第二个操作数		　1 - 2　  将给-1
 *	两个操作数的乘法				2 * 2　  将给4
 /	由分母划分的分子				2/2      会给1
-rem	将第一个数除以第二个数的余数		3 rem 2　将给出1
-div　将执行除法并返回整数组件　　	　　3 div 2　将给出1
+rem将第一个数除以第二个数的余数		3 rem 2　将给出1
+div将执行除法并返回整数组件　　	　　3 div 2　将给出1
 ```
 
 关系运算符：
@@ -85,10 +87,10 @@ not 非
 位运算符
 
 ```erlang
-band   	binary and
-bor 	binary or
-bxor 	binary xor
-bnot 	binary not 按位否定运算符
+band binary and
+bor　binary or
+bxor binary xor
+bnot binary not 按位否定运算符
 ```
 
 ### 原子值 atom
@@ -102,7 +104,7 @@ bnot 	binary not 按位否定运算符
 name
 ```
 
-### Boolean
+#### 特殊的原子值 true false ok
 
 两个保留的原子值　`true` `false` 被当作布尔值使用
 
@@ -181,8 +183,6 @@ true
 <<213,35,23,64,78,12,34,12,234>>
 ```
 
-
-
 ### 元组 tuple
 
 元组用来组合多个值。并且提供了一种相等匹配模式，用来非常方便的取出元组里的值。
@@ -219,8 +219,6 @@ true
 
 ### 列表 list
 
-如果想要表示一个可以增长的组合呢?
-
 列表用来容纳多个值，并且提供了一种相等匹配模式`[H|T]`（`H`表示列表的第一个，`T`表示剩下的），用来非常方便的存入和取出操作。
 
 ```erlang
@@ -247,8 +245,6 @@ true
 51> "中国汉语".
 [20013,22269,27721,35821]
 ```
-
-
 
 ### Record
 
@@ -324,7 +320,7 @@ joe
 Name(Args) -> Body.
 ```
 
-`Erlang`的函数可以顺序/并行执行，而模块则是包含了多个函数，是组织代码的基本单元。
+函数可以顺序并行执行，而模块则是包含了多个函数，是组织代码的基本单元。
 
 ```erlang
 -module(geometry).                      % 声明本文件是 geometry 模块
@@ -336,9 +332,10 @@ Name(Args) -> Body.
 area({rectangle, Width, Height})
     -> Width * Height;
 area({circle, Radius})
-    -> 3.14159 * Radius * Radius;
+    -> ?PI * Radius * Radius; 							% 使用了宏替换
 area({square, Side})
     -> Side * Side.
+
 % 测试用例
 test() ->
     12 = area({rectangle, 3, 4}),       % 用例1
@@ -358,7 +355,6 @@ $ erl                                   % 进入 erlang shell
 9
 4> geometry:test().                     % 调用 test 函数
 tests_passed
-5>
 ```
 
 再来解释下标点符号的使用：
@@ -401,7 +397,6 @@ total( [] ) -> 0.
 #Fun<erl_eval.6.99386804>
 5> Double(2).
 4
-
 7> Hypot = fun(X, Y) -> math:sqrt(X*X +Y*Y) end.
 #Fun<erl_eval.12.99386804>
 8> Hypot(10, 20).
@@ -459,11 +454,7 @@ true
 -module(shop).
 -export([cost/1, total/1]).
 
-cost(oranges) -> 5;
-cost(newspaper) -> 8;
-cost(apples) -> 2;
-cost(pears) -> 10;
-cost(milk) -> 7.
+% cost 函数略
 
 sum([H|T]) -> H + sum(T);
 sum([]) -> 0.
@@ -643,16 +634,14 @@ cost2(X) ->
 case of 的表达式就像是整个函数头，可以对函数的每个参数使用复杂的匹配模式，以及卫式
 
 ```erlang
-% case 表达式实现 filter
-filter(F, [H|T] ) ->
+filter(F, [H|T] ) -> % case 表达式实现 filter
   case F(H) of
-    true -> [H|filter(F,T)];
+    true -> [ H | filter(F, T) ];
     false -> filter(F,T)
   end;
 filter(F,[]) -> [].
 
-% 根据温度决定去不去海滩玩耍
-beach(Temprature) ->
+beach(Temprature) -> % 根据温度决定去不去海滩玩耍
   case Temprature of
     {celsius, N } when N >= 20, N =< 45 -> 'favorable';
     {kelvin, N} when N >= 293, N =< 318 -> 'favorable';
@@ -689,10 +678,6 @@ my_func(X) ->
 try Expr
     catch 
 		_:_ -> ...处理所有异常错误的代码...
-	end
-try Expr
-    catch 
-    _ -> ...处理所有异常错误的代码...
 	end
 ```
 
