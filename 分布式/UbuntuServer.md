@@ -69,6 +69,13 @@ $ cat id_rsa.pub >> .ssh/authorized_keys # 公私钥的重置，不影响 author
 $ chmod 600 .ssh/authorized_keys
 ```
 
+```bash
+$ sudo visudo # 设置执行 sudo 命令不需要输入密码
+%sudo   ALL=(ALL:ALL) NOPASSWD:ALL
+```
+
+
+
 ### 5. 设置时区
 
 ```bash
@@ -457,5 +464,3 @@ vim .config/ibus/rime/default.yaml
 ```
 
 ![](https://img.codekissyoung.com/2020/06/18/d9f9cf1f79f723e4c5b1956ab2950e36.png)
-
-![](img/a034227fc7c372baa7a9e496312b27b6.png)
