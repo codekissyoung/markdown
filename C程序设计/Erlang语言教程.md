@@ -651,73 +651,9 @@ beach(Temprature) -> % 根据温度决定去不去海滩玩耍
 
 
 
-## 4. 错误处理
+## 4. 并发
 
-主动抛出错误的方式：
-
-```erlang
-generate_exception(1) -> a;           % 正常
-generate_exception(2) -> {'EXIT', a}; % 正常
-generate_exception(3) ->
-  throw(a); % 抛出一个异常, 没有让进程崩溃的意思，只是为了改变控制流(非局部返回)，并期望调用方去处理异常
-generate_exception(4) ->
-  exit(a); % 终止当前进程时使用，如果未捕捉，则会广播　{'EXIT', Pid, Why} 到其他链接到本进程的其他进程，不会返回Stack
-generate_exception(5) ->
-  error(a). % 崩溃性错误,会结束当前进程，会返回 Stack
-```
-
-使用`catch`将异常处理成 `{"Exit",...}` 返回
-
-```erlang
-% 使用 catch 直接将任何异常转换为 {"EXIT", ...} 元组
-demo2() ->
-  [{I, catch generate_exception(I) } || I <- [1,2,3,4,5]].
-
-%%2> error:demo2().
-%%[{1,a},
-%%{2,a},
-%%{3,{'EXIT',a}},
-%%{4,{'EXIT',a}},
-%%{5,
-%%{'EXIT',{a,[{error,generate_exception,1,
-%%[{file,"error.erl"},{line,15}]},
-%%{error,'-demo2/0-lc$^0/1-0-',1,
-```
-
-通过　`try catch`　语句捕获错误，并分开处理
-
-```erlang
-% throw exit error 都可以被捕获和处理
-catcher(N) ->
-  % N 是入参 Ret 是表达式的返回值
-  try % 中间可以写多个表达式 , 号隔开
-    generate_exception(N)
-  of
-    Ret -> {N, normal, Ret} % 如果表达式执行正常，未抛出异常
-  catch
-    throw:Ret -> {N, caught, thrown, Ret}; % 处理 throw 异常
-    exit:Ret -> {N, caught, exited, Ret};  % 处理 exit 异常
-    error:Ret -> {N, caught, error, Ret};  % 处理 error 异常
-    _:_ -> {unkown, error}											% 处理所有异常错误的代码
-  after % 一定会执行的子句，不返回任何值，常用来关闭打开的文件等操作
-    {N, always, exec }
-  end.
-demo1() ->
-  [catcher(I) || I <- [1,2,3,4,5]].
-
-%%2> error:demo1().
-%%[{1,normal,a},
-%%{2,caught,thrown,a},
-%%{3,caught,exited,a},
-%%{4,normal,{'EXIT',a}},
-%%{5,caught,error,a}]
-```
-
-
-
-## 5. 并发
-
-### 5.1 产生新进程
+### 4.1 产生新进程
 
 ```erlang
 16> F = fun() -> io:format("new process~n") end.              
@@ -740,7 +676,7 @@ new process
 spawn(模块名，函数名，参数list).
 ```
 
-### 5.2 发送数据
+### 4.2 发送数据
 
 ```erlang
 Pid ! {a, 12} % 向 Pid 发送消息 {a, 12} 
@@ -762,7 +698,7 @@ Shell got "how are you"
 ok
 ```
 
-### 5.3 接收数据
+### 4.3 接收数据
 
 ```erlang
 receive
@@ -838,6 +774,139 @@ Shell got {<0.62.0>,ok}
 Shell got {<0.62.0>,ok}
 Shell got {<0.62.0>,{ok,bacon}}
 Shell got {<0.62.0>,{ok,not_found}}
+```
+
+
+
+## 5. 错误处理
+
+> 常见处理错误的方式：
+>
+> - 在正常代码逻辑的每一层都处理错误
+> - 正常代码逻辑处直接抛出异常，推到程序最顶层的 try catch 处理
+>
+> Erlang 还有第三种方式：
+>
+> - 将异常处理逻辑从程序的正常执行流中移出来，放到另外一个并发进程中，这样做可以让业务代码更加整洁，只需要处理＂正常的情况＂
+
+### 5.1 抛出错误 throw exit error
+
+```erlang
+generate_exception(1) -> a;           % 正常
+generate_exception(2) -> {'EXIT', a}; % 正常
+generate_exception(3) ->
+  throw(a); % 抛出一个异常, 没有让进程崩溃的意思，只是为了改变控制流(非局部返回)，并期望调用方去处理异常
+generate_exception(4) ->
+  exit(a); % 终止当前进程时使用，如果未捕捉，则会广播　{'EXIT', Pid, Why} 到其他链接到本进程的其他进程，不会返回Stack
+generate_exception(5) ->
+  error(a). % 崩溃性错误,会结束当前进程，会返回 Stack
+```
+
+### 5.2 catch 语句
+
+```erlang
+% 使用 catch 直接将任何异常转换为 {"EXIT", ...} 元组
+demo2() ->
+  [{I, catch generate_exception(I) } || I <- [1,2,3,4,5]].
+
+%%2> error:demo2().
+%%[{1,a},
+%%{2,a},
+%%{3,{'EXIT',a}},
+%%{4,{'EXIT',a}},
+%%{5,
+%%{'EXIT',{a,[{error,generate_exception,1,
+%%[{file,"error.erl"},{line,15}]},
+%%{error,'-demo2/0-lc$^0/1-0-',1,
+```
+
+### 5.3 try catch 语句
+
+```erlang
+% throw exit error 都可以被捕获和分开处理
+catcher(N) ->
+  % N 是入参 Ret 是表达式的返回值
+  try % 中间可以写多个表达式 , 号隔开
+    generate_exception(N)
+  of
+    Ret -> {N, normal, Ret} % 如果表达式执行正常，未抛出异常
+  catch
+    throw:Ret -> {N, caught, thrown, Ret}; % 处理 throw 异常
+    exit:Ret -> {N, caught, exited, Ret};  % 处理 exit 异常
+    error:Ret -> {N, caught, error, Ret};  % 处理 error 异常
+    _:_ -> {unkown, error}											% 处理所有异常错误的代码
+  after % 一定会执行的子句，不返回任何值，常用来关闭打开的文件等操作
+    {N, always, exec }
+  end.
+demo1() ->
+  [catcher(I) || I <- [1,2,3,4,5]].
+
+%%2> error:demo1().
+%%[{1,normal,a},
+%%{2,caught,thrown,a},
+%%{3,caught,exited,a},
+%%{4,normal,{'EXIT',a}},
+%%{5,caught,error,a}]
+```
+
+### 5.4 链接 link()
+
+通过 `link(Pid)` 函数将本进程　与　指定进程链接到一起，当其中一个进程死亡时，另一个可以收到消息通知．
+
+```erlang
+myproc() ->
+  timer:sleep(5000),
+  throw({no_reason}). % 改成 exit 和 error 分别试试
+```
+
+```erlang
+3> link(spawn(linkmon, myproc, [])). % exit({no_reason}) 的表现
+true
+** exception error: {no_reason}
+
+5> link(spawn(linkmon, myproc, [])). % error({no_reason}) 表现
+true
+=ERROR REPORT==== 27-Nov-2020::01:51:42.215265 ===
+Error in process <0.95.0> with exit value:
+{{no_reason},[{linkmon,myproc,0,[{file,"linkmon.erl"},{line,7}]}]}
+** exception error: {no_reason}
+     in function  linkmon:myproc/0 (linkmon.erl, line 7)
+                                                   
+7> link(spawn(linkmon, myproc, [])). % throw({no_reason}) 表现
+true
+=ERROR REPORT==== 27-Nov-2020::01:52:44.791259 ===
+Error in process <0.103.0> with exit value:
+{{nocatch,{no_reason}},[{linkmon,myproc,0,[{file,"linkmon.erl"},{line,7}]}]}
+** exception error: {nocatch,{no_reason}}
+     in function  linkmon:myproc/0 (linkmon.erl, line 7)
+```
+
+
+
+```erlang
+chain(0) ->
+  receive
+    _ -> ok
+  after 2000 ->
+    throw("chain dies here")
+  end;
+chain(N) ->
+  link(spawn( fun() -> chain(N - 1) end )),
+  receive
+    _ -> ok
+  end.
+```
+
+```erlang
+% 错误一直从 chain(0) 传递到本 shell
+12> link(spawn(linkmon, chain, [3])).
+true
+=ERROR REPORT==== 27-Nov-2020::02:01:19.352302 ===
+Error in process <0.131.0> with exit value:
+{{nocatch,"chain dies here"},
+ [{linkmon,chain,1,[{file,"linkmon.erl"},{line,13}]}]}
+** exception error: {nocatch,"chain dies here"}
+     in function  linkmon:chain/1 (linkmon.erl, line 13)
 ```
 
 
