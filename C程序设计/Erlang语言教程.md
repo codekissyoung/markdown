@@ -1,32 +1,55 @@
-# Erlang 教程
+# Erlang 中文教程
 
 面向消息、面向并发的语言`Erlang`!!!
 
-## 1. 安装与部署
+## 1. 安装与执行
 
 ```bash
 # 去下面这个网址下载最新的安装包　各大系统都有
 https://www.erlang-solutions.com/resources/download.html
 
-$ erlc -d hello.erl 编译成 *.beam 文件
-$ erl -noshell -s hello start -s init stop
+$ erlc -d -W hello.erl 														# 编译成 *.beam 文件
+$ erl -noshell -pa dir -s module fun 					# 在指定目录下，执行指定模块的函数
+$ erl -noshell -s hello start -s init stop  # 在当前目录，先执行 shell:start()　再执行 init:stop()
 Hello world
 ```
 
-## 2. 变量与数据类型
+### 1.1 erlang shell
 
 ```bash
-$ erl # 进入 erl shell
+$ erl	 # 进入 erl shell
 > q(). # 退出 erl shell
 > b(). # 打印当前变量绑定
 > f(). # 删除所有当前变量绑定,　f(X) 删除指定变量绑定
+> regs(). # 打印所有绑定了 PID 的原子
 > cd("目录"). # 进入目录, erlang shell 可以查找到,当前目录下的 *.beam 里的函数,直接调用它们
 > c("xxx.erl", [debug_info]). # 编译
 > help(). # 展示 erl shell 中所有可以调用的命令
 > xxmodule:module_info().  # 打印该模块所有信息，module_info("xxx") 打印指定属性
 ```
 
-### 变量
+### 1.2 escript 
+
+```erlang
+#!/usr/bin/env escript
+%% 将参数转换成整数类型后调用阶乘函数, A 是命令行参数
+%% ./fac.sh 4
+%% factorial 4 = 24
+main([A]) ->
+    I = list_to_integer(A),
+    F = fac(I),
+    io:format("factorial ~w = ~w~n", [I, F]),
+    init:stop().
+
+fac(0) ->1;
+fac(N) ->N*fac(N-1).
+```
+
+
+
+## 2. 变量与数据类型
+
+### 2.1 变量
 
 大写字母开头的单词是变量 (Name X Age),在命令式的语言(C Go JAVA)里，变量名其实是伪装起来的内存地址，`X = 12`　表达的将该内存地址处的值修改为 `12`.
 
@@ -41,7 +64,7 @@ $ erl # 进入 erl shell
 ** exception error: no match of right hand side value "codekissyoung"
 ```
 
-### 整数
+### 2.2 整数
 
 ```erlang
 格式 : Base#Value
@@ -51,40 +74,26 @@ $ erl # 进入 erl shell
 $a $A $\n % ASCII 字符表示的整数 97 65 10
 ```
 
-算术运算符：
+#### 算术运算符
 
-```erlang
-+	增加了两个操作数				1 + 2　  将给出3
-−	从第一个减去第二个操作数		　1 - 2　  将给-1
-*	两个操作数的乘法				2 * 2　  将给4
-/	由分母划分的分子				2/2      会给1
-rem将第一个数除以第二个数的余数		3 rem 2　将给出1
-div将执行除法并返回整数组件　　	　　3 div 2　将给出1
-```
+`+` `-` `*` `/` `rem` 求余 `div` 整除
 
-关系运算符：
+#### 关系运算符
 
-```erlang
-==	测试两个对象之间的相等性		   2 = 2  将给出真实
-=:= 精确等于 会比较类型
-/=	测试两个对象之间的差异			    3 /= 2 将给出真实
-=/= 精确不等于
-<	检查左对象是否小于右操作数。		  2 <  3 将给出真实
-=<	检查左对象是否小于或等于右操作数。	2 =< 3 将给出真实
->	检查左对象是否大于右操作数。		  3 >  2 将给出真实
->=	检查左对象是否大于或等于右操作数。	3> = 2 将给出真实
-```
+`==` 值相等 `/=` 值不相等
 
-逻辑运算符
+`=:=` 值与类型都相等 `=/=` 值与类型都不相等
 
-```erlang
-and andalso 等价于 && 
-or orelse 等价 ||  
-xor 异或 
-not 非
-```
+`<` 小于 `<=` 小于等于 `>` 大于 `>=`　大于等于
 
-位运算符
+#### 逻辑运算
+
+`andalso` 等价于 && 
+`orelse` 等价 ||  
+`xor` 异或 
+`not` 非
+
+#### 位运算符
 
 ```erlang
 band binary and
@@ -93,7 +102,7 @@ bxor binary xor
 bnot binary not 按位否定运算符
 ```
 
-### 原子值 atom
+### 2.3 原子 Atom
 
 而小写字母开头（`name` `friend`）后可接　`字母`　`数字` `@` `.` `_` 作为原子值
 
@@ -104,7 +113,7 @@ bnot binary not 按位否定运算符
 name
 ```
 
-#### 特殊的原子值 true false ok
+#### true false ok
 
 两个保留的原子值　`true` `false` 被当作布尔值使用
 
@@ -118,7 +127,7 @@ true
 7> 
 ```
 
-### Bit String 位串
+### 2.4 位串 Bit 
 
 ```erlang
 4> <<5,10,20>>.
@@ -183,7 +192,7 @@ true
 <<213,35,23,64,78,12,34,12,234>>
 ```
 
-### 元组 tuple
+### 2.5 元组 tuple
 
 元组用来组合多个值。并且提供了一种相等匹配模式，用来非常方便的取出元组里的值。
 
@@ -217,7 +226,9 @@ true
 
 `_`是占位符，用来接收不需要的值。我们再来复述一遍相等匹配模式：假如要使`=`两边的东西相等，那么`Erlang`要做啥操作呢？答案是：让 `Name` 的实际内容存储为`codekissyoung`。
 
-### 列表 list
+### 2.6 列表 list
+
+#### 2.6.1 基础
 
 列表用来容纳多个值，并且提供了一种相等匹配模式`[H|T]`（`H`表示列表的第一个，`T`表示剩下的），用来非常方便的存入和取出操作。
 
@@ -235,283 +246,15 @@ true
 [{orange,4},{apple,10},{pear,6},{milk,3}]
 ```
 
-### 字符串 string
+#### 2.6.2 列表推导
 
-`Erlang`字符串本质为`Unicode`数字列表。
-
-```erlang
-48> [83,117,114,112,114,105,115,101].
-"Surprise"
-51> "中国汉语".
-[20013,22269,27721,35821]
-```
-
-### Record
-
-```erlang
-% records.hrl
--record(todo, {status=reminder,who=joe,text}). % 定义 名为 todo 的 record 类型
-
-% 在函数 records 的模式匹配
-clear_status(#todo{status = S, who = W} = R) ->
-  R#todo{text="Finished",status=finished}.
-
-% 匹配某个类型的 records
-do_something(X) when is_record(X, todo) ->
-  X#todo{status = finished}.
-```
-
-```erlang
-3> rr("records.hrl").  % 载入头文件
-[todo]
-
-4> #todo{}. % 实例化一个 todo
-#todo{status = reminder,who = joe,text = undefined}
-
-5> X = #todo{status=urgent, text="Fix errata in book"}. % 实例化一个 todo 绑定到 X
-#todo{status = urgent,who = joe,text = "Fix errata in book"}
-
-7> X2 = X#todo{status=done, who=joe, text="gone with Wind"}. % 修改 X 后，绑定到 X2
-#todo{status = done,who = joe,text = "gone with Wind"}
-
-8> #todo{who=W, text=Txt} = X2. % 模式匹配
-#todo{status = done,who = joe,text = "gone with Wind"}
-9> W.
-joe
-10> Txt.
-"gone with Wind"
-
-11> X2#todo.text. % 直接访问 record 里字段的值
-"gone with Wind"
-12> X2#todo.who. 
-```
-
-### Map
-
-```erlang
-#{Key1 Op Val1, Key2 Op Val2 ... }
-% Op 可以是 => 新增 和 := 修改 
-```
-
-```erlang
-1> F1 = #{ a => 1, b => 2 }. # 创建一个 Map 绑定到 F1
-#{a => 1,b => 2}
-
-2> Facts = #{ {wife,fred} => "Sue", {age, fred} => 45 }. % 键值可以是任何 Erlang 类型
-#{{age,fred} => 45,{wife,fred} => "Sue"}
-
-3> F2 = F1#{ c => xx }. # 新增键后，绑定到 F2
-#{a => 1,b => 2,c => xx}
-
-4> F3 = F2#{ c := ok }. # 修改键后，绑定到 F3
-#{a => 1,b => 2,c => ok}
-```
-
-#### 操作map的内置函数
-
-#### 与json的互转
-
-
-
-## 3. 模块与函数
-
-```erlang
-% 函数格式: Body 必须是一个或者多个用 , 分割的 Erlang 表达式, 最后一个表达式的值作为返回值
-Name(Args) -> Body.
-```
-
-函数可以顺序并行执行，而模块则是包含了多个函数，是组织代码的基本单元。
-
-```erlang
--module(geometry).                      % 声明本文件是 geometry 模块
--define(PI, 3.14159). % 定义宏
--define(sub(X,Y), X - Y).
--export([test/0, area/1]).              % 导出 test area 函数，0 1 是参数数目
-
-% 实现1 求正方形面积
-area({rectangle, Width, Height})
-    -> Width * Height;
-area({circle, Radius})
-    -> ?PI * Radius * Radius; 							% 使用了宏替换
-area({square, Side})
-    -> Side * Side.
-
-% 测试用例
-test() ->
-    12 = area({rectangle, 3, 4}),       % 用例1
-    144 = area({square, 12}),           % 用例2
-    tests_passed.                       % 用例全部通过
-```
-
-代码的编译和执行过程：
-
-```erlang
-$ erl                                   % 进入 erlang shell
-1> c(geometry).                         % 编译
-{ok,geometry}
-2> geometry:area({rectangle, 10, 5}).   % 调用 area 函数
-50
-3> geometry:area({square, 3}).
-9
-4> geometry:test().                     % 调用 test 函数
-tests_passed
-```
-
-再来解释下标点符号的使用：
-
-- `,` 用于分隔开函数调用参数、数据构造、和模式中的参数、表达式
-- `;` 用于分隔函数子句
-- `.` 是句号，分隔函数整体
-
-再来看一个例子，体会下参数的变化
-
-```erlang
--module(shop).
--export([cost/1, total/1]).
-
-cost(oranges) -> 5;
-cost(newspaper) -> 8;
-cost(apples) -> 2;
-cost(pears) -> 10;
-cost(milk) -> 7.
-
-total( [{What,N}|T] ) -> shop:cost(What) * N + total(T);
-total( [] ) -> 0.
-```
-
-运行结果如下:
-
-```erlang
-2> BuyList = [{oranges,4}, {newspaper,1}, {milk,3}, {apples, 10}].
-[{oranges,4},{newspaper,1},{milk,3},{apples,10}]
-4> shop:total(BuyList).
-69
-```
-
-#### 高阶函数 fun
-
-通过下面的`fun`直观的来感受下高阶函数：
-
-```erlang
-4> Double = fun(X) -> 2 * X end.
-#Fun<erl_eval.6.99386804>
-5> Double(2).
-4
-7> Hypot = fun(X, Y) -> math:sqrt(X*X +Y*Y) end.
-#Fun<erl_eval.12.99386804>
-8> Hypot(10, 20).
-22.360679774997898
-
-10> TempConvert = fun({c, C}) -> {f, 32+C*9/5};
-10>                  ({f, F}) -> {c, (F-32)*5/9} end.
-#Fun<erl_eval.6.99386804>
-11> TempConvert({c, 100}).
-{f,212.0}
-12> TempConvert(TempConvert({c, 100})).
-{c,100.0}
-```
-
-再来看两个接收高阶函数的作为参数的常用函数`lists:map()`与`lists:filter()`：
-
-```erlang
-# lists:map(F, L) L 函数
-6> L = [1,2,3,4,5,6].
-[1,2,3,4,5,6]
-7> lists:map(fun(X) -> 2 * X end, L).
-[2,4,6,8,10,12]
-
-# lists:filter(F, L) L 函数
-8> Even = fun(X) -> (X rem 2) =:= 0 end.
-#Fun<erl_eval.7.126501267>
-10> lists:map(Even, [1,2,3,4,5,6,7,8]).
-[false,true,false,true,false,true,false,true]
-11> lists:filter(Even, [1,2,3,4,5,6,7,8]).
-[2,4,6,8]
-```
-
-再来看一下将高阶函数作为返回值的例子：
-
-```erlang
-# 返回 Fun 类型
-# lists:member(X, L) Bool  X 是否在 L 内
-12> Fruit = [apple,pear,orange].
-[apple,pear,orange]
-13> MakeTest = fun(L) -> (fun(X) -> lists:member(X, L) end ) end.
-#Fun<erl_eval.7.126501267>
-14> IsFruit = MakeTest(Fruit).
-#Fun<erl_eval.7.126501267>
-15> IsFruit(dog).  
-false
-16> IsFruit(apple).
-true
-17> lists:filter(IsFruit, [dog,orange,cat,apple,bear]).
-[orange,apple]
-```
-
-然后我们通过高阶函数来改造下`shop`例子：
-
-```erlang
--module(shop).
--export([cost/1, total/1]).
-
-% cost 函数略
-
-sum([H|T]) -> H + sum(T);
-sum([]) -> 0.
-
-map(_, []) -> [];
-map(F, [H|T]) -> [F(H) | map(F, T)].
-
-total( L ) ->
-    sum( map( fun({What,N}) -> shop:cost(What) * N end, L ) ).
-```
-
-```erlang
-6> shop:total([{oranges,6},{newspaper, 1},{milk, 2}]).
-52
-```
-
-
-
-#### 自定义控制抽象
-
-Erlang 没有 If Switch for while 语句，但是使用模式匹配和高阶函数，却可以创造自己的＂控制抽象＂，一则可以根据实际问题创建出精确的控制结构，二来不受语言自带的少量固定控制结构的束缚．
-
-```erlang
--module(lib).
--export([for/3]).
-
-for(Max, Max, F) -> % 这句一定要在前面，是终止条件
-  [ F(Max) ];
-for(I, Max, F) ->
-  [ F(I) | for(I+1, Max, F) ].
-
-%% 20> c("lib.erl").
-%% {ok,lib}
-%% 21> lib:for(1, 10, fun(X) -> X end).
-%% [1,2,3,4,5,6,7,8,9,10]
-%% 22> lib:for(1, 10, fun(X) -> X * 2 end).
-%% [2,4,6,8,10,12,14,16,18,20]
-```
-
-#### 可重入解析代码 reentrant parsing code
-#### 解析组合器 parser combinator
-#### 惰性求值器 lazy evaluator
-
-#### 列表推导 list comprehension
+list comprehension
 
 ```erlang
 [ Expression || Generator ... , filter ... ] % || 左边是想要的结果，|| 右边的表达式执行顺序是 从左到右
 ```
 
 ```erlang
-# 使用高阶函数
-1> L = [1,2,3,4,5].
-[1,2,3,4,5]
-2> lists:map(fun(X) -> 2 * X end, L).
-[2,4,6,8,10]
-
-# 等价的列表推导
 4> [ 2 * X || X <- L ]. %  X <- L 是生成器表达式
 [2,4,6,8,10]
 
@@ -593,7 +336,149 @@ perms( L )  -> [ [H|T] || H <- L, T <- perms( L -- [H]) ].
  "tsca","tsac","scat","scta","sact","satc","stca","stac"]
 ```
 
-### 保护式/卫式/关卡
+#### 2.6.3 字符串 string
+
+字符串是使用双引号括起来的一串字符, 本质是一个整数列表。
+
+```erlang
+48> [83,117,114,112,114,105,115,101].
+"Surprise"
+51> "中国汉语".
+[20013,22269,27721,35821]
+```
+
+### 2.7 记录 Record
+
+```erlang
+% records.hrl
+-record(todo, {status=reminder,who=joe,text}). % 定义 名为 todo 的 record 类型
+
+% 在函数 records 的模式匹配
+clear_status(#todo{status = S, who = W} = R) ->
+  R#todo{text="Finished",status=finished}.
+
+% 匹配某个类型的 records
+do_something(X) when is_record(X, todo) ->
+  X#todo{status = finished}.
+```
+
+```erlang
+3> rr("records.hrl").  % 载入头文件
+[todo]
+
+4> #todo{}. % 实例化一个 todo
+#todo{status = reminder,who = joe,text = undefined}
+
+5> X = #todo{status=urgent, text="Fix errata in book"}. % 实例化一个 todo 绑定到 X
+#todo{status = urgent,who = joe,text = "Fix errata in book"}
+
+7> X2 = X#todo{status=done, who=joe, text="gone with Wind"}. % 修改 X 后，绑定到 X2
+#todo{status = done,who = joe,text = "gone with Wind"}
+
+8> #todo{who=W, text=Txt} = X2. % 模式匹配
+#todo{status = done,who = joe,text = "gone with Wind"}
+9> W.
+joe
+10> Txt.
+"gone with Wind"
+
+11> X2#todo.text. % 直接访问 record 里字段的值
+"gone with Wind"
+12> X2#todo.who. 
+```
+
+### 2.8 映射 Map
+
+```erlang
+#{Key1 Op Val1, Key2 Op Val2 ... }
+% Op 可以是 => 新增 和 := 修改 
+```
+
+```erlang
+1> F1 = #{ a => 1, b => 2 }. # 创建一个 Map 绑定到 F1
+#{a => 1,b => 2}
+
+2> Facts = #{ {wife,fred} => "Sue", {age, fred} => 45 }. % 键值可以是任何 Erlang 类型
+#{{age,fred} => 45,{wife,fred} => "Sue"}
+
+3> F2 = F1#{ c => xx }. # 新增键后，绑定到 F2
+#{a => 1,b => 2,c => xx}
+
+4> F3 = F2#{ c := ok }. # 修改键后，绑定到 F3
+#{a => 1,b => 2,c => ok}
+```
+
+#### 操作map的内置函数
+
+#### 与json的互转
+
+## 3. 模块与函数
+
+### 3.1 基本概念
+
+**引用透明性**　：　referential transparency　对于同样的参数，函数永远要返回同样的值．
+
+```erlang
+% 函数格式: Body 必须是一个或者多个用 , 分割的 Erlang 表达式, 最后一个表达式的值作为返回值
+Name(Args) -> Body.
+```
+
+函数可以顺序并行执行，而模块则是包含了多个函数，是组织代码的基本单元。
+
+```erlang
+-module(geometry).                      % 声明本文件是 geometry 模块
+-define(PI, 3.14159). 												% 定义宏
+-define(sub(X,Y), X - Y).
+-export([test/0, area/1]).              % 导出 test area 函数，0 1 是参数数目
+
+% 实现1 求正方形面积
+area({rectangle, Width, Height})
+    -> Width * Height;
+area({circle, Radius})
+    -> ?PI * Radius * Radius; 							% 使用了宏替换
+area({square, Side})
+    -> Side * Side.
+
+% 测试用例
+test() ->
+    12 = area({rectangle, 3, 4}),       % 用例1
+    144 = area({square, 12}),           % 用例2
+    tests_passed.                       % 用例全部通过
+```
+
+代码的编译和执行过程：
+
+```erlang
+$ erl                                   % 进入 erlang shell
+1> c(geometry).                         % 编译
+{ok,geometry}
+2> geometry:area({rectangle, 10, 5}).   % 调用 area 函数
+50
+3> geometry:area({square, 3}).
+9
+4> geometry:test().                     % 调用 test 函数
+tests_passed
+```
+
+再来解释下标点符号的使用：
+
+- `,` 用于分隔开函数调用参数、数据构造、和模式中的参数、表达式
+- `;` 用于分隔函数子句，以及匹配表达式
+- `.` 是句号，分隔函数整体
+
+Erlang 是没有专门的控制流程的语句的，有的只有表达式．但是我们可以构造出通用的控制流程结构．
+
+### 3.2 分支流程
+
+#### 3.2.1 函数匹配
+
+函数匹配就是一种分支控制，如上面例子中的`area`函数匹配。
+
+#### 3.2.2 Guard 保护式/卫式/关卡/断言
+
+当函数的匹配结构是一样的时候，需要对具体的值进行判断了，这时候可以使用 Guard ，进一步分支。
+
+以 `when` 开头，`;` 连接相当于 `or`, `,`连接相当于 `and`. 常见的用于 Guard 的的函数有：`is_atom(X)` `is_function` 等.
 
 ```erlang
 max(X, Y) when X > Y -> X; % 如果匹配这句，就直接返回
@@ -605,19 +490,11 @@ moreThan6(X, Y) when is_integer(X), X > Y, Y < 6 -> X;
 moreThan6(X, Y) -> Y.
 ```
 
-### if Expr
+#### 3.2.3 if 表达式
 
 if 的表现与 "函数+卫式" 的构造一样：
 
 ```erlang
-% 使用 if 改写 cost
-%%2> shop:cost2(orange).
-%%5
-%%3> shop:cost2(milk).
-%%7
-%%4> shop:cost2(aaaa).
-%%unkown
-%%5>
 cost2(X) ->
   if
     X == orange -> 5;
@@ -625,22 +502,15 @@ cost2(X) ->
     X == apples -> 2;
     X == pears -> 9;
     X == milk -> 7;
-    true -> unkown
+    true -> unkown 			% 用于捕获其他所有的情况
   end.
 ```
 
-### case of Expr
+#### 3.2.4 case of 表达式
 
-case of 的表达式就像是整个函数头，可以对函数的每个参数使用复杂的匹配模式，以及卫式
+case of 的表达式就像是整个函数头，可以对函数的每个参数使用 匹配模式 + Guard
 
 ```erlang
-filter(F, [H|T] ) -> % case 表达式实现 filter
-  case F(H) of
-    true -> [ H | filter(F, T) ];
-    false -> filter(F,T)
-  end;
-filter(F,[]) -> [].
-
 beach(Temprature) -> % 根据温度决定去不去海滩玩耍
   case Temprature of
     {celsius, N } when N >= 20, N =< 45 -> 'favorable';
@@ -648,6 +518,97 @@ beach(Temprature) -> % 根据温度决定去不去海滩玩耍
     _ -> 'avoid beach'
   end.
 ```
+
+个人感觉，去掉 if 和 case of 完全可行，同一个操作没必要使用多种写法。
+
+### 3.3 循环流程
+
+Erlang 没有 for 语句，但是使用模式匹配和高阶函数，却可以创造自己的＂控制抽象＂，一则可以根据实际问题创建出精确的控制结构，二来不受语言自带的少量固定控制结构的束缚．
+
+```erlang
+for(Max, Max, F) -> % 这句一定要在前面，是终止条件
+  [ F(Max) ];
+for(I, Max, F) ->
+  [ F(I) | for(I+1, Max, F) ].
+%% 21> lib:for(1, 10, fun(X) -> X end).
+%% [1,2,3,4,5,6,7,8,9,10]
+%% 22> lib:for(1, 10, fun(X) -> X * 2 end).
+%% [2,4,6,8,10,12,14,16,18,20]
+```
+
+### 3.4 高阶函数
+
+```erlang
+4> Double = fun(X) -> 2 * X end.
+5> Double(2).
+4
+7> Hypot = fun(X, Y) -> math:sqrt(X*X +Y*Y) end.
+8> Hypot(10, 20).
+22.360679774997898
+
+10> TempConvert = fun({c, C}) -> {f, 32+C*9/5};
+10>                  ({f, F}) -> {c, (F-32)*5/9} end.
+11> TempConvert({c, 100}).
+{f,212.0}
+12> TempConvert(TempConvert({c, 100})).
+{c,100.0}
+```
+
+再来看两个接收高阶函数的作为参数的常用函数`lists:map()`与`lists:filter()`：
+
+```erlang
+# lists:map(F, L) L 函数
+6> L = [1,2,3,4,5,6].
+[1,2,3,4,5,6]
+7> lists:map(fun(X) -> 2 * X end, L).
+[2,4,6,8,10,12]
+
+# lists:filter(F, L) L 函数
+8> Even = fun(X) -> (X rem 2) =:= 0 end.
+#Fun<erl_eval.7.126501267>
+10> lists:map(Even, [1,2,3,4,5,6,7,8]).
+[false,true,false,true,false,true,false,true]
+11> lists:filter(Even, [1,2,3,4,5,6,7,8]).
+[2,4,6,8]
+```
+
+再来看一下将高阶函数作为返回值的例子：
+
+```erlang
+# lists:member(X, L) Bool  X 是否在 L 内
+12> Fruit = [apple,pear,orange].
+[apple,pear,orange]
+13> MakeTest = fun(L) -> (fun(X) -> lists:member(X, L) end ) end.
+#Fun<erl_eval.7.126501267>
+14> IsFruit = MakeTest(Fruit).
+#Fun<erl_eval.7.126501267>
+15> IsFruit(dog).  
+false
+16> IsFruit(apple).
+true
+17> lists:filter(IsFruit, [dog,orange,cat,apple,bear]).
+[orange,apple]
+```
+
+然后我们通过高阶函数来改造下`shop`例子：
+
+```erlang
+sum([H|T]) -> H + sum(T);
+sum([]) -> 0.
+
+map(_, []) -> [];
+map(F, [H|T]) -> [F(H) | map(F, T)].
+total( L ) ->
+    sum( map( fun({What,N}) -> shop:cost(What) * N end, L ) ).
+% 6> shop:total([{oranges,6},{newspaper, 1},{milk, 2}]).
+$ 52
+```
+
+可重入解析代码 reentrant parsing code
+
+解析组合器 parser combinator
+
+惰性求值器 lazy evaluator
 
 
 
@@ -657,7 +618,6 @@ beach(Temprature) -> % 根据温度决定去不去海滩玩耍
 
 ```erlang
 16> F = fun() -> io:format("new process~n") end.              
-#Fun<erl_eval.21.126501267>
 17> spawn(F). % 产生一个新进程
 new process
 <0.126.0>
@@ -679,8 +639,7 @@ spawn(模块名，函数名，参数list).
 ### 4.2 发送数据
 
 ```erlang
-Pid ! {a, 12} % 向 Pid 发送消息 {a, 12} 
-
+Pid ! {a, 12} 									% 向 Pid 发送消息 {a, 12} 
 foo(12) ! area({square, 5}) % foo(12) 必须返回一个 Pid , area(...) 将表达式计算出的值，发送给 Pid
 ```
 
@@ -702,8 +661,9 @@ ok
 
 ```erlang
 receive
-	Pattern1 when Guard1 -> Expr1;   % 匹配模式一一验证
-	...
+    Pattern1 when Guard1 -> Expr1;　 % 匹配模式一一验证
+    Pattern2 when Guard2 -> Expr2;
+    Pattern3 -> Expr3
 end
 ```
 
@@ -736,7 +696,7 @@ Shell got "thanks"
 false
 ```
 
-保存状态：
+### 4.4 进程中保存状态
 
 ```erlang
 fridge(FoodList) ->
@@ -789,7 +749,9 @@ Shell got {<0.62.0>,{ok,not_found}}
 >
 > - 将异常处理逻辑从程序的正常执行流中移出来，放到另外一个并发进程中，这样做可以让业务代码更加整洁，只需要处理＂正常的情况＂
 
-### 5.1 抛出错误 throw exit error
+### 5.1 抛出错误
+
+throw exit error
 
 ```erlang
 generate_exception(1) -> a;           % 正常
@@ -818,29 +780,47 @@ demo2() ->
 %%{'EXIT',{a,[{error,generate_exception,1,
 %%[{file,"error.erl"},{line,15}]},
 %%{error,'-demo2/0-lc$^0/1-0-',1,
+
+% 旧的异常处理风格
+case (catch foo(...)) of
+    {'EXIT', Why} ->...
+    Val           ->...
+end.
 ```
 
-### 5.3 try catch 语句
+### 5.3 try catch语句
 
 ```erlang
-% throw exit error 都可以被捕获和分开处理
+try FuncOrExpressionSequence of  %% 首先对FuncOrExpressionSequence求值
+    Pattern1 [when Guard1] ->Expressions1;
+    ...
+catch
+    ExceptionType: ExPattern1 [when ExGuard1] ->ExExpressions1;
+    ...
+after
+    AfterExpressions
+end.
+```
+
+```erlang
+% 新的异常处理风格
 catcher(N) ->
-  % N 是入参 Ret 是表达式的返回值
-  try % 中间可以写多个表达式 , 号隔开
-    generate_exception(N)
+  try 
+    generate_exception(N) % 中间可以写多个表达式, 号隔开
   of
     Ret -> {N, normal, Ret} % 如果表达式执行正常，未抛出异常
   catch
     throw:Ret -> {N, caught, thrown, Ret}; % 处理 throw 异常
-    exit:Ret -> {N, caught, exited, Ret};  % 处理 exit 异常
+    throw:{fileError, Ret} -> {N, caught, thrown, Ret}; % 处理 fileError 异常
+    exit:Ret  -> {N, caught, exited, Ret};  % 处理 exit 异常
     error:Ret -> {N, caught, error, Ret};  % 处理 error 异常
-    _:_ -> {unkown, error}											% 处理所有异常错误的代码
-  after % 一定会执行的子句，不返回任何值，常用来关闭打开的文件等操作
-    {N, always, exec }
+    _:_       -> {unkown, error}											% 处理所有异常错误的代码
+  after 
+    {N, always, exec } % 一定会执行的子句，不返回任何值，常用来关闭打开的文件等操作
   end.
+
 demo1() ->
   [catcher(I) || I <- [1,2,3,4,5]].
-
 %%2> error:demo1().
 %%[{1,normal,a},
 %%{2,caught,thrown,a},
@@ -849,7 +829,7 @@ demo1() ->
 %%{5,caught,error,a}]
 ```
 
-### 5.4 链接 link()
+### 5.4 链接
 
 通过 `link(Pid)` 函数将本进程　与　指定进程链接到一起，当其中一个进程死亡时，另一个可以收到消息通知．
 
@@ -857,38 +837,12 @@ demo1() ->
 myproc() ->
   timer:sleep(5000),
   throw({no_reason}). % 改成 exit 和 error 分别试试
-```
 
-```erlang
-3> link(spawn(linkmon, myproc, [])). % exit({no_reason}) 的表现
-true
-** exception error: {no_reason}
-
-5> link(spawn(linkmon, myproc, [])). % error({no_reason}) 表现
-true
-=ERROR REPORT==== 27-Nov-2020::01:51:42.215265 ===
-Error in process <0.95.0> with exit value:
-{{no_reason},[{linkmon,myproc,0,[{file,"linkmon.erl"},{line,7}]}]}
-** exception error: {no_reason}
-     in function  linkmon:myproc/0 (linkmon.erl, line 7)
-                                                   
-7> link(spawn(linkmon, myproc, [])). % throw({no_reason}) 表现
-true
-=ERROR REPORT==== 27-Nov-2020::01:52:44.791259 ===
-Error in process <0.103.0> with exit value:
-{{nocatch,{no_reason}},[{linkmon,myproc,0,[{file,"linkmon.erl"},{line,7}]}]}
-** exception error: {nocatch,{no_reason}}
-     in function  linkmon:myproc/0 (linkmon.erl, line 7)
-```
-
-
-
-```erlang
 chain(0) ->
   receive
     _ -> ok
   after 2000 ->
-    throw("chain dies here")
+    throw("chain dies here") % 改成 exit 和 error 分别试试
   end;
 chain(N) ->
   link(spawn( fun() -> chain(N - 1) end )),
@@ -898,45 +852,61 @@ chain(N) ->
 ```
 
 ```erlang
-% 错误一直从 chain(0) 传递到本 shell
-12> link(spawn(linkmon, chain, [3])).
-true
-=ERROR REPORT==== 27-Nov-2020::02:01:19.352302 ===
+3> link(spawn(linkmon, myproc, [])). % exit({no_reason}) 的表现
+** exception error: {no_reason}
+
+5> link(spawn(linkmon, myproc, [])). % error({no_reason}) 表现
+Error in process <0.95.0> with exit value:
+{{no_reason},[{linkmon,myproc,0,[{file,"linkmon.erl"},{line,7}]}]}
+** exception error: {no_reason}
+     in function  linkmon:myproc/0 (linkmon.erl, line 7)
+                                                   
+7> link(spawn(linkmon, myproc, [])). % throw({no_reason}) 表现
+Error in process <0.103.0> with exit value:
+{{nocatch,{no_reason}},[{linkmon,myproc,0,[{file,"linkmon.erl"},{line,7}]}]}
+** exception error: {nocatch,{no_reason}}
+     in function  linkmon:myproc/0 (linkmon.erl, line 7)
+                                                   
+12> link(spawn(linkmon, chain, [3])). % 错误一直从 chain(0) 传递到本 shell
 Error in process <0.131.0> with exit value:
 {{nocatch,"chain dies here"},
  [{linkmon,chain,1,[{file,"linkmon.erl"},{line,13}]}]}
 ** exception error: {nocatch,"chain dies here"}
-     in function  linkmon:chain/1 (linkmon.erl, line 13)
+     in function  linkmon:chain/1 (linkmon.erl, line 13)                                                
 ```
 
+错误在进程之间传播，并且杀死对方，是通过＂信号＂实现的．通过将进程设置为＂系统进程＂，可以将＂kill＂信号转化为消息，从而避免被杀死．
 
+````erlang
+6> process_flag(trap_exit, true). % 设置本进程成为 系统进程
 
-## BIF
+7> spawn_link(fun() -> 1/0 end). 
+Error in process <0.92.0> with exit value:
+{badarith,[{erlang,'/',[1,0],[]}]}
+
+8> flush().
+Shell got {'EXIT',<0.92.0>,{badarith,[{erlang,'/',[1,0],[]}]}}
+````
+
+现在快速杀死进程的机制已经有了，现在再看下快速重启的机制．
+
+### 5.5 监控
+
+连接是双向的，并且两个进程之间只能存在一条链接，而监控是单向的，并且可以叠加多条监控．
 
 ```erlang
-1> element(2, {a,b,c}).
-b
+12> erlang:monitor(process, spawn(fun() -> timer:sleep(500) end)).
+#Ref<0.950962386.96468998.180487>
+13> flush().
+Shell got {'DOWN',#Ref<0.950962386.96468998.180487>,process,<0.99.0>,normal}
 ```
 
+### 5.6 命名进程
 
+通过链接和监控都能检测到我们依赖的某个进程的死亡，然后我们可以做些什么呢？
 
+```erlang
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
 
 
