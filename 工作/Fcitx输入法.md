@@ -1,7 +1,5 @@
 # Fcitx输入法
 
-
-
 ```bash
 $ sudo rm -rf ~/.config/fcitx # 删掉旧的配置 
 $ sudo apt-get install fcitx

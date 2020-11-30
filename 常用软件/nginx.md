@@ -269,13 +269,14 @@ http {
 }
 ```
 
-```
-#设定负载均衡的服务器列表
-     upstream mysvr {
+```nginx
+# 设定负载均衡的服务器列表
+upstream mysvr {
     #weigth参数表示权值，权值越高被分配到的几率越大
     #本机上的Squid开启3128端口
     server 192.168.8.1:3128 weight=5;
     server 192.168.8.2:80  weight=1;
     server 192.168.8.3:80  weight=6;
-    }
+}
 ```
+
