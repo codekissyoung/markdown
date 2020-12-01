@@ -20,7 +20,6 @@ Swap:         2.4G       722M       1.7G
 sudo dd if=/dev/zero of=swapfile bs=1024 count=2000000  # 生成一个2G空字节文件
 sudo mkswap -f swapfile                                 # 将这个文件转化为 swap文件
 sudo swapon swapfile                                    # 启用这个swap文件
-
 ```
 
 #### 卸载与配置
@@ -49,7 +48,7 @@ sudo swapoff swapfile      # 卸载这个 swap文件
 
 ## 字符匹配
 
-```
+```bash
 * 代表任意字符串
 ？代表一个字符
 [abcd...]代表从里面选字符
@@ -59,37 +58,19 @@ sudo swapoff swapfile      # 卸载这个 swap文件
 
 ## 重定向
 
-```
-ls  -l  /tmp > /tmp.msg   不再屏幕显示，而是输入到/tmp.msg 这个文件
-date >> /tep.msg    >>表示在末尾追加
-grep 127 < /etc/hosts   输入重定向
-cp -R /usr   /backup/usr.bak  2> /bak.error   错误输出重定
+```bash
+$ cp -R /usr /backup/usr.bak  2> /bak.error   错误输出重定
 ```
 
 ## 命令替换符
 
 ```
-ls  -l  `which touch`  将which touch的输入作为 ls -l 的参数
-```
-
-## 目录与文件管理命令
-
-```
-cp  test.c   /root    复制 test.c 到 /root
-cp   -R   test   /root     复制test 文件夹到 /root
-mv  test.c  /root   移动 test.c 到/root
-mv  test.c  /root/test2.c     移动并且改名
-rm    -rf    /mydir 不询问 y/n，强制删除/mydir 目录和里面的文件
-more  Myfile 分页查看文件内容，空格：下一页，enter：下一行，q：退出
-tail -num log.txt 实时查看文件前num行内容
-ln source.txt  /var/source.txt 创建硬链接
-ln -s  source.txt  /var/source.txt 创建软连接
-sudo chmod -R 777 /sh
+ls  -l  `which touch`  将 which touch 的输出作为 ls -l 的参数
 ```
 
 ## 压缩和解压
 
-```
+```bash
 gzip    -d    文件：压缩为 .gz文件，不支持目录，不保留源文件，-d 为解压缩
 bzip2  -k    文件：压缩为.bz2 文件，它的压缩比非常惊人，-k 会保留源文件。
 bunzip2    .bz2文件：解压 .bz2 文件。
@@ -102,10 +83,10 @@ uzip    压缩文件：解压文件；
 
 ## 文件权限
 
-```
-chmod  [-R]  777   /var/home/www    改变文件/目录权限 -R是递归
-chown   caokaiyan    /var/home/www/aa.txt    改变文件所有者
-chgrp  [-R]  admin        /var/home/www/aa.txt    改变文件所有组
+```bash
+chmod  [-R]  777   /var/home/www 改变文件/目录权限 -R是递归
+chown  caokaiyan   /var/home/www/aa.txt    改变文件所有者
+chgrp  [-R]  admin /var/home/www/aa.txt    改变文件所有组
 ```
 
 ## 用户管理
@@ -143,7 +124,7 @@ route -n：显示本机路由表
 
 ## 查看硬盘分区情况
 
-```
+```bash
 fdisk    -l    [/dev/had]硬盘分区情况
 df    -h    硬盘分区的使用情况
 du    -sh   /root    查看/root下所有目录大小
@@ -157,13 +138,11 @@ Locale    查看当前语言环境
 LANG=zh_CN.UTF-8   设置当前语言 ，LANG 是环境变量
 可以使用配置环境变量，而不用去修改对应的配置文件
 env    列出所有的环境变量
-date   显示当前时间
-cal    显示当前日历
 ```
 
 ## 进程管理
 
-```
+```bash
 ps aux 查看运行的所有进程
 ps e
 kill  8024  通过PID杀死进程
@@ -222,7 +201,6 @@ nohup 命令 &  # 后台命令脱离终端运行
 /etc/gshadow 组密码文件
 
 ## 给用户sudo权限
-
 
 `visudo` 编辑 sudo 文件
 下面是 sudo 文件的配置
@@ -429,7 +407,7 @@ traceroute to www.imooc.com (117.121.101.41), 30 hops max, 60 byte packets
 
 ### mtr
 
-- 能测试出主机到每个路由间的连通性
+能测试出主机到每个路由间的连通性
 
 ```bash
 ➜  ~ mtr -r www.imooc.com

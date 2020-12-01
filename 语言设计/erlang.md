@@ -26,8 +26,6 @@ X1 = X + 1
 
 Erlang 里一切都是表达式，而表达式最终都会产生一个值。
 
-
-
 ### 声明性语言
 
 声明性质的语言原则是：描述应该计算什么，而不是去解释这个值是如何计算出来的．
@@ -57,8 +55,6 @@ case Dgram of
         <<Opts:OptsLen/binary,Data/binary>> = RestDgram, 
 end.
 ```
-
-
 
 
 
