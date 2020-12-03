@@ -396,7 +396,7 @@ time1 between '2011-03-03 17:39:05' and '2011-03-03 17:39:52';
 DATE_FORMA T(date, format);
 ```
 
-## multi query 将多条SQL语句批量执行
+## multiQuery将多条SQL语句批量执行
 
 ```php
 $mysqli = new MySQLi( "ip", "username", "password", "db_name" );

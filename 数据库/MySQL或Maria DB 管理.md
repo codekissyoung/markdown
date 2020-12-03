@@ -1,4 +1,4 @@
-# MySQL 和 Maria DB 管理
+# MySQL和MariaDB管理
 
 ## 深入理解数据库概念
 

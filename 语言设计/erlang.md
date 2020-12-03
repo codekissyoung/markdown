@@ -56,13 +56,7 @@ case Dgram of
 end.
 ```
 
-
-
-### 关卡
-
-关卡是对模式匹配的一种补充．
-
-合法的关卡表达式：
+### Guard
 
 - 原子为 true
 - 常量为 false
@@ -80,18 +74,13 @@ max(X,Y) -> Y.
 
 % , 是 并且 的含义
 func(X, Y) when is_integer(X), X > Y, Y > 6 -> 
-    ....
 
 func(T, L) when is_tuple(T), tuple_size(T) =:= 6, abs(element(3,T)) > 5
 　　　　　　　　　element(4, X) =:= hd(L) -> 
-    ....
-
 % ; 是 或者 的含义
 func(X, Y) when X =:= dog; X =:= cat
                 is_integer(X), X > Y; abs(Y) < 23 ->
-    ...
                                                                              
 func(A, B) when A >= -1.0 andalso A + 1 > B
                 is_atom(L) orelse (is_list(L) andalso length(L) > 2)
-    ...                          
 ```
