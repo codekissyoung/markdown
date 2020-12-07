@@ -750,6 +750,25 @@ demo2() ->
 %%[{file,"error.erl"},{line,15}]}　...
 ```
 
+- catch 从 exit(P) 拿到的是 {'EXIT', P}
+- catch 从 throw(Q) 拿到的就是 Q
+
+如果系统的顶层，不设法修正一个它检测到的错误，那么进程将终止，并且广播给所有的 Linker 和 Monitor. 进程死掉的时候产生了一个 {'EXIT',Why} 异常，那么退出信号 {'EXIT', P, Why} 会发送给所有 Linker 和 Monitor. 
+
+任何收到 Why 不为 normal 信号的进程都会一起死亡,除非它是“系统进程”，系统进程会将退出信号转换为一个进程间通信消息，添加到它的邮箱中。
+
+```erlang
+go() -> 
+    process_flag(trap_exit, true), % 成为系统进程
+    loop().
+loop() -> 
+    receive
+    	{'EXIT', P, Why} -> Why;
+    end.
+```
+
+例外是 exit(P, kill) 调用，这种信号可以直接杀死 P 系统进程.
+
 ### 5.3 try catch
 
 ```erlang
@@ -857,6 +876,11 @@ Shell got {'EXIT',<0.92.0>,{badarith,[{erlang,'/',[1,0],[]}]}}
 连接是双向的，并且两个进程之间只能存在一条链接，而监控是单向的，并且可以叠加多条监控．
 
 ```erlang
+> Ref = erlang:monitor(prcess,B) % 本进程 A 监控进程 B
+{'DOWN', Ref, process, B, Why} % B 死掉时，A 进程会收到本消息
+```
+
+```erlang
 12> erlang:monitor(process, spawn(fun() -> timer:sleep(500) end)).
 #Ref<0.950962386.96468998.180487>
 13> flush().
@@ -904,9 +928,26 @@ critic() ->
   critic().
 ```
 
+
+端口收到的数据，都会转化成 {Port, {data, D}} 消息，给到控制进程。
+
+### 5.7 热更新
+
+A 模块使用 B 模块的代码，假如 B 模块更新来，原来执行B模块代码中进程，既可以选择执行老版本代码，也可以选择执行新版本代码。
+
+```erlang
+-moudule(m).
+loop(Data, F) -> 
+    receive
+    		{From, Q} -> {Reply, Data1} -> F(Q, Data),
+        m:loop(data1, F); % 每次调用都加载最新版本
+        % loop(data1, F); % 希望继续执行当前版本代码，而不是新版本代码
+    end.
+```
+
 ## 6. 定时通知小应用
 
-[Github 代码](https://github.com/codekissyoung/learn-erlang/tree/main/todolist)
+[定时通知小应用代码](https://github.com/codekissyoung/learn-erlang/tree/main/todolist)
 
 ## 7. OTP框架
 
@@ -918,9 +959,59 @@ OTP就是利用上述的机制，考虑了各种陷阱，创建的一组模块�
 
 Erlang并发程序模式：一个函数负责创建新的进程，一个函数负责提供初始值，一个函数负责主循环，具备容错功能的消息发送函数
 
+### 7.1 gen_server
+
+通用型服务进程。
+
+### 7.2 gen_fsm
+
+```erlang
+State(S) x Event(E) -> Actions(A), State(S')
+```
+
+有限状态机适用于文本解析，模式匹配、游戏逻辑等等方面的处理。
+
+```erlang
+gen_fsm:start_link(进程注册名,回调模块,传递给 init/1 的参数, 状态机的选项)
+```
+
+### 7.3 gen_event
+
+事件管理器。
+
+### 7.4 supervisor
+
+监督者。
+
+## 8. OTP 应用
+
+OTP应用特指用 OTP behavior 实现进程，再用一种特定的结构对它们进行打包。通过这个结构，VM 就知道如何进行初始化以及退出清理。
 
 
 
+## 9. 分布式编程
+
+### 9.1 分布式编程
+
+```erlang
+spawn(Node, Fun) % 在一个远端节点 Node, 运行 Fun 进程
+monitor(Node)    % 监视整个节点
+```
+
+### 9.2 端口 Port
+
+```erlang
+Port ! {Pid, Command} % Pid 是端口控制进程 控制端口完成Command任务
+
+% {command, Data} 往端口写入数据
+% close 关闭端口
+% {connect, Pid1} 移交端口控制权给 Pid1
+```
+
+
+
+
+## 10. 分布式OTP应用
 
 
 

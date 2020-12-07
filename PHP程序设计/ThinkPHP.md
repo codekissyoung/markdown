@@ -1,11 +1,8 @@
 # ThinkPHP 3.2.3 框架
 
-`ThinkPHP`的使用笔记.
-
 ## 目录结构
 
 ```bash
-.
 ├── Application             # 应用目录
 │   ├── Common              # 公共模块 （不能直接访问）
 │   │   ├── Common          # 应用公共函数目录
