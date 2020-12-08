@@ -1,53 +1,38 @@
 # Docker
 
-![](http://img.codekissyoung.com/2019/12/11/8fc3e024ef6ccd87fecbc06bb6e61683.png)
-
-## 安装与配置
+## 1. 安装与配置
 
 ```bash
 $ sudo apt-get install linux-image-extra-virtual       
 $ sudo apt-get install apt-transport-https ca-certificates software-properties-common
 $ sudo apt-get install docker.io
-$ sudo usermod -aG docker $USER		# 免 sudo 执行 docker
-$ docker version  
-$ docker info
-```
-
-### 配置加速器
-
-```json
-// /etc/docker/daemon.json
-{
-  "registry-mirrors":[
-    "https://registry.docker-cn.com",
-    "https://reg-mirror.qiniu.com",
-    "https://x39d1d5v.mirror.aliyuncs.com"
-  ]
-}
-```
-
-```bash
 $ sudo systemctl daemon-reload    # 重启 daemon
 $ sudo systemctl restart docker   # 重启 docker daemon
 $ sudo systemctl enable docker    # 开机启动 docker
+$ docker version
+$ docker info
+$ sudo usermod -aG docker $USER      # 免 sudo 执行 docker
+$ dockerd -D -H tcp://127.0.0.1:2376 # 监听socket端口，而不是sock文件
+$ journalctl -u docker.service       # 查看服务日志
 ```
 
-### 服务端管理
-
-```bash
-$ dockerd -D -H tcp://127.0.0.1:2376
-$ journalctl -u docker.service 			# 查看服务日志
-```
+配置加速器 /etc/docker/daemon.json
 
 ```json
-// /etc/docker/daemon.json
 {
-	"debug":true,
+    "registry-mirrors":[
+        "https://registry.docker-cn.com",
+        "https://reg-mirror.qiniu.com",
+        "https://x39d1d5v.mirror.aliyuncs.com"
+    ],
+    "debug":true,
     "hosts":["tcp://127.0.0.1:2376"]
 }
 ```
 
-## 快速常用命令
+
+
+快速常用命令
 
 ```bash
 $ docker build -t="link/ubuntu.v1" .	# 从Dockerfile构建镜像
