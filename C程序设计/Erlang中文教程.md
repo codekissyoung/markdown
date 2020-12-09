@@ -987,8 +987,6 @@ gen_fsm:start_link(进程注册名,回调模块,传递给 init/1 的参数, 状�
 
 OTP应用特指用 OTP behavior 实现进程，再用一种特定的结构对它们进行打包。通过这个结构，VM 就知道如何进行初始化以及退出清理。
 
-
-
 ## 9. 分布式编程
 
 ### 9.1 分布式编程
@@ -1007,8 +1005,6 @@ Port ! {Pid, Command} % Pid 是端口控制进程 控制端口完成Command任�
 % close 关闭端口
 % {connect, Pid1} 移交端口控制权给 Pid1
 ```
-
-
 
 
 ## 10. 分布式OTP应用

@@ -30,109 +30,87 @@ $ journalctl -u docker.service       # 查看服务日志
 }
 ```
 
-
-
-快速常用命令
+## 2. 镜像管理
 
 ```bash
-$ docker build -t="link/ubuntu.v1" .	# 从Dockerfile构建镜像
-$ docker run -d -p 3306:3306 -v /mysql_data:/var/lib/mysql \
--e MYSQL_ROOT_PASSWORD=123456 --restart=always --name db01 mysql:5.6	# Daemon
-```
+$ docker images -a # 查看本地的镜像
+$ docker pull [OPTIONS] NAME[:TAG]  # 从远程库拉取镜像到本地
+$ docker push [OPTIONS] NAME:[:TAG] # 推送库到远程仓库
+$ docker image prune -f	 # 清理无用的镜像
+$ docker rmi 镜像ID/名字	# 删除镜像
+$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04	# 导出镜像到本地文件
+$ docker load -i ubuntu_18.04.tar.gz # 导入本地镜像文件
+$ docker history [OPTIONS] CONTAINER # 查看镜像构建历史
 
-## 镜像管理
-
-```bash
-$ docker images                   						# 查看本地的 Images
-$ docker pull ubuntu              						# 从 Registry 拉取一个 Image 到 本地
-$ docker image prune -f			  						# 清理无用的镜像
-$ docker rmi 镜像ID/名字		   						 # 删除镜像
-$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04		  # 导出镜像到本地文件
-$ docker load -i ubuntu_18.04.tar.gz 				     # 导入本地镜像文件
-```
-
-### 将容器打包成镜像
-
-```bash
+# 1. 将容器固化为一个新的镜像（临时做法）
 $ docker commit -m"commit msg" -a"link" 容器ID link/ubuntu:18.04.v1
 $ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 tag，tag 就是 IMAGE ID 方便易于记忆的
 $ docker history image_id     				# 查看一个Image的构建历史
+
+# 2. 从当前文件夹下 Dockerfile 构建镜像（官方推荐做法）
+$ docker build -t="link/ubuntu.v1" ./ 
 ```
 
-### 利用`Dockerfile`创建镜像
+## 3. 容器管理
+
+### 3.1 运行容器
 
 ```bash
-$ docker build -t link/ubuntu.v1 .
-```
+# 格式: docker run [options] IMAGE [COMMAND] [ARG]
+# -t 在新容器内指定一个伪终端或终端
+# -i 允许你对容器内的标准 IO 进行交互
 
-## 容器管理
-
-### 作为 command 运行
-
-```bash
-# 格式: docker run [image] [command ...]
+# 1. 作为 shell 运行
 $ docker run ubuntu:18.04 /bin/echo "hello 18.04"
-```
 
-### 作为 shell 运行
-
-```bash
+# 2. 退出后停止运行
 $ docker run -it ubuntu:18.04 /bin/bash # 起一个容器，并进入它的终端界面
 root@7f62c7880035:/# cat /proc/version
 root@7f62c7880035:~# exit               # 退出容器，容器也直接停止了
-```
 
-- `-t` 在新容器内指定一个伪终端或终端
-- `-i` 允许你对容器内的标准 IO 进行交互
-
-### 作为 Daemon 运行
-
-```bash
+# 3. 作为 Daemon 运行
 $ docker run -d ubuntu:18.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
-$ docker run -p 3306:3306                       # 端口映射
-$ docker run -v /home/mysql/data:/var/lib/mysql # 存储卷映射
-$ docker run -e VAR="xxxx"                      # 指定容器环境变量
-$ docker run --restart=always  --name web -d centos /bin/sh -c "echo helloworld"    # 自动重启
+$ docker run -p [host-port]:[container-port] # 端口映射
+$ docker run -v [host-dir]:[container-dir]:[rw|ro] # 存储映射
+$ docker run -e VAR="xxxx" # 指定容器环境变量
+$ docker run --restart=always  --name web -d centos /bin/sh -c "echo helloworld" # 自动重启
 # 退出代码非０时才重启，重启尝试次数为５次
 $ docker run --restart=on-failure:5 --name web -d ubuntu /bin/bash 
 ```
 
-### 查看容器
+### 3.2 管理容器
 
 ```bash
 # 查看
-$ docker ps                                     # 查看运行状态的容器
-$ docker ps -a                                  # 查看所有状态的容器
-$ docker stats                                  # 查看所有正在运行的容器的状态
-$ docker logs -ft e73ae1b93869                  # 查看 logs
-$ docker top e73ae1b93869          				# 查看容器内进程
-$ docker inspect e73ae1b93869              		# 查看容器的详细状态
+$ docker ps -a # 查看所有状态的容器
+$ docker stats # 查看所有正在运行的容器的状态
+$ docker logs -ft e73ae1b93869 # 查看 logs
+$ docker events [OPTIONS] # 查看实时系统事件
+$ docker top e73ae1b93869 # 查看容器内进程
+$ docker inspect e73ae1b93869 # 查看容器的详细状态
 
 ## 停止
-$ docker stop e73ae1b93869                      # 停止容器
+$ docker stop e73ae1b93869 # 停止容器
 
 ## 再启动
-$ docker start e73ae1b93869                		# 重新启动已经停止的容器
-$ docker exec -it e73ae1b93869 /bin/bash   		# 附着到一个容器上,连接到容器的shell
+$ docker start e73ae1b93869 # 重新启动已经停止的容器
+$ docker exec -it e73ae1b93869 /bin/bash # 附着到一个容器上,连接到容器的shell
 
 ## 销毁
-$ docker rm e73ae1b93869                   		# 删除一个容器
+$ docker rm e73ae1b93869                 # 删除一个容器
 $ docker container prune            			# 将所有 exit 状态的容器清除
 $ docker rm $(docker ps -aq)        			# 删除所有容器
-```
 
-### 其他容器命令
-
-```bash
-$ docker cp data.txt test:/tmp/ 				# 复制文件到容器内部
-$ docker container port test 					# 查看容器端口映射情况
-$ docker export -o ubuntu18.04.c.tar.gz 容器ID		# 导出一个容器
+# 其他
+$ docker cp data.txt test:/tmp/ # 复制文件到容器内部
+$ docker container port test # 查看容器端口映射情况
+$ docker export -o ubuntu18.04.c.tar.gz 容器ID # 导出一个容器
 $ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1 # 导入一个容器
 ```
 
 如果容器内 `PID = 1` 号进程停止运行了，那么容器也会随着退出。
 
-#### WebApp应用案例
+### 3.3 Web APP案例
 
 ```bash
 $ docker pull training/webapp
@@ -154,14 +132,13 @@ UID   PID    PPID   C   STIME   TTY   TIME      CMD
 root  26706  26678  0   17:35   ?     00:00:00  python app.py
 ```
 
-#### 数据库案例
+### 3.4 容器启动案例
 
 ```bash
-$ docker pull mysql:5.6        # 获取一个 Mysql 5.6 的镜像
-$ docker run -p 3306:3306 -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6
+# 启动一个数据库
+$ docker run -d -p 3306:3306 -v ~/mysqldata:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=123456 --restart=always --name db01 mysql:5.6
 ```
-
-## 数据卷
 
 ```bash
 $ docker volume create -d local test
@@ -169,9 +146,22 @@ $ docker run -d -P --mount type=bind,source=/webapp,destination=/opt/webapp trai
 $ docker run -d -P -v /webapp:/opt/webapp training/webapp python app.py 
 ```
 
-## Dockerfile
+### 3.5 容器应用栈例子
 
-### Nginx例子
+![](img/98c2d45ad8c30670d22f7e6e929346f9.png)
+
+```bash
+$ docker pull ubuntu
+$ docker pull django
+$ docker pull haproxy
+$ docker pull redis
+```
+
+
+
+## 4. Dockerfile
+
+### 4.1 Nginx例子
 
 ```dockerfile
 FROM ubuntu:18.04
@@ -192,8 +182,6 @@ $ curl localhost:32776
 Hi, I am your container
 ```
 
-#### Dockerfile 参考
-
 ```dockerfile
 FROM ubuntu:18.04
 MAINTAINER link "link@muchenglin.com"
@@ -208,7 +196,7 @@ EXPOSE 80
 CMD /usr/sbin/sshd -D
 ```
 
-## 容器互联
+## 5. 容器互联
 
 ```bash
 $ ip a show # 查看 ip 地址，没有 ifconfig 情况下使用
