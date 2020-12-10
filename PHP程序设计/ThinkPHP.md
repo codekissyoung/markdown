@@ -25,10 +25,9 @@
 
 一个 TP 项目中，一个入口文件`index.php`配上一个模块`Admin/` 构成一个应用，应用之间理论上是应该逻辑隔离的，只有`Common/`模块是共享的．
 
-### 1.1 入口文件
+### 1.1 入口文件 index.php
 
 ```php
-// index.php
 // THINK_PATH	框架目录
 // STORAGE_TYPE	存储类型（默认为File）
 // APP_MODE	应用模式（默认为common）
@@ -38,6 +37,7 @@ define('APP_PATH','./Application/');        # apps dir, only one
 define('RUNTIME_PATH', '/tmp/tp-runtime');  # runtime dir, need writable
 define('BIND_CONTROLLER','控制器名称');      # 入口文件绑定默认访问控制器
 define('BIND_ACTION', '动作名称');           # 入口文件绑定默认访问动作
+
 require './ThinkPHP/ThinkPHP.php';
 ```
 
@@ -47,36 +47,24 @@ require './ThinkPHP/ThinkPHP.php';
 配置的加载顺序：
 
 ```bash
-ThinkPHP/Conf/convention.php
-Application/Common/Conf/config.php
-Application/Common/Conf/config_应用模式名称.php       # 可选
-ThinkPHP/Conf/debug.php                              # 可选
-Application/Common/Conf/debug.php                    # 可选
-Application/Common/Conf/dev.php                      # 状态配置，用于划分 生产 和 测试　define('APP_STATUS','dev');
-Application/Common/Conf/user.php　				   # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
-Application/Common/Conf/db.php
-Application/当前模块名/Conf/config.php                # 模块配置
-Application/当前模块名/Conf/config_应用模式名称.php    # 可选
-Application/当前模块名/Conf/dev.php                   # 可选
-Application/当前模块/Conf/user.php
-Application/当前模块/Conf/db.php
+# 模块共用
+ThinkPHP/Conf/convention.php # 默认配置
+Application/Common/Conf/config.php # 公共配置
+Application/Common/Conf/config_$APP_MODE.php # 运行模式配置可选　默认为common，还有 sae api 模式可选
+ThinkPHP/Conf/debug.php # 调试配置 可选
+Application/Common/Conf/dev.php # 场景配置，用于划分生产和测试　define('APP_STATUS','dev'); home company pro 等　
+Application/Common/Conf/user.php # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
+Application/Common/Conf/db.php # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
+
+# 模块独立配置
+Application/$MODULE/Conf/config.php                # 模块配置
+Application/$MODULE/Conf/config_$APP_MODE.php    # 可选
+Application/$MODULE/Conf/dev.php                   # 可选
+Application/$MODULE/Conf/user.php
+Application/$MODULE/Conf/db.php
 ```
 
 每个配置文件返回一个数组，同样的键，后面加载的值覆盖前面的．
-
-```php
-// Application/Common/Conf/config.php
-'SHOW_PAGE_TRACE' => true,                  # 开启 Trace 调试工具
-'URL_CASE_INSENSITIVE' => true,             # 忽略大小写
-'DB_TYPE' => 'mysql',                       # mysql数据库类型
-'DB_HOST' => 'localhost',                   # 数据库 host
-'DB_USER' => 'root',                        # 用户名
-'DB_PWD' => '123456',                       # 密码
-'DB_NAME' => 'ThinkPHP',                    # 数据库名称
-'DB_PREFIX' => 'prefix_',                   # 表的前缀
-```
-
-#### 
 
 ```php
 # 获取配置
