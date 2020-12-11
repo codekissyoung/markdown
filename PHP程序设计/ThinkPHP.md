@@ -49,9 +49,11 @@ require './ThinkPHP/ThinkPHP.php';
 ```bash
 # 模块共用
 ThinkPHP/Conf/convention.php # 默认配置
+ThinkPHP/Conf/debug.php # 调试配置 可选
+
+# 公共模块配置，所有模块都会先加载的
 Application/Common/Conf/config.php # 公共配置
 Application/Common/Conf/config_$APP_MODE.php # 运行模式配置可选　默认为common，还有 sae api 模式可选
-ThinkPHP/Conf/debug.php # 调试配置 可选
 Application/Common/Conf/dev.php # 场景配置，用于划分生产和测试　define('APP_STATUS','dev'); home company pro 等　
 Application/Common/Conf/user.php # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
 Application/Common/Conf/db.php # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
