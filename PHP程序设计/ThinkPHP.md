@@ -57,9 +57,9 @@ Application/Common/Conf/user.php # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
 Application/Common/Conf/db.php # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
 
 # 模块独立配置
-Application/$MODULE/Conf/config.php                # 模块配置
-Application/$MODULE/Conf/config_$APP_MODE.php    # 可选
-Application/$MODULE/Conf/dev.php                   # 可选
+Application/$MODULE/Conf/config.php # 模块配置
+Application/$MODULE/Conf/config_$APP_MODE.php # 可选
+Application/$MODULE/Conf/dev.php # 可选
 Application/$MODULE/Conf/user.php
 Application/$MODULE/Conf/db.php
 ```
@@ -77,21 +77,93 @@ C( 'USER_CONFIG.USER_TYPE', 1 );    // 设置 二维
 C( ['WEB_SITE_TITLE'=>'ThinkPHP','WEB_SITE_DESCRIPTION'=>'开源PHP框架'] ); // 批量设置
 ```
 
-## 3. 模块
 
-默认以 `PATHINFO` 模式访问应用：
+
+## 3. 路由
+
+下面这个访问模式是固定的．
 
 ```bash
-http://serverName/index.php/模块/控制器/操作/[参数名/参数值...]
-$ php index.php 模块/控制器/操作/[参数名/参数值...]
+http://serverName/index.php/模块/控制器/操作　　　　# Web 访问
+php index.php 模块/控制器/操作 				   # 命令行访问
 ```
 
-应用： 一个入口文件，代表一个应用。
-模块：`APP_PATH` 下，一个 `Module` (比如`Home`) 代表一个模块，一个应用下可以有多个模块。
-控制器：`Module`下`Controller`目录下，一个控制器类，代表一个控制器
-操作：控制器类的方法，一个方法 表示 一个操作
+后续给到操作的参数，一般设置成 `rewrite` 模式, 即没有　`index.php`　文件（需要启用 Nginx 或是 Apache 的 `rewrite.so` URL 重写模块），将下列 `URL` :
 
-## CBD 模式
+```
+http://xxx.com/Home/LinkTest/test/name/link/age/19
+# name : link , age : 19
+```
+
+```php
+// Application/Home/Controller/LinkTestController.class.php
+class LinkTestController extends Controller
+{
+    public function test($name = "", $age = 0) {
+        echo "name : $name , age : $age ";
+    }
+}
+```
+
+### 3.1 自定义路由
+
+略过
+
+## 4. 控制器
+
+控制器文件名必须以 `.class.php` 结尾
+
+`spl_autoload_register` 以 `Application` 作为查找路径的，所以相应的完整类名为:`模块文件夹名\文件夹名\类文件名`，类文件名注意要去掉 `.class.php` 后缀．
+
+### 4.1 Ajax 返回
+
+```php
+// 指定XML格式返回数据
+$data['status']  = 1;
+$data['content'] = 'content';
+$this->ajaxReturn($data,'xml');
+```
+
+### 4.2 读取输入
+
+```php
+I('get.id',0); // 如果不存在$_GET['id'] 则返回0
+I('get.name',''); // 如果不存在$_GET['name'] 则返回空字符串
+I('get.name','','htmlspecialchars'); // 采用htmlspecialchars方法对$_GET['name'] 进行过滤，如果不存在则返回空字符串
+I('post.name','','htmlspecialchars'); // 采用htmlspecialchars方法对$_POST['name'] 进行过滤，如果不存在则返回空字符串
+I('session.user_id',0); // 获取$_SESSION['user_id'] 如果不存在则默认为0
+I('cookie.'); // 获取整个 $_COOKIE 数组
+I('server.REQUEST_METHOD'); // 获取 $_SERVER['REQUEST_METHOD'] 
+I('post.email','','email'); // 验证为 email
+
+// http://serverName/index.php/New/2013/06/01
+
+// 正则匹配过滤
+I('get.name','','/^[A-Za-z]+$/'); // 采用正则表达式进行变量过滤
+I('get.id',0,'/^\d+$/');
+
+// 修饰符
+I('get.id/d'); // 强制变量转换为整型
+I('post.name/s'); // 强制转换变量为字符串类型
+I('post.ids/a'); // 强制变量转换为数组类型
+```
+
+### 4.3 前置后置操作
+
+```php
+public function _before_index(){ // 前置操作方法
+	echo 'before<br/>';
+}
+public function _after_index(){ // 后置操作方法
+	echo 'after<br/>';
+}
+```
+
+## 5. 模型
+
+
+
+## 5. CBD 模式
 
 ```php
 ./TinkPHP                                       # 框架系统
@@ -124,35 +196,15 @@ $ php index.php 模块/控制器/操作/[参数名/参数值...]
 │   ├── Api
 │   ├── api.php
 │   ├── common.php                              # 普通模式定义文件
-│   ├── Lite
 │   ├── Sae
 │   └── sae.php
 └── Tpl                 # 系统模板
     └── think_exception.tpl
 ```
 
-### 3.1 控制器
-
-```php
-// Home/Controller/IndexController.class.php
-namespace Home\Controller;
-use Think\Controller;
-class IndexController extends Controller{
-    public function index(){
-        echo "<h1> Hello ThinkPHP</h1>";
-    }
-}
-```
-
-在浏览器中访问 `http://host/Home/Index/index` 即是访问`IndexController`类的`index()`方法。
-
-`spl_autoload_register`注册的自动加载函数中，是以`Application`作为查找路径的，所以相应的完整类名为:`Home\Controller\IndexController`。
-
-PS: 控制器文件名以`.class.php`结尾，这是`ThinkPHP`框架要求的，在框架代码里面强制要求类符合这一规范，才会自动被加载。
 
 
-
-## 调试
+## 6. 调试
 
 ```php
 dump( C() );                                        # 获取 ThinkPHP 中定义的所有配置
@@ -160,7 +212,7 @@ dump( get_defined_constants(true)['user'] );        # 获取 ThinkPHP 中定义�
 ```
 
 
-## 开发规范
+## 7. 开发规范
 
 - `ThinkPHP` 内部类库文件名：类名(驼峰 首字母大写) + `class.php`
 - `APP_PATH` 目录为命名空间的顶层目录，所有内部类的 `namespace` 与 路径 保持一致，比如：
