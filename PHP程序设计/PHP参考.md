@@ -80,11 +80,7 @@ $obj instanceof interface_name ; // 判断 $obj 是否实现了某个接口
 
 // 调用方法
 call_user_func('myFunction');
-
-// 调用方法
-call_user_func( [ $myObj, 'method_name'], 20 );
-// 等价于
-$myObj -> method_name(20);
+call_user_func( [ $myObj, 'method_name'], 20 );  // 等价于 $myObj -> method_name(20);
 
 call_user_func_array([$obj,'method_name'],$args);
 // 等价于

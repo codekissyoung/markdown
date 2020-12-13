@@ -2,30 +2,9 @@
 
 ## 第 1 章 Unix 系统编程概述
 
-登录、运行与注销:
+在登录过程中，当用户名和密码通过验证后，内核启动 `shell进程`,然后把用户交给`shell`,shell 再去与内核交互，期间 shell 也可以帮用户启动其他程序
 
-- 在登录过程中，当用户名和密码通过验证后，内核启动 `shell进程`,然后把用户交给`shell`,shell 再去与内核交互，期间 shell 也可以帮用户启动其他程序
-- 每个用户都有属于自己的`shell`进程
-- 当用户注销时，内核会结束所有分配给这个用户的进程
-
-- 从宏观的角度看，系统可能由很多程序，很多计算机系统相互连接而成
-- 通信: 进程 如何 与其他进程 交换信息?
-- 协作: 如何协调多个进程，使它们没有冲突的访问共享资源?
-- 网络: 处于不同计算机的程序，如何通过网络连接到一起？
-
-拷贝`stdin`输入流到`stdout`输出流程序:
-
-```c++
-int main( int argc, char *argv[] )
-{
-    int c;
-    while ( ( c = getchar() ) != EOF )
-        putchar( c );
-    return EXIT_SUCCESS;
-}
-```
-
-第一个版本的`more`程序:
+每个用户都有属于自己的`shell`进程，当用户注销时，内核会结束所有分配给这个用户的进程
 
 ```c++
 #define PAGELEN 3       // 一页显示行数
@@ -64,7 +43,8 @@ int see_more() {
     int c;
     printf("see more?");
 
-    // 演示下从 /dev/tty 读取数据, Linux 会自动将 /dev/tty 重定向到一个终端窗口，因此该文件对于读取人工输入时特别有用
+    // 演示下从 /dev/tty 读取数据, 
+    // Linux 会自动将 /dev/tty 重定向到一个终端窗口，因此该文件对于读取人工输入时特别有用
     FILE *fp_tty = fopen( "/dev/tty", "r" );
     if( fp_tty == nullptr )
         exit( 1 );
@@ -86,17 +66,13 @@ int see_more() {
 }
 
 void do_more( FILE *fp ){
-
     char line[LINELEN];
     int num_of_lines = 0;
-
     while ( fgets( line, LINELEN, fp ) ){
-
         if( fputs( line, stdout ) == EOF )
             exit(1);
         else
             ++num_of_lines;
-
         // 每输出固定行，就询问一下用户，下一步操作: 退出？下一行？下一页？
         if( num_of_lines == PAGELEN ){
             int reply = see_more();
@@ -111,8 +87,8 @@ void do_more( FILE *fp ){
 
 `more`程序待解决的问题:
 
-- 终端如何反白显示文字？
 - 如何使用户输入的字符立即送到程序，而不用等待`[Enter]`? 如何使输入的字符不回显？用户操作的终端有很多参数，通过调整参数实现上述问题。
+
 - 用户终端是分类型的(比如 VT100 终端), 类型会影响到参数调整，如何使得程序能够兼容处理各种类型的终端? 这需要学习如何控制和调整终端参数的知识。
 
 ## 第 2 章 用户、文件操作与链接帮助

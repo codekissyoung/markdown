@@ -11,7 +11,7 @@ Code Review主要用来在软件工程过程中改进代码质量，通过Code R
 
 Code Review是一种用来确认方案设计和代码实现的质量保证机制，通过这个机制我们可以对代码、测试过程和注释进行检查。
 
-## 1.2Code Review的前提
+## 1.2 Code Review的前提
 
 进入Code Review需要检查的条件如下：
 （1）Code Review人员是否理解了Code Review的概念和Code Review将做什么

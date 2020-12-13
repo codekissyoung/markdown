@@ -8,7 +8,6 @@
 
 ```bash
 ➜ www.dadishe.com tree
-.
 ├── Apache
 │   ├── 1_root_bundle.crt
 │   ├── 2_www.dadishe.com.crt

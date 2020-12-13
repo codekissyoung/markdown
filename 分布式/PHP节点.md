@@ -22,7 +22,7 @@ $ sudo composer selfupdate
 $ composer config -g repo.packagist composer https://packagist.phpcomposer.com
 ```
 
-在`t1`目录下，创建一个`composer.json`文件：
+在`t1`目录下，创建一个`composer.json`文件
 
 ```json
 {

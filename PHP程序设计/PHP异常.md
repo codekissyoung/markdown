@@ -1,7 +1,5 @@
 # 异常处理流程
 
-## 参考
-
 ```php
 class My_Exception extends Exception {
     function getInfo() {

@@ -6,10 +6,7 @@
 sudo aptitude install -y nginx          # 安装
 sudo systemctl start nginx.service      # 启动
 cky@codekissyoung2:~$ sudo lsof -i:80   # 检测是否启动
-
-# 配置目录
 cky@cky-pc:/etc/nginx$ tree -L 1
-.
 ├── conf.d                  # 一般性的配置文件
 ├── fastcgi.conf            # FastCGI 配置文件
 ├── fastcgi_params          # FastCGI 默认参数
@@ -24,9 +21,9 @@ cky@cky-pc:/etc/nginx$ tree -L 1
 ├── snippets
 ```
 
-## Ubuntu 下彻底删除 Nginx，重新安装
+## Ubuntu 下彻底删除 Nginx 重新安装
 
-如果自己手动删除 Nginx 后，删除`/etc/nginx`目录后，或者其他相关文件后，再次重装，可能会发生安装不上的问题，所以要 **完全清理**,以下是方法
+如果自己手动删除 Nginx 后，删除`/etc/nginx`目录后，或者其他相关文件后，再次重装，可能会发生安装不上的问题，所以要 **完全清理**, 以下是方法
 
 ```bash
 # 1. 关闭Nginx进程

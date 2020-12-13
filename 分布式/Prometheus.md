@@ -112,10 +112,8 @@ http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",
 // 在总共2次请求当中。http 请求响应时间 <=10 秒 的请求次数为 2
 http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="10.0",} 2.0
 http_requests_latency_seconds_histogram_bucket{path="/",method="GET",code="200",le="+Inf",} 2.0
-
 // 实际含义： 发生的2次 http 请求总的响应时间为 13.107670803000001 秒
 http_requests_latency_seconds_histogram_sum{path="/",method="GET",code="200",} 13.1076708
-
 // 实际含义： 当前一共发生了 2 次 http 请求
 http_requests_latency_seconds_histogram_count{path="/",method="GET",code="200",} 2.0
 ```

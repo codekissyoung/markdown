@@ -43,21 +43,16 @@ int mkfifo( char *filename, mode_t mode); # 创建有名管道
 
 ```c
 #define BUFES PIPE_BUF
-
 int main( int argc, char* argv[] )
 {
     int fd;
     int len = 0;
     char buf[BUFES];
-
-    if( ( fd = open( "/home/cky/workspace/C/IPC/fifo1", O_RDONLY ) ) < 0 )
-    {
+    if( ( fd = open( "/home/cky/workspace/C/IPC/fifo1", O_RDONLY ) ) < 0 ){
         perror("open error\n");
         exit(1);
     }
-
-    while( ( len = read( fd, buf, BUFES ) ) > 0 )
-    {
+    while( ( len = read( fd, buf, BUFES ) ) > 0 ){
         printf("read info from fifo1 : %s\n", buf );
     }
     printf("hehe");
@@ -68,7 +63,6 @@ int main( int argc, char* argv[] )
 
 ```c
 #define BUFES 256
-
 int main( int argc, char* argv[] )
 {
     int fd;

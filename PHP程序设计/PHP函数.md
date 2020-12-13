@@ -210,13 +210,11 @@ call_user_func_array([$foo, "bar"], ["three", "four"]); // 等价 $foo->bar("thr
 
 ```php
 namespace Foobar;
-
 class Foo {
     static public function test($name) {
         print "Hello {$name}!\n";
     }
 }
-
 call_user_func_array( __NAMESPACE__ .'\Foo::test', ['Hannes']);
 call_user_func_array( [__NAMESPACE__ .'\Foo', 'test'], ['Philip']);
 ```

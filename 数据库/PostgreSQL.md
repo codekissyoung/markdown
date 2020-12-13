@@ -1,7 +1,5 @@
 # PostgreSQL
 
-
-
 ## 1. 安装
 
 ```bash

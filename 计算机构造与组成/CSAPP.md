@@ -10,12 +10,6 @@
 
 ## 1. 系统漫游
 
-#### 编译流程
-
-![编译流程](https://img.codekissyoung.com/2019/10/07/1da6efa564b71d4b0d79bb3742020acb.png)
-
-#### 系统硬件
-
 ![系统硬件](https://img.codekissyoung.com/2019/10/07/73e58c74a0eea7f9f53c1c4bdae601db.png)
 
 CMOS是一块芯片，记录计算机硬件信息。BIOS 是可以修改 CMOS 的程序，该程序为写死在硬件上，不可修改。硬件开机，第一个执行的程序便是 BIOS ，然后再是操作系统的引导程序（MBR：主引导记录，GRUB：统一引导加载器），然后是操作系统内核，再是内核上的操作系统。

@@ -15,10 +15,8 @@ AC_CONFIG_HEADERS([config.h])                # 宏用于生成config.h文件，�
 AC_PROG_CC                                   # 指定编译器，默认gcc
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h stdlib.h string.h sys/param.h sys/socket.h unistd.h])
 AC_TYPE_PID_T
-
 AC_FUNC_FORK
 AC_CHECK_FUNCS([memset socket])
-
 AC_CONFIG_FILES([Makefile])                   # 用于生成相应的Makefile文件
 AC_OUTPUT
 ```
