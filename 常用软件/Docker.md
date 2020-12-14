@@ -65,7 +65,6 @@ $ docker run ubuntu:18.04 /bin/echo "hello 18.04"
 
 # 2. 退出后停止运行
 $ docker run -it ubuntu:18.04 /bin/bash # 起一个容器，并进入它的终端界面
-root@7f62c7880035:/# cat /proc/version
 root@7f62c7880035:~# exit               # 退出容器，容器也直接停止了
 
 # 3. 作为 Daemon 运行
@@ -73,15 +72,13 @@ $ docker run -d ubuntu:18.04 /bin/sh -c "while true; do echo hello world; sleep 
 $ docker run -p [host-port]:[container-port] # 端口映射
 $ docker run -v [host-dir]:[container-dir]:[rw|ro] # 存储映射
 $ docker run -e VAR="xxxx" # 指定容器环境变量
-$ docker run --restart=always  --name web -d centos /bin/sh -c "echo helloworld" # 自动重启
-# 退出代码非０时才重启，重启尝试次数为５次
-$ docker run --restart=on-failure:5 --name web -d ubuntu /bin/bash 
+$ docker run --restart=always 				# 自动重启
+$ docker run --restart=on-failure:5 # 退出代码非０时才重启，重启尝试次数为５次
 ```
 
 ### 3.2 管理容器
 
 ```bash
-# 查看
 $ docker ps -a # 查看所有状态的容器
 $ docker stats # 查看所有正在运行的容器的状态
 $ docker logs -ft e73ae1b93869 # 查看 logs
@@ -110,28 +107,6 @@ $ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1 # 导入一个容器
 
 如果容器内 `PID = 1` 号进程停止运行了，那么容器也会随着退出。
 
-### 3.3 Web APP案例
-
-```bash
-$ docker pull training/webapp
-$ docker run -d -P training/webapp python app.py              # -P 主机随机端口
-$ docker run -d -p 4000:5000 training/webapp python app.py    # -p 指定主机端口
-$ docker ps
-CONTAINER ID  IMAGE           COMMAND         CREATED       STATUS        PORTS
-05941fb95b13  training/webapp "python app.py" 4 seconds ago Up 3 seconds  0.0.0.0:4000->5000/tcp
-51c8abb1e411  training/webapp "python app.py" 2 minutes ago Up 2 minutes  0.0.0.0:32807->5000/tcp
-
-$ curl localhost:4000
-Hello world!%
-
-$ docker logs -ft 05941fb95b13
-2020-02-20T09:35:38.040175400Z Running on http://0.0.0.0:5000/
-
-$ docker top 05941fb95b13
-UID   PID    PPID   C   STIME   TTY   TIME      CMD
-root  26706  26678  0   17:35   ?     00:00:00  python app.py
-```
-
 ### 3.4 容器启动案例
 
 ```bash
@@ -147,8 +122,6 @@ $ docker run -d -P -v /webapp:/opt/webapp training/webapp python app.py
 ```
 
 ### 3.5 容器应用栈例子
-
-![](img/98c2d45ad8c30670d22f7e6e929346f9.png)
 
 ```bash
 $ docker pull ubuntu
@@ -185,14 +158,11 @@ Hi, I am your container
 ```dockerfile
 FROM ubuntu:18.04
 MAINTAINER link "link@muchenglin.com"
-
 RUN /bin/echo "root:Link_123456" | chpasswd
 RUN useradd link
 RUN /bin/echo "link:Link_123456" | chpasswd
-
 EXPOSE 22
 EXPOSE 80
-
 CMD /usr/sbin/sshd -D
 ```
 
