@@ -1,18 +1,7 @@
 # PHP 语言
 
-如何从一门编程语言的角度，去学习`PHP`?
-
-## 准备工作
-
-首先，安装好`xdebug`工具，方便我们调试`PHP`代码。
-
-```bash
-$ sudo apt-get install php-xdebug
-```
-
 ```php
-$name = "Link";
-xdebug_debug_zval( 'name' ); // name: (refcount=1, is_ref=0) string 'Link' (length=4)
+
 ```
 
 ## 变量
