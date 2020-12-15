@@ -1,20 +1,21 @@
-# SHELL
+# SHELL脚本
 
-`SHELL`的操作对象是 **文件**、**文本行**：执行程序，查找文件，删除文件，批量改变文件名，备份文件、列出目录的文件。
+## １．概述
 
-`awk` 可作为 `SHELL` 操作 **文本列** 的补充，更细一个粒度。
+Shell 比较适合文件、文本行、文本列粒度的操作。执行程序、查找文件、删除文件、批量改变文件名、备份文件、列出目录的文件等。它的调用命令可以划分为：
 
-`SHELL`中的调用命令分类：
+- 内建命令 : 不会产生子进程，为了效率才内建，比如 cd / read / echo
+- 函数 : 函数可以直接作为命令一样使用
+- 外部命令 : 在　PATH　里搜寻并且执行的命令，产生子进程
 
-- **内建命令** : 不会产生子进程，为了效率才内建，比如`cd` `read` `echo`
-- **函数** : 函数可以直接作为命令一样使用
-- **外部命令** : 在`PATH`里搜寻并且执行的命令，产生子进程
+SHELL 脚本的执行被设计为阻塞式的，从上到下，依次执行，遇见创建子进程的外部命令，一定会等待子进程返回后，才继续往下执行。所有命令返回 0 表示执行成功。
 
-`SHELL` 脚本的执行被设计为阻塞式的，从上到下，依次执行，遇见创建子进程的外部命令，一定会等待子进程返回后，才继续往下执行。所有命令返回 0 表示执行成功。
+作为脚本执行的 shell 程序是子进程，没有 alias 别名，没有环境变量 PS1，不读入初始化文件，所有的操作不会影响到父进程。别名在脚本中默认不开启，所以不要使用别名。
 
-## 执行环境
+> PS : 用 `.` 或 `source` 执行，则是在当前`Shell`进程中执行，所以会对当前环境产生影响。
 
 ```bash
+＃ 初始化文件
 $ /etc/profile (必读) --> /etc/profile.d/*.sh (可选)
 $ ~/.bash_profile (必读) --> ~/.bash_login, or ~/.profile --> ~/.bashrc -->  /etc/bashrc (可选)
 $ ~/.bash_logout (退出必读)
@@ -22,17 +23,11 @@ $ ~/.bash_logout (退出必读)
 
 ```bash
 if [ -z "$PS1" ]; then
-    echo "脚本里";
-else
-    echo "交互式环境里";
+    echo "作为脚本运行"
 fi
 ```
 
-执行脚本启动 `SHELL` 子进程中没有`alias`、没有环境变量`PS1`、不读入初始化文件（`profile`等）、没有作业控制（当然的事）... 所有的操作不会影响到父进程。
-
-而以命令 `.` 或 `source` 执行脚本，则是在当前`Shell`进程中执行，所以会对当前环境产生影响。
-
-### 长时间运行脚本
+## 2. 作为 Daemon 运行
 
 当远程`SSH`登录执行长时间运行的命令时，如果网络中断，则终端会收到`HUP`中断信号，从而关闭所有的子进程。所以为了长时间运行程序不受干扰，我们需要：
 
@@ -46,7 +41,9 @@ $ setsid ping www.baidu.com &> setsid_ping.log  # setsid 命令
 $ (ping www.baidu.com &> abc.log &)             # 孙子进程法，最后命令成了 孤儿进程
 ```
 
-#### 通配符
+## 3. 基础知识
+
+### 3.1 通配符
 
 ```bash
 *                     代表任意字符串
@@ -58,52 +55,24 @@ $ (ping www.baidu.com &> abc.log &)             # 孙子进程法，最后命令
 ls my_{finger,toe}s   匹配 my_fingers my_toes
 ```
 
-#### 信号
-
-```bash
-Ctrl + z        # HUP 挂起当前进程
-Ctrl + c        # INT 中断当前进程
-$ kill -l       # 列出所有信号
-kill -9 PID     # 给 PID 进程发送信号 9 KILL 
-kill -QUIT PID  # QUIT信号、TERM 软件终止信号
-```
-
-#### 命令别名
-
-在脚本中默认不开启，所以不可以使用别名。
-
-```bash
-# `./xxx.sh`运行shell脚本,，alias别名无效，`source`和`.`方式是起有效的，因为是在当前shell运行
-alias ls='ls --color=auto';
-alias rm='rm() { mv $@ ~/backup/; };rm' # 配合函数，使用alias命令,将危险的rm命令，替换成mv命令
-```
-
-#### 搜索
-
-```bash
-$ whereis gcc                   
-$ sudo updatedb && locate gcc
-```
-
-## 调试
+### 3.2 调试脚本
 
 ```bash
 set -x              # 调试开始, 显示每条实际执行的命令和参数
-# 调试代码 ...
+# 业务代码 ...
 set +x              # 调试结束
 ```
 
-## 输入
-
-对于 `内置命令` `外部命令` `内置函数` 来说，输入只有两个来源：`参数` 和 `/dev/stdin` 输入流。
-
-### 参数来源
+### 3.3 脚本参数
 
 ```bash
-$0,$1,$2,$3,$#      # 脚本名参数，第1，2，3个参数，参数个数
-$@                  # 整个命令行
-$*                  # 用 IFS 的第一个字符(一般是空格)分割后，产生的 列表
-$$                  # 当前脚本的 进程号
+$$            # PID
+$0								# 脚本名
+$1,$2,$3 			 # 第1，2，3个参数
+$# 								# 参数个数
+$@  						 # 整个命令行
+$*								 # 用 IFS 的第一个字符(一般是空格)分割后，产生的 列表
+$?							  # 子 shell 的退出值，上一个程序执行后的退出码
 ```
 
 `shift` 命令将参数左移动，`$1` 的原先的值丢弃，`$2` 的值变为 `$1` 的值，依次类推
@@ -122,31 +91,51 @@ while [ -n "$1" ] ;do
 done
 ```
 
-### 输入流来源
+### 3.4 子shell
+
+`$()` 产生一个子进程，子进程不会对当前 shell 有任何影响
 
 ```bash
-#!/bin/bash
+count=$(ls | cat -n | wc -l)
+echo "共有$count个子文件"
+
+count2=`ls | cat -n | wc -l`        # `` 与 $() 相同
+echo "count2 : $count2";
+```
+
+### 3.5 退出shell
+
+```bash
+exit 0          # 正常退出, 1 ~ 255 都表示错误
+echo $?         # 输出上一个程序执行后的退出码
+```
+
+## 4. 输入
+
+
+### 4.1 脚本输入流
+
+```bash
+# t.sh
 var=$(cat -);	                # 等价于 $(cat /dev/stdin)
 echo "from input : ${var}";
-```
 
-```bash
 $ echo "ok" | t.sh 
 from input : ok
+
+# yes 不断输出 y 字符，通过管道变成成了 rm 的输入流，当 rm 从输入流中读取时，会读到 y 
+# 所以就不需要手动敲 y 来确认删除
+$ yes | rm -i *.txt 
 ```
 
-`yes` 命令作用是不停输出 `y`，连接到管道时，比如 `yes | rm -i *.txt` ，`rm` 从`/dev/stdin`中读取到 `y`，就可以不需要手动敲 `y` 来确认删除。
+### 4.2 输入流转化为参数
 
-### 输入流来源 => 参数来源 Xargs
-
-部分 `SHELL` 命令被设计成 只接受 命令行 参数输入，所以我们需要一个能将 `/dev/stdin` 转换为 命令行参数的工具 `xargs`。
+部分命令被设计成 只接受 命令行 参数输入，所以我们需要一个能将 输入流 转换为 命令行参数的工具 `xargs`。
 
 ```bash
-#!/bin/bash
-echo "get ${*} ok";
-```
+# t.sh
+echo "get $* ok";
 
-```bash
 $ echo "hello bob" | t.sh
 get  ok                 # 取值 失败
 
@@ -158,7 +147,12 @@ get hello ok
 get bob ok              # 取值成功，而且是分割开调用 t.sh 两次
 ```
 
-这就是`xargs`的作用，采用`空格`（换行符先转换为空格）作为分割符，将`/dev/stdin`流分割，通过`-n`指定每次传几个参数 给到 后面的命令 作为参数，更厉害的是，可以通过 `-I {}` 指定 传入参数的 位置。`-0`指定分割符为`NULL`(字符串结尾)，`-d:`指定分割符为`:`。
+`xargs`　采用　`空格` `换行`　作为分割符，将输入流的文本分割成多个参数:
+
+- `-n` 指定每次传几个参数作为参数，默认 1
+- `-I {}` 指定 传入参数的 位置
+- `-0` 指定分割符为 `\0`，默认为 `\n` `\b` 
+- `-d:`指定分割符为`:`
 
 ```bash
 find . -name "*.txt" | xargs -0 rm -f                   # 将找到的 txt 文件删除
@@ -167,9 +161,9 @@ find . -name "*.c"   | xargs -0 wc -l	                # 统计当前目录下 c 
 find . -name "*.php" | xargs cat | grep -v ^$ | wc -l   # 统计当前目录下所有.php文件中代码行数 过滤空白行
 ```
 
-## 输出
+## 5. 输出
 
-### 格式化输出
+### 5.1 格式化输出
 
 ```bash
 # 默认是换行， -n 不换行
@@ -198,18 +192,17 @@ for STYLE in 1 3 4 5 7 8; do
 done
 ```
 
-### 重定向输出
+### 5.2 重定向输出
 
 ```bash
 command > output.txt 2> error.log < input.txt # < 输入 > 截断输出 >> 追加输出 1> 正常输出 2> 错误输出
 command > output.txt 2>&1 < input.txt         # 2>&1 错误输出重定向到 1，而 1 是正常输出
 command &> output.txt < input.txt             # 上句简写版
-command &> output.txt < input.txt &           # 最后的 & 让命令在后台执行
 command 2> /dev/null                          # /dev/null 是文件黑洞，表示丢弃 2> 输出
 command | tee -a out.txt | wc -l              # tee 复制一份输出, -a 表示追加写入
 ```
 
-## 变量
+## 6. 变量
 
 ### 普通变量
 
@@ -223,7 +216,11 @@ unset   time                    # 删除该变量
 set                             # 输出当前 shell 所有变量
 ```
 
-PS： 所有的变量都建议使用`"${var}"`, 双引号 + `${}` 包裹使用，可以防止变量为空时，程序发生莫名其妙的错误，比如 ` if [ ${var} = "yes" ]`。
+```bash
+if [ "${var}" = "yes" ] # 最佳实践，可以防止变量为空时，程序发生莫名其妙的错误
+```
+
+
 
 ### 环境变量
 
@@ -258,7 +255,7 @@ done
 IFS=${IFS_OLD}                # 恢复原值
 ```
 
-## 简单计算
+## 7. 简单计算
 
 记住两种就够了,之所以说是简单计算，是因为如果需要复杂计算的话，那就不要用SHELL啊。
 
@@ -274,34 +271,7 @@ res=$[ ${foo} * (${bar} + ${foo}) ]     # 复杂点的用 $[] , 注意[]中空�
 echo ${res};
 ```
 
-## 子shell
-
-`$()` 产生一个子进程，子进程不会对当前 shell 有任何影响
-
-```bash
-count=$(ls | cat -n | wc -l)
-echo "共有$count个子文件"
-
-count2=`ls | cat -n | wc -l`        # `` 与 $() 相同
-echo "count2 : $count2";
-```
-
-## 条件分支
-
-#### 判断命令执行成功
-
-```bash
-# 测试命令是否执行成功，根据 $? 的值来判断,$? = 0 则为真
-if command; then
-    echo "命令执行成功";
-fi
-
-if grep codekissyoung /etc/passwd; then
-    echo "用户codekissyoung存在";
-fi
-```
-
-#### 判断数字、字符串、文件
+## 8. 条件分支
 
 ```bash
 if [[ condition ]]; then        # [[]] 两边的空格是必要的
@@ -311,33 +281,58 @@ elif [[ cond2 ]]; then
 else
     command3;
 fi
+```
 
+### 8.1 判断命令执行成功
+
+```bash
+# command 的退出值 $? = 0 则为真
+if command; then
+    echo "命令执行成功";
+fi
+```
+
+### 8.2 判断数字
+
+```bash
 a=10
 b=10
 if [[ ${a} -eq ${b} ]]; then  # 判断数字大小 只限于整数 , -gt 大于，-lt 小于
    echo "a 等于 b"
 fi
+```
 
+### 8.3 判断字符串
+
+```bash
 export LANG=zh_CN.UTF-8       # 设置字符集
 export LC_ALL=zh_CN.UTF-8     # 统一值
-
 if [[ "${USER}" == "cky" ]]   # 判断字符串相等，支持 != , < , > 大小根据字典序来判断
 if [[ -n "${var}" ]]          # 非空字符串
 if [[ -z "${PS1}" ]]          # 是空字符串
+```
+
+### 8.4 判断文件
+
+```bash
 if [[ -d file ]]              # -d 目录存在, -f 文件存在, -e 文件存在
 if [[ -w file ]]              # -r -w -x 判断文件是否 可读 可写 可执行
 if [[ -O file ]]              # 判断执行者是否是文件的属主
 if [[ -L "${var}" ]]          # 是符号链接
 if [[ file1 -nt file2 ]]      # file1 是否比 file2 更新, 镜像: file1 -ot file2
+```
 
+### 8.5 组合条件
+
+```bash
 if [[ -d $HOME ]] && [[ -w "$HOME" ]]; then     # && 与 || 组合条件
     echo "$HOME 存在并且可读";
 fi
 ```
 
-## 循环
+## 9. 循环语句
 
-### 字符串循环
+### 9.1 遍历字符串
 
 循环中字符串的解析，借助的是`$IFS`，而我们可以通过暂时修改`IFS`的值来改变我们的解析规则
 
@@ -355,17 +350,17 @@ IFS=$`\n`                               # 按行分割 命令获取到的字符�
 for var in $(cat /etc/passwd); do
     echo "$var";
 done
+```
 
+### 9.2 遍历文件
+
+```bash
 for script in /etc/*.d /etc/*.conf; do  # 接多个目录通配符，获取文件列表
     echo $script
 done
-
-for i in {a..z}; do                     # 生成序列 {1..10}
-    echo ${i}; # 输出 a b c d e f g h i j k l m n o p q r s t u v w x y z
-done;
 ```
 
-### 条件循环
+### 9.3 条件循环
 
 ```bash
 while [[ condition; ]]; do
@@ -375,12 +370,16 @@ while [[ condition; ]]; do
 done
 ```
 
-## 函数
+## 10. 函数
 
-函数、内置命令、外部命令同名时，函数的执行优先级最高，所以是执行函数。执行函数或则外部命令都会 `fork` 子进程。 `:(){:|:&}:` 是有名的 `fork` 炸弹, `:` 是函数名，递归在后台调用自身，不断的 fork 子进程，直到拖垮系统。
+函数、内置命令、外部命令同名时，函数的执行优先级最高，所以是执行函数。执行函数或则外部命令都会 `fork` 子进程。 
 
 ```bash
-function printit()  # 定义函数，其实不用 function 声明也可以
+:(){:|:&}:  # 是有名的 fork 炸弹,  : 是函数名，递归在后台调用自身，不断的 fork 子进程，直到拖垮系统
+```
+
+```bash
+printit()  # 定义函数
 {
     echo "$1,$2";       # 打印第一个参数, 第二个参数
     echo "$@";          # 以列表的形式打印出所有的参数
@@ -401,7 +400,9 @@ fi
 export -f printit;     # 导出函数为全局函数， 这样在子进程中，也能使用该函数了
 ```
 
-## 特殊文件
+## 11. 常用命令参考
+
+### 11.1 特殊文件
 
 `/dev/tty`  表示当前终端
 `/dev/null` 数据黑洞，丢弃全部输入，读取则返回EOF
@@ -421,14 +422,7 @@ cat /dev/null > /var/log/file # 将file清空，而又不删除它
 dd if=/dev/zero of=/dev/sdb bs=4M # 把/dev/sdb 清零
 ```
 
-## 退出SHELL
-
-```bash
-exit 0          # 正常退出, 1 ~ 255 都表示错误
-echo $?         # 输出上一个程序执行后的退出码
-```
-
-## 文件与目录命令
+### 11.2 文件与目录命令
 
 所谓 “文件与目录命令”，就是不关心文件里的内容，操作对象就是文件目录。
 
@@ -510,13 +504,13 @@ tar -zcvf cky.tar.gz ./cky  # 归档压缩
 tar -zxvf cky.tar.gz      	# 解压到当前目录
 ```
 
-## 其他命令
+### 11.3 其他命令
 
 #### 网络通信命令
 
 ```bash
 ping blog.codekissyoung.com     # 坚持网络连通性
-ping 127.0.0.1                  # 检测自己机器安装了tip/ip 协议
+ping 127.0.0.1                  # 检测自己机器安装了 Tcp/Ip 协议
 ifconfig -a                     # 查看网卡信息
 traceroute www.baidu.com        # 追踪本机到目标的路由
 netstat [-anp | -nat]           # 查看本机端口监听情况
@@ -583,7 +577,6 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 
 - in : 每秒被中断的进程次数
 - cs : 每秒钟进行的事件切换次数,值越大，代表系统与接口设备的通信越繁忙
-
 - us : 非内核进程消耗cpu运算时间的百分比
 - sy : 内核进程消耗cpu运算时间的百分比
 - id : 空闲cpu的百分比
@@ -594,17 +587,16 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 #### 杂
 
 ``` bash
-sleep 1                             		# 休眠 1 s
 date +%s                            		# 返回时间戳
 date +%Y_%m_%d_%H_%M_%S             		# 返回 年_月_日_时_分_秒
 ```
 
-## 经典代码参考
+### 11.4 经典代码参考
 
-#### 执行一个命令 直到命令运行成功
+#### 11.4.1 重复一个命令直到成功
 
 ```bash
-function repeat()
+repeat()
 {
     while true ; do
       $@ && return;
@@ -614,10 +606,9 @@ function repeat()
 repeat wget -c http://www.xunlei.com/software-aa.tar.gz
 ```
 
-#### 批量重命名 和 移动
+#### 11.4.2 批量重命名和移动
 
 ```bash
-#!/bin/bash
 count=1;
 for img in `find . -iname "*.png" -o -iname '*.jpg'`; do
   ext=${img##*.}
