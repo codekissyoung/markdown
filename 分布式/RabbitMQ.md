@@ -5,21 +5,14 @@
 ## 安装
 
 ```bash
-$ apt-get install erlang
-$ apt-get install rabbitmq-server
-$ rabbitmq-server -detached  		# 启动 rabbitmq-server daemon
-```
-
-```bash
-# 默认端口:
-4369 (epmd)
-25672 (Erlang distribution)
+4369 (epmd erlang 虚拟机端口)
+25672 (Erlang 分布式集群端口)
 5672 (AMQP 0-9-1 without TLS) amqp 协议访问
 5671 (AMQP 0-9-1 with TLS) 
 15672 web Http协议
 ```
 
-## Server 管理
+## Server管理
 
 ```bash
 rabbitmqctl status                    # 查看当前节点状态
@@ -54,20 +47,21 @@ rabbitmqctl list_user_permissions {user}					   # 查看某用户的所有权限
 rabbitmqctl clear_permissions [-p {vhost}] {username}			# 清理权限
 ```
 
-- `administrator`：拥有以下所有权限
+- `administrator`　：拥有以下所有权限
 - `monitoring`：可登陆管理控制台，同时可以查看节点的相关信息(进程数，内存使用情况，磁盘使用情况等)
 - `policymaker`：可登陆管理控制台, 同时可以对 policy 进行管理。但无法查看节点的相关信息
 - `management`：仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理
 - `other`：普通的生产者和消费者
 
-#### 集群
+## 集群
 
 ```bash
-rabbitmqctl cluster_status                     # 查看集群内节点信息
-rabbitmqctl join_cluster 节点@主机名            # 创建集群
+rabbitmqctl -n rabbit@node　		    # -n 在指定节点执行命令
+rabbitmqctl cluster_status           # 查看集群内节点信息
+rabbitmqctl join_cluster 节点@主机名  # 加入到指定节点，组成集群
 ```
 
-#### 插件管理
+## 插件管理
 
 ```bash
 rabbitmq-plugins enable plugin-name          # 开启插件
