@@ -1,4 +1,4 @@
-# 《Effective C++》第三版
+# Effective C++
 
 《Effective C++》第三版的学习笔记。
 

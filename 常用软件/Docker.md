@@ -69,6 +69,7 @@ root@7f62c7880035:~# exit               # 退出容器，容器也直接停止�
 
 # 3. 作为 Daemon 运行
 $ docker run -d ubuntu:18.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
+$ docker exec -it 容器ID /bin/bash # 附着到一个容器上,连接到容器的shell
 $ docker run -p [host-port]:[container-port] # 端口映射
 $ docker run -v [host-dir]:[container-dir]:[rw|ro] # 存储映射
 $ docker run -e VAR="xxxx" # 指定容器环境变量
@@ -79,22 +80,17 @@ $ docker run --restart=on-failure:5 # 退出代码非０时才重启，重启尝
 ### 3.2 管理容器
 
 ```bash
-$ docker ps -a # 查看所有状态的容器
-$ docker stats # 查看所有正在运行的容器的状态
-$ docker logs -ft e73ae1b93869 # 查看 logs
-$ docker events [OPTIONS] # 查看实时系统事件
-$ docker top e73ae1b93869 # 查看容器内进程
-$ docker inspect e73ae1b93869 # 查看容器的详细状态
-
-## 停止
-$ docker stop e73ae1b93869 # 停止容器
-
-## 再启动
-$ docker start e73ae1b93869 # 重新启动已经停止的容器
-$ docker exec -it e73ae1b93869 /bin/bash # 附着到一个容器上,连接到容器的shell
+$ docker ps -a 							 # 查看所有状态的容器
+$ docker stats 						   # 查看所有正在运行的容器的状态
+$ docker logs -ft 容器ID   # 查看 logs
+$ docker events [OPTIONS] 	# 查看实时系统事件
+$ docker top 容器ID 				  # 查看容器内进程
+$ docker inspect 容器ID     # 查看容器的详细状态
+$ docker stop 容器ID        # 停止容器
+$ docker start 容器ID       # 重新启动已经停止的容器
 
 ## 销毁
-$ docker rm e73ae1b93869                 # 删除一个容器
+$ docker rm 容器ID                 # 删除一个容器
 $ docker container prune            			# 将所有 exit 状态的容器清除
 $ docker rm $(docker ps -aq)        			# 删除所有容器
 

@@ -1,7 +1,7 @@
 # 简历
 
-状态 ：在职 / 25岁 / 男
-联系 ：1802765xxxx
+状态 ：在职 / 26岁 / 男
+联系 ：xxxxxxxxxx
 学历 ：2016届本科 / 中国地质大学(北京) / 地质学遥感方向
 博客 ：blog.codekissyoung.com
 代码 ：github.com/codekissyoung
@@ -11,7 +11,6 @@
 熟悉语言：C / Go / PHP / JS
 数据存储：MySQL / Redis
 熟悉框架：Codeigniter / Yii2 advanced / ThinkPHP
-自我评价：
 
 ## 2019.12 - 至今 互联网保险平台 小雨伞 运维开发工程师
 

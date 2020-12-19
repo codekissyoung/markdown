@@ -1,19 +1,10 @@
 # Prometheus
 
-监控系统`Prometheus`的相关知识。
-
 [使用 prometheus_client_php 为 Prometheus 提供数据](https://blog.csdn.net/JackLiu16/article/details/80381210)
 [使用 prometheus_client_php 对接 prometheus 监控系统](https://16bh.github.io/2017/07/25/prometheus-on-php/)
 [Prometheus 简单使用及 exporter 开发，使用 prometheus_client_php](https://segmentfault.com/a/1190000021314370)
 [使用 Prometheus 针对自己的服务器采集自定义的参数](https://segmentfault.com/a/1190000021164508?utm_source=tag-newest)
 [从零搭建 Prometheus 监控报警系统 PushGateWay 方式](https://www.cnblogs.com/chenqionghe/p/10494868.html)
-
-## 安装
-
-```bash
-$ sudo apt-get install prometheus
-$ prometheus --version
-```
 
 ## 数据类型
 
