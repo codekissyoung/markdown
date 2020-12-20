@@ -448,7 +448,6 @@ HOST: cky                         Loss%   Snt   Last   Avg  Best  Wrst StDev
 /etc/fstab    文件系统配置
 /etc/profile    增加环境变量等的配置文件 如PATH 如配置javaEE 开发环境
 /etc/ftp*    ftp 的配置文件
-/etc/ssh*    ssh的配置文件
 /etc/resolv.conf    dns域名服务器的配置文件
 /etc/passwd    系统能识别的用户清单，纯文本显示加密了的口令，普通用户可读
 /etc/shadow    超级用户才能读，用于保护加密口令的安全，隐藏口令
