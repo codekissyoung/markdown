@@ -8,6 +8,12 @@ SSH 是一个安全的客户端/网络端协议，是关于如何在网络上构
 - 加密：对数据进行加密，除接受者，其他人都无法理解数据
 - 完整性：确保网络上传输的数据到达目的地时，没有被改变
 
+认证是双向的，包含了server 对 client 的验证，也包含了 client 对 server 的验证。
+
+SSH 提供的端到端的加密，基础是随机密钥，每次通过验证后，都会产生一个会话，client 与 server 协商产生随机密钥，发送的数据全部使用该密钥加密。在会话结束后，该密钥被丢弃。对数据加密的算法有: Blowfish / DES / IDEA (对称加密) 等。
+
+授权是认证之后进行的，可以对通过ssh登录的用户权限进行一些限制。
+
 
 
 ## SSL 安全Socket协议
@@ -19,8 +25,6 @@ SSH 是一个安全的客户端/网络端协议，是关于如何在网络上构
 基于TCP通信的程序，可以使用SSL来增强安全性。比如 SSLtelnet / SSLftp .
 
 而 SSH 实现不同于 SSL , SSH 的实现可以和各种用途的工具集成在一起，完全是为了提高安全性而编写的。
-
-
 
 
 
@@ -92,6 +96,14 @@ $ ssh username@hostname command
 
 ## 端口转发
 
+转发或隧道是在一个SSH会话中封装另外一个基于TCP的服务，从而完全利用上SSH的安全传输的特性。
+
+通常支持的转发有三种：
+
+- 普通的基于TCP的转发
+- X协议转发
+- 代理转发，允许 client 使用远程主机上的 private key
+
 ### 动态端口转发
 
 ```bash
@@ -107,7 +119,7 @@ $ ssh -D 2121 cky@blog.codekissoung.com -N
 ### 本地端口转发
 
 ```bash
-ssh  -L 9999:targetServer:80 user@remoteserver -N
+防火墙ssh  -L 9999:targetServer:80 user@remoteserver -N
 ```
 
 所有发向本地 9999 端口的请求，都会经过 remoteserver 发往 targetServer 的 80 端口，这就相当于直接连上了 targetServer 的 80 端口。
@@ -264,7 +276,9 @@ https://www.stunnel.org/index.html
 
 
 
+## 加密解密
 
+### 密钥分布问题
 
 
 
