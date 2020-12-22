@@ -74,8 +74,6 @@ $ sudo visudo # 设置执行 sudo 命令不需要输入密码
 %sudo   ALL=(ALL:ALL) NOPASSWD:ALL
 ```
 
-
-
 ### 5. 设置时区
 
 ```bash

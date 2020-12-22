@@ -17,8 +17,6 @@ sudo apt-get install libc6-dev-i386
 示例代码如下，`num` 就是供定位的最后一个命名参数（注意，这里强调下`sum`可能是第二、第三个参数，这是汇编器无法确认的，正是由于这点才影响了实现）
 
 ```c
-#include <stdio.h>
-#include <stdarg.h>
 long sum( long num, ... ){
 	va_list ap;
 	va_start(ap, num);

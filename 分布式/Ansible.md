@@ -17,7 +17,6 @@ sudo apt-get install ansible
 
 ```bash
 $ tree
-.
 ├── ansible.cfg
 └── hosts
 ```
