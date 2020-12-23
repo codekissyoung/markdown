@@ -6,9 +6,9 @@
 $ sudo apt-get install linux-image-extra-virtual       
 $ sudo apt-get install apt-transport-https ca-certificates software-properties-common
 $ sudo apt-get install docker.io
-$ sudo systemctl daemon-reload    # 重启 daemon
-$ sudo systemctl restart docker   # 重启 docker daemon
-$ sudo systemctl enable docker    # 开机启动 docker
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart docker
+$ sudo systemctl enable docker
 $ docker version
 $ docker info
 $ sudo usermod -aG docker $USER      # 免 sudo 执行 docker
@@ -32,12 +32,15 @@ $ journalctl -u docker.service       # 查看服务日志
 
 ## 2. 镜像管理
 
+镜像是文件系统叠加而成，底层是 bootfs (引导文件系统)，但是当启动后 bootfs 会被卸载，以节省更多内存空间，恩就是个工具人。
+
+### 本地操作
+
 ```bash
-$ docker images -a # 查看本地的镜像
-$ docker pull [OPTIONS] NAME[:TAG]  # 从远程库拉取镜像到本地
-$ docker push [OPTIONS] NAME:[:TAG] # 推送库到远程仓库
+$ docker images -a 				# 查看本地的镜像
 $ docker image prune -f	 # 清理无用的镜像
 $ docker rmi 镜像ID/名字	# 删除镜像
+
 $ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04	# 导出镜像到本地文件
 $ docker load -i ubuntu_18.04.tar.gz # 导入本地镜像文件
 $ docker history [OPTIONS] CONTAINER # 查看镜像构建历史
@@ -45,11 +48,20 @@ $ docker history [OPTIONS] CONTAINER # 查看镜像构建历史
 # 1. 将容器固化为一个新的镜像（临时做法）
 $ docker commit -m"commit msg" -a"link" 容器ID link/ubuntu:18.04.v1
 $ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 tag，tag 就是 IMAGE ID 方便易于记忆的
-$ docker history image_id     				# 查看一个Image的构建历史
+$ docker history image_id # 查看一个Image的构建历史
 
 # 2. 从当前文件夹下 Dockerfile 构建镜像（官方推荐做法）
 $ docker build -t="link/ubuntu.v1" ./ 
 ```
+
+### 远程操作
+
+```bash
+$ docker pull [OPTIONS] NAME[:TAG]  # 从远程库拉取镜像到本地
+$ docker push [OPTIONS] NAME:[:TAG] # 推送库到远程仓库
+```
+
+
 
 ## 3. 容器管理
 
