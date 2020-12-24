@@ -1,5 +1,7 @@
 # Docker
 
+Docker的基础知识、命令。
+
 ## 1. 安装与配置
 
 ```bash
@@ -89,6 +91,14 @@ $ docker logs -ft 容器ID    # 容器日志
 $ docker events [OPTIONS]   # 系统事件
 $ docker top 容器ID         # 查看容器内进程
 $ docker inspect 容器ID     # 查看容器的详细状态
+$ docker inspect mysql01 --format '{{.NetworkSettings.IPAddress}}'
+172.17.0.2
+$ ifconfig # 容器和宿主机有一个虚拟网卡，所以可以通信
+docker0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+$ ping 172.17.0.2                                           
+PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
+64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=0.027 ms
 
 ## 销毁
 $ docker rm 容器ID                 # 删除一个容器
@@ -97,10 +107,10 @@ $ docker rm $(docker ps -aq)       # 删除所有容器
 
 # 其他
 $ docker cp data.txt test:/tmp/    # 复制文件到容器内部
-$ docker container port test       # 查看容器端口映射情况
+$ docker port mysql01									# 查看容器端口映射情况
 ```
 
-### 3.4 容器启动案例
+### 3.3 容器启动案例
 
 ```bash
 # 启动一个数据库
@@ -114,7 +124,7 @@ $ docker run -d -P --mount type=bind,source=/webapp,destination=/opt/webapp trai
 $ docker run -d -P -v /webapp:/opt/webapp training/webapp python app.py 
 ```
 
-### 3.5 容器应用栈例子
+### 3.4 容器应用栈例子
 
 ```bash
 $ docker pull ubuntu
@@ -123,11 +133,21 @@ $ docker pull haproxy
 $ docker pull redis
 ```
 
-## 2. 镜像管理
+## 4. 镜像管理
 
-镜像是文件系统叠加而成，底层是 bootfs (引导文件系统)，但是当启动后 bootfs 会被卸载，以节省更多内存空间，恩就是个工具人。
+镜像是文件系统叠加而成：
 
-### 2.1 本地操作
+- 底层是 bootfs (引导文件系统)，但是当启动后 bootfs 会被卸载，以节省更多内存空间，恩就是个工具人。
+
+- 第二层是 rootfs ，是操作系统层（裁剪版Debian或Ubuntu），永远处于只读状态
+- 往上可以继续叠加更多的文件系统
+- 最顶层是一个可读可写的文件系统，Docker中运行的程序就是在这个读写层执行的
+
+Docker使用的是一种联合加载技术（union mount），文件系统一层叠一层，从最顶部往下，同名文件会被遮盖，最终从外面看起来是一个文件系统。
+
+![](img/f98fa2c325cf2ff1aa23d26e6108c84b.png)
+
+### 4.1 本地操作
 
 ```bash
 $ docker images -a # 查看本地的镜像
@@ -143,22 +163,23 @@ $ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1 # 导入一个容器
 $ docker history [OPTIONS] CONTAINER # 查看镜像构建历史
 
 # 1. 将容器固化为一个新的镜像（临时做法）
-$ docker commit -m"commit msg" -a"link" 容器ID link/ubuntu:18.04.v1
+$ docker commit -m"commit msg" -a"author: link" 容器ID link/ubuntu:18.04.v1
 $ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 Image tag 方便记忆
 $ docker history imageId # 查看一个Image的构建历史
+$ docker inspect link/sample:latest -f '{{.Config.Cmd}}' # 查看Image的情况
 
 # 2. 从当前文件夹下 Dockerfile 构建镜像（官方推荐做法）
 $ docker build -t="link/ubuntu.v1" ./ 
 ```
 
-### 2.2 远程操作
+### 4.2 远程操作
 
 ```bash
 $ docker pull [OPTIONS] NAME[:TAG]  # 从远程库拉取镜像到本地
 $ docker push [OPTIONS] NAME:[:TAG] # 推送库到远程仓库
 ```
 
-### 2.3 Ubuntu镜像
+### 4.3 Ubuntu镜像
 
 安装些常用命令
 
@@ -170,26 +191,35 @@ apt-get install iproute2 # ip 命令
 apt-get install libterm-readkey-perl 
 ```
 
-## 4. Dockerfile
+## 5. Dockerfile
 
-### 4.1 Nginx例子
+### 5.1 Nginx例子
 
 ```dockerfile
-FROM ubuntu:18.04
-MAINTAINER link "1162097842@qq.com"
-RUN apt-get update && apt-get install -y nginx
+FROM ubuntu:18.04 # 指定基于的镜像
+MAINTAINER link "1162097842@qq.com" # 写入作者信息
+ENV CREATED_AT 2020-12-25 # 设置环境变量
+# RUN 命令在容器里会使用 /bin/sh -c 执行命令
+RUN apt-get update && apt-get install -y nginx # 每条 RUN 命令会创建一个新镜像层
 RUN echo 'Hi, I am your container' > /var/www/html/index.html
-EXPOSE 80
+EXPOSE 80 # 暴露 80 端口
 ```
 
 ```bash
-$ docker build -t link/ubuntu:0.6 ./
+$ docker build -t link/ubuntu:0.6 ./ # 从本目录下的 Dockerfile 开始构建镜像
 Status: Downloaded newer image for ubuntu:18.04
- ---> c3c304cb4f22 (stepID)
-$ docker run -it setpID /bin/bash # 通过stepID进入容器, 调试正确后,退出修改 Dockerfile
-$ docker build --no-cache -t link/ubuntu:0.6 ./ # 取消构建cache
-$ docker run -itd -P --name test7 link/ubuntu:0.6 nginx -g "daemon off;" # 运行自定义镜像
-$ curl localhost:32776
+ ---> c3c304cb4f22 (stepID) # 每条命令都会产生执行步骤 ID
+
+# 如果结果不符合预期，可以通过 stepID 进入容器，调试正确后，然后退出修改 Dockerfile
+$ docker run -it stepID /bin/bash
+
+# 删除 cache，再次构建
+$ docker build --no-cache -t link/ubuntu:0.6 ./
+
+# 运行自定义镜像
+$ docker run -itd -p 80:80 --name test7 link/ubuntu:0.6 nginx -g "daemon off;" 
+
+$ curl localhost:80
 Hi, I am your container
 ```
 
@@ -204,7 +234,7 @@ EXPOSE 80
 CMD /usr/sbin/sshd -D
 ```
 
-## 5. 容器互联
+## 6. 容器互联
 
 ```bash
 $ ip a show # 查看 ip 地址，没有 ifconfig 情况下使用
