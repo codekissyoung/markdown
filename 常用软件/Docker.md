@@ -30,14 +30,48 @@ $ journalctl -u docker.service       # 查看服务日志
 }
 ```
 
+
+
+## 2. 基础
+
+```bash
+$ docker run -itd ubuntu /bin/bash
+# -t 为容器分配一个伪终端
+# -i 开启容器的 STDIN
+# -d Daemon
+$ docker exec -it 容器 /bin/bash # 进入容器
+```
+
+创建了一个新容器，该容器拥有自己的网络 IP地址 以及一个和宿主机通信的桥接网络接口．
+
+```bash
+# 在容器中
+root@3798a98859f9:~# hostname
+3798a98859f9
+root@3798a98859f9:~# cat /etc/hosts
+127.0.0.1	localhost
+172.17.0.3	3798a98859f9
+root@3798a98859f9:~# ps aux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0   4108  3288 pts/0    Ss+  04:42   0:00 /bin/bash
+```
+
+## 3. 容器管理
+
+
+
+
+
+
+
 ## 2. 镜像管理
 
 镜像是文件系统叠加而成，底层是 bootfs (引导文件系统)，但是当启动后 bootfs 会被卸载，以节省更多内存空间，恩就是个工具人。
 
-### 本地操作
+### 2.1 本地操作
 
 ```bash
-$ docker images -a 				# 查看本地的镜像
+$ docker images -a # 查看本地的镜像
 $ docker image prune -f	 # 清理无用的镜像
 $ docker rmi 镜像ID/名字	# 删除镜像
 
@@ -47,18 +81,30 @@ $ docker history [OPTIONS] CONTAINER # 查看镜像构建历史
 
 # 1. 将容器固化为一个新的镜像（临时做法）
 $ docker commit -m"commit msg" -a"link" 容器ID link/ubuntu:18.04.v1
-$ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 tag，tag 就是 IMAGE ID 方便易于记忆的
-$ docker history image_id # 查看一个Image的构建历史
+$ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 Image tag 方便记忆
+$ docker history imageId # 查看一个Image的构建历史
 
 # 2. 从当前文件夹下 Dockerfile 构建镜像（官方推荐做法）
 $ docker build -t="link/ubuntu.v1" ./ 
 ```
 
-### 远程操作
+### 2.2 远程操作
 
 ```bash
 $ docker pull [OPTIONS] NAME[:TAG]  # 从远程库拉取镜像到本地
 $ docker push [OPTIONS] NAME:[:TAG] # 推送库到远程仓库
+```
+
+### 2.3 Ubuntu镜像
+
+安装些常用命令
+
+```bash
+apt-get update
+apt install net-tools # ifconfig
+apt install iputils-ping # ping 命令
+apt-get install iproute2 # ip 命令
+apt-get install libterm-readkey-perl 
 ```
 
 
@@ -69,8 +115,6 @@ $ docker push [OPTIONS] NAME:[:TAG] # 推送库到远程仓库
 
 ```bash
 # 格式: docker run [options] IMAGE [COMMAND] [ARG]
-# -t 在新容器内指定一个伪终端或终端
-# -i 允许你对容器内的标准 IO 进行交互
 
 # 1. 作为 shell 运行
 $ docker run ubuntu:18.04 /bin/echo "hello 18.04"
@@ -85,18 +129,18 @@ $ docker exec -it 容器ID /bin/bash # 附着到一个容器上,连接到容器�
 $ docker run -p [host-port]:[container-port] # 端口映射
 $ docker run -v [host-dir]:[container-dir]:[rw|ro] # 存储映射
 $ docker run -e VAR="xxxx" # 指定容器环境变量
-$ docker run --restart=always 				# 自动重启
-$ docker run --restart=on-failure:5 # 退出代码非０时才重启，重启尝试次数为５次
+$ docker run --restart=always # 自动重启
+$ docker run --restart=on-failure:5 # 退出代码非 0 时才重启，重启尝试次数为５次
 ```
 
 ### 3.2 管理容器
 
 ```bash
-$ docker ps -a 							 # 查看所有状态的容器
-$ docker stats 						   # 查看所有正在运行的容器的状态
-$ docker logs -ft 容器ID   # 查看 logs
-$ docker events [OPTIONS] 	# 查看实时系统事件
-$ docker top 容器ID 				  # 查看容器内进程
+$ docker ps -a # 查看所有状态的容器
+$ docker stats # 查看所有正在运行的容器的状态
+$ docker logs -ft 容器ID # 查看 logs
+$ docker events [OPTIONS] # 系统事件
+$ docker top 容器ID # 查看容器内进程
 $ docker inspect 容器ID     # 查看容器的详细状态
 $ docker stop 容器ID        # 停止容器
 $ docker start 容器ID       # 重新启动已经停止的容器
