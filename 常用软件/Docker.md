@@ -30,8 +30,6 @@ $ journalctl -u docker.service       # 查看服务日志
 }
 ```
 
-
-
 ## 2. 基础
 
 ```bash
@@ -42,7 +40,7 @@ $ docker run -itd ubuntu /bin/bash
 $ docker exec -it 容器 /bin/bash # 进入容器
 ```
 
-创建了一个新容器，该容器拥有自己的网络 IP地址 以及一个和宿主机通信的桥接网络接口．
+创建了一个新容器，该容器拥有自己的网络 IP地址 以及一个和宿主机通信的桥接网络接口．如果容器内 1 号进程（启动进程）停止运行了，那么容器也会随着退出。
 
 ```bash
 # 在容器中
@@ -58,11 +56,72 @@ root           1  0.0  0.0   4108  3288 pts/0    Ss+  04:42   0:00 /bin/bash
 
 ## 3. 容器管理
 
+### 3.1 运行容器
 
+```bash
+# 格式: docker run [options] IMAGE [COMMAND] [ARG]
 
+# 1. 退出后停止运行
+$ docker run -it ubuntu:18.04 /bin/bash # 起一个容器，并进入它的终端界面
+root@7f62c7880035:~# exit               # 退出容器，容器也直接停止了
 
+# 2. 作为 Daemon 运行
+$ docker run -d ubuntu:18.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
+$ docker exec -it 容器ID /bin/bash # 附着到一个容器上,连接到容器的shell
 
+# 常用参数
+$ docker run -p [host-port]:[container-port] # 端口映射
+$ docker run -v [host-dir]:[container-dir]:[rw|ro] # 存储映射
+$ docker run -e VAR="xxxx" # 指定容器环境变量
+$ docker run --restart=always # 自动重启
+$ docker run --restart=on-failure:5 # 退出代码非 0 时才重启，重启尝试次数为５次
+```
 
+### 3.2 管理容器
+
+```bash
+$ docker start 容器ID       # 重新启动已经停止的容器
+$ docker stop  容器ID       # 停止容器
+
+$ docker stats              # 查看所有正在运行的容器的状态
+$ docker ps -a              # 查看所有状态的容器
+$ docker logs -ft 容器ID    # 容器日志
+$ docker events [OPTIONS]   # 系统事件
+$ docker top 容器ID         # 查看容器内进程
+$ docker inspect 容器ID     # 查看容器的详细状态
+
+## 销毁
+$ docker rm 容器ID                 # 删除一个容器
+$ docker container prune           # 将所有 exit 状态的容器清除
+$ docker rm $(docker ps -aq)       # 删除所有容器
+
+# 其他
+$ docker cp data.txt test:/tmp/    # 复制文件到容器内部
+$ docker container port test       # 查看容器端口映射情况
+```
+
+### 3.4 容器启动案例
+
+```bash
+# 启动一个数据库
+$ docker run -d -p 3306:3306 -v ~/mysqldata:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=123456 --restart=always --name db01 mysql:5.6
+```
+
+```bash
+$ docker volume create -d local test
+$ docker run -d -P --mount type=bind,source=/webapp,destination=/opt/webapp training/webapp python app.py
+$ docker run -d -P -v /webapp:/opt/webapp training/webapp python app.py 
+```
+
+### 3.5 容器应用栈例子
+
+```bash
+$ docker pull ubuntu
+$ docker pull django
+$ docker pull haproxy
+$ docker pull redis
+```
 
 ## 2. 镜像管理
 
@@ -76,7 +135,11 @@ $ docker image prune -f	 # 清理无用的镜像
 $ docker rmi 镜像ID/名字	# 删除镜像
 
 $ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04	# 导出镜像到本地文件
+$ docker export -o ubuntu18.04.c.tar.gz 容器ID # 导出一个容器
+
 $ docker load -i ubuntu_18.04.tar.gz # 导入本地镜像文件
+$ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1 # 导入一个容器
+
 $ docker history [OPTIONS] CONTAINER # 查看镜像构建历史
 
 # 1. 将容器固化为一个新的镜像（临时做法）
@@ -106,83 +169,6 @@ apt install iputils-ping # ping 命令
 apt-get install iproute2 # ip 命令
 apt-get install libterm-readkey-perl 
 ```
-
-
-
-## 3. 容器管理
-
-### 3.1 运行容器
-
-```bash
-# 格式: docker run [options] IMAGE [COMMAND] [ARG]
-
-# 1. 作为 shell 运行
-$ docker run ubuntu:18.04 /bin/echo "hello 18.04"
-
-# 2. 退出后停止运行
-$ docker run -it ubuntu:18.04 /bin/bash # 起一个容器，并进入它的终端界面
-root@7f62c7880035:~# exit               # 退出容器，容器也直接停止了
-
-# 3. 作为 Daemon 运行
-$ docker run -d ubuntu:18.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
-$ docker exec -it 容器ID /bin/bash # 附着到一个容器上,连接到容器的shell
-$ docker run -p [host-port]:[container-port] # 端口映射
-$ docker run -v [host-dir]:[container-dir]:[rw|ro] # 存储映射
-$ docker run -e VAR="xxxx" # 指定容器环境变量
-$ docker run --restart=always # 自动重启
-$ docker run --restart=on-failure:5 # 退出代码非 0 时才重启，重启尝试次数为５次
-```
-
-### 3.2 管理容器
-
-```bash
-$ docker ps -a # 查看所有状态的容器
-$ docker stats # 查看所有正在运行的容器的状态
-$ docker logs -ft 容器ID # 查看 logs
-$ docker events [OPTIONS] # 系统事件
-$ docker top 容器ID # 查看容器内进程
-$ docker inspect 容器ID     # 查看容器的详细状态
-$ docker stop 容器ID        # 停止容器
-$ docker start 容器ID       # 重新启动已经停止的容器
-
-## 销毁
-$ docker rm 容器ID                 # 删除一个容器
-$ docker container prune            			# 将所有 exit 状态的容器清除
-$ docker rm $(docker ps -aq)        			# 删除所有容器
-
-# 其他
-$ docker cp data.txt test:/tmp/ # 复制文件到容器内部
-$ docker container port test # 查看容器端口映射情况
-$ docker export -o ubuntu18.04.c.tar.gz 容器ID # 导出一个容器
-$ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1 # 导入一个容器
-```
-
-如果容器内 `PID = 1` 号进程停止运行了，那么容器也会随着退出。
-
-### 3.4 容器启动案例
-
-```bash
-# 启动一个数据库
-$ docker run -d -p 3306:3306 -v ~/mysqldata:/var/lib/mysql \
--e MYSQL_ROOT_PASSWORD=123456 --restart=always --name db01 mysql:5.6
-```
-
-```bash
-$ docker volume create -d local test
-$ docker run -d -P --mount type=bind,source=/webapp,destination=/opt/webapp training/webapp python app.py
-$ docker run -d -P -v /webapp:/opt/webapp training/webapp python app.py 
-```
-
-### 3.5 容器应用栈例子
-
-```bash
-$ docker pull ubuntu
-$ docker pull django
-$ docker pull haproxy
-$ docker pull redis
-```
-
-
 
 ## 4. Dockerfile
 
