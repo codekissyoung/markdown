@@ -108,6 +108,7 @@ $ docker rm $(docker ps -aq)       # 删除所有容器
 # 其他
 $ docker cp data.txt test:/tmp/    # 复制文件到容器内部
 $ docker port mysql01									# 查看容器端口映射情况
+$ docker kill -s <signal> <container> # 向容器内发信号
 ```
 
 ### 3.3 容器启动案例
@@ -145,7 +146,22 @@ $ docker pull redis
 
 Docker使用的是一种联合加载技术（union mount），文件系统一层叠一层，从最顶部往下，同名文件会被遮盖，最终从外面看起来是一个文件系统。
 
-![](img/f98fa2c325cf2ff1aa23d26e6108c84b.png)
+```bash
+可写容器
+-----------------------|
+Apache 镜像
+-----------------------|
+emacs 镜像
+-----------------------|
+基础 Ubuntu 镜像 rootfs
+-----------------------|
+引导文件系统 bootfs
+-----------------------|
+容器组 命名空间 设备映射
+-----------------------|
+宿主内核
+-----------------------|
+```
 
 ### 4.1 本地操作
 
@@ -236,21 +252,17 @@ CMD /usr/sbin/sshd -D
 
 ## 6. 容器互联
 
-```bash
-$ ip a show # 查看 ip 地址，没有 ifconfig 情况下使用
-```
+### 6.1 桥接网络
 
 ```bash
-$ docker network create -d bridge link-test-net   # 创建新网络
-ba8f1ed449a4bb927418c5a632760a624979dc0791ec0230c874fe222cc03c8c
-$ docker network ls # 查看网络
-NETWORK ID          NAME                        DRIVER              SCOPE
-99a9441d083e        bridge                      bridge              local
-7d62ec3cf6e9        host                        host                local
-ba8f1ed449a4        link-test-net               bridge              local
+$ docker network create app # 创建一个 brige 网络
 
-$ docker run -itd --name web --network link-test-net link/ubuntu:dev /bin/bash
-$ docker run -itd --name db1 --network link-test-net link/ubuntu:dev /bin/bash
+$ docker network ls # 查看
+NETWORK ID     NAME                        DRIVER    SCOPE
+b57758027b03   app                         bridge    local
+
+$ docker run -itd --name web --net app ubuntu /bin/bash
+$ docker run -itd --name db1 --net app ubuntu /bin/bash
 
 $ docker exec -it web /bin/bash   # 和 db1 可以相互 ping通
 root@00f61db4e4e1:/# ping db1
@@ -258,4 +270,34 @@ PING db1 (172.19.0.3) 56(84) bytes of data.
 64 bytes from db1.link-test-net (172.19.0.3): icmp_seq=1 ttl=64 time=0.113 ms
 64 bytes from db1.link-test-net (172.19.0.3): icmp_seq=2 ttl=64 time=0.122 ms
 ```
+
+### 6.2 跨主机通信 overlay 网络
+
+## 7. 容器编排 Orchestration
+
+### 7.1 Docker Compose
+
+一个 Python 写的工具，通过`yaml`格式的配置文件，来批量启动容器。
+
+### 7.2 Consul
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
