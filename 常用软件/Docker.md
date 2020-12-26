@@ -325,8 +325,6 @@ CMD command param1 param2
 ENTRYPOINT command param1 param2
 ```
 
-
-
 ## 6. 容器互联
 
 ### 6.1 桥接网络
@@ -355,6 +353,35 @@ PING db1 (172.19.0.3) 56(84) bytes of data.
 ### 7.1 Docker Compose
 
 一个 Python 写的工具，通过`yaml`格式的配置文件，来批量启动容器。
+
+服务 (service) ：一个应用的容器，实际上可以包括若干运行相同镜像的容器实例。
+
+项目 (project) ：由一组关联的应用容器组成的一个完整业务单元，在 docker-compose.yml 文件中定义。
+
+```bash
+# docker-compose 命令都需要在项目目录下执行
+
+$ docker-compose build # 构建（重新构建）项目中的服务容器
+$ docker-compose up 		# 启动项目， -d 在后台运行
+$ docker-compose ps 		# 列出服务              
+        Name                      Command               State           Ports         
+--------------------------------------------------------------------------------------
+learncompose_redis_1   docker-entrypoint.sh redis ...   Up      6379/tcp              
+learncompose_web_1     python app.py                    Up      0.0.0.0:5000->5000/tcp
+
+$ docker-compose stop # 停止服务
+Stopping learncompose_redis_1 ... done
+Stopping learncompose_web_1   ... done
+
+$ docker-compose start # 启动已经存在的服务容器
+$ docker-compose down # 停用移除所有容器以及网络相关
+$ docker-compose rm   # #删除所有（停止状态的）服务容器
+$ docker-compose logs # 查看服务容器的输出
+$ docker-compose pull # 拉取服务依赖的镜像
+$ docker-compose restart # 重启项目中的服务
+$ docker-compose run ubuntu ping docker.com # 在指定服务上执行一个命令
+$ docker-compose scale web=3 db=2 # 设置指定服务运行的容器个数
+```
 
 ### 7.2 Consul
 
