@@ -5,12 +5,16 @@ Docker的基础知识、命令。
 ## 1. 安装与配置
 
 ```bash
-$ sudo apt-get install linux-image-extra-virtual       
+# 安装
+$ sudo apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual
 $ sudo apt-get install apt-transport-https ca-certificates software-properties-common
 $ sudo apt-get install docker.io
+
+# 启动
 $ sudo systemctl daemon-reload
 $ sudo systemctl restart docker
 $ sudo systemctl enable docker
+
 $ docker version
 $ docker info
 $ sudo usermod -aG docker $USER      # 免 sudo 执行 docker
@@ -35,6 +39,26 @@ $ journalctl -u docker.service       # 查看服务日志
 ## 2. 基础
 
 ```bash
+$ docker run hello-world                               
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+To try something more ambitious, you can run an Ubuntu container with:
+$ docker run -it ubuntu bash
+Share images, automate workflows, and more with a free Docker ID:
+https://hub.docker.com/
+For more examples and ideas, visit:
+https://docs.docker.com/get-started/
+```
+
+```bash
 $ docker run -itd ubuntu /bin/bash
 # -t 为容器分配一个伪终端
 # -i 开启容器的 STDIN
@@ -45,7 +69,6 @@ $ docker exec -it 容器 /bin/bash # 进入容器
 创建了一个新容器，该容器拥有自己的网络 IP地址 以及一个和宿主机通信的桥接网络接口．如果容器内 1 号进程（启动进程）停止运行了，那么容器也会随着退出。
 
 ```bash
-# 在容器中
 root@3798a98859f9:~# hostname
 3798a98859f9
 root@3798a98859f9:~# cat /etc/hosts
@@ -109,6 +132,7 @@ $ docker rm $(docker ps -aq)       # 删除所有容器
 $ docker cp data.txt test:/tmp/    # 复制文件到容器内部
 $ docker port mysql01									# 查看容器端口映射情况
 $ docker kill -s <signal> <container> # 向容器内发信号
+$ docker diff <container>						# 查看容器读写层的改动
 ```
 
 ### 3.3 容器启动案例
@@ -209,20 +233,26 @@ apt-get install libterm-readkey-perl
 
 ## 5. Dockerfile
 
-### 5.1 Nginx例子
+Dockerfile 定义镜像，镜像运行成为容器，可以说 Dockerfile 就是镜像的源代码，编译后成了镜像，运行后就成了容器。
 
 ```dockerfile
-FROM ubuntu:18.04 # 指定基于的镜像
-MAINTAINER link "1162097842@qq.com" # 写入作者信息
-ENV CREATED_AT 2020-12-25 # 设置环境变量
+FROM ubuntu:18.04 																		# 指定基于的镜像
+MAINTAINER link "1162097842@qq.com" 						# 写入作者信息
+ENV CREATED_AT 2020-12-25 													# 设置环境变量
 # RUN 命令在容器里会使用 /bin/sh -c 执行命令
 RUN apt-get update && apt-get install -y nginx # 每条 RUN 命令会创建一个新镜像层
 RUN echo 'Hi, I am your container' > /var/www/html/index.html
 EXPOSE 80 # 暴露 80 端口
+ENTRYPOINT ["/usr/sbin/nginx"] 
+
+# docker run -it  link/test -g "daemon off;"
+# 最终在容器中执行的命令为 /usr/sbin/nginx -g "daemon off;"
 ```
 
+构建会在 Docker Daemon 中执行。构建前，构建进程会将全部内容发送到守护进程。大多情况下，应该将一个空目录作为构建上下文环境，并将 Dockerfile 文件放在该目录下。可以通过`.dockerignore`排除不需要的文件和目录。
+
 ```bash
-$ docker build -t link/ubuntu:0.6 ./ # 从本目录下的 Dockerfile 开始构建镜像
+$ docker build -t link/ubuntu:0.6 ./ 						# 从本目录下的 Dockerfile 开始构建镜像
 Status: Downloaded newer image for ubuntu:18.04
  ---> c3c304cb4f22 (stepID) # 每条命令都会产生执行步骤 ID
 
@@ -230,10 +260,10 @@ Status: Downloaded newer image for ubuntu:18.04
 $ docker run -it stepID /bin/bash
 
 # 删除 cache，再次构建
-$ docker build --no-cache -t link/ubuntu:0.6 ./
+$ docker build --no-cache -t link/ubuntu:0.7 ./
 
 # 运行自定义镜像
-$ docker run -itd -p 80:80 --name test7 link/ubuntu:0.6 nginx -g "daemon off;" 
+$ docker run -itd -p 80:80 --name test7 link/ubuntu:0.7 nginx -g "daemon off;" 
 
 $ curl localhost:80
 Hi, I am your container
@@ -249,6 +279,53 @@ EXPOSE 22
 EXPOSE 80
 CMD /usr/sbin/sshd -D
 ```
+
+### 6.2 常用指令
+
+```dockerfile
+# 指定容器内部，程序运行的工作目录
+# 设置工作目录后，RUN、CMD、ENTRYPOINT、ADD、COPY 等命令都会在该目录下执行
+WORKDIR <路径>
+
+# 将从构建目录中的文件/目录，复制到新的一层的镜像内的<目标路径>
+# 如果原路径是个 URL，那么会下载好文件后，再放入
+ADD <源路径> <目标路径>
+ADD package.json /usr/src/app/
+ADD hom?.txt /mydir/
+
+# 设置容器内环境变量
+ENV VERSION=1.0 DEBUG=on NAME="Happy Feet"
+
+# 指定可以指定一或多条元数据
+LABEL version="1.0" description="这是一个Web服务器" by="IT笔录"
+
+# 指定传递给构建运行时的变量
+# docker build --build-arg site=itiblu.com -t itbilu/test .
+ARG site
+ARG build_user=IT笔录
+
+# 开放监听端口
+EXPOSE <port> [<port>...]
+
+# 用于设置停止容器所要发送的系统调用信号
+STOPSIGNAL signal
+
+# 数据卷映射
+# 让我们可以将源代码、数据或其它内容添加到镜像中，而又不并提交到镜像中，并使我们可以多个容器间共享这些内容
+VOLUME ["/data"]
+
+# 指定当前用户
+USER apache
+
+# 在容器启动时所要执行的命令，在 docker run 中指定命令，可以覆盖本句
+CMD command param1 param2
+
+# 给容器配置一个可执行程序。也就是说，每次使用镜像创建容器时，通过 ENTRYPOINT 指定的程序都会被设置为默认程序。
+# 而 docker run 命令中指定的任何参数，都会被当做参数再次传递给 ENTRYPOINT
+ENTRYPOINT command param1 param2
+```
+
+
 
 ## 6. 容器互联
 
