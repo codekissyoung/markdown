@@ -335,6 +335,18 @@ ENTRYPOINT command param1 param2
 
 如果是在生产环境，还需要配合上更复杂的服务发现机制。
 
+如何去访问一个容器内的应用?
+
+如果应用在Docker容器内部运行，该如何以一种相对安全的方式取连接或发现所依赖的应用服务?
+
+在网络上，该如何加固这些运行在 Docker 容器内部的应用?
+
+
+
+
+
+
+
 ### 6.1 桥接网络
 
 ```bash
@@ -354,7 +366,7 @@ PING db1 (172.19.0.3) 56(84) bytes of data.
 64 bytes from db1.link-test-net (172.19.0.3): icmp_seq=2 ttl=64 time=0.122 ms
 ```
 
-### 6.2 跨主机通信 overlay 网络
+### 6.2 overlay网络
 
 ## 7. 容器编排 Orchestration
 
