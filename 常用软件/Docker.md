@@ -6,9 +6,10 @@ Docker的基础知识、命令。
 
 ```bash
 # 安装
-$ sudo apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual
-$ sudo apt-get install apt-transport-https ca-certificates software-properties-common
-$ sudo apt-get install docker.io
+$ sudo apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual # 使用 aufs 存储
+$ sudo apt-get install apt-transport-https ca-certificates software-properties-common curl
+$ # 添加 gpg 密钥
+$ sudo apt-get install docker-ce
 
 # 启动
 $ sudo systemctl daemon-reload
@@ -21,6 +22,8 @@ $ sudo usermod -aG docker $USER      # 免 sudo 执行 docker
 $ dockerd -D -H tcp://127.0.0.1:2376 # 监听socket端口，而不是sock文件
 $ journalctl -u docker.service       # 查看服务日志
 ```
+
+默认配置文件在 `/etc/default/docker`　
 
 配置加速器 /etc/docker/daemon.json
 
@@ -105,14 +108,15 @@ $ docker run --restart=on-failure:5 # 退出代码非 0 时才重启，重启尝
 ### 3.2 管理容器
 
 ```bash
+$ docker ps -a              # 查看所有容器
+
 $ docker start 容器ID       # 重新启动已经停止的容器
 $ docker stop  容器ID       # 停止容器
 
 $ docker stats              # 查看所有正在运行的容器的状态
-$ docker ps -a              # 查看所有状态的容器
+$ docker top 容器ID         # 查看容器内进程
 $ docker logs -ft 容器ID    # 容器日志
 $ docker events [OPTIONS]   # 系统事件
-$ docker top 容器ID         # 查看容器内进程
 $ docker inspect 容器ID     # 查看容器的详细状态
 $ docker inspect mysql01 --format '{{.NetworkSettings.IPAddress}}'
 172.17.0.2
@@ -133,6 +137,9 @@ $ docker cp data.txt test:/tmp/    # 复制文件到容器内部
 $ docker port mysql01									# 查看容器端口映射情况
 $ docker kill -s <signal> <container> # 向容器内发信号
 $ docker diff <container>						# 查看容器读写层的改动
+
+$ docker export -o ubuntu18.04.c.tar.gz 容器ID # 导出一个容器
+$ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1 # 导入一个容器
 ```
 
 ### 3.3 容器启动案例
@@ -192,33 +199,34 @@ emacs 镜像
 ### 4.1 本地操作
 
 ```bash
-$ docker images -a # 查看本地的镜像
-$ docker image prune -f	 # 清理无用的镜像
-$ docker rmi 镜像ID/名字	# 删除镜像
-
-$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04	# 导出镜像到本地文件
-$ docker export -o ubuntu18.04.c.tar.gz 容器ID # 导出一个容器
-
-$ docker load -i ubuntu_18.04.tar.gz # 导入本地镜像文件
-$ docker import ubuntu18.04.tar.gz - link/ubuntu18.v1 # 导入一个容器
-
-$ docker history [OPTIONS] CONTAINER # 查看镜像构建历史
-
-# 1. 将容器固化为一个新的镜像（临时做法）
-$ docker commit -m"commit msg" -a"author: link" 容器ID link/ubuntu:18.04.v1
-$ docker tag 9f8af246f7c6 link/ubuntu:dev   # 设置一下 Image tag 方便记忆
-$ docker history imageId # 查看一个Image的构建历史
-$ docker inspect link/sample:latest -f '{{.Config.Cmd}}' # 查看Image的情况
+# 1. 基于已有容器构建
+$ docker commit -m"commit msg" -a"author link" 容器ID link/ubuntu:18.04.v1
 
 # 2. 从当前文件夹下 Dockerfile 构建镜像（官方推荐做法）
 $ docker build -t="link/ubuntu.v1" ./ 
+
+$ docker images -a # 查看本地的镜像
+$ docker tag 镜像ID link/ubuntu:dev   # 给 Image 打上 tag
+$ docker inspect link/sample:latest -f '{{.Config.Cmd}}' # 查看Image的情况
+$ docker history imageId # 查看一个Image的构建历史
+
+$ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04	# 将镜像导出
+$ docker load -i ubuntu_18.04.tar.gz # 导入
+
+
+$ docker rmi 镜像ID	# 删除镜像
+$ docker image prune -f	 # 清理无用的镜像
 ```
 
 ### 4.2 远程操作
 
 ```bash
-$ docker pull [OPTIONS] NAME[:TAG]  # 从远程库拉取镜像到本地
-$ docker push [OPTIONS] NAME:[:TAG] # 推送库到远程仓库
+$ docker pull NAME[:TAG]  # 从远程库拉取镜像到本地
+$ docker push NAME:[:TAG] # 推送库到远程仓库
+$ docker pull registry.hub.docker.com/ubuntu:18.04  # 拉取镜像，这里用的是完整的路径
+$ docker pull hub.c.163.com/public/ubuntu:18.04     # 拉取镜像，这里用的是完整的路径
+pull 参数:
+--registry-mirror=proxy_url 指定代理服务器
 ```
 
 ### 4.3 Ubuntu镜像

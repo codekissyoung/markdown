@@ -6,6 +6,12 @@ Docker 技术将应用 程序代码 / 运行时库 / 系统工具 等依赖全�
 
 每个容器的 文件系统 / 网络 / CPU / 内存 资源都是隔离开的。
 
+LXC : Linux Containers， 正是 LXC 被集成到Linux内核中，催生了 Docker，最早可以追溯到 1982 年 Unix 的 `chroot` 工具。
+
+Docker 提供的分发、版本、移植工具，极大的改善了 LXC 的使用体验。
+
+当然后期，Docker 开发了 `libcontainer` 驱动，替代了 Linux 上的原生的 LXC ，作为容器引擎的一部分，但是它们的功能与目的时差不多的。
+
 
 
 ## 1. 基础技术
