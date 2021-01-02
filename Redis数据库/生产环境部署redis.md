@@ -23,7 +23,7 @@ sudo mkdir -p /var/redis/6379
 
 ### 写配置文件
 
-1. 将源代码文件中的`redis.conf`复制到`/etc/redis`目录中，命名为`6379.conf`，修改下面几项
+将源代码文件中的`redis.conf`复制到`/etc/redis`目录中，命名为`6379.conf`，修改下面几项
 
 ```bash
 daemonize yes                       # 以守护进程方式运行

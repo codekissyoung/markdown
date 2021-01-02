@@ -5,7 +5,7 @@
 - [阮一峰的网络日志 / Git 远程操作详解](http://www.ruanyifeng.com/blog/2014/06/git_remote.html)
 - [阮一峰的网络日志 / Git 工作流程](http://www.ruanyifeng.com/blog/2015/12/git-workflow.html)
 
-![阮一峰的网络日志 / git示意图](http://www.ruanyifeng.com/blogimg/asset/2015/bg2015120901.png)
+![](http://www.ruanyifeng.com/blogimg/asset/2015/bg2015120901.png)
 
 - **Workspace**：工作区
 - **Index / Stage**：暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。 有时候也被称作　索引　，不过一般说法还是叫暂存区域。
@@ -81,14 +81,14 @@ $ git fetch --all 				# 将全部远程仓库的更新获取到本地
 $ git merge origin/master 		# 当前分支合并远程分支
 $ git push origin test 			# 将当前分支推送到origin的test分支,如果远程库没有该分支，则创建
 $ git remote rm git_test 		# 删除远程仓库
-$ git remote rename [remote_name] [new_remote_name] 修改远程库名字
+$ git remote rename [remote_name] [new_remote_name] # 修改远程库名字
 # 切换到某一分支，若该分支为远程分支,则以该分支为基础，在本地新建一个与之同名的分支，并设置为跟踪该远程分支　
 $ git checkout branch_name
 $ git branch --set-upstream-to=github/master # 设置当前分支跟踪远程的github/master分支
 $ git checkout -b newBrach origin/master 	 # 在origin/master的基础上，创建一个新分支
 ```
 
-## git commit 产生的对象(commit 对象　 tree 对象 blob 快照对象)
+## git commit产生的对象(commit对象tree对象blob快照对象)
 
 ![分支](https://git-scm.com/book/en/v2/book/03-git-branching/images/commit-and-tree.png)
 

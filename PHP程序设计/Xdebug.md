@@ -26,16 +26,13 @@ echo php_ini_loaded_file();   # 查看加载的 php.ini 位置
 echo php_ini_scanned_files();
 ```
 
-## 常用调试代码
+### 常用调试代码
 
 
 ```php
 $name = "Link";
 xdebug_debug_zval( 'name' ); // name: (refcount=1, is_ref=0) string 'Link' (length=4)
-
-
 ```
-
 
 ## PHPStorm Xdebug 远程调试
 

@@ -48,7 +48,6 @@ This message shows that your installation appears to be working correctly.
 To generate this message, Docker took the following steps:
  1. The Docker client contacted the Docker daemon.
  2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
-    (amd64)
  3. The Docker daemon created a new container from that image which runs the
     executable that produces the output you are currently reading.
  4. The Docker daemon streamed that output to the Docker client, which sent it
@@ -351,10 +350,6 @@ ENTRYPOINT command param1 param2
 
 
 
-
-
-
-
 ### 6.1 桥接网络
 
 ```bash
@@ -388,10 +383,9 @@ PING db1 (172.19.0.3) 56(84) bytes of data.
 
 ```bash
 # docker-compose 命令都需要在项目目录下执行
-
 $ docker-compose build # 构建（重新构建）项目中的服务容器
 $ docker-compose up 		# 启动项目， -d 在后台运行
-$ docker-compose ps 		# 列出服务              
+$ docker-compose ps 		# 列出服务
         Name                      Command               State           Ports         
 --------------------------------------------------------------------------------------
 learncompose_redis_1   docker-entrypoint.sh redis ...   Up      6379/tcp              
@@ -412,24 +406,3 @@ $ docker-compose scale web=3 db=2 # 设置指定服务运行的容器个数
 ```
 
 ### 7.2 Consul
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

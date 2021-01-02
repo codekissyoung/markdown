@@ -15,7 +15,7 @@
 https://github.com/overnote OverNote地址：
 https://github.com/ruyuejun 笔者的地址：
 
-：详尽的Go领域笔记：Go语法、Go并发编程、GoWeb编程、Go微服务等
+详尽的Go领域笔记：Go语法、Go并发编程、GoWeb编程、Go微服务等
 [大前端](https://github.com/overnote/over-javascript)：包含JavaScript、Node.js、vue/react、微信开发、Flutter等大前端技术
 [数据结构与算法](https://github.com/overnote/over-algorithm)：以C/Go实现为主记录数据结构与算法的笔记
 [服务端架构](https://github.com/overnote/over-server)：分布式与微服务笔记，附Nginx、Mysql、Redis等常用服务端技术

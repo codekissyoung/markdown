@@ -4,7 +4,7 @@
 
 ### 申请证书
 
-- [腾讯免费证书申请](https://www.qcloud.com/product/ssl)
+[腾讯免费证书申请](https://www.qcloud.com/product/ssl)
 
 ```bash
 ➜ www.dadishe.com tree

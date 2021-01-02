@@ -1302,7 +1302,7 @@ parent_code( pid );
   - 如果父进程调用`wait`或`waitpid`来等待子进程结束，则通知父进程
   - 向父进程发送`SIGCHLD`
 
-## 第 9 章 可编程的 shell、shell 变量和环境:编写自己的 shell
+## 第 9 章 shell
 
 ```bash
 #!/bin/bash
@@ -1335,7 +1335,7 @@ rm /tmp/pb.tmp
 
 ## 第 12 章 链接和协议:编写 Web 服务器
 
-## 第 13 章 基于数据报(Datagram)的编程:编写许可证服务器
+## 第 13 章 UDP编程:编写许可证服务器
 
 ## 第 14 章 线程机制: 并发函数的使用
 
