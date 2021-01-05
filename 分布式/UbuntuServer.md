@@ -144,6 +144,8 @@ $ sudo netplan apply    # 重启下网络，如果是 ssh 链接，那么执行�
 $ ifconfig              # 确认下是否已经修改
 ```
 
+
+
 ## 快速复制多个 Ubuntu Server
 
 在制作完一个干净的`Ubuntu 18.04 Server`后，我们完全可以以它作为源，复制出多个`Server`用于实验。这里利用的是`Virtual Box`的 “链接复制”，复制快速，节省磁盘。要注意重新生成网卡的`MAC`地址。
@@ -170,6 +172,18 @@ $ ssh link@192.168.0.11                       # 使用新 IP 免密登录 link1 
 
 服务器都设置好后，使用“无界面启动”模式启动，然后使用`ssh link@192.168.0.*`登录。
 
+### 确认MAC地址和product_uuid唯一
+
+```bash
+link@k8smaster:~$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:36:3a:1a brd ff:ff:ff:ff:ff:ff
+link@k8smaster:~$ sudo cat /sys/class/dmi/id/product_uuid
+BCCB5FF1-CA27-D040-BDA8-2D5310CF481F
+```
+
 ## 安装服务端基础开发软件
 
 ```bash
@@ -182,6 +196,9 @@ sudo apt-get install -y rar unrar p7zip zip unzip          # 压缩
 sudo apt-get install -y gcc gdb make autoconf automake libtool build-essential flex bison cmake
 sudo apt-get install -y linux-headers-$(uname -r)
 sudo apt-get install -y automake autoconf libtool pkg-config intltool checkinstall
+
+# 修复因为依赖问题，安装失败的软件
+apt --fix-broken install
 ```
 
 ```bash

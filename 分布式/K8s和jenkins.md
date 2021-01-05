@@ -10,7 +10,7 @@ https://kubernetes.io/docs/tutorials/hello-minikube/
 $ Kubectl create -f test.yaml
 ```
 
-## MiniKube
+## Minikube
 
 #### 安装 kubectl
 
@@ -55,7 +55,7 @@ www.listen(8080);
 
 使用 `node server.js` 运行，在本机 `localhost:8080` 中测试下是否可以访问到。
 
-应用测试好后，我们将它制作成一个 `docker` 镜像, `Dockerfile` 参考如下:
+应用测试好后，我们将它制作成一个 `docker` 镜像， `Dockerfile` 参考如下:
 
 ```bash
 FROM node:8.10.0
@@ -117,7 +117,7 @@ $ minikube service hello-node
 |-----------|------------|-------------|-----------------------------|
 | default   | hello-node |             | http://192.168.99.101:32100 |
 |-----------|------------|-------------|-----------------------------|
-🎉  Opening service default/hello-node in default browser...
+Opening service default/hello-node in default browser...
 ```
 
 清理在集群中创建的资源:
