@@ -24,3 +24,5 @@ Namespace: 将一个物理的Cluster划分为逻辑上的多个Cluster，不同�
 $ kubectl get namespace
 ```
 
+
+
