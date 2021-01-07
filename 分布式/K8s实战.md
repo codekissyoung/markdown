@@ -26,27 +26,7 @@ $ kubectl get namespace
 
 
 
-## Q1 OKR
-
-MQ 集群迁移
-
-MQ / Metrics / Redis 组件代码迁移到 phpcommon 库
-
-Go 消费者后台管理系统
-
-Redis 组件优化 (多次Ping / RedisHelper内部调用Util/Redis / 更多命令支持 / 文档)
-
-
-
-MQ 组件优化：
-
-MQ Server : 连接数优化（15000+优化到500+），链接数监控，堆积消息告警到个人
-
-生产者：amqp库升级，连接断开后自动重新链接，发送消息确认机制，自动重发，发送消息数监控
-
-消费者：信号机制实现平滑重启，异常崩溃后秒级重启，告警到个人，保活监控，消费消息数监控，延迟消费监控
-
-功能性：延迟队列，大容量队列
+![](https://img.codekissyoung.com/2021/01/08/8b15efec8824c13d07f0629380fb701e.png)
 
 
 
