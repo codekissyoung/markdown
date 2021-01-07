@@ -91,7 +91,7 @@ string
 
 #### Session 共享问题
 
-接着上面的讨论，假如我们不使用本地 Redis,而是所有 PHP Server 共用一个中心 Redis，那么它们的 Session 不就共享了么 ^\_^，用户通过负载均衡过来的请求，无论最后分给哪一个 PHP Server 处理，都能拿到该用户存储在 Session 中的数据。
+接着上面的讨论，假如我们不使用本地 Redis,而是所有 PHP Server 共用一个中心 Redis，那么它们的 Session 不就共享了么，用户通过负载均衡过来的请求，无论最后分给哪一个 PHP Server 处理，都能拿到该用户存储在 Session 中的数据。
 
 ![](https://img.codekissyoung.com/2020/02/29/494edee80eb7df61267580d82172f72d.png)
 

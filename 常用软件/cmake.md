@@ -1,4 +1,4 @@
-# Cmake 详解
+# Cmake详解
 
 本文记录了`cmake`的用法。
 

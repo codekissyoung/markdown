@@ -24,7 +24,6 @@ redis-cli -n 0 keys "a*" | xargs redis-cli -n 0 del
 
 ```bash
 127.0.0.1:6379> ping 测试到 redis server 的链接是否通畅, server 返回 pong 表示通畅
-
 127.0.0.1:6379> CONFIG GET *                 获取所有配置
 127.0.0.1:6379> CONFIG GET loglevel          获取loglevel的配置
 127.0.0.1:6379> CONFIG SET loglevel "notice" 设置loglevel
