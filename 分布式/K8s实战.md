@@ -1,7 +1,5 @@
 # Kubernetes in Action
 
-
-
 ## minikube
 
 https://minikube.sigs.k8s.io/docs/start/
@@ -72,6 +70,10 @@ hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0          93m   172.17.0.5 
 $ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详情
 ```
 
+## Pod
+
+Pod里的容器，有哪些东西是相同的？
+
 
 
 Cluster：计算、存储、网络资源集合
@@ -105,12 +107,6 @@ CronJobs：提供了一种调度pod执行的方法。它们非常适合定期运
 CustomResourceDefinitions：简称 CRD 它提供了一种扩展机制，集群的操作人员和开发人员可以使用它来创建自己的资源类型。
 
 ```bash
-
-$ kubectl get nodes # 列出集群节点
-$ kubectl get services # 列出Services
-NAME       STATUS   ROLES                  AGE   VERSION
-minikube   Ready    control-plane,master   17m   v1.20.0
-$ kubectl describe node minikube # 打印节点的状态 CPU 和内存数据系统数据、系统信息、运行容器　
 $ minikube docker-env
 export DOCKER_TLS_VERIFY="1"
 export DOCKER_HOST="tcp://192.168.99.100:2376"
@@ -123,25 +119,6 @@ export MINIKUBE_ACTIVE_DOCKERD="minikube"
 ![](https://img.codekissyoung.com/2021/01/08/8b15efec8824c13d07f0629380fb701e.png)
 
 ![](https://img.codekissyoung.com/2021/01/10/5790a9ee7f4d349e40aa5e164abe6184.png)
-
-```
-$ minikube start                                                                                    
-😄  Ubuntu 18.04 上的 minikube v1.16.0
-✨  Automatically selected the docker driver. Other choices: virtualbox, none
-👍  Starting control plane node minikube in cluster minikube
-🚜  Pulling base image ...
-
-🔥  Creating docker container (CPUs=2, Memory=8000MB) ...
-
-💡  To pull new external images, you may need to configure a proxy: https://minikube.sigs.k8s.io/docs/reference/networking/proxy/
-🐳  正在 Docker 20.10.0 中准备 Kubernetes v1.20.0…
-    ▪ Generating certificates and keys ...
-    ▪ Booting up control plane ...
-    ▪ Configuring RBAC rules ...
-🔎  Verifying Kubernetes components...
-🌟  Enabled addons: storage-provisioner, default-storageclass
-🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
-```
 
 
 
