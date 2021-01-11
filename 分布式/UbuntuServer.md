@@ -95,7 +95,6 @@ $ sudo apt-get install -y language-pack-zh-hans # 安装中文简体语言包
 $ locale -a                                     # 查看已安装的语言包
 
 # 将下面这句写入到 ~/.bashrc 只给当前用户修改下环境变量，不需要全局
-
 export LANG="zh_CN.utf8"
 
 $ date #　重启后，查看下时间，就知道中文和时区已经配置好了
@@ -155,7 +154,7 @@ $ ifconfig              # 确认下是否已经修改
 复制完后的`Server`，它们的公私钥、`hostname` 和 `ip` 是一毛一样的，所以我们需要修改下，启动后：
 
 ```bash
-$ ssh link@192.168.0.10         # 副本与源Server一毛一样，所以直接ssh登录副本
+$ ssh link@192.168.0.10 # 副本与源Server一毛一样，所以直接ssh登录副本
 
 # SSH 登录副本后
 $ ssh-keygen                                  # 重新生成公私钥
@@ -365,8 +364,6 @@ sudo checkinstall # 构建debian包并且安装
 [Linux 上好用的截图工具 flameshot](https://blog.csdn.net/qq_34347375/article/details/83589772)，这一款是带画笔工具的，非常好用，唯一就是每次都需要选定保存的文件夹。
 [Flameshot 一个简洁但功能丰富的截图工具](https://linux.cn/article-10180-1.html)
 
-
-
 ## 解决软件包版本太高问题
 
 - `E:无法修正错误，因为您要求某些软件包保持现状，就是它们破坏了软件包间的依赖关系 解决办法` 就是这个提示
@@ -415,7 +412,6 @@ sudo checkinstall # 构建debian包并且安装
 ```bash
 ➜  / ls -alh / |grep tmp
 drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
-
 ```
 
 - SBIT 权限, `--t` ,该权限只对目录有效,用户在该目录下创建的文件或目录，权限默认为`-rw-r--r--`,即只有该用户和 root 可以删除
@@ -423,7 +419,7 @@ drwxrwxrwt  16 root root 4.0K 6月   3 13:01 tmp
 
 限制用户进程数
 
-- 在`/etc/security/limits.conf` 文件后面添加上下面代码，限制用户进程数为 200
+在`/etc/security/limits.conf` 文件后面添加上下面代码，限制用户进程数为 200
 
 ```bash
 *   hard    nproc   200
