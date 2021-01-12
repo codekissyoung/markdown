@@ -74,6 +74,55 @@ $ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详�
 
 Pod里的容器，有哪些东西是相同的？
 
+kubia-manual.yaml
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kubia-manual
+spec:
+  containers:
+  - image: codekissyoung/kubia
+    name: kubia
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+```
+
+
+
+```bash
+$ kubectl create -f kubia-manual.yaml # 通过文件创建Pod
+$ kubectl logs -f kubia-manual # 查看Pod的输出日志
+$ kubectl port-forward kubia-manual 8888:8080 # 通过端口转发，直接映射到Pod中，方便调试
+$ curl localhost:8888 # 等价于访问 PodIp:8080
+```
+
+### label 标签
+
+用于管理 Pod
+
+```bash
+$ kubectl get pods --show-labels # 显示Pod的labels
+$ kubectl label pod kubia-manual create_method=manual # 给Pod加上标签，--overwrite 表示覆盖原有的 
+$ kubectl get pod -l create_method=manual # 列出指定label=Value的Pod  
+$ kubectl get pod -l env　# 列出指定label的Pod  
+$ kubectl get pod -l '!env' # 列出没有env标签的的Pod, 语法有：env!=dev ; env in (pro,dev) ; env notin (pro,dev) 
+```
+
+### namespace 命名空间
+
+```bash
+$ kubectl get pod -n xys-dev # 列出指定命名空间的Pods
+```
+
+
+
+
+
+
+
 
 
 Cluster：计算、存储、网络资源集合
