@@ -1,6 +1,6 @@
 # Kubernetes in Action
 
-## minikube
+## 1. minikube
 
 https://minikube.sigs.k8s.io/docs/start/
 
@@ -11,15 +11,11 @@ https://minikube.sigs.k8s.io/docs/start/
 ❗  This container is having trouble accessing https://k8s.gcr.io
 ```
 
-
-
 ```bash
 export HTTP_PROXY="http://192.168.13.8:1081"
 export HTTPS_PROXY="http://192.168.13.8:1081"
 export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.99.0/24,192.168.39.0/24
 ```
-
-
 
 ```bash
 $ minikube start --driver=virtualbox
@@ -48,7 +44,7 @@ $ kubectl get service # 查看所有服务，以及访问方式
 NAME             TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 hello-minikube   NodePort       10.103.115.44    <none>        8080:31837/TCP   69m
 $ minikube service hello-minikube # 获取 外部IP:Port 访问方式
-|-----------|----------------|-------------|-----------------------------|
+|-----------|----------Pod: 最小工作单元，每个Pod包含1~N个容器，作为一个整体被调度到一个Node上运行。所有容器共用一个网络namespace，即相同的IP和Port空间，可以使用localhost通信，共享存储。挂载Volume到Pod，等于挂载到Pod中每一个容器。------|-------------|-----------------------------|
 | NAMESPACE |      NAME      | TARGET PORT |             URL             |
 |-----------|----------------|-------------|-----------------------------|
 | default   | hello-minikube |        8080 | http://192.168.99.102:31837 |
@@ -58,7 +54,7 @@ $ minikube service list # 查看所有服务，以及访问方式
 |----------------------|---------------------------|--------------|-----------------------------|
 | default              | hello-minikube            |         8080 | http://192.168.99.102:31837 |
 # 或者通过绑定到HOST本地端口，也可以访问到 Pods
-$ kubectl port-forward service/hello-minikube 7080:8080 
+$ kubectl port-forward Pod: 最小工作单元，每个Pod包含1~N个容器，作为一个整体被调度到一个Node上运行。所有容器共用一个网络namespace，即相同的IP和Port空间，可以使用localhost通信，共享存储。挂载Volume到Pod，等于挂载到Pod中每一个容器。service/hello-minikube 7080:8080 
 ```
 
 Pod的创建和删除是非常频繁的，所以不能将它直接提供给用户，所以设计了Service（创建好后，Ip是固定的），请求到达Service后，Service确保转发给它后面的某个Pod.
@@ -70,7 +66,15 @@ hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0          93m   172.17.0.5 
 $ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详情
 ```
 
-## Pod
+## 2. Pod
+
+Cluster：计算、存储、网络资源集合
+
+Master：Cluster的大脑，负责调度，管理Node
+
+Node：负责管理容器的生命周期，监控并且上报容器状态
+
+Pod: 最小工作单元，每个Pod包含1~N个容器，作为一个整体被调度到一个Node上运行。所有容器共用一个网络namespace，即相同的IP和Port空间，可以使用localhost通信，共享存储。挂载Volume到Pod，等于挂载到Pod中每一个容器。
 
 Pod里的容器，有哪些东西是相同的？
 
@@ -97,6 +101,8 @@ $ kubectl create -f kubia-manual.yaml # 通过文件创建Pod
 $ kubectl logs -f kubia-manual # 查看Pod的输出日志
 $ kubectl port-forward kubia-manual 8888:8080 # 通过端口转发，直接映射到Pod中，方便调试
 $ curl localhost:8888 # 等价于访问 PodIp:8080
+
+$ kubectl delete pod kubia-manual # 删除Pod
 ```
 
 ### label 标签
@@ -109,29 +115,27 @@ $ kubectl label pod kubia-manual create_method=manual # 给Pod加上标签，--o
 $ kubectl get pod -l create_method=manual # 列出指定label=Value的Pod  
 $ kubectl get pod -l env　# 列出指定label的Pod  
 $ kubectl get pod -l '!env' # 列出没有env标签的的Pod, 语法有：env!=dev ; env in (pro,dev) ; env notin (pro,dev) 
+$ kubectl delete pod -l create_method=manual # 删除符合标签的Pod
 ```
 
 ### namespace 命名空间
 
-```bash
-$ kubectl get pod -n xys-dev # 列出指定命名空间的Pods
+```dockerfile
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: xys-dev
 ```
 
+```bash
+$ kubectl get pod -n xys-dev # 列出指定命名空间的Pods
+$ kubectl create -f custom-namespace.yaml # 通过yaml创建命名空间
+$ kubectl delete ns xys-dev # 删除整个命名空间
+```
 
+## 3. Controller
 
-
-
-
-
-
-
-Cluster：计算、存储、网络资源集合
-
-Master：Cluster的大脑，负责调度，管理Node
-
-Node：负责管理容器的生命周期，监控并且上报容器状态
-
-Pod: 最小工作单元，每个Pod包含1~N个容器，作为一个整体被调度到一个Node上运行。所有容器共用一个网络namespace，即相同的IP和Port空间，可以使用localhost通信，共享存储。挂载Volume到Pod，等于挂载到Pod中每一个容器。
+通常在部署时不会直接创建Pod,而是创建ReplicationController和DeploymentController,再由它们去创建和管理Pods.
 
 Controller：管理Pod的生命周期，定义了Pod的部署特性，类型有:
 
@@ -163,7 +167,7 @@ export DOCKER_CERT_PATH="/home/cky/.minikube/certs"
 export MINIKUBE_ACTIVE_DOCKERD="minikube"
 ```
 
-
+## ４． 服务
 
 ![](https://img.codekissyoung.com/2021/01/08/8b15efec8824c13d07f0629380fb701e.png)
 
