@@ -2,16 +2,34 @@
 
 ## minikube
 
+#### 安装 kubectl
+
+```bash
+$ curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt   # kubectl 最新版本
+$ curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubectl
+$ chmod +x kubectl
+$ kubectl version
+```
+
+#### 安装 minikube
+
+```bash
+$ wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+$ chmod +x minikube-linux-amd64
+$ sudo mv minikube-linux-amd64 /usr/local/bin/minikube
+$ minikube version
+```
+
 https://minikube.sigs.k8s.io/docs/start/
 
 首先需要配置好代理，特别注意的是，代理的地址不能是`localhost`和`127.0.0.1`，保证minikube和它启动的VM内部都能够访问外网．
+
+`~/.kube/config` 是 `Minikube`的环境。
 
 ```
 ❗  minikube was unable to download gcr.io/k8s-minikube/kicbase:v0.0.15-snapshot4, but successfully downloaded kicbase/stable:v0.0.15-snapshot4 as a fallback image
 ❗  This container is having trouble accessing https://k8s.gcr.io
 ```
-
-
 
 ```bash
 export HTTP_PROXY="http://192.168.13.8:1081"
@@ -19,43 +37,33 @@ export HTTPS_PROXY="http://192.168.13.8:1081"
 export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.99.0/24,192.168.39.0/24
 ```
 
-
-
 ```bash
 $ minikube start --driver=virtualbox
-$ minikube dashboard  # 开启仪表盘
-$ minikube addons list # 查看开启的插件
-$ minikube pause # Pause Kubernetes without impacting deployed applications
-$ minikube stop # Halt the cluster:
+$ minikube dashboard  	# 开启仪表盘
+$ minikube addons list 	# 查看开启的插件
+$ minikube pause 		# Pause Kubernetes without impacting deployed applications
+$ minikube stop 		# Halt the cluster:
 $ minikube delete --all # Delete all of the minikube clusters
 
 $ kubectl cluster-info  # 查看集群的信息                                     
-Kubernetes control plane is running at https://192.168.99.102:8443
-KubeDNS is running at https://192.168.99.102:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
-$ kubectl get node # 查看节点
+$ kubectl get node 		# 查看节点
 $ kubectl get namespace # 查看所有的namespace
 $ kubectl cluster-info 
-$ minikube ssh # 进入 master node
+$ minikube ssh 			# 进入 master node
 ```
-
-
 
 ```bash
 $ kubectl get pods -A # 获取所有的pods
 $ kubectl create deployment hello-minikube --image=k8s.gcr.io/echoserver:1.4 # 部署一个pod
-$ kubectl expose deployment hello-minikube --type=NodePort --port=8080 # 暴露到外部
+$ kubectl expose deployment hello-minikube --type=NodePort --port=8080 		 # 暴露到外部
 $ kubectl get service # 查看所有服务，以及访问方式
 NAME             TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 hello-minikube   NodePort       10.103.115.44    <none>        8080:31837/TCP   69m
 $ minikube service hello-minikube # 获取 外部IP:Port 访问方式
-|-----------|----------------|-------------|-----------------------------|
 | NAMESPACE |      NAME      | TARGET PORT |             URL             |
-|-----------|----------------|-------------|-----------------------------|
 | default   | hello-minikube |        8080 | http://192.168.99.102:31837 |
 $ minikube service list # 查看所有服务，以及访问方式
-|----------------------|---------------------------|--------------|-----------------------------|
 |      NAMESPACE       |           NAME            | TARGET PORT  |             URL             |
-|----------------------|---------------------------|--------------|-----------------------------|
 | default              | hello-minikube            |         8080 | http://192.168.99.102:31837 |
 # 或者通过绑定到HOST本地端口，也可以访问到 Pods
 $ kubectl port-forward service/hello-minikube 7080:8080 
@@ -72,39 +80,19 @@ $ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详�
 
 ## Pod
 
-Pod里的容器，有哪些东西是相同的？
-
-kubia-manual.yaml
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: kubia-manual
-spec:
-  containers:
-  - image: codekissyoung/kubia
-    name: kubia
-    ports:
-    - containerPort: 8080
-      protocol: TCP
-```
-
 
 
 ```bash
-$ kubectl create -f kubia-manual.yaml # 通过文件创建Pod
-$ kubectl logs -f kubia-manual # 查看Pod的输出日志
+$ kubectl create -f kubia-manual.yaml 	# 通过文件创建Pod
+$ kubectl get pods --show-labels 		# 列出所有Pod
+$ kubectl logs -f kubia-manual -c kubia # 查看Pod的输出日志 -c 指定容器
 $ kubectl port-forward kubia-manual 8888:8080 # 通过端口转发，直接映射到Pod中，方便调试
-$ curl localhost:8888 # 等价于访问 PodIp:8080
+$ curl localhost:8888 						　# 等价于访问 PodIp:8080
 ```
 
 ### label 标签
 
-用于管理 Pod
-
 ```bash
-$ kubectl get pods --show-labels # 显示Pod的labels
 $ kubectl label pod kubia-manual create_method=manual # 给Pod加上标签，--overwrite 表示覆盖原有的 
 $ kubectl get pod -l create_method=manual # 列出指定label=Value的Pod  
 $ kubectl get pod -l env　# 列出指定label的Pod  
@@ -116,12 +104,6 @@ $ kubectl get pod -l '!env' # 列出没有env标签的的Pod, 语法有：env!=d
 ```bash
 $ kubectl get pod -n xys-dev # 列出指定命名空间的Pods
 ```
-
-
-
-
-
-
 
 
 

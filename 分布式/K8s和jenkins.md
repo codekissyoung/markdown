@@ -4,40 +4,7 @@
 
 https://kubernetes.io/docs/tutorials/hello-minikube/
 
-## K8s
 
-```bash
-$ Kubectl create -f test.yaml
-```
-
-## Minikube
-
-#### 安装 kubectl
-
-```bash
-$ curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt   # kubectl 最新版本
-$ curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubectl
-$ chmod +x kubectl
-$ kubectl version
-```
-
-#### 安装 minikube
-
-```bash
-$ wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-$ chmod +x minikube-linux-amd64
-$ sudo mv minikube-linux-amd64 /usr/local/bin/minikube
-$ minikube version
-```
-
-#### 运行 minikube
-
-`~/.kube/config` 是 `Minikube`的环境。
-
-```bash
-$ minikube start
-$ kubectl cluster-info      # 查看 cluster 信息
-```
 
 搞个 `nodejs` 应用:
 
@@ -106,10 +73,6 @@ $ minikube service hello-node
 ```bash
 $ vim server.js                                 # 修改 js 代码
 $ docker build -t hello-node:v2 .               # 重新制作镜像
-$ docker image ls
-REPOSITORY                                TAG                 IMAGE ID            CREATED             SIZE
-hello-node                                v2                  9d626dfcd396        15 seconds ago      673MB
-hello-node                                v1                  498598a928c6        24 minutes ago      673MB
 $ kubectl set image deployment/hello-node hello-node=hello-node:v2  # 更新部署
 $ minikube service hello-node
 |-----------|------------|-------------|-----------------------------|

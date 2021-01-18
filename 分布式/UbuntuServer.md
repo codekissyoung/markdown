@@ -27,12 +27,9 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted unive
 
 ```bash
 $ systemd-resolve --status          # 查看当前使用的 DNS Server
-
 $ sudo vim /etc/systemd/resolved.conf
-
 [Resolve]
 DNS=119.29.29.29 182.254.116.116    # 换成DNSPod
-
 $ sudo systemctl restart systemd-resolved.service # 重启服务
 ```
 
@@ -143,8 +140,6 @@ $ sudo netplan apply    # 重启下网络，如果是 ssh 链接，那么执行�
 $ ifconfig              # 确认下是否已经修改
 ```
 
-
-
 ## 快速复制多个 Ubuntu Server
 
 在制作完一个干净的`Ubuntu 18.04 Server`后，我们完全可以以它作为源，复制出多个`Server`用于实验。这里利用的是`Virtual Box`的 “链接复制”，复制快速，节省磁盘。要注意重新生成网卡的`MAC`地址。
@@ -207,26 +202,7 @@ git config --global user.name "link"                    # git username
 git config --global user.email "link@muchenglin.com"    # git email
 ```
 
-## 安装 lnmp 环境
 
-```bash
-sudo apt-get install nginx
-sudo apt-get install mysql-server mysql-client
-sudo apt-get install redis-server
-sudo apt-get install php
-```
-
-## 美化 Ubuntu
-
-[Ubuntu18 桌面美化(MacOS Mojave)](https://blog.csdn.net/barbarassa/article/details/97301735)
-
-护眼软件：
-
-```shell
-sudo apt install gtk-redshift redshift python-appindicator
-```
-
-## 后面待定
 
 ```bash
 #!/bin/bash
@@ -253,7 +229,7 @@ Ctrl + Alt + T          # 开启终端
 Super + tab             # 切换 App
 Shift + Ctrl + Print    # 区域截图到剪贴板
 Shift + Print           # 区域截图到 图片 目录
-Ctrl + shift + A        # 带画笔的截图（Flameshot提供）、
+Ctrl + shift + A        # 带画笔的截图（Flameshot提供）
 F5                      # 刷新
 ```
 
@@ -366,18 +342,16 @@ sudo checkinstall # 构建debian包并且安装
 
 ## 解决软件包版本太高问题
 
-- `E:无法修正错误，因为您要求某些软件包保持现状，就是它们破坏了软件包间的依赖关系 解决办法` 就是这个提示
-- 解决办法: [Ubuntu 解决包依赖关系](https://blog.csdn.net/newmann/article/details/70149021)
-- 方案就是使用`aptitude`
-  - 执行命令`sudo aptitude install build-essential`
-  - 在展示`1) build-essential [未安装的]`等保持原样，并且询问 `是否接受该解决方案？[Y/n/q/?]` 时，填入 `n`,表示不接受
-  - 在继续展示 `降级 下列软件包：1) gcc-7-base [7.3.0-21ubuntu1~16.04 (now) -> 7.3.0-16ubuntu3 (bionic)]`, 并询问`是否接受该解决方案？[Y/n/q/?]`时，填入`Y` 表示接受软件包降级，这样问题就解决了
+`E:无法修正错误，因为您要求某些软件包保持现状，就是它们破坏了软件包间的依赖关系 解决办法` 就是这个提示
 
-## linux 用于完成特定任务的用户
+解决办法: [Ubuntu 解决包依赖关系](https://blog.csdn.net/newmann/article/details/70149021)
 
-`nobody` `admin` `ftp` ，无密码,无 home 目录，无 shell,主要就是为了运行某些特定的进程，比如 nginx 使用 nobody 用户来运行
+方案就是使用`aptitude`
+- 执行命令`sudo aptitude install build-essential`
+- 在展示`1) build-essential [未安装的]`等保持原样，并且询问 `是否接受该解决方案？[Y/n/q/?]` 时，填入 `n`,表示不接受
+- 在继续展示 `降级 下列软件包：1) gcc-7-base [7.3.0-21ubuntu1~16.04 (now) -> 7.3.0-16ubuntu3 (bionic)]`, 并询问`是否接受该解决方案？[Y/n/q/?]`时，填入`Y` 表示接受软件包降级，这样问题就解决了
 
-## 特殊权限
+### 特殊权限
 
 ```bash
 000 , --- , 0 , 不使用任何特殊权限

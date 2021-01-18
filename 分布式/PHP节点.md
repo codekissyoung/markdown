@@ -14,12 +14,7 @@ $ php composer-setup.php
 $ php -r "unlink('composer-setup.php');"
 $ sudo mv composer.phar /usr/local/bin/composer
 $ sudo composer selfupdate
-```
-
-配置中国镜像：
-
-```bash
-$ composer config -g repo.packagist composer https://packagist.phpcomposer.com
+$ composer config -g repo.packagist composer https://packagist.phpcomposer.com # 配置中国镜像
 ```
 
 在`t1`目录下，创建一个`composer.json`文件
@@ -80,7 +75,7 @@ $logger->pushHandler(new FirePHPHandler());
 $logger->info('My logger is now ready');
 ```
 
-## 安装牛逼的 Laravel 框架
+## 安装 Laravel 框架
 
 ```bash
 $ sudo apt-get install php7.2-bcmath

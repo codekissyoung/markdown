@@ -4,8 +4,6 @@
 
 ## 概述
 
-`Ubuntu 18.04`下安装：
-
 ```bash
 sudo apt install software-properties-common
 sudo apt-add-repository ppa:ansible/ansible
