@@ -1,6 +1,6 @@
 # Kubernetes in Action
 
-## minikube
+## 1. minikube
 
 #### 安装 kubectl
 
@@ -78,34 +78,7 @@ hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0          93m   172.17.0.5 
 $ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详情
 ```
 
-## Pod
-
-
-
-```bash
-$ kubectl create -f kubia-manual.yaml 	# 通过文件创建Pod
-$ kubectl get pods --show-labels 		# 列出所有Pod
-$ kubectl logs -f kubia-manual -c kubia # 查看Pod的输出日志 -c 指定容器
-$ kubectl port-forward kubia-manual 8888:8080 # 通过端口转发，直接映射到Pod中，方便调试
-$ curl localhost:8888 						　# 等价于访问 PodIp:8080
-```
-
-### label 标签
-
-```bash
-$ kubectl label pod kubia-manual create_method=manual # 给Pod加上标签，--overwrite 表示覆盖原有的 
-$ kubectl get pod -l create_method=manual # 列出指定label=Value的Pod  
-$ kubectl get pod -l env　# 列出指定label的Pod  
-$ kubectl get pod -l '!env' # 列出没有env标签的的Pod, 语法有：env!=dev ; env in (pro,dev) ; env notin (pro,dev) 
-```
-
-### namespace 命名空间
-
-```bash
-$ kubectl get pod -n xys-dev # 列出指定命名空间的Pods
-```
-
-
+## 2. Pod
 
 Cluster：计算、存储、网络资源集合
 
@@ -114,6 +87,52 @@ Master：Cluster的大脑，负责调度，管理Node
 Node：负责管理容器的生命周期，监控并且上报容器状态
 
 Pod: 最小工作单元，每个Pod包含1~N个容器，作为一个整体被调度到一个Node上运行。所有容器共用一个网络namespace，即相同的IP和Port空间，可以使用localhost通信，共享存储。挂载Volume到Pod，等于挂载到Pod中每一个容器。
+
+```bash
+$ kubectl create -f kubia-manual.yaml 	# 通过文件创建Pod
+$ kubectl get pods --show-labels 		# 列出所有Pod
+$ kubectl logs -f kubia-manual -c kubia # 查看Pod的输出日志 -c 指定容器
+$ kubectl port-forward kubia-manual 8888:8080 # 通过端口转发，直接映射到Pod中，方便调试
+$ curl localhost:8888 # 等价于访问 PodIp:8080
+$ kubectl delete pod kubia-manual # 按名称删除Pod
+```
+
+### label 标签
+
+```bash
+$ kubectl label pod kubia-manual create_method=manual # 给Pod加上标签，--overwrite 表示覆盖原有的 
+$ kubectl get pod -l create_method=manual # 列出指定label=Value的Pod  
+$ kubectl get pod -l env    # 列出指定label的Pod  
+$ kubectl get pod -l '!env' # 列出没有env标签的的Pod, 语法有：env!=dev ; env in (pro,dev) ; env notin (pro,dev) 
+$ kubectl delete pod -l create_method=manual # 删除符合标签的Pod
+```
+
+### namespace 命名空间
+
+```dockerfile
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: xys-dev
+```
+
+```bash
+$ kubectl get pod -n xys-dev # 列出指定命名空间的Pods
+$ kubectl create -f custom-namespace.yaml # 通过yaml创建命名空间
+$ kubectl delete ns xys-dev # 删除整个命名空间
+$ kubectl delete pod --all # 删除所有容器，但保留命名空间
+$ kubectl delete all --all # 删除本命名空间下的所有资源
+```
+
+## 3. Controller
+
+Cluster：计算、存储、网络资源集合
+
+Master：Cluster的大脑，负责调度，管理Node
+
+Node：负责管理容器的生命周期，监控并且上报容器状态
+
+通常在部署时不会直接创建Pod,而是创建ReplicationController和DeploymentController,再由它们去创建和管理Pods.
 
 Controller：管理Pod的生命周期，定义了Pod的部署特性，类型有:
 
@@ -145,7 +164,7 @@ export DOCKER_CERT_PATH="/home/cky/.minikube/certs"
 export MINIKUBE_ACTIVE_DOCKERD="minikube"
 ```
 
-
+## ４． 服务
 
 ![](https://img.codekissyoung.com/2021/01/08/8b15efec8824c13d07f0629380fb701e.png)
 
