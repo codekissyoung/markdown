@@ -6,6 +6,12 @@
 [使用 Prometheus 针对自己的服务器采集自定义的参数](https://segmentfault.com/a/1190000021164508?utm_source=tag-newest)
 [从零搭建 Prometheus 监控报警系统 PushGateWay 方式](https://www.cnblogs.com/chenqionghe/p/10494868.html)
 
+
+
+
+
+![image-20210119143704528](https://img.codekissyoung.com/2021/01/19/8c84710f879ab1e97e4cb0405ebd9e27.png)
+
 ## 数据类型
 
 **metric** 指标：由`(metric-name, lable sets)`组成，`metric-name`表示指标含义，`lable sets`细化分类，格式如下：
