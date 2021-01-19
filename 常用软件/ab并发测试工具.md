@@ -2,9 +2,8 @@
 
 ## 命令格式
 
-`ab -n 10 -c 10 http://www.baidu.com/`
-
 ```bash
+$ ab -n 10 -c 10 http://www.baidu.com/
 -V              查看ab版本
 -k              Use HTTP KeepAlive feature
 -d              Do not show percentiles served table.
