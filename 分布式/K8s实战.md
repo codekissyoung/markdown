@@ -22,9 +22,7 @@ $ minikube version
 
 https://minikube.sigs.k8s.io/docs/start/
 
-首先需要配置好代理，特别注意的是，代理的地址不能是`localhost`和`127.0.0.1`，保证minikube和它启动的VM内部都能够访问外网．
-
-`~/.kube/config` 是 `Minikube`的环境。
+首先需要配置好代理，特别注意的是，代理的地址不能是`localhost`和`127.0.0.1`，保证minikube和它启动的VM内部都能够访问外网．`~/.kube/config` 是 Minikube 的配置文件。
 
 ```
 ❗  minikube was unable to download gcr.io/k8s-minikube/kicbase:v0.0.15-snapshot4, but successfully downloaded kicbase/stable:v0.0.15-snapshot4 as a fallback image
@@ -44,12 +42,11 @@ $ minikube addons list 	# 查看开启的插件
 $ minikube pause 		# Pause Kubernetes without impacting deployed applications
 $ minikube stop 		# Halt the cluster:
 $ minikube delete --all # Delete all of the minikube clusters
+$ minikube ssh						　# 进入 master node
 
 $ kubectl cluster-info  # 查看集群的信息                                     
-$ kubectl get node 		# 查看节点
+$ kubectl get node 				# 查看节点
 $ kubectl get namespace # 查看所有的namespace
-$ kubectl cluster-info 
-$ minikube ssh 			# 进入 master node
 ```
 
 ```bash
@@ -60,10 +57,8 @@ $ kubectl get service # 查看所有服务，以及访问方式
 NAME             TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 hello-minikube   NodePort       10.103.115.44    <none>        8080:31837/TCP   69m
 $ minikube service hello-minikube # 获取 外部IP:Port 访问方式
-| NAMESPACE |      NAME      | TARGET PORT |             URL             |
 | default   | hello-minikube |        8080 | http://192.168.99.102:31837 |
-$ minikube service list # 查看所有服务，以及访问方式
-|      NAMESPACE       |           NAME            | TARGET PORT  |             URL             |
+$ minikube service list 						 # 查看所有服务，以及访问方式
 | default              | hello-minikube            |         8080 | http://192.168.99.102:31837 |
 # 或者通过绑定到HOST本地端口，也可以访问到 Pods
 $ kubectl port-forward service/hello-minikube 7080:8080 
@@ -73,8 +68,7 @@ Pod的创建和删除是非常频繁的，所以不能将它直接提供给用�
 
 ```bash
 $ kubectl get pods -o wide # 查看所有 pod 详情
-NAME                              READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
-hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0          93m   172.17.0.5   minikube   <none>           <none>
+hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0   93m   172.17.0.5   minikube   <none>  <none>
 $ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详情
 ```
 
