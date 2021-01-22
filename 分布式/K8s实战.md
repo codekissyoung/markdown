@@ -74,12 +74,6 @@ $ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详�
 
 ## 2. Pod
 
-Cluster：计算、存储、网络资源集合
-
-Master：Cluster的大脑，负责调度，管理Node
-
-Node：负责管理容器的生命周期，监控并且上报容器状态
-
 Pod: 最小工作单元，每个Pod包含1~N个容器，作为一个整体被调度到一个Node上运行。所有容器共用一个网络namespace，即相同的IP和Port空间，可以使用localhost通信，共享存储。挂载Volume到Pod，等于挂载到Pod中每一个容器。
 
 ```bash

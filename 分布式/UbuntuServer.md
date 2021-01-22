@@ -169,12 +169,12 @@ $ ssh link@192.168.0.11                       # 使用新 IP 免密登录 link1 
 ### 确认MAC地址和product_uuid唯一
 
 ```bash
-link@k8smaster:~$ ip link
+$ ip link
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
     link/ether 08:00:27:36:3a:1a brd ff:ff:ff:ff:ff:ff
-link@k8smaster:~$ sudo cat /sys/class/dmi/id/product_uuid
+$ sudo cat /sys/class/dmi/id/product_uuid
 BCCB5FF1-CA27-D040-BDA8-2D5310CF481F
 ```
 
