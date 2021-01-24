@@ -146,13 +146,15 @@ root@kubia-rs-ll75w:~# curl http://kubia-service # 访问服务
 
 ![image-20210124151356430](https://img.codekissyoung.com/2021/01/24/c021a04de9c9a6fd35daef8d009663fe.png)
 
+### Ingress
+
+通过一个IP地址，公开所有服务。
+
+![image-20210125015634842](https://img.codekissyoung.com/2021/01/25/ddb332b486496ffd7ba8a4b329faf96e.png)
 
 
-kubectl exec -it kubia-rs-ll75w -- bash
 
-
-
-
+![image-20210125020038562](https://img.codekissyoung.com/2021/01/25/21fc3a777daa9733656f87c424bd5ddd.png)
 
 
 ![](https://img.codekissyoung.com/2021/01/08/8b15efec8824c13d07f0629380fb701e.png)
