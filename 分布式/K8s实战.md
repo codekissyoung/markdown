@@ -134,14 +134,21 @@ export MINIKUBE_ACTIVE_DOCKERD="minikube"
 ## ４． 服务
 
 ```bash
-
+$ kubectl get service
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes      ClusterIP   10.96.0.1       <none>        443/TCP          12h
+kubia-service   ClusterIP   10.110.247.72   <none>        80/TCP,443/TCP   8h
+# 在指定的Pod中执行指定的命令
+$ kubectl exec kubia-rs-mzjz5 -- curl -s http://10.110.247.72
+$ kubectl exec -it kubia-rs-ll75w -- bash # 在指定的Pod中运行bash
+root@kubia-rs-ll75w:~# curl http://kubia-service # 访问服务
 ```
 
+![image-20210124151356430](https://img.codekissyoung.com/2021/01/24/c021a04de9c9a6fd35daef8d009663fe.png)
 
 
 
-
-
+kubectl exec -it kubia-rs-ll75w -- bash
 
 
 
