@@ -2,25 +2,20 @@
 
 ## 1. minikube
 
-#### 安装 kubectl
+https://minikube.sigs.k8s.io/docs/start/
 
 ```bash
+# 安装 kubectl
 $ curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt   # kubectl 最新版本
 $ curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubectl
 $ chmod +x kubectl
 $ kubectl version
-```
 
-#### 安装 minikube
-
-```bash
+# 安装 minikube
 $ wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 $ chmod +x minikube-linux-amd64
 $ sudo mv minikube-linux-amd64 /usr/local/bin/minikube
-$ minikube version
 ```
-
-https://minikube.sigs.k8s.io/docs/start/
 
 首先需要配置好代理，特别注意的是，代理的地址不能是`localhost`和`127.0.0.1`，保证minikube和它启动的VM内部都能够访问外网．`~/.kube/config` 是 Minikube 的配置文件。
 
@@ -37,22 +32,28 @@ export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.99.0/24,192.168.39.0/24
 
 ```bash
 $ minikube start --driver=virtualbox
-$ minikube dashboard  	# 开启仪表盘
+$ minikube dashboard    # 开启仪表盘
 $ minikube addons list 	# 查看开启的插件
-$ minikube pause 		# Pause Kubernetes without impacting deployed applications
-$ minikube stop 		# Halt the cluster:
+$ minikube stop 					
 $ minikube delete --all # Delete all of the minikube clusters
 $ minikube ssh						　# 进入 master node
-
 $ kubectl cluster-info  # 查看集群的信息                                     
 $ kubectl get node 				# 查看节点
-$ kubectl get namespace # 查看所有的namespace
+$ kubectl get ns        # 查看所有的namespace
+$ kubectl get pods -A 		# 获取所有的pods
+$ kubectl get pods -o wide # 查看所有 pod 详情
+hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0   93m   172.17.0.5   minikube   <none>  <none>
+$ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详情
 ```
 
 ```bash
-$ kubectl get pods -A # 获取所有的pods
 $ kubectl create deployment hello-minikube --image=k8s.gcr.io/echoserver:1.4 # 部署一个pod
-$ kubectl expose deployment hello-minikube --type=NodePort --port=8080 		 # 暴露到外部
+$ kubectl expose deployment hello-minikube --type=NodePort --port=8080 		    # 暴露到外部
+```
+
+Pod的创建和删除是非常频繁的，所以不能将它直接提供给用户，所以设计了Service（创建好后，Ip是固定的），请求到达Service后，Service确保转发给它后面的某个Pod.
+
+```bash
 $ kubectl get service # 查看所有服务，以及访问方式
 NAME             TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 hello-minikube   NodePort       10.103.115.44    <none>        8080:31837/TCP   69m
@@ -62,14 +63,6 @@ $ minikube service list 						 # 查看所有服务，以及访问方式
 | default              | hello-minikube            |         8080 | http://192.168.99.102:31837 |
 # 或者通过绑定到HOST本地端口，也可以访问到 Pods
 $ kubectl port-forward service/hello-minikube 7080:8080 
-```
-
-Pod的创建和删除是非常频繁的，所以不能将它直接提供给用户，所以设计了Service（创建好后，Ip是固定的），请求到达Service后，Service确保转发给它后面的某个Pod.
-
-```bash
-$ kubectl get pods -o wide # 查看所有 pod 详情
-hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0   93m   172.17.0.5   minikube   <none>  <none>
-$ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详情
 ```
 
 ## 2. Pod
@@ -114,35 +107,21 @@ $ kubectl delete all --all # 删除本命名空间下的所有资源
 
 ## 3. Controller
 
-Cluster：计算、存储、网络资源集合
-
-Master：Cluster的大脑，负责调度，管理Node
-
-Node：负责管理容器的生命周期，监控并且上报容器状态
-
-通常在部署时不会直接创建Pod,而是创建ReplicationController和DeploymentController,再由它们去创建和管理Pods.
-
-Controller：管理Pod的生命周期，定义了Pod的部署特性，类型有:
+```bash
+$ kubectl scale rc kubia-rc-example --replicas=4 # 扩容or缩容
+```
 
 - ReplicaSet : 实现了Pod的多副本管理，自动被Deployment使用，所以通常也不需要手动直接使用
-
 - Deployment : 管理Pod的多个副本
-- DaemonSet: 用于每个Node最多只运行一个Pod的场景
-- StatefuleSet: 保证Pod每个副本，在整个生命周期中，名称是不变的
+- DaemonSet : 用于每个Node最多只运行一个Pod的场景,比如`kube-proxy`
+- StatefuleSet : 保证Pod每个副本，在整个生命周期中，名称是不变的
 - Job: 用于运行结束就删除的应用
-
-
-Ingresses : 提供一种负载均衡方法，用于将群集外部的访问，负载到群集内部相应目的 Pod。一个外部的 Ingresses 入口可以导向许多不同的内部服务。
-
-Service : 管理Pod的访问。定义了外界访问一组特定Pod的方式。Service有自己的IP和端口，为Pod提供负载均衡
-
-Namespace : 将一个物理的Cluster划分为逻辑上的多个Cluster，不同的逻辑Cluster，资源是完全隔离的
-
-Secrets : 用于存储非公共信息，如令牌、证书或密码。Secrets 可以在运行时附加到 Pods，以便将敏感的配置数据可以安全地存储在集群中。
-
-CronJobs：提供了一种调度pod执行的方法。它们非常适合定期运行备份、报告和自动化测试等任务。
-
-CustomResourceDefinitions：简称 CRD 它提供了一种扩展机制，集群的操作人员和开发人员可以使用它来创建自己的资源类型。
+- Ingresses : 提供一种负载均衡方法，用于将群集外部的访问，负载到群集内部相应目的 Pod。一个外部的 Ingresses 入口可以导向许多不同的内部服务。
+- Service : 管理Pod的访问。定义了外界访问一组特定Pod的方式。Service有自己的IP和端口，为Pod提供负载均衡
+- Namespace : 将一个物理的Cluster划分为逻辑上的多个Cluster，不同的逻辑Cluster，资源是完全隔离的
+- Secrets : 用于存储非公共信息，如令牌、证书或密码。Secrets 可以在运行时附加到 Pods，以便将敏感的配置数据可以安全地存储在集群中。
+- CronJobs：提供了一种调度pod执行的方法。它们非常适合定期运行备份、报告和自动化测试等任务。
+- CustomResourceDefinitions：简称 CRD 它提供了一种扩展机制，集群的操作人员和开发人员可以使用它来创建自己的资源类型。
 
 ```bash
 $ minikube docker-env
@@ -153,6 +132,21 @@ export MINIKUBE_ACTIVE_DOCKERD="minikube"
 ```
 
 ## ４． 服务
+
+```bash
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 ![](https://img.codekissyoung.com/2021/01/08/8b15efec8824c13d07f0629380fb701e.png)
 
