@@ -1,12 +1,6 @@
-# Docker K8s 和 jenkins
+# Docker 和 jenkins
 
-[K8s 官方文档](https://kubernetes.io/zh/docs/tutorials/kubernetes-basics/)
-
-https://kubernetes.io/docs/tutorials/hello-minikube/
-
-
-
-搞个 `nodejs` 应用:
+搞个 `nodejs` 应用
 
 ```js
 // node/server.js
