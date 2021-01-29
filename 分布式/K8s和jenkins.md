@@ -1,7 +1,5 @@
 # Docker 和 jenkins
 
-搞个 `nodejs` 应用
-
 ```js
 // node/server.js
 var http = require("http");
@@ -14,11 +12,14 @@ var www = http.createServer(handleRequest);
 www.listen(8080);
 ```
 
-使用 `node server.js` 运行，在本机 `localhost:8080` 中测试下是否可以访问到。
-
-应用测试好后，我们将它制作成一个 `docker` 镜像， `Dockerfile` 参考如下:
-
 ```bash
+$ node server.js
+$ curl localhost:8080
+```
+
+制作成一个 `docker` 镜像， `Dockerfile` 参考如下:
+
+```dockerfile
 FROM node:8.10.0
 EXPOSE 8080
 COPY server.js .
@@ -26,8 +27,8 @@ CMD node server.js
 ```
 
 ```bash
-$ eval $(minikube docker-env)               # 设置一些 minikube docker 制作的一些环境变量
-$ docker build -t hello-node:v1 .           # 开始制作 镜像
+$ eval $(minikube docker-env)     # 设置一些 minikube docker 制作的一些环境变量
+$ docker build -t hello-node:v1 . # 开始制作 镜像
 $ docker image ls                           # 制作好之后，可以查看到
 REPOSITORY    TAG                 IMAGE ID            CREATED             SIZE
 hello-node    v1                  498598a928c6        8 minutes ago       673MB
