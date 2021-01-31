@@ -20,8 +20,8 @@ $ sudo mv minikube-linux-amd64 /usr/local/bin/minikube
 首先需要配置好代理，特别注意的是，代理的地址不能是`localhost`和`127.0.0.1`，保证minikube和它启动的VM内部都能够访问外网．`~/.kube/config` 是 Minikube 的配置文件。
 
 ```
-❗  minikube was unable to download gcr.io/k8s-minikube/kicbase:v0.0.15-snapshot4, but successfully downloaded kicbase/stable:v0.0.15-snapshot4 as a fallback image
-❗  This container is having trouble accessing https://k8s.gcr.io
+minikube was unable to download gcr.io/k8s-minikube/kicbase:v0.0.15-snapshot4, but successfully downloaded kicbase/stable:v0.0.15-snapshot4 as a fallback image
+This container is having trouble accessing https://k8s.gcr.io
 ```
 
 ```bash

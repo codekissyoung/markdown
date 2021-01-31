@@ -27,7 +27,6 @@ cky@cky-pc:/etc/nginx$ tree -L 1
 
 ```bash
 # 1. 关闭Nginx进程
-
 # 2. --purge 删除Nginx所有包
 dpkg --get-selections | grep nginx
 sudo apt-get --purge remove nginx
@@ -35,7 +34,7 @@ sudo apt-get --purge remove nginx-common
 sudo apt-get --purge remove nginx-core
 ```
 
-## 编译安装 Nginx
+## 编译安装
 
 ```bash
 # 安装依赖
@@ -232,13 +231,11 @@ http {
         server_name  192.168.8.x;
     # 对aspx后缀的进行负载均衡请求
     location ~ .*\.aspx$ {
-         root   /root;      #定义服务器的默认网站根目录位置
-          index index.php index.html index.htm;   #定义首页索引文件的名称
-          proxy_pass  http://mysvr ;#请求转向mysvr 定义的服务器列表
+         root   /root;      # 定义服务器的默认网站根目录位置
+          index index.php index.html index.htm; # 定义首页索引文件的名称
+          proxy_pass  http://mysvr ; # 请求转向mysvr 定义的服务器列表
           # 以下是一些反向代理的配置可删除.
-
           proxy_redirect off;
-
           #后端的Web服务器可以通过X-Forwarded-For获取用户真实IP
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
