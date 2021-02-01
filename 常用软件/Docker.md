@@ -5,20 +5,17 @@ Docker的基础知识、命令。
 ## 1. 安装与配置
 
 ```bash
-# 安装
 $ sudo apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual # 使用 aufs 存储
 $ sudo apt-get install apt-transport-https ca-certificates software-properties-common curl
-$ # 添加 gpg 密钥
 $ sudo apt-get install docker-ce
-
-# 启动
 $ sudo systemctl daemon-reload
 $ sudo systemctl restart docker
 $ sudo systemctl enable docker
 
 $ docker version
 $ docker info
-$ sudo usermod -aG docker $USER      # 免 sudo 执行 docker
+$ sudo usermod -aG docker $USER # 免 sudo 执行 docker
+
 $ dockerd -D -H tcp://127.0.0.1:2376 # 监听socket端口，而不是sock文件
 $ journalctl -u docker.service       # 查看服务日志
 ```
@@ -53,11 +50,7 @@ To generate this message, Docker took the following steps:
  4. The Docker daemon streamed that output to the Docker client, which sent it
     to your terminal.
 To try something more ambitious, you can run an Ubuntu container with:
-$ docker run -it ubuntu bash
-Share images, automate workflows, and more with a free Docker ID:
-https://hub.docker.com/
-For more examples and ideas, visit:
-https://docs.docker.com/get-started/
+    docker run -it ubuntu bash
 ```
 
 ```bash
@@ -65,10 +58,10 @@ $ docker run -itd ubuntu /bin/bash
 # -t 为容器分配一个伪终端
 # -i 开启容器的 STDIN
 # -d Daemon
-$ docker exec -it 容器 /bin/bash # 进入容器
+$ docker exec -it 容器ID /bin/bash # 进入容器
 ```
 
-创建了一个新容器，该容器拥有自己的网络 IP地址 以及一个和宿主机通信的桥接网络接口．如果容器内 1 号进程（启动进程）停止运行了，那么容器也会随着退出。
+创建了一个新容器，该容器拥有自己的网络IP地址以及一个和宿主机通信的桥接网络接口．如果容器内1号进程（启动进程）停止运行了，那么容器也会随着退出。
 
 ```bash
 root@3798a98859f9:~# hostname
@@ -112,7 +105,7 @@ $ docker ps -a              # 查看所有容器
 $ docker start 容器ID       # 重新启动已经停止的容器
 $ docker stop  容器ID       # 停止容器
 
-$ docker stats              # 查看所有正在运行的容器的状态
+$ docker stats # 查看所有正在运行的容器的状态
 $ docker top 容器ID         # 查看容器内进程
 $ docker logs -ft 容器ID    # 容器日志
 $ docker events [OPTIONS]   # 系统事件
@@ -211,7 +204,6 @@ $ docker history imageId # 查看一个Image的构建历史
 
 $ docker save -o ubuntu_18.04.tar.gz ubuntu:18.04	# 将镜像导出
 $ docker load -i ubuntu_18.04.tar.gz # 导入
-
 
 $ docker rmi 镜像ID	# 删除镜像
 $ docker image prune -f	 # 清理无用的镜像

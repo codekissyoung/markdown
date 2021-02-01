@@ -35,7 +35,7 @@ fi
 - 让脚本运行在新的会话，脱离此终端，从而不收到终端`HUP`信号
 - `()`可让命令在子 shell 中运行
 
-```c
+```bash
 $ nohup ping www.baidu.com &> ping.log &        # nohup 命令
 $ setsid ping www.baidu.com &> setsid_ping.log  # setsid 命令
 $ (ping www.baidu.com &> abc.log &)             # 孙子进程法，最后命令成了 孤儿进程

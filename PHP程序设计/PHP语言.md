@@ -98,25 +98,18 @@ var_dump($data);
 - 上策: 使用 `trait` 实现 `Geocodable` 功能, 然后分别 "注入" 到 `RetailStore` 和 `Car`中
 
 ```php
-// 定义 trait
-trait Geocodable {
+trait Geocodable { // 定义 trait
     protected $address;
     protected $geocoder;
-    public function setGeocoder(){
-        //...
-    }
-    public function getLatitude(){
-        // ...
-    }
-    protected function geocodeAddress(){
-        // ...
-    }
+    public function setGeocoder(){}
+    public function getLatitude(){}
+    protected function geocodeAddress(){}
 }
 class RetailStore {
-    use Geocodable;     // 注入 Geocodable
+    use Geocodable;// 注入 Geocodable
 }
 class Car {
-    use Geocodable;     // 注入 Geocodable
+    use Geocodable;// 注入 Geocodable
 }
 ```
 
@@ -137,7 +130,6 @@ function makeRange( $length ){
     for( $i = 0; $i < $length; $i++ )
         yield $i;
 }
-
 foreach( makeRange(1000) as $i )
     echo $i;
 
@@ -148,7 +140,6 @@ function getRows($file){
         yield fgetcsv($handle);
     fclose($handle);
 }
-
 foreach( getRows('data.csv') as $row )
     print_r($row);
 ```
