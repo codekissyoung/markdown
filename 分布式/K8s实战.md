@@ -20,8 +20,8 @@ $ sudo mv minikube-linux-amd64 /usr/local/bin/minikube
 首先需要配置好代理，特别注意的是，代理的地址不能是`localhost`和`127.0.0.1`，保证minikube和它启动的VM内部都能够访问外网．`~/.kube/config` 是 Minikube 的配置文件。
 
 ```
-❗  minikube was unable to download gcr.io/k8s-minikube/kicbase:v0.0.15-snapshot4, but successfully downloaded kicbase/stable:v0.0.15-snapshot4 as a fallback image
-❗  This container is having trouble accessing https://k8s.gcr.io
+minikube was unable to download gcr.io/k8s-minikube/kicbase:v0.0.15-snapshot4, but successfully downloaded kicbase/stable:v0.0.15-snapshot4 as a fallback image
+This container is having trouble accessing https://k8s.gcr.io
 ```
 
 ```bash
@@ -36,17 +36,17 @@ $ minikube dashboard    # 开启仪表盘
 $ minikube addons list 	# 查看开启的插件
 $ minikube stop 					
 $ minikube delete --all # Delete all of the minikube clusters
-$ minikube ssh						　# 进入 master node
-$ kubectl cluster-info  # 查看集群的信息                                     
-$ kubectl get node 				# 查看节点
-$ kubectl get ns        # 查看所有的namespace
-$ kubectl get pods -A 		# 获取所有的pods
-$ kubectl get pods -o wide # 查看所有 pod 详情
-hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0   93m   172.17.0.5   minikube   <none>  <none>
-$ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详情
+$ minikube ssh			# 进入 master node
 ```
 
 ```bash
+$ kubectl cluster-info  # 查看集群的信息                                     
+$ kubectl get node 		# 查看节点
+$ kubectl get ns        # 查看所有的namespace
+$ kubectl get pods -A 	# 获取所有的pods
+$ kubectl get pods -o wide # 查看所有 pod 详情
+hello-minikube-6ddfcc9757-bfmnj   1/1     Running   0   93m   172.17.0.5   minikube   <none>  <none>
+$ kubectl describe pod hello-minikube-6ddfcc9757-bfmnj # 查看某个pod的详情
 $ kubectl create deployment hello-minikube --image=k8s.gcr.io/echoserver:1.4 # 部署一个pod
 $ kubectl expose deployment hello-minikube --type=NodePort --port=8080 		    # 暴露到外部
 ```
