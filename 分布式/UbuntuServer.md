@@ -1,4 +1,4 @@
-# Ubuntu 装机指南
+# Ubuntu装机指南
 
 `Ubuntu 18.04` 作为示范机，U 盘装机软件 `LinuxLive USB Creator`。
 

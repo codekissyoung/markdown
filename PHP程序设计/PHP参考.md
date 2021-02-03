@@ -87,8 +87,6 @@ call_user_func_array([$obj,'method_name'],$args);
 $obj -> method($arr); // $arr 参数数组
 ```
 
-
-
 ## 写 http 头
 
 ```php

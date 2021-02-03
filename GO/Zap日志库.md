@@ -114,8 +114,6 @@ defer logger.Sync()
 logger.Info("constructed a logger")
 ```
 
-
-
 The zap package itself is a relatively thin wrapper around the interfaces in go.uber.org/zap/zapcore. 
 
 Extending zap to support：
@@ -129,21 +127,15 @@ Extending zap to support：
 
 typically requires implementing the zapcore.Encoder, zapcore.WriteSyncer, or zapcore.Core interfaces. 
 
-
-
 See the zapcore documentation for details.
 
 Similarly, package authors can use the high-performance Encoder and Core implementations in the zapcore package to build their own loggers.
-
-
 
 日志有两个概念：字段和消息。字段用来结构化输出错误相关的上下文环境，而消息简明扼要的阐述错误本身
 
 ```go
 log.Error("User does not exist", zap.Int("uid", uid))
 ```
-
-
 
 在`zap`的设计理念中，`Logger`虽然是结构体，但`Logger`中的`core`却是接口，这个接口可以有不同的实现，`core`中的方法才是真正实现日志的编码和输出的地方。
 

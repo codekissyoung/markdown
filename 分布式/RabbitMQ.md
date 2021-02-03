@@ -6,10 +6,10 @@
 
 ```bash
 4369 (epmd erlang 虚拟机端口)
-25672 (Erlang 分布式集群端口)
-5672 (AMQP 0-9-1 without TLS) amqp 协议访问
 5671 (AMQP 0-9-1 with TLS) 
+5672 (AMQP 0-9-1 without TLS) amqp 协议访问
 15672 web Http协议
+25672 (Erlang 分布式集群端口)
 ```
 
 ## Server管理

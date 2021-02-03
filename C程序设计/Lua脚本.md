@@ -5,7 +5,7 @@
 ## 安装与测试
 
 ```bash
-$ sudo apt-get install lua5.3  # 安装 
+$sudo apt-get install lua5.3  # 安装 
 ```
 
 ```lua
