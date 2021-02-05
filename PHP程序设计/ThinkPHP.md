@@ -53,7 +53,7 @@ ThinkPHP/Conf/debug.php # 调试配置 可选
 
 # 公共模块配置，所有模块都会先加载的
 Application/Common/Conf/config.php # 公共配置
-Application/Common/Conf/config_$APP_MODE.php # 运行模式配置可选　默认为common，还有 sae api 模式可选
+Application/Common/Conf/config_$APP_MODE.php # 运行模式配置可选　默认为common
 Application/Common/Conf/dev.php # 场景配置，用于划分生产和测试　define('APP_STATUS','dev'); home company pro 等　
 Application/Common/Conf/user.php # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
 Application/Common/Conf/db.php # 拓展配置 'LOAD_EXT_CONFIG' => 'user,db'
@@ -79,11 +79,7 @@ C( 'USER_CONFIG.USER_TYPE', 1 );    // 设置 二维
 C( ['WEB_SITE_TITLE'=>'ThinkPHP','WEB_SITE_DESCRIPTION'=>'开源PHP框架'] ); // 批量设置
 ```
 
-
-
 ## 3. 路由
-
-下面这个访问模式是固定的．
 
 ```bash
 http://serverName/index.php/模块/控制器/操作　　　　# Web 访问
@@ -106,10 +102,6 @@ class LinkTestController extends Controller
     }
 }
 ```
-
-### 3.1 自定义路由
-
-略过
 
 ## 4. 控制器
 
