@@ -3,11 +3,11 @@
 最好的方法是限定几个可以访问 api 的域名,其他域名全部拒绝。
 但是`Access-Control-Allow-Origin`只能设置一个值，所以要多端共用,只有`header("Access-Control-Allow-Origin:*");`
 
-## Ajax 跨域请求带上 COOKIE
+## Ajax跨域请求带上COOKIE
 
 前端：`'xhrFields': {'withCredentials': true}`(jquery ajax 设置)，注意：`Access-Control-Allow-Origin:*` 与这个有冲突
 `A wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header when the credentials flag is true`
-后端：`header("Access-Control-Allow-Credentials: true");`跨域请求允许带 cookie
+后端：`header("Access-Control-Allow-Credentials: true");`跨域请求允许带cookie
 
 ## web 客户端储存数据
 
