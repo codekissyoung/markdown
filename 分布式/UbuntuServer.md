@@ -2,23 +2,61 @@
 
 `Ubuntu 18.04` 作为示范机，U 盘装机软件 `LinuxLive USB Creator`。
 
-## 制作一个干净的 Ubuntu18.04 Server
+
+
+## Virtual Box使用
+
+### 虚拟机互通
+
+设置为`NAT`网络模式:
+
+```
+全局设置 -> 网络 -> NAT网络
+```
+
+新增一个NAT网络，然后设置各虚拟机网络类型为该网络。
+
+![image-20210217190522738](https://img.codekissyoung.com/2021/02/17/76411345df105f682a1d1136e2e91158.png)
+
+![image-20210217190559801](https://img.codekissyoung.com/2021/02/17/85558472a420ed6dfce32dc28be2f9ee.png)
+
+
+
+### 配置双网卡
+
+![image-20210217205556823](https://img.codekissyoung.com/2021/02/17/43da9732e560b1a590d6b3cf6d307741.png)
+
+![image-20210217205608018](https://img.codekissyoung.com/2021/02/17/9c559afa983fb98fce1b14078e078b5c.png)
+
+```bash
+network:
+  ethernets:
+    enp0s8:
+      dhcp4: true # 桥接网卡用 DHCP
+    enp0s3: # NAT 网卡自己设置 IP
+      addresses: [10.0.2.16/24]
+      gateway4: 10.0.2.2
+      dhcp4: no
+  version: 2
+```
+
+## Ubuntu20.04
 
 ### 1. 更换软件源
 
 修改 `/etc/apt/sources.list` 为如下内容:
 
 ```bash
-deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
 ```
 
 ### 2. 更换 DNS
@@ -39,7 +77,7 @@ $ sudo systemctl restart systemd-resolved.service # 重启服务
 $ sudo update-alternatives --config editor                # 默认编辑设置为vim
 ```
 
-```vim
+```bash
 set nu                        " 设置行号
 set hlsearch                  " 高亮查找项
 set incsearch                 " 查找跟随
@@ -71,7 +109,7 @@ $ sudo visudo # 设置执行 sudo 命令不需要输入密码
 %sudo   ALL=(ALL:ALL) NOPASSWD:ALL
 ```
 
-### 5. 设置时区
+### 5. 设置时区sudo apt-get install -y bind9 bind9-host dnsutils bind9-doc
 
 ```bash
 $ sudo apt-get install ntpdate  # 安装时间同步工具
@@ -176,6 +214,14 @@ $ ip link
     link/ether 08:00:27:36:3a:1a brd ff:ff:ff:ff:ff:ff
 $ sudo cat /sys/class/dmi/id/product_uuid
 BCCB5FF1-CA27-D040-BDA8-2D5310CF481F
+```
+
+## 私网DNS
+
+```bash
+sudo apt-get install -y bind9 bind9-host dnsutils bind9-doc
+sudo netstat -tulnp | grep named # 检查是否在运行
+nslookup www.qq.com # 查看该域名的DNS信息
 ```
 
 ## 安装服务端基础开发软件
