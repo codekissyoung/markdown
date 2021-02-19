@@ -67,11 +67,10 @@
 
 
 
+![image-20210219162506845](https://img.codekissyoung.com/2021/02/19/f4041de3d7f0d3b9d3fa83819cd2fcba.png)
 
+![image-20210219161846752](https://img.codekissyoung.com/2021/02/19/9704a8daabc225c33b0c9e835e7c4663.png)
 
+![image-20210219163024870](https://img.codekissyoung.com/2021/02/19/f00174e76d6c48aa1066649c794a2ec6.png)
 
-
-
-
-
-
+说明 仅密钥类型为Aliyun_AES_256和Aliyun_SM4的对称密钥支持设置轮转周期。
