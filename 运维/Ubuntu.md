@@ -178,7 +178,7 @@ $ sudo netplan apply    # 重启下网络，如果是 ssh 链接，那么执行�
 $ ifconfig              # 确认下是否已经修改
 ```
 
-## 快速复制多个 Ubuntu Server
+## 复制多个Ubuntu
 
 在制作完一个干净的`Ubuntu 18.04 Server`后，我们完全可以以它作为源，复制出多个`Server`用于实验。这里利用的是`Virtual Box`的 “链接复制”，复制快速，节省磁盘。要注意重新生成网卡的`MAC`地址。
 
