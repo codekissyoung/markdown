@@ -1,5 +1,17 @@
 # GPG
 
+参考资料：
+
+[官方英文文档](https://gnupg.org/documentation/manuals/gnupg/)
+
+[GPG配置、命令、实例与apt-key密钥测试](https://www.cnblogs.com/usmile/p/12873604.html)
+
+[GnuPG2使用指北](https://emacsist.github.io/2019/01/01/gnupg2%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8C%97/#%E7%A7%81%E9%92%A5%E7%BB%B4%E6%8A%A4)
+
+[GPG 入门](https://snowstar.org/2018/05/31/gpg-guide/)
+
+[GPG 的正确使用姿势](https://mogeko.me/2019/068/)
+
 ## 配置
 
 - S wants to send a message to G. To do that:
@@ -184,8 +196,6 @@ gpg: 密钥 4E802A0B3589AE6E：“codekissyoung <codekissyoung@gmail.com>” 未
 gpg: 处理的总数：1
 gpg:              未改变：1
 ```
-
-
 
 
 

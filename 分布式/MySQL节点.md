@@ -26,7 +26,6 @@ $ link@mysql-db-1:~$ sudo dpkg -S mysql | grep conf     # 查看软件包安装�
 
 ```bash
 $ sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf
-
 bind-address = 0.0.0.0 # 修改为本句
 
 $ netstat -natp          # 确认下
