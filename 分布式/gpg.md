@@ -12,6 +12,8 @@
 
 [GPG 的正确使用姿势](https://mogeko.me/2019/068/)
 
+[2021年，用更现代的方法使用PGP（上）](https://www.mdeditor.tw/pl/gW1n)
+
 ## 配置
 
 - S wants to send a message to G. To do that:
