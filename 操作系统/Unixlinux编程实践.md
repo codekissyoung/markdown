@@ -9,16 +9,13 @@
 ```c++
 #define PAGELEN 3       // 一页显示行数
 #define LINELEN 512     // 一行显示字符数
-
 // 读取用户输入的一个字符，返回一个指令
 // q -> 0:              退出
 // [space] -> PAGELEN: 下一页
 // [Enter] -> 1:       下一行
 int see_more();
-
 // 从 fp(标准输入流、文件流等) 中读取数据
 void do_more( FILE *fp );
-
 int main( int argc, char *argv[] )
 {
     // 程序无参数，则从输入流读取数据

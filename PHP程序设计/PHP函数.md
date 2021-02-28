@@ -24,14 +24,14 @@ echo $a( 2, 56 );
 将一个函数名当做参数传入,执行
 
 ```php
-function   filter（$fun）{
+function filter($fun){
     $i=2;
     return  $fun($i);
 }
 function one($i){
     retrun  $i*$i;
 }
-filter(one);// 这里将回调函数的名称当作变量，传入里面！
+filter(one); // 这里将回调函数的名称当作变量，传入里面！
 ```
 
 ## 递归函数
