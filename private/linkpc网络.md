@@ -6,11 +6,76 @@
 
 小米 Router : 192.168.31.1 (网关)
 
-Link-pc 本机 : 191.168.31.124 ( enp4s0 有线网卡IP )
+```
+本机 : 
+IP :      191.168.31.124/24 ( enp4s0 有线网卡IP )
+Gateway : 192.168.31.1
+DNS IP :  
+hostname : ckp-pc
+```
+
+
+
+查看本机网关 Gateway ：
+
+```bash
+# 查看本机网关的方法
+$ route -n # 以0.0.0.0开始的行的Gateway是默认网关      
+目标            网关            子网掩码        标志  跃点   引用  使用 接口
+0.0.0.0         192.168.31.1    0.0.0.0         UG    100    0        0 enp4s0
+169.254.0.0     0.0.0.0         255.255.0.0     U     1000   0        0 enp4s0
+192.168.31.0    0.0.0.0         255.255.255.0   U     100    0        0 enp4s0
+
+$ ip route show
+default via 192.168.31.1 dev enp4s0 proto static metric 100 
+169.254.0.0/16 dev enp4s0 scope link metric 1000 
+192.168.31.0/24 dev enp4s0 proto kernel scope link src 192.168.31.124 metric 100 
+
+$ netstat -rn  # 以0.0.0.0开始的行的Gateway是默认网关
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         192.168.31.1    0.0.0.0         UG        0 0          0 enp4s0
+169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 enp4s0
+192.168.31.0    0.0.0.0         255.255.255.0   U         0 0          0 enp4s0
+
+$ traceroute www.baidu.com       
+traceroute to www.baidu.com (14.215.177.38), 30 hops max, 60 byte packets
+ 1  _gateway (192.168.31.1)  0.389 ms  0.460 ms  0.524 ms
+ 2  192.168.1.1 (192.168.1.1)  0.792 ms  1.669 ms  0.974 ms
+
+$ vim /etc/network/interfaces   # Debian/Ubuntu Linux
+$ vim /etc/sysconfig/network-scripts/ifcfg-eth0 # Redhat
+```
+
+查看本机 DNS Ip
+
+```bash
+$ cat /etc/resolv.conf 
+# Run "systemd-resolve --status" to see details about the uplink DNS servers currently in use.
+
+# Third party programs must not access this file directly, but only through the
+# symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a different way,
+# replace this symlink by a static file or a different symlink.
+#
+# See man:systemd-resolved.service(8) for details about the supported modes of
+# operation for /etc/resolv.conf.
+
+nameserver 119.29.29.29
+options edns0
+```
 
 
 
 
+
+配置一台Server只需要设置下面的几个参数 :
+
+```bash
+IP
+NetMask
+Gateway
+DNS IP
+hostname
+```
 
 
 
@@ -27,20 +92,8 @@ $ sudo dmesg | grep -in eth # 确认内核加载了网卡
 667:[    1.115665] r8169 0000:04:00.0 enp4s0: renamed from eth0
 921:[    4.684383] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
 
-$ sudo lspci  # 列出硬件设备的信息，里面有网卡             
-00:00.0 Host bridge: Intel Corporation 8th Gen Core Processor Host Bridge/DRAM Registers (rev 0a)
-00:01.0 PCI bridge: Intel Corporation Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor PCIe Controller (x16) (rev 0a)
-00:14.0 USB controller: Intel Corporation Cannon Lake PCH USB 3.1 xHCI Host Controller (rev 10)
-00:14.2 RAM memory: Intel Corporation Cannon Lake PCH Shared SRAM (rev 10)
-00:16.0 Communication controller: Intel Corporation Cannon Lake PCH HECI Controller (rev 10)
-00:17.0 SATA controller: Intel Corporation Cannon Lake PCH SATA AHCI Controller (rev 10)
-00:1d.0 PCI bridge: Intel Corporation Cannon Lake PCH PCI Express Root Port 9 (rev f0)
-00:1f.3 Audio device: Intel Corporation Cannon Lake PCH cAVS (rev 10)
-00:1f.4 SMBus: Intel Corporation Cannon Lake PCH SMBus Controller (rev 10)
-00:1f.5 Serial bus controller [0c80]: Intel Corporation Cannon Lake PCH SPI Controller (rev 10)
-01:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere [Radeon RX 470/480/570/570X/580/580X] (rev e1)
-01:00.1 Audio device: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere [Radeon RX 580]
-04:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 15)
+$ sudo lspci | grep -i ethernet # 列出网卡设备的信息
+04:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet 
 
 $ sudo ifconfig enp4s0 192.168.32.10 # 给网卡设置一个Ip
 ```
