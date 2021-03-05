@@ -51,21 +51,14 @@ $ vim /etc/sysconfig/network-scripts/ifcfg-eth0 # Redhat
 ```bash
 $ cat /etc/resolv.conf 
 # Run "systemd-resolve --status" to see details about the uplink DNS servers currently in use.
-
 # Third party programs must not access this file directly, but only through the
 # symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a different way,
 # replace this symlink by a static file or a different symlink.
-#
 # See man:systemd-resolved.service(8) for details about the supported modes of
 # operation for /etc/resolv.conf.
-
 nameserver 119.29.29.29
 options edns0
 ```
-
-
-
-
 
 配置一台Server只需要设置下面的几个参数 :
 
@@ -98,10 +91,6 @@ NETWORK=192.168.1.0         <==就是该网段的第一个 IP，可省略
 BROADCAST=192.168.1.255     <==就是广播地址啰，可省略
 MTU=1500                    <==就是最大传输单元的设定值，若不更改则可省略
 ```
-
-
-
-
 
 
 
