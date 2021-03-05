@@ -7,7 +7,6 @@
 ```php
 <?php
 $manager = new MongoDB\Driver\Manager("mongodb://localhost:12345");
-
 $bulk    = new MongoDB\Driver\BulkWrite;
 
 // 插入
