@@ -14,6 +14,8 @@
 
 [2021年，用更现代的方法使用PGP（上）](https://www.mdeditor.tw/pl/gW1n)
 
+[清晰图解https如何防范中间人攻击](https://blog.csdn.net/oZhuZhiYuan/article/details/106650944)
+
 ## 配置
 
 - S wants to send a message to G. To do that:
