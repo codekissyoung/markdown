@@ -79,6 +79,26 @@ hostname
 
 
 
+![image-20210305004151109](https://img.codekissyoung.com/2021/03/05/92f9c9e80c45e21a299d254777292447.png)
+
+
+
+```bash
+vim /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE="eth0"               <==网络卡代号，必须要 ifcfg-eth0 相对应
+HWADDR="08:00:27:71:85:BD"  <==就是网络卡地址，若只有一张网卡，可省略此项目
+NM_CONTROLLED="no"          <==不要受到其他软件的网络管理！
+ONBOOT="yes"                <==是否默认启动此接口的意思
+BOOTPROTO=none              <==取得IP的方式，其实关键词只有dhcp，手动可输入none
+IPADDR=192.168.1.100        <==就是 IP 啊
+NETMASK=255.255.255.0       <==就是子网掩码
+GATEWAY=192.168.1.254       <==就是预设路由
+# 重点是上面这几个设定项目，底下的则可以省略的啰！
+NETWORK=192.168.1.0         <==就是该网段的第一个 IP，可省略
+BROADCAST=192.168.1.255     <==就是广播地址啰，可省略
+MTU=1500                    <==就是最大传输单元的设定值，若不更改则可省略
+```
+
 
 
 
