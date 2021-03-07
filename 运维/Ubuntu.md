@@ -511,8 +511,6 @@ $ sudo lshw -C network
 $ sudo systemctl stop network-manager.service # 关闭服务
 $ sudo rm /var/lib/NetworkManager/NetworkManager.state # 删除当前运行状态
 $ sudo systemctl disable network-manager.service # 禁止开机启动
-Synchronizing state of network-manager.service with SysV service script with /lib/systemd/systemd-sysv-install.
-Executing: /lib/systemd/systemd-sysv-install disable network-manager
 
 $ sudo vim /etc/NetworkManager/NetworkManager.conf # 修改配置文件
 # 设置为 managed=false 

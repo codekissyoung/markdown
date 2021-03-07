@@ -169,7 +169,7 @@ https://github.com/ruyuejun 笔者的地址：
 - [简明现代魔法](http://www.nowamagic.net) : [php 内核探索](http://www.nowamagic.net/librarys/veda/detail/1285)
 - [Linux From Scratch](http://www.linuxfromscratch.org/news.html)是一种给使用者指导建议，由使用者自行从头开始自己构建的发行版。LFS 发行版及其衍生版本，都由其同名的手册提供了完整的指导建议。目标是安装一个与现有发行版毫无关系的系统，安装 LFS 仍然不能无中生有，而必须要有一个可以编译软件包的运行中的 Linux 系统。这个系统一般称为宿主系统。
 - [鸟哥的 linux 私房菜](http://linux.vbird.org/linux_basic/)
-- [centos 官方论坛]([https://www.centos.org/forums/index.php](https://www.centos.org/forums/index.php)
+- [centos 官方论坛](https://www.centos.org/forums/index.php)
 - [php 内核学习](http://www.php-internals.com)
 - [InfoQ](http://www.infoq.com/cn)
 - [freebuf 关注黑客与极客](http://www.freebuf.com/)
