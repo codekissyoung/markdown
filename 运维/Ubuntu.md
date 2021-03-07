@@ -115,7 +115,7 @@ $ hostnamectl set-hostname link1    # 设置新 hostname，重启确认
 首先，我们需要确认下本网段内，哪些私有`IP`已经被使用了，以及网关地址。
 
 ```bash
-$ sudo nmap -sP 192.168.13.0/24 # 先嗅探下，找出本网段中没有被使用过的私有 IP 地址
+的，所以我们需要修改下，启动后：$ sudo nmap -sP 192.168.13.0/24 # 先嗅探下，找出本网段中没有被使用过的私有 IP 地址
 $ route -n                      # 找出网关地址
 ```
 
@@ -475,4 +475,58 @@ net.ipv6.conf.lo.disable_ipv6=1
 ```bash
 $ sudo sysctl -p
 ```
+
+## 禁用NetworkManager
+
+Ubuntu 默认使用 /etc/network/interfaces 来设置网络，参考如下：
+
+```bash
+# interfaces(5) file used by ifup(8) and ifdown(8)
+# 回环网卡
+auto lo
+iface lo inet loopback
+
+# 系统硬件网卡 设置成静态IP配置
+auto enp4s0
+iface enp4s0 inet static
+address 192.168.31.124
+netmask 255.255.255.0
+gateway 192.168.31.1
+```
+
+而Ubuntu Desktop版本，使用了NetworkManager来再次接管网络设置，常常发生莫名其妙的网络问题，所以建议禁用NetworkManager，只保留 interfaces 机制来配置网络。
+
+```bash
+# 查看网卡硬件，包括虚拟出来的
+$ sudo lshw -C network                         
+  *-network                 
+  				...
+       logical name: enp4s0 # 真实网卡
+       ...
+  *-network DISABLED # 这个就是未启用状态
+				 ...
+       logical name: virbr0-nic # KVM 虚拟出来的
+       serial: 52:54:00:1d:c6:ac
+
+$ sudo systemctl stop network-manager.service # 关闭服务
+$ sudo rm /var/lib/NetworkManager/NetworkManager.state # 删除当前运行状态
+$ sudo systemctl disable network-manager.service # 禁止开机启动
+Synchronizing state of network-manager.service with SysV service script with /lib/systemd/systemd-sysv-install.
+Executing: /lib/systemd/systemd-sysv-install disable network-manager
+
+$ sudo vim /etc/NetworkManager/NetworkManager.conf # 修改配置文件
+# 设置为 managed=false 
+
+$ sudo systemctl restart networking.service # 重启系统网络
+```
+
+
+
+
+
+
+
+
+
+
 
