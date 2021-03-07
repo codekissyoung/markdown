@@ -459,3 +459,20 @@ vim .config/ibus/rime/default.yaml
 ```
 
 ![](https://img.codekissyoung.com/2020/06/18/d9f9cf1f79f723e4c5b1956ab2950e36.png)
+
+## 禁用ipv6协议
+
+编辑　/etc/sysctl.conf　文件,在最后面添加：
+
+```bash
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+net.ipv6.conf.lo.disable_ipv6=1
+```
+
+终端执行，让配置生效，然后重启电脑。
+
+```bash
+$ sudo sysctl -p
+```
+
