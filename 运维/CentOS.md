@@ -7,9 +7,9 @@
 $ dd if=CentOS-7-x86_64-Minimal-2009.iso of=/dev/sdc
 ```
 
-## 使用KVM虚拟化安装CentOS
+## 准备KVM
 
-### １．安装相关软件
+### 1. 安装相关软件
 
 ```bash
 $ egrep -c '(vmx|svm)' /proc/cpuinfo
@@ -40,7 +40,7 @@ $ service libvirtd status
 -   virtinst 用来创建虚拟机的命令行工具
 -   virt-manager 提供一个易用的图形界面，并且通过libvirt 支持用于管理虚拟机的命令行工具
 
-### 2．为KVM虚拟机配置网桥
+### 2. 为KVM虚拟机配置网桥
 
 在 libvirt 安装后中，一个被称为 virbr0　的桥接设备默认被创建。这个设备使用 NAT 来连接客户机到外面的世界。
 
