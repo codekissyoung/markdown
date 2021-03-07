@@ -31,9 +31,13 @@ $ service libvirtd status
 
 ### 2．为KVM虚拟机配置网桥
 
+KVM 虚拟机需要通过网桥才能访问 Host 主机或访问网络，所以在安装好之后需要先配置网桥。编辑　
 
+/etc/netplan/50-cloud-init.yaml
 
+```yaml
 
+```
 
 
 
