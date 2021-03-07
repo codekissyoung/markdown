@@ -29,9 +29,9 @@ $ sudo usermod -aG libvirt $USER
 $ sudo usermod -aG kvm $USER
 
 # 自动启动并启用 libvirtd 服务
-$ sudo service libvirtd start
-$ sudo update-rc.d libvirtd enable
-$ service libvirtd status
+$ sudo systemctl start libvirtd.service
+$ sudo systemctl enable libvirtd.service
+$ sudo systemctl status libvirtd.service
 ```
 
 - qemu-kvm 为 KVM 管理程序提供硬件模拟的软件程序
