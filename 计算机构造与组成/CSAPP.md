@@ -343,7 +343,7 @@ int tmult_ok( int x, int y )
 
 ![2019-10-09 12-12-27 的屏幕截图.png](https://img.codekissyoung.com/2019/10/09/7e5d546d09120a0bd6c258091d971ef2.png)
 
-#### 小数转换成浮点数的简单方法
+#### 小数转换成浮点数
 
 ![2019-10-11 13-09-05 的屏幕截图.png](https://img.codekissyoung.com/2019/10/11/f3b9853ae5a05086b75235d39f800c87.png)
 
