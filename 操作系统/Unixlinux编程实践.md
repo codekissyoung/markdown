@@ -1,10 +1,10 @@
 # Unix/Linux 编程实践教程
 
-## 第 1 章 Unix 系统编程概述
+## 第 1 章 Unix系统编程概述
 
 在登录过程中，当用户名和密码通过验证后，内核启动 `shell进程`,然后把用户交给`shell`,shell 再去与内核交互，期间 shell 也可以帮用户启动其他程序
 
-每个用户都有属于自己的`shell`进程，当用户注销时，内核会结束所有分配给这个用户的进程
+每个用户都有属于自己的`shell`进程，当用户注销时，内核会结束所有分配给这个用户的进程。
 
 ```c++
 #define PAGELEN 3       // 一页显示行数
@@ -39,13 +39,11 @@ int main( int argc, char *argv[] )
 int see_more() {
     int c;
     printf("see more?");
-
     // 演示下从 /dev/tty 读取数据, 
     // Linux 会自动将 /dev/tty 重定向到一个终端窗口，因此该文件对于读取人工输入时特别有用
     FILE *fp_tty = fopen( "/dev/tty", "r" );
     if( fp_tty == nullptr )
         exit( 1 );
-
     while ( ( c = getc( fp_tty ) ) != EOF ) {
         switch (c) {
             case 'q':
@@ -61,7 +59,6 @@ int see_more() {
     fclose(fp_tty);
     return 0;
 }
-
 void do_more( FILE *fp ){
     char line[LINELEN];
     int num_of_lines = 0;
