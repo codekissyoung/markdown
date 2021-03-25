@@ -1,10 +1,10 @@
-# 如何理解 CSS 的盒子模型？
+#### 如何理解 CSS 的盒子模型？
 
 每个 HTML 元素都是长方形盒子。
 （1）盒子模型有两种：IE 盒子模型、标准 W3C 盒子模型；IE 的 content 部分包含了 border 和 pading。
 （2）标准 W3C 盒模型包含：内容(content)、填充(padding)、边界(margin)、边框(border)。
 
-# link 和@import 的区别？
+#### link 和@import 的区别？
 
 （1）link 属于 XHTML 标签，而@import 是 CSS 提供的。
 （2）页面被加载时，link 会同时被加载，而@import 引用的 CSS 会等到页面被加载完再加载。
@@ -12,7 +12,7 @@
 （4）link 方式的样式权重高于@import 的权重。
 （5）使用 dom 控制样式时的差别。当使用 javascript 控制 dom 去改变样式的时候，只能使用 link 标签，因为@import 不是 dom 可以控制的。
 
-# CSS 选择符有哪些？哪些属性可以继承？优先级算法如何计算？CSS 3 新增伪类有哪些？
+#### CSS 选择符有哪些？哪些属性可以继承？优先级算法如何计算？CSS 3 新增伪类有哪些？
 
 id 选择器（# myid）
 类选择器（.myclassname）
@@ -38,7 +38,7 @@ p:nth-child(2) 选择属于其父元素的第二个子元素的每个<p>元素�
 :enabled、:disabled 控制表单控件的禁用状态。
 :checked 单选框或复选框被选中。
 
-# 用纯 CSS 创建一个三角形的原理是什么？
+#### 用纯 CSS 创建一个三角形的原理是什么？
 
 ```css
 #demo {
@@ -50,7 +50,7 @@ p:nth-child(2) 选择属于其父元素的第二个子元素的每个<p>元素�
 }
 ```
 
-# 怎么让 Chrome 支持小于 12px 的文字？
+#### 怎么让 Chrome 支持小于 12px 的文字？
 
 ```css
 body {
@@ -58,7 +58,7 @@ body {
 }
 ```
 
-# ::before 和 :after 中双冒号和单冒号 有什么区别？解释一下这 2 个伪元素的作用。
+#### ::before 和 :after 中双冒号和单冒号 有什么区别？解释一下这 2 个伪元素的作用。
 
 ```
 单冒号(:)用于CSS3伪类，双冒号(::)用于CSS3伪元素。
@@ -67,7 +67,7 @@ body {
 提醒，如果你的网站只需要兼容webkit、firefox、opera等浏览器，建议对于伪元素采用双冒号的写法，如果不得不兼容IE浏览器，还是用CSS2的单冒号写法比较安全。
 ```
 
-# 现在 HTML5 中 css3 可以写出一个旋转的立方体，请写出要用到的 CSS 属性。
+#### 现在 HTML5 中 css3 可以写出一个旋转的立方体，请写出要用到的 CSS 属性。
 
 ```
 -webkit-transform-style: preserve-3d;
