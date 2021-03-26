@@ -168,13 +168,26 @@ $ netwox 2 # netwox 1 包含调试信息的输出
 
 
 
+```bash
+# 探测局域网中所有主机的IP地址、主机名和MAC地址信息
+$ sudo netwox 3 -a 192.168.13.0/24
+IP address:  192.168.13.1
+Hostname:    _gateway
+Hostnames:   _gateway
+Eth address: D0:76:E7:6E:A8:CD
 
+IP address:  192.168.13.7
+Hostname:    unresolved
+Hostnames:   unresolved
+Eth address: 1C:A0:B8:7A:C2:C4
+...
 
-
-
-
-
-
+$ sudo netwox 3 -a blog.codekissyoung.com
+IP address:  101.200.144.41
+Hostname:    unresolved
+Hostnames:   unresolved
+Eth address: unresolved
+```
 
 
 
