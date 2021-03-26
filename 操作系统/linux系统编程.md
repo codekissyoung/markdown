@@ -999,7 +999,7 @@ int mkfifo(char *pathname, mode_t mode);
 
 都是为了解决一个问题：同时检查多个文件描述符，看它们是否准备好了执行`I/O`操作。
 
-`Libevent`是这样的一个软件层，它提供了检查文件描述符 IO 事件的抽象，它底层能够识别并应用`select()`、`poll()`、`信号驱动IO`、`epoll`、`Solaris的/dev/pull`和`BSD的kqueue`接口。
+Libevent 是这样的一个软件层，它提供了检查文件描述符 IO 事件的抽象，它底层能够识别并应用`select()`、`poll()`、`信号驱动IO`、`epoll`、`Solaris的/dev/pull`和`BSD的kqueue`接口。
 
 #### select 系统调用
 
