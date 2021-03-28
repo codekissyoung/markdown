@@ -1,5 +1,9 @@
 # Virtual Box
 
+https://www.bilibili.com/video/BV1JV411t7ow?from=search&seid=6697858248324967619
+
+
+
 ## 网络接入模式
 
 ### NAT 网络地址转换模式
