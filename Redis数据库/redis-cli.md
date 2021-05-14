@@ -1,25 +1,5 @@
 # Redis-cli 常用命令
 
-## 链接/关闭 Redis 服务器
-
-```bash
-redis-cli -h {host} -p {port} -a {mypasswd} 链接redis服务器
-redis-cli -h {host} -p {port} {command} 链接并且执行命令
-redis-cli shutdown [save|nosave] 关闭redis服务器 [生成|不生成]持久化文件
-
-# 批量删除键
-redis-cli keys "scenic_hot_list:*" | xargs redis-cli del
-
-# 如果redis-cli没有设置成系统变量，需要指定redis-cli的完整路径  
-/usr/local/redis/redis-cli keys "a*" | xargs /usr/local/redis/redis-cli del
-
-# 如果需要访问密码
-redis-cli -a password keys "a*" | xargs redis-cli -a password del
-
-# 指定序号为 0 的数据库
-redis-cli -n 0 keys "a*" | xargs redis-cli -n 0 del
-```
-
 ## 与Redis Server 相关命令
 
 ```bash
@@ -33,7 +13,6 @@ redis-cli -n 0 keys "a*" | xargs redis-cli -n 0 del
 
 ```bash
 127.0.0.1:6379> SELECT 15
-OK
 127.0.0.1:6379[15]>
 ```
 
