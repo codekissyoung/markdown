@@ -12,9 +12,8 @@ class Father{
         return new self();
     }
 }
-class Son extends Father{ }
-class Girl extends Father{ }
-
+class Son extends Father{}
+class Girl extends Father{}
 var_dump(Son::create()); // Object Father
 var_dump(Girl::create()); // Object Father
 ```
