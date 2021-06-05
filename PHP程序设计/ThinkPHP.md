@@ -118,45 +118,6 @@ $data['content'] = 'content';
 $this->ajaxReturn($data,'xml');
 ```
 
-### 4.2 读取输入
-
-```php
-I('get.id',0); // 如果不存在$_GET['id'] 则返回0
-I('get.name',''); // 如果不存在$_GET['name'] 则返回空字符串
-I('get.name','','htmlspecialchars'); // 采用htmlspecialchars方法对$_GET['name'] 进行过滤，如果不存在则返回空字符串
-I('post.name','','htmlspecialchars'); // 采用htmlspecialchars方法对$_POST['name'] 进行过滤，如果不存在则返回空字符串
-I('session.user_id',0); // 获取$_SESSION['user_id'] 如果不存在则默认为0
-I('cookie.'); // 获取整个 $_COOKIE 数组
-I('server.REQUEST_METHOD'); // 获取 $_SERVER['REQUEST_METHOD'] 
-I('post.email','','email'); // 验证为 email
-
-// http://serverName/index.php/New/2013/06/01
-
-// 正则匹配过滤
-I('get.name','','/^[A-Za-z]+$/'); // 采用正则表达式进行变量过滤
-I('get.id',0,'/^\d+$/');
-
-// 修饰符
-I('get.id/d'); // 强制变量转换为整型
-I('post.name/s'); // 强制转换变量为字符串类型
-I('post.ids/a'); // 强制变量转换为数组类型
-```
-
-### 4.3 前置后置操作
-
-```php
-public function _before_index(){ // 前置操作方法
-	echo 'before<br/>';
-}
-public function _after_index(){ // 后置操作方法
-	echo 'after<br/>';
-}
-```
-
-## 5. 模型
-
-
-
 ## 5. CBD 模式
 
 ```php
@@ -213,7 +174,6 @@ dump( get_defined_constants(true)['user'] );        # 获取 ThinkPHP 中定义�
 
 ```bash
 APP_PATH/Home/Controller/UserController.class.php
-
 namespace 要求为：Home\Controller
 类名      要求为：UserController
 ```

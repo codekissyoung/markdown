@@ -12,18 +12,17 @@ array get_loaded_extensions();      // 获取所有加载的 模块
 ## Bool 判断
 
 ```php
-给定一个变量 $a ,下列是它的所有情况
-
-1. $a; 未赋值过
+// 给定一个变量 $a ,下列是它的所有情况
+1. $a; // 未赋值过
 2. $a = null;
 3. $a = ""  ''  0  0.00  "0"  '0'  []
-4. $a = new A(); 空对象 class A{}
+4. $a = new A(); // 空对象 class A{}
 5. $a = 其他值
 
-is_null($a);        // 1, 2 为 true
-isset($a);          // 3, 4, 5 为 true
-empty($a);          // 1, 2, 3 为 true
-if( $a );           // 4, 5    为 true
+is_null($a); // 1, 2 为 true
+isset($a);   // 3, 4, 5 为 true
+empty($a);   // 1, 2, 3 为 true
+if($a);      // 4, 5 为 true
 ```
 
 ```php
@@ -35,7 +34,7 @@ var_dump($GLOBALS); // 打印脚本中的所有的全局变量
 ## 常量
 
 ```php
-bool defined( ABC_NAME );           // 判断常量是否被定义
+bool defined( ABC_NAME ); // 判断常量是否被定义
 ```
 
 ## is 系列
@@ -391,12 +390,8 @@ trait World {
 class MyHelloWorld{
     use Hello;
     use World;
-    public function sayMark() {
-        echo " !";
-    }
 }
 $o = new MyHelloWorld();
 $o -> sayHello();
 $o -> sayWorld();
-$o -> sayMark();
 ```
