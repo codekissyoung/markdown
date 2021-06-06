@@ -22,27 +22,6 @@ fmt.Printf("type : %T value: %v", s, s)
 
 `make`专门用于 `slice` `map` `chan` 容器，分配及初始化它们的结构和数据。
 
-## 数组
-
-相同类型`[3]int`的数组`a`和`b`可以进行`a=b`赋值操作，数组元素个数也是类型的一部分。
-
-```go
-// 比较数组是否相等
-a := [2]int{1, 2}
-b := [...]int{1, 2}
-c := [2]int{1, 3}
-fmt.Println(a == b, a == c, b == c) // "true false false"
-
-pow := []int {1, 2, 4, 8, 16, 32, 64, 128}
-// 用于遍历 Array Slice Map
-for i, v := range pow {                 // 依次将下标 和 值 复制 给 i 和 v
-    fmt.Printf("pow[%d] = %d\n", i, v)
-}
-for _, v := range pow { ... }           // 不复制 下标
-for i, _ := range pow { ... }           // 不复制 值
-for i := range pow { ... }              // 不复制 值，简写版
-```
-
 ## 切片
 
 切片的底层结构包括三部分：`起始地址` + `大小` + `容量`。
@@ -142,8 +121,6 @@ delete(scene, "brazil")
 // 清空 map 的唯一办法就是重新 make 一个新的 map
 // 不用担心垃圾回收的效率，Go语言中的并行垃圾回收效率比写一个清空函数要高效的多
 ```
-
-
 
 ### Map的多键索引
 
@@ -311,8 +288,6 @@ for _, item := range items2 {
 fmt.Printf("Version B: Value of items: %v\n", items2)
 // Version B: Value of items: [map[] map[] map[] map[] map[]]
 ```
-
-
 
 #### map 默认是无序的
 
