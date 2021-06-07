@@ -284,35 +284,11 @@ resp.Body.Close()
 fmt.Printf("%s", b)
 ```
 
-## flag
-
-对命令行参数的操作，一个很有意思的处理参数的包。
-
-```go
-n := flag.Bool("n", false, "空行")
-sep := flag.String("s", " ", "分割符")
-
-flag.Parse()
-
-fmt.Print(strings.Join(flag.Args(), *sep))
-
-if !*n {
-    fmt.Println()
-}
-```
-
-```bash
-$ main -s / ok err num
-ok/err/num
-```
-
 
 
 ## path/filepath
 
 用来操作在当前系统中的目标文件名路径。  
-
-
 
 ## 字符串
 

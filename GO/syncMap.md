@@ -2,7 +2,7 @@
 func main() {
     var sm sync.Map
     
-    sm.Store(1,"a") //store 方法,添加元素
+    sm.Store(1,"a") // store 方法,添加元素
     
     //Load 方法，获得value
     if v,ok:=sm.Load(1);ok{
