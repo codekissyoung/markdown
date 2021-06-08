@@ -256,8 +256,6 @@ func main() {
 }
 ```
 
-
-
 既然一个 key 只能对应一个 value，而 value 又是一个原始类型，那么如果一个 key 要对应多个值怎么办？例如，当我们要处理unix机器上的所有进程，以父进程（pid 为整形）作为 key，所有的子进程（以所有子进程的 pid 组成的切片）作为 value。通过将 value 定义为 `[]int` 类型或者其他类型的切片，就可以优雅的解决这个问题。
 
 ```go
@@ -291,6 +289,7 @@ fmt.Printf("Version B: Value of items: %v\n", items2)
 
 #### map 默认是无序的
 
-不管是按照 key 还是按照 value 默认都不排序（详见第 8.3 节）。
+不管是按照 key 还是按照 value 默认都不排序。
 
-如果你想为 map 排序，需要将 key（或者 value）拷贝到一个切片，再对切片排序（使用 sort 包，详见第 7.6.6 节），然后可以使用切片的 for-range 方法打印出所有的 key 和 value。
+如果你想为 map 排序，需要将 key（或者 value）拷贝到一个切片，再对切片排序（使用 sort 包），然后可以使用切片的 for-range 方法打印出所有的 key 和 value。
+

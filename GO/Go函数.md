@@ -234,8 +234,6 @@ go func(i int) {
 }(1000) // Passes argument 1000 to the function literal.
 ```
 
-
-
 ### 3.2 记忆效应
 
 ```go
@@ -316,8 +314,6 @@ func test() []func() {
 	return s
 }
 ```
-
-
 
 ### 3.5 斐波纳契数列
 
@@ -559,8 +555,6 @@ func f5() int {
 	return 0
 } // f5() = 0
 ```
-
-
 
 ## 6. panic 和 recover 
 

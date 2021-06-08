@@ -63,8 +63,6 @@ type hchan struct {
 - 会把recvq中的G全部唤醒，本该写入G的数据位置为`nil`
 - sendq中的G全部会`panic`，即向已经关闭的channel写数据会`panic`
 
-
-
 ## Select
 
 ```go
