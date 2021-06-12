@@ -1,4 +1,4 @@
-# PHP 规范
+# PHP规范
 
 [PHP PSR 标准规范](https://learnku.com/docs/psr) 合集，是一个比较好的中文翻译版本。
 

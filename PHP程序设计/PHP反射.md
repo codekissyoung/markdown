@@ -8,12 +8,10 @@ class Person
     public function say(){
         echo $this->name, " is ", $this->gender, PHP_EOL;
     }
-
     public function __set( $name, $value ){
         echo "Setting $name to $value" , PHP_EOL;
         $this -> $name = $value;
     }
-
     public function __get( $name ) {
         if ( !isset($this->$name) ){
             echo "未设置";
@@ -21,7 +19,6 @@ class Person
         }
         return $this->$name;
     }
-
     public function __call($name, $args){
         echo $name, " called ", PHP_EOL;
     }
@@ -77,7 +74,7 @@ $obj = new sqlproxy('mysql');
 $obj -> connect('member');
 ```
 
-## PHP 提供的反射类的相关知识
+## PHP提供的反射类的相关知识
 
 ```php
 Reflection          为类的摘要信息提供静态函数
