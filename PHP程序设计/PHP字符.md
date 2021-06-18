@@ -60,7 +60,9 @@ escapeshellcmd();		// 防止用户的输入执行系统命令
 exec("ls -l");			// 直接执行系统命令的函数
 ```
 
-## 汉字加密 解密，为了解决传输时，汉字符会丢失的问题
+## 汉字加密解密
+
+为了解决传输时，汉字符会丢失的问题
 
 ```php
 $urlstr = urlencode("我是codekissyoung");
@@ -71,13 +73,11 @@ urldecode($urlstr);
 
 ```php
 json_encode( $arr, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-
 json_decode( $json, [ture] ); // ture 表示解析成数组
-
 // 判断数据是合法的json字符串
 function is_json($string) {
- json_decode($string);
- return (json_last_error() == JSON_ERROR_NONE);
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
 }
 ```
 

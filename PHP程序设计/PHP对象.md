@@ -26,11 +26,8 @@ class Father{
         return new static();
     }
 }
-class Son extends Father{
-}
-class Girl extends Father{
-}
-
+class Son extends Father{}
+class Girl extends Father{}
 var_dump(Son::create()); // Object Son ,Son 执行的代码，所以 static 指向Son
 var_dump(Girl::create()); // Object Girl
 ```
@@ -81,10 +78,8 @@ class Test {
 
 ```php
 namespace main; // 声明命名空间
-
 // 相对命名空间 ，实际解析运行时，会在前面加上 main，即变成 main\com\geti...
 com\getinstance\util\Debug::helloworld();
-
 // 绝对命名空间，告诉PHP从根命名空间开始搜索
 \com\getinstance\util\Debug::helloworld();
 ```

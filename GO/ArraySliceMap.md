@@ -22,27 +22,6 @@ fmt.Printf("type : %T value: %v", s, s)
 
 `make`专门用于 `slice` `map` `chan` 容器，分配及初始化它们的结构和数据。
 
-## 数组
-
-相同类型`[3]int`的数组`a`和`b`可以进行`a=b`赋值操作，数组元素个数也是类型的一部分。
-
-```go
-// 比较数组是否相等
-a := [2]int{1, 2}
-b := [...]int{1, 2}
-c := [2]int{1, 3}
-fmt.Println(a == b, a == c, b == c) // "true false false"
-
-pow := []int {1, 2, 4, 8, 16, 32, 64, 128}
-// 用于遍历 Array Slice Map
-for i, v := range pow {                 // 依次将下标 和 值 复制 给 i 和 v
-    fmt.Printf("pow[%d] = %d\n", i, v)
-}
-for _, v := range pow { ... }           // 不复制 下标
-for i, _ := range pow { ... }           // 不复制 值
-for i := range pow { ... }              // 不复制 值，简写版
-```
-
 ## 切片
 
 切片的底层结构包括三部分：`起始地址` + `大小` + `容量`。
@@ -142,8 +121,6 @@ delete(scene, "brazil")
 // 清空 map 的唯一办法就是重新 make 一个新的 map
 // 不用担心垃圾回收的效率，Go语言中的并行垃圾回收效率比写一个清空函数要高效的多
 ```
-
-
 
 ### Map的多键索引
 
@@ -279,8 +256,6 @@ func main() {
 }
 ```
 
-
-
 既然一个 key 只能对应一个 value，而 value 又是一个原始类型，那么如果一个 key 要对应多个值怎么办？例如，当我们要处理unix机器上的所有进程，以父进程（pid 为整形）作为 key，所有的子进程（以所有子进程的 pid 组成的切片）作为 value。通过将 value 定义为 `[]int` 类型或者其他类型的切片，就可以优雅的解决这个问题。
 
 ```go
@@ -312,10 +287,9 @@ fmt.Printf("Version B: Value of items: %v\n", items2)
 // Version B: Value of items: [map[] map[] map[] map[] map[]]
 ```
 
-
-
 #### map 默认是无序的
 
-不管是按照 key 还是按照 value 默认都不排序（详见第 8.3 节）。
+不管是按照 key 还是按照 value 默认都不排序。
 
-如果你想为 map 排序，需要将 key（或者 value）拷贝到一个切片，再对切片排序（使用 sort 包，详见第 7.6.6 节），然后可以使用切片的 for-range 方法打印出所有的 key 和 value。
+如果你想为 map 排序，需要将 key（或者 value）拷贝到一个切片，再对切片排序（使用 sort 包），然后可以使用切片的 for-range 方法打印出所有的 key 和 value。
+

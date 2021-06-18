@@ -67,10 +67,6 @@ func main() {
 }
 ```
 
-
-
-
-
 ## io / ioutil
 
 `io`提供了基本输入输出功能，大多数是围绕系统功能的封装。  
@@ -288,35 +284,11 @@ resp.Body.Close()
 fmt.Printf("%s", b)
 ```
 
-## flag
-
-对命令行参数的操作，一个很有意思的处理参数的包。
-
-```go
-n := flag.Bool("n", false, "空行")
-sep := flag.String("s", " ", "分割符")
-
-flag.Parse()
-
-fmt.Print(strings.Join(flag.Args(), *sep))
-
-if !*n {
-    fmt.Println()
-}
-```
-
-```bash
-$ main -s / ok err num
-ok/err/num
-```
-
 
 
 ## path/filepath
 
 用来操作在当前系统中的目标文件名路径。  
-
-
 
 ## 字符串
 
@@ -584,8 +556,6 @@ fmt.Printf("%x %s\n", sha1h.Sum([]byte("")), TestFile)
 - `math/rand`: 伪随机数生成。  
 - `sort`: 为数组排序和自定义集合。  
 
-
-
 ### math/big
 
 大数的实现和计算。  
@@ -593,10 +563,6 @@ fmt.Printf("%x %s\n", sha1h.Sum([]byte("")), TestFile)
 有用来表示大整数的 `big.Int` 和表示大有理数的 `big.Rat` 类型（可以表示为 2/5 或 3.1416 这样的分数，而不是无理数或 π）。这些类型可以实现任意位类型的数字，只要内存足够大。缺点是更大的内存和处理开销使它们使用起来要比内置的数字类型慢很多。
 
 大的整型数字是通过 `big.NewInt(n)` 来构造的，其中 n 为 int64 类型整数。而大有理数是通过 `big.NewRat(n, d)` 方法构造。n（分子）和 d（分母）都是 int64 型整数。因为 Go 语言不支持运算符重载，所以所有大数字类型都有像是 `Add()` 和 `Mul()` 这样的方法。它们作用于作为 receiver 的整数和有理数，大多数情况下它们修改 receiver 并以 receiver 作为返回结果。因为没有必要创建 `big.Int` 类型的临时变量来存放中间结果，所以运算可以被链式地调用，并节省内存。
-
-
-
-
 
 ## 数据 Encoding
 
@@ -639,4 +605,4 @@ func Update(info *Info) {
 
 ```
 
-在 sync 包中还有一个 `RWMutex` 锁：他能通过 `RLock()` 来允许同一时间多个线程对变量进行读操作，但是只能一个线程进行写操作。如果使用 `Lock()` 将和普通的 `Mutex` 作用相同。包中还有一个方便的 `Once` 类型变量的方法 `once.Do(call)`，这个方法确保被调用函数只能被调用一次。
+在 sync 包中还有一个 `RWMutex` 锁：他能通过 `RLock()` 来允许同一时间多个线程对变量进行读操作，但是只能一个线程进行写操作。如果使用 `Lock()` 将和普通的 `Mutex` 作用相同。包中还有一个方便的 `Once` 类型变量的方法 `once.Do(call)`，这个方法确保被调用函数只能被调用一次。,

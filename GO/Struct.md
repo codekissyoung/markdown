@@ -1,9 +1,5 @@
 # 结构体
 
-
-
-## 字段
-
 1. 在一个结构体中对于每一种数据类型只能有一个匿名字段。
 
 1. 当两个字段拥有相同的名字（可能是继承来的名字）时该怎么办呢？
@@ -37,8 +33,6 @@ d.file.name = "file2" // 使用 类型名 + 字段名 访问 里面被遮蔽的�
 
 一个附属于字段的字符串，可以是文档或其他的重要标记。标签的内容不可以在一般的编程中使用，只有包 `reflect` 能获取它。
 
-
-
 ## 方法
 
 方法是作用在接收者 Receiver 上的一个函数。
@@ -47,8 +41,6 @@ d.file.name = "file2" // 使用 类型名 + 字段名 访问 里面被遮蔽的�
 
 - 接收者不能是一个接口类型，因为接口是一个抽象定义，但是方法却是具体实现
 - 接收者不能是一个指针类型，但是它可以是任何其他允许类型的指针
-
-
 
 ### Recevier 是 T 或 *T
 
@@ -118,8 +110,6 @@ m.name = "link"
 println(m.show())      // manager link
 println(m.user.show()) // link
 ```
-
-
 
 ```go
 type user struct {
@@ -200,9 +190,7 @@ func main() {
 }
 ```
 
-
-
-#### 从实例退化
+### 从实例退化
 
 ```go
 type N int
@@ -300,8 +288,6 @@ func funcDo(v int) {
 }
 ```
 
-
-
 ### 简单实现事件机制
 
 ```go
@@ -351,8 +337,6 @@ func (l *Log) String() string {
 }
 ```
 
-
-
 ### 通过组合
 
 ```go
@@ -363,7 +347,6 @@ type Customer struct {
 func (c *Customer) Log() *Log {
 	return c.log
 }
-
 func main() {
 	c := &Customer{"Barak Obama", &Log{"1 - Yes we can!"}}
 	c.Log().Add("2 - After me the world will be a better place!")
@@ -381,7 +364,6 @@ type Customer struct {
 func (c *Customer) String() string {
 	return c.Name + "\nLog:\n" + c.Log.String()
 }
-
 func main() {
 	c := &Customer{"Barak Obama", Log{"1 - Yes we can!"}}
 	c.Add("2 - After me the world will be a better place!")
@@ -397,11 +379,7 @@ func main() {
 
 只要嵌入这两个类型就可以解决这个问题。
 
-
-
 ## 和其他面向对象语言比较 Go 的类型和方法
-
-
 
 在如 C++、Java、C# 和 Ruby 这样的面向对象语言中，方法在类的上下文中被定义和继承：在一个对象上调用方法时，运行时会检测类以及它的超类中是否有此方法的定义，如果没有会导致异常发生。
 
@@ -425,8 +403,6 @@ func (i *Integer) String() string {
 在 Go 中，代码复用通过组合和委托实现，多态通过接口的使用来实现：有时这也叫 **组件编程（Component Programming）**。
 
 许多开发者说相比于类继承，Go 的接口提供了更强大、却更简单的多态行为。
-
-如果真的需要更多面向对象的能力，看一下 [`goop`](https://github.com/losalamos/goop) 包（Go Object-Oriented Programming），它由 Scott Pakin 编写: 它给 Go 提供了 JavaScript 风格的对象（基于原型的对象），并且支持多重继承和类型独立分派，通过它可以实现你喜欢的其他编程语言里的一些结构。
 
 ## String方法的递归问题
 
