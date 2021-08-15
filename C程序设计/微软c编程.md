@@ -1,10 +1,6 @@
 # 微软C编程
 
-## 每条准则都有例外
-
-- 准则是用来说明一般情况的，当理由十分充足时，才可以违背准则
-
-## 假想编译程序
+### 假想编译程序
 
 ```c
 -> line 23: while (i<=j)
@@ -17,13 +13,11 @@ algorithm error: itoa fails when i is -32768
 Invalid argument: memcpy fails when malloc returns NULL
 ```
 
-- 把自己当作一个假设可以发现任何错误的编译程序，去运行程序，从而发现潜伏的错误
-
 使用编译程序所有的可选警告设施
 
 使用静态分析程序
 
-Lint (在linux上是Splint)
+使用 Splint 静态分析工具
 
 ## 进行单元测试
 
@@ -51,7 +45,7 @@ word = bHigh << 8 + bLow;
 
 ```
 
-## 为了防止传参错误
+### 为了防止传参错误
 
 ```c
 void memcpy(void* pvTo , void* pvFrom , size_t size){
@@ -63,7 +57,7 @@ void memcpy(void* pvTo , void* pvFrom , size_t size){
 }
 ```
 
-## 既要维护程序的交付版本,又要维护程序的调试版本
+#### 既要维护程序的交付版本,又要维护程序的调试版本
 
 要同时维护交付和调试两个版本。封装交付的版本,应尽可能地使用调试版本进行 自动查错。
 
