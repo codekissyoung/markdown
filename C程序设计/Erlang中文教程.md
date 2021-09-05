@@ -1000,7 +1000,6 @@ monitor(Node)    % 监视整个节点
 
 ```erlang
 Port ! {Pid, Command} % Pid 是端口控制进程 控制端口完成Command任务
-
 % {command, Data} 往端口写入数据
 % close 关闭端口
 % {connect, Pid1} 移交端口控制权给 Pid1

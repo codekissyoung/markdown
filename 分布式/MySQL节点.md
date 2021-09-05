@@ -1,4 +1,4 @@
-# MySQL 节点
+# MySQL节点
 
 参考 [Ubuntu 装机指南](https://blog.codekissyoung.com/%E5%88%86%E5%B8%83%E5%BC%8F/UbuntuServer)，获得一个干净的`Server`后，下面可以将这个`Server`做成`MySQL`节点。
 
