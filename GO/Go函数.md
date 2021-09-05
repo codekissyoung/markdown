@@ -759,3 +759,20 @@ fmt.Printf(format string, a ...interface{}) (n int, errno error)
 ```
 
 这个函数通过枚举 `slice` 类型的实参动态确定所有参数的类型。并查看每个类型是否实现了 `String()` 方法，如果是就用于产生输出信息。
+
+## 8. init函数
+
+每个`init`函数在此包加载的时候将被（串行）执行并且只执行一遍。
+
+
+
+
+
+
+
+
+
+
+
+
+
