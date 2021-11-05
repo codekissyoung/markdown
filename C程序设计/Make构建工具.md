@@ -5,9 +5,9 @@
 ## 编写makefile
 
 ```makefile
+# 注释
 target : requires ...
     commands
-# 注释
 ```
 
 `target` 是工作目标，`requires` 是生成工作目标需要的 必要文件 或 其他工作目标 ，`commands` 是完成工作目标所执行的命令（子`shell`执行），以`[tab]`开头。

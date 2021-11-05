@@ -1,24 +1,5 @@
 # 微软C编程
 
-### 假想编译程序
-
-```c
--> line 23: while (i<=j)
-off by one error: this should be '<'
-
--> line 42: int itoa(int i, char* str)
-algorithm error: itoa fails when i is -32768
-
--> line 318: strCopy = memcpy(malloc(length), str, length);
-Invalid argument: memcpy fails when malloc returns NULL
-```
-
-使用编译程序所有的可选警告设施
-
-使用静态分析程序
-
-使用 Splint 静态分析工具
-
 ## 进行单元测试
 
 - 哪怕只是移动下代码的位置，也需要运行下单元测试
@@ -34,15 +15,12 @@ if(flight == 063)
 // 将 && 写成 &
 if(pb != NULL & pb != 0xff)
 
-// ／ 和 * 之间没有空格 变成注释的开始
+// / 和 * 之间没有空格 变成注释的开始
 quot = numer/*pdenom;
 */
 
 // 运算符优先级错误 , 实际执行的是，bHigh << (8+bLow)
 word = bHigh << 8 + bLow;
-
-// 预处理器带来的意想不到的错误
-
 ```
 
 ### 为了防止传参错误

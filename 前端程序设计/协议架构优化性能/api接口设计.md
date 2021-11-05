@@ -1,5 +1,3 @@
-
-
 最好的方法是限定几个可以访问 api 的域名,其他域名全部拒绝。
 但是`Access-Control-Allow-Origin`只能设置一个值，所以要多端共用,只有`header("Access-Control-Allow-Origin:*");`
 

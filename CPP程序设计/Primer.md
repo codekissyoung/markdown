@@ -9,14 +9,6 @@
 0-201-70353-X        4               24.99
 ```
 
-为了解决卖书的问题，需要编写一个程序，很显然，这个程序需要：
-
-- 定义变量
-- 进行输入和输出
-- 使用数据结构保存数据
-- 检测两条记录是否为同一个ISBN
-- 循环处理销售档案中的每条记录
-
 类的作者决定了在该类型上可以使用的所有操作。比如对于`Sales_item`类，我们希望有的操作为:
 
 - `Sales_item.isbn()` 获取一本书的 isbn 编号
@@ -30,10 +22,8 @@
 ```c++
 #ifndef CPP_SALES_ITEM_H
 #define CPP_SALES_ITEM_H
-
 #include <iostream>
 #include <string>
-
 class Sales_item {
 private:
     std::string isbn;       // 书编号
@@ -67,13 +57,11 @@ public:
         return isbn == rhs.isbn;
     }
 };
-
 Sales_item operator+(const Sales_item &lhs, const Sales_item &rhs );
 bool operator==(const Sales_item &lhs, const Sales_item &rhs );
 bool operator!=(const Sales_item &lhs, const Sales_item &rhs );
 std::istream &operator>>(std::istream &, Sales_item &);
 std::ostream &operator<<(std::ostream &, const Sales_item &);
-
 #endif
 ```
 
@@ -1384,8 +1372,6 @@ transform( vi.begin(), vi.end(), vi.begin(), [](int i ) -> int {
 先略过，讲的有点复杂。
 
 ### 泛型算法结构
-
-略过！
 
 ## 第11章 关联容器
 

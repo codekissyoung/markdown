@@ -2,9 +2,9 @@
 
 ## 1. 概述
 
-Shell适合文件、文本行、文本列粒度的操作。执行程序、查找文件、删除文件、批量改变文件名、备份文件、列出目录的文件等。它的调用命令可以划分为：
+Shell适合文件、文本行、文本列粒度的操作。执行程序、查找文件、删除文件、批量改变文件名、备份文件、列出目录的文件等。它的调用命令可以划分为。
 
-- 内建命令 : 不会产生子进程，为了效率才内建，比如 cd / read / echo
+- 内建命令 : 不会产生子进程，为了效率才内建，比如 cd / read / echo 
 - 函数 : 函数可以直接作为命令一样使用
 - 外部命令 : 在　PATH　里搜寻并且执行的命令，产生子进程
 
@@ -491,17 +491,14 @@ find . -name '*.sh'  -exec cp {} copy.sh \;  # 将查询到的所有文件都拷
 #### 压缩/解压
 
 ```bash
-bzip2 -k cky              	# 压缩cky文件为.bz2文件，-k 保留源文件
-bunzip2 cky.bz2           	# 解压文件
-
-gzip cky                  	# 压缩cky文件为.gz文件
-gzip -d cky.gz            	# 解压文件
-
-zip -r src.zip ./src       	# 递归压缩 src/ 目录下的文件 为 src.zip
-unzip src.zip             	# 解压
-
+bzip2 -k cky                # 压缩cky文件为.bz2文件，-k 保留源文件
+bunzip2 cky.bz2             # 解压文件
+gzip cky                    # 压缩cky文件为.gz文件
+gzip -d cky.gz              # 解压文件
+zip -r src.zip ./src        # 递归压缩 src/ 目录下的文件 为 src.zip
+unzip src.zip               # 解压
 tar -zcvf cky.tar.gz ./cky  # 归档压缩
-tar -zxvf cky.tar.gz      	# 解压到当前目录
+tar -zxvf cky.tar.gz        # 解压到当前目录
 ```
 
 ### 11.3 其他命令

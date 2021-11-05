@@ -1,4 +1,4 @@
-# Erlang 中文教程
+# Erlang教程
 
 面向消息、面向并发的语言`Erlang`!!!
 
@@ -7,7 +7,6 @@
 ```bash
 # 去下面这个网址下载最新的安装包　各大系统都有
 https://www.erlang-solutions.com/resources/download.html
-
 $ erlc -d -W hello.erl 														# 编译成 *.beam 文件
 $ erl -noshell -pa dir -s module fun 					# 在指定目录下，执行指定模块的函数
 $ erl -noshell -s hello start -s init stop  # 在当前目录，先执行 shell:start()　再执行 init:stop()
