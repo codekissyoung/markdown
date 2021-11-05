@@ -1,7 +1,5 @@
 # LinkPC网络
 
-
-
 电信 Router : 192.168.1.1 (网关)
 
 小米 Router : 192.168.31.1 (网关)
@@ -13,8 +11,6 @@ Gateway : 192.168.31.1
 DNS IP :  
 hostname : ckp-pc
 ```
-
-
 
 查看本机网关 Gateway ：
 
