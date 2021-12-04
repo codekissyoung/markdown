@@ -1,6 +1,6 @@
 # Linux 下 C 程序开发
 
-本文记录我在 `Linux` 下开发 `C` 程序用到的知识。
+在 `Linux` 下开发 `C` 程序用到的知识。
 
 ## 匿名半双工管道
 
@@ -22,7 +22,6 @@ int main( int argc, char *argv[] )
         close( fd[1] ); // 子进程关闭 写入端
         char buf[ PIPE_BUF ];
         int len = read( fd[0], buf, PIPE_BUF );
-
         write( STDOUT_FILENO, buf, len );
         exit(0);
     }
@@ -219,7 +218,6 @@ struct sockaddr
     //存放地址和端口，14字节
     char sa_data[14];
 }
-
 struct sockaddr_in
 {
     //地址族
@@ -270,8 +268,6 @@ struct sockaddr_in
 ### 速率
 
 还有个问题那就是如果读缓冲满了怎么办，网卡收到了对方的消息要怎么处理？一般的做法就是丢弃掉不给对方 ack，对方如果发现 ack 迟迟没有来，就会重发消息。那缓冲为什么会满？是因为消息接收方处理的慢而发送方生产的消息太快了，这时候 tcp 协议就会有个动态窗口调整算法来限制发送方的发送速率，使得收发效率趋于匹配。如果是 udp 协议的话，消息一丢那就彻底丢了。
-
-# linux c 系统调用列表
 
 ## 进程控制
 

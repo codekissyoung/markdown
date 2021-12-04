@@ -12,16 +12,12 @@ type hchan struct {
     buf      unsafe.Pointer // 环形队列指针
     elemtype *_type         // 元素类型
     elemsize uint16         // 每个元素的大小
-    
     dataqsiz uint           // 环形队列长度
     qcount   uint           // 剩余位置数
-
     sendx    uint           // 队列写入位置
     recvx    uint           // 队列读出位置
-    
     recvq    waitq          // 等待读消息的 goroutine 队列
     sendq    waitq          // 等待写消息的 goroutine 队列
-    
     closed   uint32         // 标识关闭状态
     lock mutex              // 互斥锁，chan不允许并发读写
 }
