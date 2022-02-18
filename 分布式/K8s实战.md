@@ -90,7 +90,7 @@ $ kubectl delete pod -l create_method=manual # 删除符合标签的Pod
 
 ### namespace 命名空间
 
-```dockerfile
+```
 apiVersion: v1
 kind: Namespace
 metadata:
