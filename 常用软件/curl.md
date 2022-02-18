@@ -8,4 +8,3 @@ ret=$(curl -F "action=upload" -F "filename=@$1" http://img.codekissyoung.com/)
 echo "Upload Success:";
 echo $ret | tr -d "\"[]";
 ```
-
