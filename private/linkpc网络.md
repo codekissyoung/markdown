@@ -66,11 +66,7 @@ DNS IP
 hostname
 ```
 
-
-
 ![image-20210305004151109](https://img.codekissyoung.com/2021/03/05/92f9c9e80c45e21a299d254777292447.png)
-
-
 
 ```bash
 vim /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -88,8 +84,6 @@ BROADCAST=192.168.1.255     <==就是广播地址啰，可省略
 MTU=1500                    <==就是最大传输单元的设定值，若不更改则可省略
 ```
 
-
-
 ```bash
 $ sudo dmesg | grep -in eth # 确认内核加载了网卡
 665:[    1.115165] r8169 0000:04:00.0 eth0: RTL8168h/8111h, 04:d4:c4:ec:c0:80, XID 541, IRQ 127
@@ -99,11 +93,8 @@ $ sudo dmesg | grep -in eth # 确认内核加载了网卡
 
 $ sudo lspci | grep -i ethernet # 列出网卡设备的信息
 04:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet 
-
 $ sudo ifconfig enp4s0 192.168.32.10 # 给网卡设置一个Ip
 ```
-
-
 
 ```bash
 /etc/services    # 协议名 （HTTP FTP SSH） 与　默认端口对应表

@@ -2,14 +2,14 @@
 
 单步跟踪程序、查看变量内容、内存位置、以及指向每条语句后CPU寄存器的变化情况。也可以分析到达程序中某个点之前的函数调用序列。
 
-`GDB`是 符号式调试器，必须通过`-g`选项，在程序编译时将源代码到机器指令的信息写入到可执行文件的符号表中。在包含多个源代码文件的大型程序中，必须在编译每个模块的时候都使用`-g`选项。
+`GDB`是符号式调试器，必须通过`-g`选项，在程序编译时将源代码到机器指令的信息写入到可执行文件的符号表中。在包含多个源代码文件的大型程序中，必须在编译每个模块的时候都使用`-g`选项。
 
-[GDBFrontend 一个GUI调试工具](https://oguzhaneroglu.com/projects/gdb-frontend/) 
+[GDBFrontend一个GUI调试工具](https://oguzhaneroglu.com/projects/gdb-frontend/) 
 
 ## 启用gdb调试
 
 ```bash
-$gcc -Og main.c -o cky # -g 表示编译支持 gdb 调试, 并且不能带上-O 或者 -O2 优化
+$gcc -g main.c -o cky # -g 表示编译支持 gdb 调试, 并且不能带上-O 或者 -O2 优化
 $gdb cky              # 调试 cky 程序
 $gdb cky core         # 带上 core 文件一起调试，程序非法执行后 core dump 后产生 core 文件
 $gdb cky <PID>        # 指定这个服务程序运行时的进程ID。gdb会自动attach上去，并调试他

@@ -1,16 +1,12 @@
 # Docker 和 jenkins
 
 ```bash
-$ eval $(minikube docker-env)     # 设置一些 minikube docker 制作的一些环境变量
-```
-
-```bash
-$ kubectl run hello-node --image=hello-node:v1 --port=8080  # 使用 hello-node 镜像，启动一个 Pod
+$ kubectl run hello-node --image=hello-node:v1 --port=8080  # 用 hello-node 镜像启动 Pod
 $ kubectl get events                                        # 查看 集群 events
 $ kubectl config view                                       # 查看 kubectl 配置
 ```
 
-默认情况，`Pod`只能通过`Kubernetes`群集内部 IP 访问。要使`hello-node`容器从`Kubernetes`虚拟网络外部访问，须要使用`Kubernetes Service`暴露`Pod`
+默认情况`Pod`只能通过`Kubernetes`群集内部 IP 访问。要使`hello-node`容器从`Kubernetes`外部访问，须要使用`Kubernetes Service`暴露`Pod`
 
 ```bash
 $ kubectl expose deployment hello-node --type=LoadBalancer  # 将 Pod 暴露到外部环境
@@ -42,5 +38,4 @@ Opening service default/hello-node in default browser...
 ```bash
 $ kubectl delete service hello-node
 $ kubectl delete deployment hello-node
-$ minikube stop
 ```
