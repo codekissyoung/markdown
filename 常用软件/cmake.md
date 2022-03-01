@@ -2,9 +2,7 @@
 
 本文记录了`cmake`的用法。
 
-## 概述
-
-### cmake 是什么
+## cmake 是什么
 
 `cmake`是一款优秀的工程构建工具。KDE 开发者在使用了近 10 年`autotools`之后，终于决定为`KDE4`选择一个新的工程构建工具。
 
@@ -15,7 +13,7 @@
 - 简化编译构建过程和编译过程，工具链简单`cmake + make`
 - 高效，比`autotools`快`%40`,主要是因为在工具链中没有`libtool`
 - 可拓展，可以为`cmake`编写特定功能的模块，扩充`cmake`功能
-- 额外的构建目录树（采用外部构建），不用担心任何删除源码文件的风险
+- （采用外部构建）额外的构建目录树，不用担心任何删除源码文件的风险
 - 支持机器字节序以及其他硬件特性问题的测试
 - 在大部分平台下支持并行构建和自动生成文件依赖
 
@@ -30,7 +28,7 @@ make && make install
 
 ### 基本语法
 
-```bash
+```cmake
 command(arg1 arg2 ...)          # 运行命令
 set(var_name var_value)         # 定义变量,或者给已经存在的变量赋值
 command(arg1 ${var_name})       # 使用变量
@@ -42,11 +40,10 @@ ELSE(expression)
     COMMAND2(ARGS)
 ENDIF(expression)
 
-# expression
 IF(var)                       # 不是空, 0, N, NO, OFF, FALSE, NOTFOUND 或 <var>_NOTFOUND时，为真
-IF(NOT var)                   # 与上述条件相反。
-IF(var1 AND var2)             # 当两个变量都为真是为真。
-IF(var1 OR var2)              # 当两个变量其中一个为真时为真。
+IF(NOT var)                   # 与上述条件相反
+IF(var1 AND var2)             # 当两个变量都为真是为真
+IF(var1 OR var2)              # 当两个变量其中一个为真时为真
 IF(COMMAND cmd)               # 当给定的cmd确实是命令并可以调用是为真
 IF(EXISTS dir)                # 目录名存在
 IF(EXISTS file)               # 文件名存在
@@ -61,6 +58,7 @@ WHILE(condition)
 ENDWHILE(condition)
 
 AUX_SOURCE_DIRECTORY(. SRC_LIST)
+
 FOREACH(one_dir ${SRC_LIST})
     MESSAGE(${one_dir})
 ENDFOREACH(onedir)
@@ -68,54 +66,41 @@ ENDFOREACH(onedir)
 
 在项目的每个目录中，都需要编写一个`CMakeLists.txt`。
 
-## hello cmake 例子
+## 单目录例子
 
 准备好下面两个文件。
 
 ```c
 // cmake-demo/main.c
 #include <stdio.h>
-int main( int argc, char *argv[] )
-{
+int main( int argc, char *argv[] ){
     printf("hello cmake!\n");
     return 0;
 }
 ```
 
-```c
+```cmake
 // cmake-demo/CMakeLists.txt
-PROJECT(HELLO)
-SET(SRC_LIST main.c)
-ADD_EXECUTABLE(main ${SRC_LIST})
+PROJECT(HELLO)       								// 项目名称
+SET(SRC_LIST main.c) 								// 把源代码文件列出来
+ADD_EXECUTABLE(main ${SRC_LIST}) // 编译成可执行文件 main
 ```
 
-### 内部构建
-
-在`cmake-demo`目录下执行:
-
-```bash
-cmake .
-```
-
-就可以看到`cmake`为项目生产的`Makefile`文件，以及一些`cmake`缓存文件。
-
-```bash
-make
-```
-
-### 外部构建
+### 内部构建(不建议使用)
 
 内部构建生成的`Cmake`的中间文件与源代码文件混杂在一起，并且`cmake`没有提供清理这些中间文件的命令。
 
-所以`cmake`推荐使用外部构建，步骤如下:
+### 外部构建
+
+`cmake`推荐使用外部构建，步骤如下:
 
 1. 在`CMakeLists.txt`的同级目录下，新建一个`build`文件夹
 1. 进入`build`文件夹，执行`cmake ..`命令，这样所有的中间文件以及`Makefile`都在`build`目录下了
 1. 在`build`目录下执行`make`就可以得到可执行文件
 
-## 从 hello cmake 到项目
+## 单模块项目例子
 
-### 多个源代码文件
+## 多个源代码文件
 
 ```bash
 .
@@ -133,9 +118,7 @@ make
 // main.c
 #include <stdio.h>
 #include "mod1/mod1.h"
-
-int main( int argc, char *argv[] )
-{
+int main( int argc, char *argv[] ){
     mod1_process();
     return 0;
 }
@@ -176,13 +159,13 @@ void mod1_func()
 
 本项目只有一个入口`main.c`文件，然后就是多个模块的源代码文件。一个主`CMakeLists.txt`也可管理好:
 
-```bash
+```cmake
 cmake_minimum_required(VERSION 3.10)
 PROJECT(PROJECT_ONE)
 add_executable(main main.c mod1/mod1.c mod1/mod1_func.c) # 指明需要的源代码文件就好
 ```
 
-### 将 mod1 模块作为动态库
+## 添加动态库
 
 对于上述文件，如果想让`mod1`独立编译，然后再链接进入可执行文件。则需要做出的修改如下:
 
@@ -199,21 +182,20 @@ add_executable(main main.c mod1/mod1.c mod1/mod1_func.c) # 指明需要的源代
     └── mod1.h
 ```
 
-```bash
+```cmake
 # ./CMakeLists.txt
-cmake_minimum_required(VERSION 3.10)
-PROJECT(PROJECT_ONE)
+...
 add_subdirectory(mod1 lib)          # 添加一个模块，并且将编译好库文件放置在 build/lib 目录
 add_executable(main main.c)
 target_link_libraries(main mod1)    # 链接 mod1
 ```
 
-```bash
+```cmake
 # ./mod1/CMakeLists.txt
 add_library(mod1 SHARED mod1.c mod1_func.c) # 生成动态库 libmod1.so
 ```
 
-### mod1 依赖静态库 mod2
+## 添加静态库
 
 ```bash
 .
@@ -264,7 +246,7 @@ void mod2_func(){
 
 `main.c`没有直接用到`mod2`的，所以主`CMakeLists.txt`保持不变。`mod1`依赖`mod2`，所以由`mod1`的`CMakeLists.txt`负责`mod2`模块。
 
-```bash
+```cmake
 # mod1/CMakeLists.txt
 add_subdirectory(mod2 mo2_lib)  # 新增 mod2 模块,　编译好的库置于 build/lib/mod2_lib　中
 link_directories(mod2_lib)      # 添加链接器的查找路径 build/lib/mod2_lib
@@ -272,7 +254,7 @@ add_library(mod1 SHARED mod1.c mod1_func.c) # 生成动态库 libmod1.so
 target_link_libraries(mod1 mod2) # 将 libmod2.a 链接进入 libmod1.so 中
 ```
 
-```bash
+```cmake
 # mod1/mod2/CMakeLists.txt
 add_library(mod2 STATIC mod2.c) # 生成静态库 libmod2.a
 ```
@@ -289,7 +271,7 @@ main -> libmod1.a  -> libmod2.so
 - 对于底层是`libmod2.a`的情况，所有的实现代码都已经打包进入`libmod1`中，所以`libmod2.a`在最终生成`main`后，可以删除
 - 对于底层是`libmod2.so`的情况，打包进入`libmod1`中的全部都是符号表，所以要保证`libmod2.so`的存在，并且正确链接到`main`了
 
-### 如何支持 make install 操作
+### 支持 make install
 
 ```bash
 .
@@ -312,7 +294,7 @@ main -> libmod1.a  -> libmod2.so
 
 各个目录的`CMakeLists.txt`各自负责自己目录下要安装的文件:
 
-```bash
+```cmake
 # ./CMakeLists.txt
 cmake_minimum_required(VERSION 3.10)
 PROJECT(PROJECT_ONE)
@@ -325,7 +307,7 @@ install(DIRECTORY doc/ DESTINATION share/PROJECT_ONE) # 安装项目文档
 install(TARGETS main RUNTIME DESTINATION bin )        # main 安装到 usr/bin
 ```
 
-```bash
+```cmake
 # ./mod1/CMakeLists.txt
 add_subdirectory(mod2 mo2_lib)  # 新增 mod2 模块,　编译好的库置于 build/lib/mod2_lib　中
 link_directories(mod2_lib)      # 添加链接器的查找路径 build/lib/mod2_lib
@@ -336,7 +318,7 @@ install(TARGETS mod1 LIBRARY DESTINATION lib)  # 安装到 usr/lib
 install(FILES mod1.h DESTINATION include/mod1) # 安装到 usr/include/mod1
 ```
 
-```bash
+```cmake
 # ./mod1/mod2/CMakeLists.txt
 add_library(mod2 SHARED mod2.c) # 生成静态库 libmod2.a
 install(TARGETS mod2 LIBRARY DESTINATION lib)  # 安装到 usr/lib
@@ -347,7 +329,7 @@ install(FILES mod2.h DESTINATION include/mod2) # 安装到 usr/include/mod2
 
 其实纯粹依靠`cmake`本身提供的基本指令来管理工程是一件非常复杂的事情，所以`cmake`设计成了可扩展的架构，可以通过编写一些通用的模块来扩展`cmake`。这便是`Finder`功能，对于`linux`里一些常用的内置库，`cmake`也预先提供了这样模块，比如`FindCURL`、`FindCurses`、`FindImageMagick`模块。在`CMakeLists.txt`里的使用如下:
 
-```bash
+```cmake
 find_package(CURL)
 if(CURL_FOUND)
     include_directories(${CURL_INCLUDE_DIR})
@@ -434,7 +416,7 @@ int main( int argc, char *argv[] )
 
 自定义`FindHIREDIS`模块:
 
-```bash
+```cmake
 find_path(HIREDIS_INCLUDE_DIR hiredis.h /usr/local/include/hiredis)
 find_library(HIREDIS_LIBRARY NAMES hiredis PATH /usr/local/lib)
 
@@ -455,7 +437,7 @@ endif(HIREDIS_FOUND)
 
 修改主`CMakeLists.txt`为:
 
-```bash
+```cmake
 cmake_minimum_required(VERSION 3.10)
 PROJECT(PROJECT_ONE)
 add_subdirectory(mod1 lib)
@@ -481,7 +463,7 @@ install(TARGETS main RUNTIME DESTINATION bin)
 
 在`CMakeLists.txt`中配置参数，控制源代码中代码的编译部分，比如可以通过一个参数控制，是用自己写的库还是系统库？
 
-```bash
+```cmake
 .
 ├── build
 ├── cmake
@@ -498,10 +480,9 @@ install(TARGETS main RUNTIME DESTINATION bin)
 
 在主`CMakeLists.txt`里定义:
 
-```bash
+```cmake
 cmake_minimum_required(VERSION 3.10)
 PROJECT(PROJECT_ONE)
-
 # 通过 cmakeconfig.h 传递参数给源文件
 set(AUTHOR "codekissyoung")
 set(RELEASE_DATE "2019-6-25")
@@ -511,14 +492,12 @@ configure_file(
     ${PROJECT_BINARY_DIR}/cmakeconfig.h
 )
 include_directories(${PROJECT_BINARY_DIR})
-
 add_subdirectory(mod1 lib)                            # 添加模块，编译后放在 build/lib
-...
 ```
 
 再定义`cmakeconfig.h.in`,它会在`Build`目录里生成一个`cmakeconfig.h`，`@@`中间的名字会被替换:
 
-```bash
+```cmake
 #define AUTHOR "@AUTHOR@"
 #define RELEASE_DATE "@RELEASE_DATE@"
 #define USE_MY_LIB "@USE_MY_LIB@"
@@ -534,15 +513,12 @@ add_subdirectory(mod1 lib)                            # 添加模块，编译后
 int main( int argc, char *argv[] )
 {
     printf("author: %s, release_date: %s\n", AUTHOR, RELEASE_DATE );
-
     #ifdef USE_MY_LIB
         printf("使用自己的库的代码\n");
     #else
         printf("使用系统库的代码\n");
     #endif
-
     mod1_process();
-    ...
 }
 ```
 
@@ -564,37 +540,31 @@ int main( int argc, char *argv[] )
 
 我自己在写代码的时候，习惯在开发版本打开所有的错误报告，而上述的开发版本只使用了`-g`，这显然是不够的，需要通过在`CMakeLists.txt`里重新设置下开发版本的编译参数:
 
-```bash
-cmake_minimum_required(VERSION 3.10)
-
-PROJECT(PROJECT_ONE)
-
+```cmake
 set(CMAKE_C_FLAGS_DEBUG "-g -Wall -pedantic -DDEBUG")
 message(STATUS "debug flags: ${CMAKE_C_FLAGS_DEBUG}")
-
 message(STATUS "release flags: ${CMAKE_C_FLAGS_RELEASE}")
-...
 ```
 
 通常我习惯使用脚本来完成重复的`构建-编译-运行`这一过程，参考如下:
 
 ```bash
 # ./make-debug.sh
+
 #!/bin/bash
 rm -rf build/*                                # 清理上一次的结果
-
 cd build && cmake -DCMAKE_BUILD_TYPE=debug .. # 进入debug目录，执行构建
-
 make && ./main                                # 编译，然后运行
 ```
 
+
+
 ```bash
 ./make-release.sh
+
 #!/bin/bash
 rm -rf release/*                                  # 清理上一次的结果
-
 cd release && cmake -DCMAKE_BUILD_TYPE=release .. # 进入release目录，执行构建
-
 make && ./main                                    # 编译，然后运行
 ```
 
@@ -633,10 +603,6 @@ make && ./main                                    # 编译，然后运行
 - 开发版本 与 发布版本 分离
 
 ## 指令参考
-
-```bash
-PROJECT(projectname) # 项目名
-```
 
 ```bash
 SET(VAR [VALUE] [CACHE TYPE DOCSTRING [FORCE]])
@@ -708,7 +674,7 @@ INCLUDE(module [OPTIONAL])　　　 # 载入 cmake 模块
 
 项目目录相关:
 
-```bash
+```cmake
 # 构建发生的目录
 CMAKE_BINARY_DIR
 PROJECT_BINARY_DIR
@@ -718,27 +684,20 @@ PROJECT_BINARY_DIR
 CMAKE_SOURCE_DIR
 PROJECT_SOURCE_DIR
 <projectname>_SOURCE_DIR
-
 CMAKE_CURRENT_SOURCE_DIR  # 当前处理的CMakeLists.txt所在的路径
-
 CMAKE_CURRRENT_BINARY_DIR # 内部编译: 跟CMAKE_CURRENT_SOURCE_DIR一致
                           # 外部编译: 指的是构建目录
                           # add_subdirectory(src bin) 会更改它的值为 bin
-
 CMAKE_CURRENT_LIST_FILE   # 当前输出所在的CMakeLists.txt的完整路径
 CMAKE_CURRENT_LIST_LINE   # 当前输出所在的行
 ```
 
 ```bash
 CMAKE_MODULE_PATH         # 模块所在路径
-
 EXECUTABLE_OUTPUT_PATH    # 可执行文件存放目录
 LIBRARY_OUTPUT_PATH       # 库存放目录
-
 CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE # 将工程提供的头文件目录始终置于系统头文件目录的前面
-
 CMAKE_INCLUDE_PATH        # 头文件搜索目录
-
 CMAKE_LIBRARY_PATH        # 库搜索目录
 ```
 
@@ -758,7 +717,7 @@ WIN32                     # 在所有的Win32平台为TRUE，包括cygwin
 
 开关选项:
 
-```bash
+```cmake
 CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS   # 用来控制IF ELSE语句的书写方式
 BUILD_SHARED_LIBS                   # 这个开关用来控制默认的库编译方式: 动态库 静态库
 CMAKE_C_FLAGS                       # 设置C编译选项
@@ -790,7 +749,7 @@ message(STATUS "CMAKE_STATIC_LINKER_FLAGS_DEBUG = " ${CMAKE_STATIC_LINKER_FLAGS_
 message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASE = " ${CMAKE_STATIC_LINKER_FLAGS_RELEASE})
 ```
 
-## 其他参考
+## 参考
 
 - [CMake 入门实战](http://www.hahack.com/codes/cmake/)
 - [CMake Official Tutorial——教程还是官方的好](https://www.cnblogs.com/Xiaoyan-Li/p/5674747.html)

@@ -1,4 +1,90 @@
-# UnixLinux编程实践教程
+
+# Unix/Linux 编程实践教程
+
+## 第 1 章 Unix系统编程概述
+
+在登录过程中，当用户名和密码通过验证后，内核启动shell进程,然后把用户交给shell。shell 再去与内核交互，期间 shell 也可以帮用户启动其他程序.
+
+每个用户都有属于自己的 shell 进程，当用户注销时，内核会结束所有分配给这个用户的进程。
+
+```c++
+#define PAGELEN 3       // 一页显示行数
+#define LINELEN 512     // 一行显示字符数
+// 读取用户输入的一个字符，返回一个指令
+// q -> 0:              退出
+// [space] -> PAGELEN: 下一页
+// [Enter] -> 1:       下一行
+int see_more();
+// 从 fp(标准输入流、文件流等) 中读取数据
+void do_more( FILE *fp );
+int main( int argc, char *argv[] )
+{
+    // 程序无参数，则从输入流读取数据
+    if( argc == 1 )
+    {
+        do_more( stdin );
+    }
+    // 有参数，则默认参数为 文件名，依次显示文件内数据
+    else
+    {
+        for( int i = 1; i < argc; ++i )
+        {
+            FILE *fp = fopen( argv[i], "r" );
+            do_more( fp );
+            fclose( fp );
+        }
+    }
+    return EXIT_SUCCESS;
+}
+
+int see_more() {
+    int c;
+    printf("see more?");
+    // 演示下从 /dev/tty 读取数据, 
+    // Linux 会自动将 /dev/tty 重定向到一个终端窗口，因此该文件对于读取人工输入时特别有用
+    FILE *fp_tty = fopen( "/dev/tty", "r" );
+    if( fp_tty == nullptr )
+        exit( 1 );
+    while ( ( c = getc( fp_tty ) ) != EOF ) {
+        switch (c) {
+            case 'q':
+                return 0;
+            case ' ':
+                return PAGELEN;
+            case '\n':
+                return 1;
+            default:
+                continue;
+        }
+    }
+    fclose(fp_tty);
+    return 0;
+}
+void do_more( FILE *fp ){
+    char line[LINELEN];
+    int num_of_lines = 0;
+    while ( fgets( line, LINELEN, fp ) ){
+        if( fputs( line, stdout ) == EOF )
+            exit(1);
+        else
+            ++num_of_lines;
+        // 每输出固定行，就询问一下用户，下一步操作: 退出？下一行？下一页？
+        if( num_of_lines == PAGELEN ){
+            int reply = see_more();
+            if( reply == 0 )
+                break;
+            else
+                num_of_lines -= reply;
+        }
+    }
+}
+```
+
+`more`程序待解决的问题:
+
+- 如何使用户输入的字符立即送到程序，而不用等待`[Enter]`? 如何使输入的字符不回显？用户操作的终端有很多参数，通过调整参数实现上述问题。
+- 用户终端是分类型的(比如 VT100 终端), 类型会影响到参数调整，如何使得程序能够兼容处理各种类型的终端? 这需要学习如何控制和调整终端参数的知识。
+>>>>>>> 8c05a4b49e8ebe3243d7cd1f1cc6a5ce2fb7328f
 
 ## 第 2 章 用户、文件操作与链接帮助
 
@@ -53,22 +139,17 @@ void show_info( utmp *u ){
 int main( int argc, char *argv[] )
 {
     utmp current_record = {};
-
     int utmpfd;
     int reclen = sizeof(current_record);
-
     if( ( utmpfd = open( UTMP_FILE, O_RDONLY ) ) == -1 ){
         perror( UTMP_FILE "Error" );
         exit(1);
     }
-
     while ( read( utmpfd, &current_record, reclen ) == reclen )
     {
         show_info( &current_record );
     }
-
     close( utmpfd );
-
     return EXIT_SUCCESS;
 }
 ```
@@ -77,7 +158,6 @@ int main( int argc, char *argv[] )
 
 ```c++
 #define BUFFSIZE 10
-
 // usage: cp source-file target-file
 int main( int argc, char *argv[] )
 {
@@ -172,7 +252,6 @@ int rename( char *old_path, char *new_path ); // 修改文件名，或者移动�
 编写`ls`命令:
 
 ```c++
-
 void do_ls( const char *dirname );
 void show_file_info( const char *filename );
 char* mode_to_letters( int mode );
@@ -1218,7 +1297,6 @@ parent_code( pid );
 BOOK=$HOME/phonebook.data
 echo "find what name in phonebook";
 read NAME
-
 if grep $NAME $BOOK > /tmp/pb.tmp
 then
     echo "Entries for " $NAME
