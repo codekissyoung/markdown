@@ -37,20 +37,16 @@ int main( int argc, char *argv[] )
         while ( --argc ){
             do_ls( *++argv );
         }
-
     return EXIT_SUCCESS;
 }
 
 void do_ls( const char * dirname ) {
     DIR *dir_ptr;
     struct dirent *dir_data;
-
     dir_ptr = opendir( dirname );
-
     while ( (dir_data = readdir(dir_ptr)) != nullptr ){
         show_file_info( dir_data->d_name );
     }
-
     closedir(dir_ptr);
 }
 
