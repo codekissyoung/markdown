@@ -4,7 +4,7 @@
 
 `fileinfo->st_mode`是一个 16 位的二进制数，文件权限位:
 
-![文件权限位](https://img.codekissyoung.com/2019/06/04/86c5b9a550cccacf4bc19d494503b303.png)
+![](https://img.codekissyoung.com/2019/06/04/86c5b9a550cccacf4bc19d494503b303.png)
 
 `set-user-ID`（`SUID`）位告诉内核: 运行这个文件时，认为是这个权限拥有者在运行这个程序,用户使用`passwd`命令可以修改`/etc/passwd`中自身的密码，就是这个原因。
 显示特征是：`user`权限中的`s`标志。
@@ -74,7 +74,6 @@ void show_file_info( const char *filename ){
     strftime( time_str, 30, "%Y-%m-%d %H:%M:%S", localtime( &info.st_mtime ) );
 
     cout << " " << time_str << " ";
-
     cout << " " << filename << endl;
 }
 
@@ -101,16 +100,12 @@ char* mode_to_letters( int mode ){
 
 ## 第 4 章 文件系统:编写 pwd
 
-一块磁盘被划分成多个分区，分区再切成`512Byte`大小的扇区，扇区从 0 开始编号，然后将这些扇区分为三个部分（如下图）。
+创建一个新文件，文件系统该如何存储:
 
-![文件系统](https://img.codekissyoung.com/2019/06/05/2f92f4319bd4f07a6b7b092133824cbc.png)
-
-如果创建了一个新文件，文件系统该如何存储:
-
-1. 存储属性，找到一个空`i-node`节点
+1. 找到一个空`i-node`节点，存储属性信息
 1. 存储实际数据
-1. 在`i-node`节点记录上述实际存储数据的块序列编号
-1. 添加`i-node`节点序号，以及新文件名到 目录文件
+1. 存储数据的块序列号到`i-node`节点
+1. save `i-node` number and filename to dir-file
 
 ![创建一个新文件](https://img.codekissyoung.com/2019/06/05/4d29857bebcee145268018e97cd0ede3.png)
 
@@ -162,17 +157,14 @@ ino_t get_inode( const char * );
 void printpathto( ino_t );
 void inum_to_name( ino_t , char *, int );
 
-int main( int argc, char *argv[] )
-{
+int main( int argc, char *argv[] ){
     printpathto( get_inode(".") );
     cout << endl;
 }
 
 void printpathto( ino_t this_inode ){
-
     ino_t my_inode;
     char its_name[BUFSIZ];
-
     if( get_inode("..") != this_inode ){
         chdir( ".." );
         inum_to_name( this_inode, its_name, BUFSIZ );
@@ -192,7 +184,6 @@ void inum_to_name( ino_t inode_to_find, char *namebuf, int buflen ){
     DIR *dir_ptr;
     struct dirent *direntp;
     dir_ptr = opendir( "." );
-
     while ( ( direntp = readdir( dir_ptr ) ) != NULL ){
         if( direntp->d_ino == inode_to_find ){
             strncpy( namebuf, direntp->d_name, buflen );
@@ -1081,14 +1072,4 @@ rm /tmp/pb.tmp
 
 ![environ环境变量的问题](https://img.codekissyoung.com/2019/06/15/5520ffa6adafe8f092655508fc6b3c00.png)
 
-## 第 10 章 I/O 重定向和管道
-
-## 第 11 章 链接到近端或远端的进程:服务器与 Socket
-
-## 第 12 章 链接和协议:编写 Web 服务器
-
-## 第 13 章 UDP 编程:编写许可证服务器
-
-## 第 14 章 线程机制: 并发函数的使用
-
-## 第 15 章 进程间通信 IPC
+## 
