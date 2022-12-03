@@ -1,10 +1,8 @@
-1 能够提供 web 内容的东西都是 web 资源，比如一个图片文件，一个图书馆公共网关，因特网搜索引擎。
-
 2 MIME type ，用于描述并标记 web 多媒体内容。
 比如：html 格式文档由 text/html 标识，ASCII 文本由 text/plain 类型标识，gif ：image/gif ，jpeg 标识：image/jpeg
 
 3 URL 统一资源定位符：方案+服务器地址+ 某个具体资源
-如：http ://www.joes-hardware.com/specials/saw-blade.gif
+如：http://www.joes-hardware.com/specials/saw-blade.gif
 
 4 http 方法
 
@@ -36,8 +34,6 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 502            Bad  GateWay         代理或网关错误
 508            GateWay  Timeout     某个网关响应超时了
 ```
-
-6，一张 web 页面通常不是单个资源，而是一组资源的集合。每个资源都使用一个单独的 http 请求！
 
 7，http 报文
 

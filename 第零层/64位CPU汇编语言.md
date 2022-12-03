@@ -15,7 +15,7 @@ int main()
 
 对上面最经典的 C 语言入门程序使用 `gcc -S main.c -o main.s` ,便可得到一个汇编语言模板:
 
-```c
+```assembly
 	.file	"main.c"
 	.text
 	.section	.rodata
@@ -37,14 +37,14 @@ main:
 
 将无用的部分去除后，就是我们需要的汇编语言框架模板:
 
-```asm
+```assembly
 .section .rodata
 OUTPUT:
 	.string "fuck you"
 .text
 	.globl	main
 main:
-	pushq   %rbp
+	pushq %rbp
 	movq	%rsp, %rbp
 	leaq	OUTPUT(%rip), %rdi
 	call	puts@PLT
@@ -57,7 +57,7 @@ main:
 
 常用的数据类型:
 
-```bash
+```assembly
 .ascii      # 文本字符串
 .asciz
 .string
@@ -65,10 +65,10 @@ main:
 .double
 .float
 .int
-.long		# 4  字节整型
+.long		    # 4  字节整型
 .octa       # 16 字节整型
-.quad       # 8 字节整型
-.short      # 2 字节整型
+.quad       # 8  字节整型
+.short      # 2  字节整型
 ```
 
 定义方法:
@@ -105,7 +105,7 @@ main:
 
 .section .data
 MY_BUFFER:
-	.fill 10000                 ; 填充 10000 字节，占用了磁盘空间
+	.fill 10000            ; 填充 10000 字节，占用了磁盘空间
 ```
 
 ## 传送数据元素
@@ -114,7 +114,7 @@ MY_BUFFER:
 
 内存寻址模式:
 
-```asm
+```bash
 base_address( offset, index, size )         # 格式
 base_address + offset + index * size        # 所表示的地址
 ```
@@ -136,7 +136,6 @@ main:
 values:
     .int 10, 15, 20, 25, 30, 35, 40
 main:
-
     movl $3, %edi
     movl values( , %edi, 4 ), %eax          # 将 values + 3 * 4 处的值(25)传送给 eax
 ```
@@ -150,7 +149,6 @@ movl $values, %ebx      # 将 values 地址本身 传送给 ebx
 
 ```asm
 movl $output, %edi      # 将 output 地址本身传送给 edi
-
 movl %eax, %ebx         # 将 eax 的值传送给 ebx
 movl %eax, (%edi)       # 将 eax 的值传送给 edi 存储的内存地址处( 即output处 )
 ```
