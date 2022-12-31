@@ -516,8 +516,6 @@ $ sudo vim /etc/NetworkManager/NetworkManager.conf # 修改配置文件
 $ sudo systemctl restart networking.service # 重启系统网络
 ```
 
-
-
 ## netplan使用
 
 使用 /etc/network/interfaces 来直接设置网卡的方式，已经渐渐的被主流淘汰了，Ubuntu 从 18.04开始，就使用 netplan 来管理网络.
@@ -540,29 +538,8 @@ network:
       dhcp4: no
 ```
 
-
-
 ```bash
 $ sudo netplan -d apply # 更新网络
 $ sudo systemctl restart systemd-networkd.service # 重启 networkd
 $ sudo systemctl restart networking.service # 重启网络
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
