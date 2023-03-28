@@ -530,10 +530,6 @@ Local exec file:
 	0x000055f2d0cb1348 - 0x000055f2d0cb13c5 is .dynstr
 	0x000055f2d0cb13c6 - 0x000055f2d0cb13d2 is .gnu.version
 	0x000055f2d0cb14b8 - 0x000055f2d0cb14cf is .init
-	0x000055f2d0cb14d0 - 0x000055f2d0cb14e0 is .plt
-	0x000055f2d0cb14f0 - 0x000055f2d0cb16b2 is .text
-	0x000055f2d0cb16b4 - 0x000055f2d0cb16bd is .fini
-
     # 0x55f2d0cb16c4 地址所属的是 .rodata，不允许修改
 	0x000055f2d0cb16c0 - 0x000055f2d0cb16c8 is .rodata 
     ...
