@@ -4,16 +4,14 @@
 
 ## cmake 是什么
 
-`cmake`是一款优秀的工程构建工具。KDE 开发者在使用了近 10 年`autotools`之后，终于决定为`KDE4`选择一个新的工程构建工具。
-
-特点:
+`cmake`是一款优秀的工程构建工具。KDE开发者在使用了近 10 年`autotools`之后，终于决定为`KDE4`选择一个新的工程构建工具。特点:
 
 - 开放源代码
 - 跨平台，在`Linux/Unix`上，生成`makefile`；在`MacOS`上生成`xcode`；在`windows`上生成`MSVC`的工程文件
 - 简化编译构建过程和编译过程，工具链简单`cmake + make`
 - 高效，比`autotools`快`%40`,主要是因为在工具链中没有`libtool`
 - 可拓展，可以为`cmake`编写特定功能的模块，扩充`cmake`功能
-- （采用外部构建）额外的构建目录树，不用担心任何删除源码文件的风险
+- 外部构建，额外的构建目录树，不用担心任何删除源码文件的风险
 - 支持机器字节序以及其他硬件特性问题的测试
 - 在大部分平台下支持并行构建和自动生成文件依赖
 
@@ -54,7 +52,6 @@ IF(variable MATCHES regex)    # 符合正则
 # 循环
 WHILE(condition)
     COMMAND1(ARGS)
-    // ...
 ENDWHILE(condition)
 
 AUX_SOURCE_DIRECTORY(. SRC_LIST)

@@ -40,7 +40,7 @@ main:
 ```assembly
 .section .rodata
 OUTPUT:
-	.string "fuck you"
+	.string "helloworld"
 .text
 	.globl	main
 main:
@@ -65,7 +65,7 @@ main:
 .double
 .float
 .int
-.long		    # 4  字节整型
+.long		# 4  字节整型
 .octa       # 16 字节整型
 .quad       # 8  字节整型
 .short      # 2  字节整型
@@ -76,7 +76,7 @@ main:
 ```asm
 .section .rodata
 OUTPUT:
-	.string "fuck you"
+	.string "helloworld"
 PI:
 	.double 3.1415926			# 定义 double 类型
 SIZES:
@@ -255,7 +255,7 @@ test:
 
 - 找到 C 程序变量和寄存器之间的映射关系
 - 由于编译器常常会优化计算，所以可能有些 C 变量在汇编里已经没有对应的值了
-- 有时，编译器也会引入 C 代码中不存在的新值用于优化
+- 编译器也会引入 C 代码中不存在的新值用于优化
 - 编译器还常常试图将多个程序变量都对应到一个寄存器上，重复利用，以达到最小化寄存器使用率的目的
 
 #### do-while 循环

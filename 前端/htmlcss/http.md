@@ -2,7 +2,7 @@
 比如：html 格式文档由 text/html 标识，ASCII 文本由 text/plain 类型标识，gif ：image/gif ，jpeg 标识：image/jpeg
 
 3 URL 统一资源定位符：方案+服务器地址+ 某个具体资源
-如：http://www.joes-hardware.com/specials/saw-blade.gif
+http://www.joes-hardware.com/specials/saw-blade.gif
 
 4 http 方法
 

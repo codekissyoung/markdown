@@ -10,7 +10,6 @@ $ ab -n 10 -c 10 http://www.baidu.com/
 -S              Do not show confidence estimators and warnings.
 -g filename     Output collected data to gnuplot format file.
 -e filename     Output CSV file with percentages served
--h              Display usage information (this message)
 ```
 
 ## 参数
@@ -39,7 +38,6 @@ $ ab -n 10 -c 10 http://www.baidu.com/
 
 ```bash
 Benchmarking www.jb51.net (be patient)…..done
-
 Server Software:        Microsoft-IIS/6.0
 Server Hostname:        www.jb51.net
 Server Port:            80

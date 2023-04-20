@@ -10,7 +10,7 @@
 - **Workspace**：工作区
 - **Index / Stage**：暂存区域保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。 有时候也被称作索引，不过一般说法还是叫暂存区域。
 - **Repository**：仓库区（或本地仓库）
-- **Remote**：远程仓库,可能会有好多个,有些可以写,有些你只能读。对于远程库的工作包括:推送或拉取数据,分享各自的工作进展,包括添加远程库,移除废弃的远程库,管理各式远程库分支,定义是否跟踪这些分支
+- **Remote**：远程仓库,可能有好多个,有些可以写,有些只能读。对于远程库的工作包括:推送或拉取数据,添加远程库,移除废弃的远程库,管理各式远程库分支,定义是否跟踪这些分支
 
 ## git 配置
 
@@ -35,9 +35,9 @@ doc/**/*.pdf
 
 ## git 里怎样移除对一个文件的管理 并且不删除该文件
 
-1. 先`git rm -r --cached 文件`
-2. 在`.gitignore`中添加忽略信息
-3. 最后`gti commit -m '提交.gitignore'`
+1. `git rm -r --cached 文件`
+2. `.gitignore`中添加忽略信息
+3. `gti commit -m '提交.gitignore'`
 
 ## 新建代码库
 
@@ -109,8 +109,6 @@ http://blog.csdn.net/wangjia55/article/details/8802490
 
 http://www.oschina.net/translate/a-successful-git-branching-model
 
-查看附件,有模型的图
-
 ## git 获取远程分支
 
 通过`Git clone` 获取的远端 git 库，只包含了远端 git 库的当前工作分支。
@@ -122,8 +120,6 @@ $ git checkout -b 本地分支名 远程分支名
 
 其中，远程分支名为`git branch –r`所列出的分支名， 一般是诸如`origin/分支名`的样子
 如果本地分支名已经存在， 则不需要`-b`参数
-
-
 
 ## gitlab
 

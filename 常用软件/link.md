@@ -12,11 +12,10 @@
 
 [开源文档](https://github.com/chai2010/advanced-go-programming-book)
 
-https://github.com/overnote OverNote地址：
-https://github.com/ruyuejun 笔者的地址：
-
-详尽的Go领域笔记：Go语法、Go并发编程、GoWeb编程、Go微服务等
+https://github.com/overnote OverNote地址
+https://github.com/ruyuejun 笔者的地址
 [大前端](https://github.com/overnote/over-javascript)：包含JavaScript、Node.js、vue/react、微信开发、Flutter等大前端技术
+
 [数据结构与算法](https://github.com/overnote/over-algorithm)：以C/Go实现为主记录数据结构与算法的笔记
 [服务端架构](https://github.com/overnote/over-server)：分布式与微服务笔记，附Nginx、Mysql、Redis等常用服务端技术
 [Linux](https://github.com/overnote/over-linux)：计算机组成原理、操作系统、计算机网络、编译原理基础学科笔记
@@ -53,7 +52,7 @@ https://github.com/ruyuejun 笔者的地址：
 
 ### 配色工具
 
-- [your logos](https://mybrandnewlogo.com) 你提供产品的描述，该网站会自动生成 Logo 图案。
+- [your logos](https://mybrandnewlogo.com) 你提供产品的描述，该网站会自动生成 Logo 图案
 - [小影志](http://c7sky.com/)
 - [小影的工具箱](http://tool.c7sky.com/)
 - [千图网配色工具](http://www.58pic.com/peise/)
@@ -199,8 +198,8 @@ https://github.com/ruyuejun 笔者的地址：
 
 - <http://www.opengl-tutorial.org/>
 - <http://ogldev.atspace.co.uk/index.html>
-- <http://www.opengpu.org/> 图形学论坛
-- <http://www.chadvernon.com/blog/resources/managed-directx-2/loading-a-static-x-mesh/> 入门
-- <http://www.chadvernon.com/blog/resources/directx9/> 入门
-- <https://github.com/gameKnife/Softrenderer> 进阶
-- <https://github.com/gameknife/gkEngine> 进阶
+- <http://www.opengpu.org/> 
+- <http://www.chadvernon.com/blog/resources/managed-directx-2/loading-a-static-x-mesh/>
+- <http://www.chadvernon.com/blog/resources/directx9/> 
+- <https://github.com/gameKnife/Softrenderer> 
+- <https://github.com/gameknife/gkEngine> 
