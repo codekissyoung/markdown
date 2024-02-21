@@ -139,13 +139,13 @@ external_url 'http://gitlab.cky.com'
 gitlab_rails['smtp_enable'] = true 
 gitlab_rails['smtp_address'] = "smtp.qq.com"
 gitlab_rails['smtp_port'] = 465
-gitlab_rails['smtp_user_name'] = "1162097842@qq.com" # 发件人邮箱
+gitlab_rails['smtp_user_name'] = "xxxxxxxxx@qq.com" # 发件人邮箱
 gitlab_rails['smtp_password'] = "aaaaaaaabbbbbbccdd"   # 授权码
 gitlab_rails['smtp_domain'] = "qq.com"
 gitlab_rails['smtp_authentication'] = "login"
 gitlab_rails['smtp_enable_starttls_auto'] = true 
 gitlab_rails['smtp_tls'] = true
 gitlab_rails['gitlab_email_enabled'] = true 
-gitlab_rails['gitlab_email_from'] = '1162097842@qq.com'
+gitlab_rails['gitlab_email_from'] = 'xxxxxxxxx@qq.com'
 gitlab_rails['gitlab_email_display_name'] = 'gitlab.codekissyoung.com'
 ```
