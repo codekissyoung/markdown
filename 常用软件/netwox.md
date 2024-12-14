@@ -105,11 +105,7 @@ $ sudo apt-get install macchanger
 $ sudo netwox 75
 ```
 
-![image-20210323230202107](https://img.codekissyoung.com/2021/03/23/bc63b8e89b0e067ea42267323071a05a.png)
-
-
-
-
+![image-20210323230202107](http://img.codekissyoung.com/2021/03/23/bc63b8e89b0e067ea42267323071a05a.png)
 
 ```bash
 ################################### Devices ###################################
@@ -157,13 +153,9 @@ nu destination    /netmask         source              gateway           metric
 2  fe80::/64                       fe80::6d4:c4ff:feec:c080                   0
 ```
 
-
-
 ```bash
 $ netwox 2 # netwox 1 包含调试信息的输出
 ```
-
-
 
 自己划分子网
 
@@ -224,10 +216,3 @@ Hostname:    unresolved
 Hostnames:   unresolved
 Eth address: unresolved
 ```
-
-
-
-
-
-
-

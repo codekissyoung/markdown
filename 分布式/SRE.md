@@ -23,7 +23,7 @@
 
 有了硬件集群，这基础之上开发了一个分布式集群操作系统`Borg`，负责集群层面管理任务的编排工作。
 
-![](https://img.codekissyoung.com/2020/01/21/f0700dab99989223efa6d7b05f901785.png)
+![](http://img.codekissyoung.com/2020/01/21/f0700dab99989223efa6d7b05f901785.png)
 
 #### 数据存储
 
