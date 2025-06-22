@@ -1,15 +1,16 @@
 # 简历
 
-状态 ：在职 / 26岁 / 男
-联系 ：xxxxxxxxxx
-学历 ：2016届本科 / 中国地质大学(北京) / 地质学遥感方向
+状态 ：在职 / 29岁 / 男
+联系 ：18027655013
+学历 ：2016毕业 / 本科 / 中国地质大学(北京) / 地质学遥感方向
 博客 ：blog.codekissyoung.com
 代码 ：github.com/codekissyoung
+在职 ：深圳手回科技集团有限公司 研发部 架构平台组
 
 ## 技能清单
 
-熟悉语言：C / Go / PHP / JS
-数据存储：MySQL / Redis
+熟悉语言：Go / PHP / JS
+数据存储：类MySQL数据库 / Redis 
 熟悉框架：Codeigniter / Yii2 advanced / ThinkPHP
 
 ## 2019.12 - 至今 互联网保险平台 小雨伞 组件架构组 架构师
@@ -19,7 +20,7 @@
 项目地址 ：www.iqingyi.com
 项目介绍 ：分布式架构，前后端分离，可以简单划分为：接入层、服务层和数据层
 
-- 接入层：采用 Codeigniter 提供 API 接口、Workerman 作为 Websoket 消息推送服务，对接 IOS、Andriod、Web、Mobile Web 四个端。接入层不允许链接数据库、不保存用户会话和状态、只提供参数检查、安全防范、返回数据格式定制等功能。所以可以非常容易通过前置一个负载均衡器（比如 Nginx 反向代理）进行横向拓展，应对大流量访问。
+- 接入层：采用 PHP Codeigniter 框架提供 API 接口、Workerman 作为 Websoket 消息推送服务，对接 IOS、Andriod、Web、Mobile Web 四个端。接入层不允许链接数据库、不保存用户会话和状态、只提供参数检查、安全防范、返回数据格式定制等功能。所以可以非常容易通过前置一个负载均衡器（比如 Nginx 反向代理）进行横向拓展，应对大流量访问。
 
 - 服务层：使用 C、PHP 自研多个常驻内存的 Service 服务，可分别部署在不同节点。大部分 Service 之间相互独立无依赖关系。服务层 与 接入层 之间在 TCP 之上采用自定义的 二进制协议 进行通信。
 
