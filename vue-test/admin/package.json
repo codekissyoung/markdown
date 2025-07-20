@@ -1,0 +1,22 @@
+{
+  "name": "admin-system",
+  "version": "1.0.0",
+  "description": "Admin后台管理系统",
+  "main": "index.js",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "dev": "npm run serve"
+  },
+  "dependencies": {
+    "vue": "^2.6.14",
+    "vue-router": "^3.6.5",
+    "vuex": "^3.6.2",
+    "element-ui": "^2.15.14",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^5.0.8",
+    "vue-template-compiler": "^2.6.14"
+  }
+}
