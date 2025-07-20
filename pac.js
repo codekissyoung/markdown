@@ -4,7 +4,11 @@ var rules = [
             "xinhulu.com",
             "codekissyoung.com",
             "wolai.com",
-            "bilibili.com"
+            "bilibili.com",
+            "hdslb.com",
+            "bilivideo.com",
+            "bilivideo.cn",
+            "s1.hdslb.com"
         ],
         [
             "claude.ai",
@@ -54,7 +58,8 @@ var rules = [
             "weibo.com",
             "yahoo.cn",
             "youdao.com",
-            "zhongsou.com"
+            "zhongsou.com",
+            "bilivideo.cn"
         ],
         [
             "000webhost.com",
