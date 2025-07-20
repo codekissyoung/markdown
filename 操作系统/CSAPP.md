@@ -10,7 +10,7 @@
 
 当系统决定将控制权从当前进程转移到另一个进程时，就会进行“上下文切换”，即保存当前进程的“上下文”，然后加载别的进程的“上下文”。
 
-![进程切换](https://img.codekissyoung.com/2019/10/07/f0075e2ea7d34bba34ebd3ed9329c0af.png)
+![进程切换](http://img.codekissyoung.com/2019/10/07/f0075e2ea7d34bba34ebd3ed9329c0af.png)
 
 #### 虚拟内存
 
@@ -51,13 +51,13 @@
 
 C语言中，32位与64位下的数据类型占用的字节大小有些许不同，`long`与`*`类型在64位系统下，都是占用8个字节。
 
-![C数据类型字节数](https://img.codekissyoung.com/2019/10/08/82212f918857a6de30831cc387b73df8.png)
+![C数据类型字节数](http://img.codekissyoung.com/2019/10/08/82212f918857a6de30831cc387b73df8.png)
 
 #### 大端法与小端法
 
 数据 `0x01234567` 在内存中的存储情况:
 
-![大端法与小端法](https://img.codekissyoung.com/2019/10/08/6fb3e30df5e48f1a630fb213719d16bb.png)
+![大端法与小端法](http://img.codekissyoung.com/2019/10/08/6fb3e30df5e48f1a630fb213719d16bb.png)
 
 C语言中，需要关注字节顺序的三种情况:
 
@@ -65,13 +65,13 @@ C语言中，需要关注字节顺序的三种情况:
 
 - 第二个是在阅读反汇编语言时，比如
 
-![2019-10-08 13-48-33 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/6147f094ae67bf3195ade193aca81e66.png)
+![2019-10-08 13-48-33 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/6147f094ae67bf3195ade193aca81e66.png)
 
 - 第三个是在使用强制类型转换，显示`struct`和`union`中内容时
 
 `Sun`是大端机，所以同样的数据`12345`在内存中存储和其他机器不一样：
 
-![不同数据的内存大小端](https://img.codekissyoung.com/2019/10/08/ba16d93d234b1b38a370c5b6351d1d20.png)
+![不同数据的内存大小端](http://img.codekissyoung.com/2019/10/08/ba16d93d234b1b38a370c5b6351d1d20.png)
 
 对于字符串来说，则没有字节顺序的问题，因此，文本数据比二进制数据更具有平台独立性。
 
@@ -90,25 +90,25 @@ const char *s = "abcdef";       // 在任何系统的存储都是: 0x 61 62 63 6
 
 > 除 C 语言外，很少有语言支持无符号整数，它带来的漏洞比它带来的好处(多了一倍可用的正数)更多。因此，Java 被设计成只支持有符号整数，并且规定底层使用补码来实现。>> 被定义成算术右移，>>> 被定义成逻辑右移。
 
-![移位运算](https://img.codekissyoung.com/2019/10/07/13f248f2c8b17769da076ee9e028940d.png)
+![移位运算](http://img.codekissyoung.com/2019/10/07/13f248f2c8b17769da076ee9e028940d.png)
 
 #### 使用数学语言描述整数
 
-![2019-10-08 16-49-51 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/1e694751d4f7b3604818bcd3e7e33a71.png)
+![2019-10-08 16-49-51 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/1e694751d4f7b3604818bcd3e7e33a71.png)
 
 二进制转无符号数:
 
-![2019-10-08 16-58-11 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/c977490d29e8daf574e62ac14cb5a17f.png)
-![2019-10-08 16-55-04 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/3d31d9c33110a72b1b606c6c0afa54f4.png)
+![2019-10-08 16-58-11 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/c977490d29e8daf574e62ac14cb5a17f.png)
+![2019-10-08 16-55-04 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/3d31d9c33110a72b1b606c6c0afa54f4.png)
 
 二进制转补码(有符号数):
 
-![2019-10-08 16-58-51 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/be3155169cb30e71cc8f4098b8a74cb1.png)
-![2019-10-08 16-57-05 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/73c256853ccb4649ac0913dc6eb00445.png)
+![2019-10-08 16-58-51 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/be3155169cb30e71cc8f4098b8a74cb1.png)
+![2019-10-08 16-57-05 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/73c256853ccb4649ac0913dc6eb00445.png)
 
 由此我们可以计算出 N位 二进制可以表示的数的范围:
 
-![2019-10-08 17-02-46 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/bf0679dfdb810b7cf0ff786e4bd9c7d3.png)
+![2019-10-08 17-02-46 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/bf0679dfdb810b7cf0ff786e4bd9c7d3.png)
 
 #### 强制类型转换
 
@@ -116,7 +116,7 @@ const char *s = "abcdef";       // 在任何系统的存储都是: 0x 61 62 63 6
 
 有符号数(补码) 转 无符号数计算如下:
 
-![2019-10-08 17-13-53 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/fe8e1f9355d7df8ef0677f080fa98eef.png)
+![2019-10-08 17-13-53 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/fe8e1f9355d7df8ef0677f080fa98eef.png)
 
 ```c
 short int v = -12345;
@@ -126,17 +126,17 @@ printf( "v = %d, uv = %u" , v , uv );   // v = -12345  uv = 53191
 
 反过来，无符号数转有符号数（补码）计算如下:
 
-![2019-10-08 17-19-19 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/f1f3017e443030cfe270cb94552e1218.png)
+![2019-10-08 17-19-19 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/f1f3017e443030cfe270cb94552e1218.png)
 
 如果通过画图来形象化，表达这种计算，如下:
 
-![2019-10-08 17-20-20 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/ba976c516262e6b9aff60e8d1cc88289.png)
+![2019-10-08 17-20-20 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/ba976c516262e6b9aff60e8d1cc88289.png)
 
 C语言中，执行一个运算时，如果操作数既有`无符号数`，又包含`有符号数(补码)`，那么通常是(隐式地)将 `有符号数(补码)` 解释为 `无符号数` 然后进行计算。如果算术操作，因为无符号数 与 有符号数的 底层 二进制计算逻辑都是一样的，所以不会有问题。
 
 **但是，如果是 < 和 > 这样的比较操作，则会引发下面问题:**
 
-![可能出现问题的比较](https://img.codekissyoung.com/2019/10/07/9fb9102bb8cbee56588919fa13b6c4e6.png)
+![可能出现问题的比较](http://img.codekissyoung.com/2019/10/07/9fb9102bb8cbee56588919fa13b6c4e6.png)
 
 打`*`的求值结果是错误的，原因就是：`有符号数` 隐式地解释成了`无符号数(补码)`,所以负数被解释成了一个非常大的正数，所以`<`操作得出了一个 对人类来说 ，是错误的结果。
 
@@ -214,19 +214,19 @@ int y = sx;
 
 无符号数的加法:
 
-![无符号数的加法](https://img.codekissyoung.com/2019/10/08/b14e8b29394cc46e27289a8a03f77d6e.png)
+![无符号数的加法](http://img.codekissyoung.com/2019/10/08/b14e8b29394cc46e27289a8a03f77d6e.png)
 
 有符号数(补码)加法:
 
-![补码加法](https://img.codekissyoung.com/2019/10/08/eba404eab652fb4926a1acbb3fc9b742.png)
+![补码加法](http://img.codekissyoung.com/2019/10/08/eba404eab652fb4926a1acbb3fc9b742.png)
 
 无符号数求相反数:
 
-![无符号数求反](https://img.codekissyoung.com/2019/10/08/5762da80e58625e64da0ae330373a12a.png)
+![无符号数求反](http://img.codekissyoung.com/2019/10/08/5762da80e58625e64da0ae330373a12a.png)
 
 有符号数(补码)的相反数:
 
-![2019-10-08 19-39-38 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/bdc73a0e29e57ffc917e9eac197bca10.png)
+![2019-10-08 19-39-38 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/bdc73a0e29e57ffc917e9eac197bca10.png)
 
 无符号数与有符号数的相反数求法的底层逻辑都是一样的，都可以使用`取反再加1`这个操作，取得二进制数，然后再以有符号数或补码解释。 
 
@@ -257,25 +257,25 @@ int tsub_ok( x, y ){
 }
 ```
 
-![2019-10-08 19-36-24 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/928832d5a300fe6d2604241eec3b28e4.png)
+![2019-10-08 19-36-24 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/928832d5a300fe6d2604241eec3b28e4.png)
 
 在补码编码下，要快速对一个数进行求反操作，可以使用这个技巧 `所有位取反再加1`:
 
-![2019-10-08 19-46-25 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/be36ae09a628248b155a020895aec59d.png)
+![2019-10-08 19-46-25 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/be36ae09a628248b155a020895aec59d.png)
 
 通过这个技巧，在已知一个自然数的补码的情况下，比如 `5`的补码编码为`0101`，可以很快求出该数的相反数 `-5` 的补码为 `1011`。
 
 无符号数乘法:
 
-![2019-10-08 23-17-13 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/5c77ab884a1f65a9094002735dcd5cd3.png)
+![2019-10-08 23-17-13 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/5c77ab884a1f65a9094002735dcd5cd3.png)
 
 有符号数(补码)乘法:
 
-![2019-10-08 23-20-47 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/864cb517b0d0213527ae39e4afd049c5.png)
+![2019-10-08 23-20-47 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/864cb517b0d0213527ae39e4afd049c5.png)
 
 举例说明两种乘法的结果: 3位无符号和补码的乘法示例，虽然完整的乘积的位级表示可能会不同，但是截取到3位后，位级表示是相同的
 
-![2019-10-08 23-27-59 的屏幕截图.png](https://img.codekissyoung.com/2019/10/08/94e462253533234f535c5398d4bc27c7.png)
+![2019-10-08 23-27-59 的屏幕截图.png](http://img.codekissyoung.com/2019/10/08/94e462253533234f535c5398d4bc27c7.png)
 
 #### 算术运算的溢出
 
@@ -331,11 +331,11 @@ int tmult_ok( int x, int y )
 
 它最大缺点在于精度有限，会带来一些计算错误，比如`(3.14 + 1e20) - 1e20`的计算结果是`0.0`,而`3.14 + (1e20 - 1e20)`的结果是`3.14`,正是由于精度问题，`1e20`是一个非常大的数，加上`3.14`也没有可以表示它们的位。
 
-![2019-10-09 12-12-27 的屏幕截图.png](https://img.codekissyoung.com/2019/10/09/7e5d546d09120a0bd6c258091d971ef2.png)
+![2019-10-09 12-12-27 的屏幕截图.png](http://img.codekissyoung.com/2019/10/09/7e5d546d09120a0bd6c258091d971ef2.png)
 
 #### 小数转换成浮点数
 
-![2019-10-11 13-09-05 的屏幕截图.png](https://img.codekissyoung.com/2019/10/11/f3b9853ae5a05086b75235d39f800c87.png)
+![2019-10-11 13-09-05 的屏幕截图.png](http://img.codekissyoung.com/2019/10/11/f3b9853ae5a05086b75235d39f800c87.png)
 
 ## 3. 机器代码
 
@@ -345,7 +345,7 @@ int tmult_ok( int x, int y )
 (gdb) x/14xb multstore          # 打印 函数 multstore 地址处的 14 字节的内存
 ```
 
-![2019-10-11 16-51-38 的屏幕截图.png](https://img.codekissyoung.com/2019/10/11/0e8d846ba70b7e5e764fe9e36c11e81b.png)
+![2019-10-11 16-51-38 的屏幕截图.png](http://img.codekissyoung.com/2019/10/11/0e8d846ba70b7e5e764fe9e36c11e81b.png)
 
 
 
@@ -380,9 +380,9 @@ void echo()
 
 如下图，当`buf`被填入过长的字符串时，会依次破坏`echo`、`返回地址`、调用者的栈。导致函数返回时，`PC`程序计数器会指向一个未知的返回地址，就发生了缓冲区溢出，如果有人利用这个将PC指向一段攻击系统的指令，就是缓冲区溢出攻击。
 
-![2019-10-11 20-36-14 的屏幕截图.png](https://img.codekissyoung.com/2019/10/11/bbee77f89c20cc15e2ede4beea8e6c34.png)
+![2019-10-11 20-36-14 的屏幕截图.png](http://img.codekissyoung.com/2019/10/11/bbee77f89c20cc15e2ede4beea8e6c34.png)
 
-![2019-10-11 20-45-31 的屏幕截图.png](https://img.codekissyoung.com/2019/10/11/e564ef0e386b3af0095aced0548260da.png)
+![2019-10-11 20-45-31 的屏幕截图.png](http://img.codekissyoung.com/2019/10/11/e564ef0e386b3af0095aced0548260da.png)
 
 #### 对抗缓冲区溢出攻击
 
@@ -401,7 +401,7 @@ int main(){
 
 最近的GCC版本中，加入了一种 栈保护机制 , 原理是： 在局部缓冲区与栈状态之间存储一个 `金丝雀值`,它是程序每次运行随机产生的，所以攻击者不知道它的值，函数调用后，在返回之前 使用代码 检查这个`金丝雀值`是否被改变，如果被改变了，则终止程序。 
 
-![2019-10-11 20-57-44 的屏幕截图.png](https://img.codekissyoung.com/2019/10/11/a884150b61bc65484e5d226d2c2e7093.png)
+![2019-10-11 20-57-44 的屏幕截图.png](http://img.codekissyoung.com/2019/10/11/a884150b61bc65484e5d226d2c2e7093.png)
 
 ```asm
 echo:
@@ -430,7 +430,7 @@ echo:
 
 **限制可执行代码区域**
 
-![2019-10-11 21-18-07 的屏幕截图.png](https://img.codekissyoung.com/2019/10/11/712cb4f11718146d6266b095f60286cc.png)
+![2019-10-11 21-18-07 的屏幕截图.png](http://img.codekissyoung.com/2019/10/11/712cb4f11718146d6266b095f60286cc.png)
 
 ## 4. 指令体系结构
 
@@ -445,7 +445,7 @@ echo:
 
 指令执行过程示意图，沿着顺时针循环这个过程:
 
-![2019-10-11 22-31-37 的屏幕截图.png](https://img.codekissyoung.com/2019/10/11/5755a258ffc254d05af08e1c0948f3cd.png)
+![2019-10-11 22-31-37 的屏幕截图.png](http://img.codekissyoung.com/2019/10/11/5755a258ffc254d05af08e1c0948f3cd.png)
 
 ## 5. 优化程序性能
 
@@ -455,10 +455,10 @@ echo:
 
 `.o`文件格式:
 
-![2019-10-12 10-57-52 的屏幕截图.png](https://img.codekissyoung.com/2019/10/12/1de28fbbde589dee0b7ecd67b612458e.png)
+![2019-10-12 10-57-52 的屏幕截图.png](http://img.codekissyoung.com/2019/10/12/1de28fbbde589dee0b7ecd67b612458e.png)
 
 `ELF`可执行文件格式:
-![2019-10-12 11-48-30 的屏幕截图.png](https://img.codekissyoung.com/2019/10/12/8e3e46b20879713e8be19e16aeae06dc.png)
+![2019-10-12 11-48-30 的屏幕截图.png](http://img.codekissyoung.com/2019/10/12/8e3e46b20879713e8be19e16aeae06dc.png)
 
 ## 8. 异常控制流
 
@@ -466,7 +466,7 @@ echo:
 
 虚拟内存是硬件异常、硬件地址翻译、主存、磁盘文件和内核软件的完美交互，它为每个进程提供了一个巨大的、一致的和私有的地址空间。
 
-![虚拟寻址](https://img.codekissyoung.com/2019/10/12/9a7479e9d6c9b7a2a49b6e138d216810.png)
+![虚拟寻址](http://img.codekissyoung.com/2019/10/12/9a7479e9d6c9b7a2a49b6e138d216810.png)
 
 **MMU 内存管理单元**: CPU上的专用芯片，利用存放在主存上的查询表来动态翻译虚拟地址，该表的内容由操作系统管理。
 
@@ -478,19 +478,19 @@ echo:
 
 操作系统为每个进程，提供一个独立的页表，因而也就是一个独立的虚拟地址空间。
 
-![2019-10-12 18-30-39 的屏幕截图.png](https://img.codekissyoung.com/2019/10/12/a40a7c8496583c7288ffa3b9b38a1676.png)
+![2019-10-12 18-30-39 的屏幕截图.png](http://img.codekissyoung.com/2019/10/12/a40a7c8496583c7288ffa3b9b38a1676.png)
 
 #### 虚拟地址 与 物理地址 的翻译 
 
-![2019-10-12 19-16-59 的屏幕截图.png](https://img.codekissyoung.com/2019/10/12/c951c64ccccf2dc3a34cd9eb6ef8c977.png)
+![2019-10-12 19-16-59 的屏幕截图.png](http://img.codekissyoung.com/2019/10/12/c951c64ccccf2dc3a34cd9eb6ef8c977.png)
 
 页面命中时，完全由硬件实现所有步骤；如果缺页，则需要硬件和操作系统内核协作完成:
 
-![2019-10-12 19-36-59 的屏幕截图.png](https://img.codekissyoung.com/2019/10/12/4dc1ea52397e57868407cd3ff7e532be.png)
+![2019-10-12 19-36-59 的屏幕截图.png](http://img.codekissyoung.com/2019/10/12/4dc1ea52397e57868407cd3ff7e532be.png)
 
 虚拟内存 结合 高速缓存的实现如下，地址翻译发生在高速缓存查找之前:
 
-![2019-10-12 19-43-58 的屏幕截图.png](https://img.codekissyoung.com/2019/10/12/7d84cce6d37329002c9da8b9bdc892de.png)
+![2019-10-12 19-43-58 的屏幕截图.png](http://img.codekissyoung.com/2019/10/12/7d84cce6d37329002c9da8b9bdc892de.png)
 
 #### 程序直接使用存储器的缺点
 

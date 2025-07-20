@@ -35,7 +35,7 @@ key               | Value                      |
 
 `TiKV`实现了`Raft`协议，将数据复制到多台机器，以防单机失效。数据的写入是通过 `Raft` 这一层的接口写入，而不是直接写 `RocksDB`。
 
-![](https://img.codekissyoung.com/2020/01/07/2ee7e4f2d47669f4e1355bdd96f86a94.png)
+![](http://img.codekissyoung.com/2020/01/07/2ee7e4f2d47669f4e1355bdd96f86a94.png)
 
 ### Region
 
@@ -55,7 +55,7 @@ key               | Value                      |
 
 ### 整体架构
 
-![](https://img.codekissyoung.com/2020/01/07/ad20957a40a455425008621758b80ce6.png)
+![](http://img.codekissyoung.com/2020/01/07/ad20957a40a455425008621758b80ce6.png)
 
 说明：
 
@@ -170,7 +170,7 @@ Value: null
 
 ### 整体架构
 
-![](https://img.codekissyoung.com/2020/01/07/b39d265048f01b4bc6cbcf6c3cfab96e.png)
+![](http://img.codekissyoung.com/2020/01/07/b39d265048f01b4bc6cbcf6c3cfab96e.png)
 
 `TiDB Servers` 这一层，这一层的节点都是无状态的节点，本身并不存储数据，节点之间完全对等。负责处理用户请求，执行 `SQL` 运算逻辑。
 
@@ -200,11 +200,11 @@ Select count(*) from user where name="TiDB";
 - 将聚合函数、GroupBy 也下推到存储节点，进行预聚合，每个节点只需要返回一个 Count 值即可
 - 由 tidb-server 将 Count 值 Sum 起来
 
-![](https://img.codekissyoung.com/2020/01/07/ceac02cef174ec94a250c892237ec485.png)
+![](http://img.codekissyoung.com/2020/01/07/ceac02cef174ec94a250c892237ec485.png)
 
 ### SQL层架构
 
-![](https://img.codekissyoung.com/2020/01/07/fd9d335ac125228ebcc37f7002474871.png)
+![](http://img.codekissyoung.com/2020/01/07/fd9d335ac125228ebcc37f7002474871.png)
 
 用户的 SQL 请求会直接或者通过 Load Balancer 发送到 tidb-server，tidb-server 会解析 MySQL Protocol Packet，获取请求内容，然后做语法解析、查询计划制定和优化、执行查询计划获取和处理数据。数据全部存储在 TiKV 集群中，所以在这个过程中 tidb-server 需要和 tikv-server 交互，获取数据。最后 tidb-server 需要将查询结果返回给用户。
 

@@ -1328,7 +1328,7 @@ public:
 };
 ```
 
-![虚函数的原理](https://img.codekissyoung.com/2019/05/27/96bd6555c0b9fd246b3112e69111e76b.png)
+![虚函数的原理](http://img.codekissyoung.com/2019/05/27/96bd6555c0b9fd246b3112e69111e76b.png)
 
 PS: 基类中使用`virtual`声明方法，则该方法在所有派生类中的都是`virtual`的
 PS: 如果要在派生类中重新定义基类的方法，通常应将基类方法声明为虚的。这样，程序将根据实际的对象类型，而不是 引用 或 指针的类型来选择方法版本
@@ -1428,7 +1428,7 @@ Child &Child::operator=( const Child &cd ){
 
 成员函数属性表:
 
-![成员函数属性表](https://img.codekissyoung.com/2019/05/27/856803e250774c1b9b268110ed42b1c2.png)
+![成员函数属性表](http://img.codekissyoung.com/2019/05/27/856803e250774c1b9b268110ed42b1c2.png)
 
 可以将派生类对象的地址赋值给基类指针么（或派生类对象绑定到基类引用）？反过来呢？
 
@@ -1501,7 +1501,7 @@ PS: 通常应该使用对象作为数据成员的方式来实现`has-a`关系，
 
 `public` `protected` 与 `private`继承：
 
-![WX20190528-145747.png](https://img.codekissyoung.com/2019/05/28/06b36768cc48886f8f5a069492ab827c.png)
+![WX20190528-145747.png](http://img.codekissyoung.com/2019/05/28/06b36768cc48886f8f5a069492ab827c.png)
 
 ### 多继承 MI
 
@@ -1706,7 +1706,7 @@ public:
 
 嵌套类作用域:
 
-![嵌套类作用域](https://img.codekissyoung.com/2019/05/28/26004897aecc93ff566531246a081638.png)
+![嵌套类作用域](http://img.codekissyoung.com/2019/05/28/26004897aecc93ff566531246a081638.png)
 
 ```c++
 class Queue{
@@ -1795,7 +1795,7 @@ if( ps = dynamic_cast<Superb *>(pm) )
     ps -> speak();
 ```
 
-![Screenshot from 2019-05-29 00-01-09.png](https://img.codekissyoung.com/2019/05/29/6183fa4fd5976159441203fe5a2675e2.png)
+![Screenshot from 2019-05-29 00-01-09.png](http://img.codekissyoung.com/2019/05/29/6183fa4fd5976159441203fe5a2675e2.png)
 
 ```c++
 if( typeid(*pg) == typeid(Magnificent) )
@@ -1833,7 +1833,7 @@ Pond *pp = static_cast<Pond *>(&blow);  // 错误
 
 `string`类的构造函数：
 
-![WX20190529-115342.png](https://img.codekissyoung.com/2019/05/29/2442c8de4b0ced1829f82cdd0f4a7a21.png)
+![WX20190529-115342.png](http://img.codekissyoung.com/2019/05/29/2442c8de4b0ced1829f82cdd0f4a7a21.png)
 
 知道有哪些输入方式可用，对于`C-style`字符串:
 
@@ -1892,7 +1892,7 @@ void remodel( string &str )
 }
 ```
 
-![WX20190529-140855.png](https://img.codekissyoung.com/2019/05/29/3e024f4c80abdaca13a65973962ffc1c.png)
+![WX20190529-140855.png](http://img.codekissyoung.com/2019/05/29/3e024f4c80abdaca13a65973962ffc1c.png)
 
 使用`shared_ptr`与`unique_ptr`:
 
@@ -2054,7 +2054,7 @@ iterator find_ll( iterator head, iterator end, const double &val ){
 
 五种迭代器的类型以及能执行的操作：
 
-![WX20190529-162231.png](https://img.codekissyoung.com/2019/05/29/73431874bc80311bc8eb62069bddecfd.png)
+![WX20190529-162231.png](http://img.codekissyoung.com/2019/05/29/73431874bc80311bc8eb62069bddecfd.png)
 
 ### 函数对象
 

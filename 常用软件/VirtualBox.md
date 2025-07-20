@@ -156,17 +156,17 @@ Paravirtualized network adapter (virtio-net)
 
 新增一个NAT网络，然后设置各虚拟机网络类型为该网络。
 
-![image-20210217190522738](https://img.codekissyoung.com/2021/02/17/76411345df105f682a1d1136e2e91158.png)
+![image-20210217190522738](http://img.codekissyoung.com/2021/02/17/76411345df105f682a1d1136e2e91158.png)
 
-![image-20210217190559801](https://img.codekissyoung.com/2021/02/17/85558472a420ed6dfce32dc28be2f9ee.png)
+![image-20210217190559801](http://img.codekissyoung.com/2021/02/17/85558472a420ed6dfce32dc28be2f9ee.png)
 
 
 
 ### 配置双网卡
 
-![image-20210217205556823](https://img.codekissyoung.com/2021/02/17/43da9732e560b1a590d6b3cf6d307741.png)
+![image-20210217205556823](http://img.codekissyoung.com/2021/02/17/43da9732e560b1a590d6b3cf6d307741.png)
 
-![image-20210217205608018](https://img.codekissyoung.com/2021/02/17/9c559afa983fb98fce1b14078e078b5c.png)
+![image-20210217205608018](http://img.codekissyoung.com/2021/02/17/9c559afa983fb98fce1b14078e078b5c.png)
 
 ```bash
 network:

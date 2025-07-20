@@ -130,6 +130,6 @@ link@phpServer:~/t1$ tree -L 1
 └── webpack.mix.js
 ```
 
-![](https://img.codekissyoung.com/2020/01/15/13619d72fb58e1e71168e15d0841b4ee.png)
+![](http://img.codekissyoung.com/2020/01/15/13619d72fb58e1e71168e15d0841b4ee.png)
 
 访问`http://t1.cky.com`看到上图，则安装成功!

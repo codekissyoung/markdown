@@ -71,7 +71,7 @@ ld systemcall.o -o systemcall
 $ kdbg systemcall
 ```
 
-![](https://img.codekissyoung.com/2020/04/05/fbc711906978630b67c14ded54a052d7.png)
+![](http://img.codekissyoung.com/2020/04/05/fbc711906978630b67c14ded54a052d7.png)
 
 ## 基础知识
 
@@ -94,11 +94,11 @@ section .data
 
 ### 栈
 
-![](https://img.codekissyoung.com/2020/04/05/7f81080a90bfece032343450bc7d0de6.png)
+![](http://img.codekissyoung.com/2020/04/05/7f81080a90bfece032343450bc7d0de6.png)
 
 ### 软中断
 
-![](https://img.codekissyoung.com/2020/04/05/d7f8057f914aa9408f4ff4028dcadfb8.png)
+![](http://img.codekissyoung.com/2020/04/05/d7f8057f914aa9408f4ff4028dcadfb8.png)
 
 `80H`中断正是进入`Linux`内核的大门，在进入之前，首先会将下一条指令的地址自动`PUSH`到栈里，然后陷入内核调度程序，调度程序执行完，只需要`IRET`就可以恢复用户进程的执行。一个完整的中断调用过程如下：
 
@@ -298,7 +298,7 @@ FUCK YOU BITCH
 
 ## 使用 标准 C 函数库的汇编程序
 
-![](https://img.codekissyoung.com/2020/04/07/cc4a5a65bac2693390ecc8e43cccd6e1.png)
+![](http://img.codekissyoung.com/2020/04/07/cc4a5a65bac2693390ecc8e43cccd6e1.png)
 
 C 函数调用公约：
 

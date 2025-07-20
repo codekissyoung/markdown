@@ -45,7 +45,7 @@ masm/               # 项目目录
 
 在 CPU 内部，这个拼凑就是通过地址加法器实现的：
 
-![2019-09-10 18-16-42 的屏幕截图.png](https://img.codekissyoung.com/2019/09/10/c421eed8fac926efc6acdcc198ee1bf5.png)
+![2019-09-10 18-16-42 的屏幕截图.png](http://img.codekissyoung.com/2019/09/10/c421eed8fac926efc6acdcc198ee1bf5.png)
 
 ```asm
 mov ax, bl      ; 错误, 操作的位数要一致,ax16位，bl是8位
@@ -66,15 +66,15 @@ jmp ax          ; IP = ax
 
 任意时刻，CPU 都将`CS:IP`指向的内存地址处的二进制信息，当作指令来执行。当前`CS:IP`指向`2000:0000`。
 
-![2019-09-10 18-26-00 的屏幕截图.png](https://img.codekissyoung.com/2019/09/10/8f4a260a2621506e114da563b8f7deb3.png)
+![2019-09-10 18-26-00 的屏幕截图.png](http://img.codekissyoung.com/2019/09/10/8f4a260a2621506e114da563b8f7deb3.png)
 
 读取一条完整指令后，`IP`**自动增加**指令所占用的字节数，此时`CS:IP`指向`2000:0003`,即下一条指令开始位置。
 
-![2019-09-10 18-27-36 的屏幕截图.png](https://img.codekissyoung.com/2019/09/10/0430b60fc5202d4eb08909806b68197d.png)
+![2019-09-10 18-27-36 的屏幕截图.png](http://img.codekissyoung.com/2019/09/10/0430b60fc5202d4eb08909806b68197d.png)
 
 执行控制器将一条指令执行完毕后，`CPU`继续读取`CS:IP`指向的下一条指令，依次执行完所有指令。
 
-![2019-09-10 19-51-29 的屏幕截图.png](https://img.codekissyoung.com/2019/09/10/51a19b312400ef6ba0488177fadaf840.png)
+![2019-09-10 19-51-29 的屏幕截图.png](http://img.codekissyoung.com/2019/09/10/51a19b312400ef6ba0488177fadaf840.png)
 
 ## 内存访问
 
@@ -154,7 +154,7 @@ C:\> debug test.exe        # 调试，单步执行
 
 为了观察程序运行，我们使用`DEBUG`工具将程序载入内存，设置`CS:IP`指向程序的入口，但`DEBUG`又不放弃对`CPU`的控制，这样我们就可以用`DEBUG`的相关命令来单步执行程序，查看每一条指令执行的结果。
 
-![](https://img.codekissyoung.com/2020/03/22/eae01c3d7b30c2d4b2b73df2c6186ee3.png)
+![](http://img.codekissyoung.com/2020/03/22/eae01c3d7b30c2d4b2b73df2c6186ee3.png)
 
 然后一直按`-t`，单步调试，观察寄存器的变化。
 
@@ -654,7 +654,7 @@ CPU 检测到中断后，控制权转移到中断向量表`0:0003-0:0006`记录�
 
 执行`debug abc.exe`时，真正在内存运行的程式并不是那个被载入的程式，而是 debug 本身，debug 只是列出该程式被载入时的初始形况：
 
-![](https://img.codekissyoung.com/2019/09/22/ad4d922aba2373b2b19ce04f9aab60d2.jpg)
+![](http://img.codekissyoung.com/2019/09/22/ad4d922aba2373b2b19ce04f9aab60d2.jpg)
 
 按下 `-t` 时，debug 把 `cs:ip` 设置为你的程序的入口的值，同时设置`IF = 1`，修改中断表`0:0003-0:0006`中的值，指向`debug`程序自身。
 

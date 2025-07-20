@@ -4,7 +4,7 @@
 
 linux 就是一个单内核设计。
 
-![image-20210320185347876](https://img.codekissyoung.com/2021/03/20/7080563e0710082abfe7430d174df0d3.png)
+![image-20210320185347876](http://img.codekissyoung.com/2021/03/20/7080563e0710082abfe7430d174df0d3.png)
 
 ### 进程管理
 

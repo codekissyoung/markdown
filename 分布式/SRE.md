@@ -29,7 +29,7 @@
 
 需要有一套存储系统向用户提供一套简单易用、可靠的集群存储服务。
 
-![](https://img.codekissyoung.com/2020/01/21/d767341ed7d4d74ac3b2d277d621ebc2.png)
+![](http://img.codekissyoung.com/2020/01/21/d767341ed7d4d74ac3b2d277d621ebc2.png)
 
 `D`是底层存储服务，`Colossus`（`GFS`改进版）建立了一个覆盖整个集群的文件系统。提供操作接口，同时还支持复制与加密功能。
 `Bigtable`是一个`NoSQL`数据库，是一个松散存储的、分布式的、有顺序的、持久化的多维映射表。以`RowKey + ColummnKey + Timestamp`作为索引，值是按原始字节存储的。支持“最终一致”的跨数据中心复制模型。

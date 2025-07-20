@@ -94,7 +94,7 @@ int dup2(int oldfd, int newfd); // new fd; -1 on error
 int dup3(int oldfd, int newfd, int flags); // new fd; -1 on error
 ```
 
-![](https://img.codekissyoung.com/2019/10/28/272aa9e92430e17189092d3ddf4626e5.png)
+![](http://img.codekissyoung.com/2019/10/28/272aa9e92430e17189092d3ddf4626e5.png)
 
 现象 1:进程 A 中`fd=1`和`fd=20`指向同一个文件打开表记录，这种情况可能是`dup` `dup2` `fcntl`调用后生成的。
 
@@ -155,7 +155,7 @@ pid_t getpid(void);     // return pid of caller
 pid_t getppid(void);    // get pid of caller's parent
 ```
 
-![](https://img.codekissyoung.com/2019/10/28/9f6db6f1d7e327e3a0e987c4c6386c08.png)
+![](http://img.codekissyoung.com/2019/10/28/9f6db6f1d7e327e3a0e987c4c6386c08.png)
 
 #### 进程环境
 
@@ -312,7 +312,7 @@ int setgroups(size_t gidsetsize, gid_t *grouplist);
 int initgroups(char *user, gid_t group);
 ```
 
-![](https://img.codekissyoung.com/2019/10/28/9b622d885c648577b8d5544b2be1f757.png)
+![](http://img.codekissyoung.com/2019/10/28/9b622d885c648577b8d5544b2be1f757.png)
 
 ## 10. 时间
 
@@ -374,8 +374,8 @@ long pathconf(char *pathname, int name);
 long fpathconf(int fd, int name);
 ```
 
-![](https://img.codekissyoung.com/2019/10/28/d51dda51f64a7dc611ee6582fcfa6d6f.png)
-![](https://img.codekissyoung.com/2019/10/28/310d1823eaad220c69b0c1d5cadebff3.png)
+![](http://img.codekissyoung.com/2019/10/28/d51dda51f64a7dc611ee6582fcfa6d6f.png)
+![](http://img.codekissyoung.com/2019/10/28/310d1823eaad220c69b0c1d5cadebff3.png)
 
 ## 12. 系统和进程信息
 
@@ -408,7 +408,7 @@ int fsync( int fd ); // 即写入数据，也写入元数据到磁盘
 void sync(void);    // 强制刷新进程中所有内核缓冲区的数据到磁盘
 ```
 
-![](https://img.codekissyoung.com/2019/10/29/27830aba0f03d75d60c5018623bc36ea.png)
+![](http://img.codekissyoung.com/2019/10/29/27830aba0f03d75d60c5018623bc36ea.png)
 
 ```c
 int fileno(FILE *stream);           // 给定文件流，返回文件描述符
@@ -419,12 +419,12 @@ FILE *fdopen(int fd, char *mode);   // 将文件描述符 转化成 文件流
 
 ### EXT2 文件系统
 
-![](https://img.codekissyoung.com/2019/10/29/4786f2264e08eb70dd97531c1f66ecc5.png)
-![](https://img.codekissyoung.com/2019/10/29/8d134537711bca62c70e3d2c80bfb4c6.png)
+![](http://img.codekissyoung.com/2019/10/29/4786f2264e08eb70dd97531c1f66ecc5.png)
+![](http://img.codekissyoung.com/2019/10/29/8d134537711bca62c70e3d2c80bfb4c6.png)
 
 ### 虚拟文件系统
 
-![](https://img.codekissyoung.com/2019/10/29/b156ab33135408cc6e1764ce3a309baa.png)
+![](http://img.codekissyoung.com/2019/10/29/b156ab33135408cc6e1764ce3a309baa.png)
 
 `VFS`系统为上层程序定义了一套通用接口（`open()`、`read()`、`write()`等），同时底层文件系统都会提供`VFS`接口的实现。除了个别文件系统，比如`FAT`不支持`symlink()`操作，会告知上层`VFS`，`VFS`再去通知应用程序。
 
@@ -550,17 +550,17 @@ size_t flistxattr(int fd, char *list, size_t size);
 
 ## 17. 访问控制列表
 
-![](https://img.codekissyoung.com/2019/10/29/635eb935ba9eccb53a9df56ba1549ec7.png)
+![](http://img.codekissyoung.com/2019/10/29/635eb935ba9eccb53a9df56ba1549ec7.png)
 
 ## 18. 目录和链接
 
 ### 硬链接
 
-![](https://img.codekissyoung.com/2019/10/29/9399b45156a3927d75815acbd97ccaad.png)
+![](http://img.codekissyoung.com/2019/10/29/9399b45156a3927d75815acbd97ccaad.png)
 
 ### 软链接
 
-![](https://img.codekissyoung.com/2019/10/29/83ef53acc4fa12c53c64a6a4e57b0b7a.png)
+![](http://img.codekissyoung.com/2019/10/29/83ef53acc4fa12c53c64a6a4e57b0b7a.png)
 
 ```c
 int link(char *existpath,  char *newpath );
@@ -647,7 +647,7 @@ char *basename(char *pathname); // 获取路径里最后的文件名
 
 Linux 提供`inotify`机制用于监控文件事件。
 
-![](https://img.codekissyoung.com/2019/10/29/375e644ee54fd9e226c1e180c3f1d29e.png)
+![](http://img.codekissyoung.com/2019/10/29/375e644ee54fd9e226c1e180c3f1d29e.png)
 
 ```c
 int inotify_init(void);
@@ -655,8 +655,8 @@ int inotify_add_watch(int fd,char *pathname, uint32_t mask);
 int inotify_rm_watch(int fd,uint32_t wd);
 ```
 
-![](https://img.codekissyoung.com/2019/10/29/8417c3fb2723c4136cedf6ca8ea9ca40.png)
-![](https://img.codekissyoung.com/2019/10/29/4bd912608b08dcf4830b354289408f05.png)
+![](http://img.codekissyoung.com/2019/10/29/8417c3fb2723c4136cedf6ca8ea9ca40.png)
+![](http://img.codekissyoung.com/2019/10/29/4bd912608b08dcf4830b354289408f05.png)
 
 ## 20. 信号: 基本概念
 
@@ -665,8 +665,8 @@ int inotify_rm_watch(int fd,uint32_t wd);
 - 发送信号情况: Ctrl + C 、子进程终止、进程设定的定时器到期、进程尝试访问无效的内存地址
 - 收到信号的进程采取: 1. 忽略信号 2. 被信号杀死 3. 挂起，等待新信号唤醒
 
-![](https://img.codekissyoung.com/2019/10/29/c12318f057d8a9ca502dca73d33b40c2.png)
-![](https://img.codekissyoung.com/2019/10/29/abd18fc9500b82268abe01b891d7f362.png)
+![](http://img.codekissyoung.com/2019/10/29/c12318f057d8a9ca502dca73d33b40c2.png)
+![](http://img.codekissyoung.com/2019/10/29/abd18fc9500b82268abe01b891d7f362.png)
 
 ### signal 信号机制
 
@@ -685,7 +685,7 @@ char *strsignal(int sig);           // 获取信号的字符串说明
 void psignal(int sig, char *msg);   // 向stderr发送错误报告
 ```
 
-![](https://img.codekissyoung.com/2019/10/29/590b69d73656fa1bf3e6760109a2825e.png)
+![](http://img.codekissyoung.com/2019/10/29/590b69d73656fa1bf3e6760109a2825e.png)
 
 信号集,表示一组不同的信号：
 
@@ -749,13 +749,13 @@ $ ulimit -c unlimited       # 开启 core 文件
 
 `SIGKILL`和`SIGSTOP`被设计为默认行为，无法用`signal`和`sigaction`修改，无法阻塞。这样我们可以通过这两个信号来杀死一个失控的进程。
 
-![](https://img.codekissyoung.com/2019/10/29/047bfee3c0db42b8df2bf5e34d7db7c6.png)
+![](http://img.codekissyoung.com/2019/10/29/047bfee3c0db42b8df2bf5e34d7db7c6.png)
 
 ## 23. 定时器与休眠
 
 ## 24. 进程的创建
 
-![](https://img.codekissyoung.com/2019/10/29/f94d854b5835af3771e01b1d7904d504.png)
+![](http://img.codekissyoung.com/2019/10/29/f94d854b5835af3771e01b1d7904d504.png)
 
 ```c
 pid_t fork(void); // pid of child on parent process; 0 on child on child process; -1 on error
@@ -811,10 +811,10 @@ int clone(int (*func)(void*), void *child_stack, int flags, void *func_arg, ...)
 
 ### exec 和 fork 对进程属性的影响
 
-![](https://img.codekissyoung.com/2019/10/30/482b26e204ea017c90a3f1e76efa8508.png)
-![](https://img.codekissyoung.com/2019/10/30/19cde51fd7cefed488dc030467982b2d.png)
-![](https://img.codekissyoung.com/2019/10/30/b0c659c7d8430e4e2d8bbcb91254645e.png)
-![](https://img.codekissyoung.com/2019/10/30/0a4f7174df14e8be6b81a7130cdf2587.png)
+![](http://img.codekissyoung.com/2019/10/30/482b26e204ea017c90a3f1e76efa8508.png)
+![](http://img.codekissyoung.com/2019/10/30/19cde51fd7cefed488dc030467982b2d.png)
+![](http://img.codekissyoung.com/2019/10/30/b0c659c7d8430e4e2d8bbcb91254645e.png)
+![](http://img.codekissyoung.com/2019/10/30/0a4f7174df14e8be6b81a7130cdf2587.png)
 
 ## 29. 线程：介绍
 
@@ -840,7 +840,7 @@ int pthread_setspecific(pthread_key_t key, void *value);
 void *pthread_getspecific(pthread_key_t key);
 ```
 
-![](https://img.codekissyoung.com/2019/10/31/d1c9f53c10764dd2aa05ce6294720909.png)
+![](http://img.codekissyoung.com/2019/10/31/d1c9f53c10764dd2aa05ce6294720909.png)
 
 ## 32. 线程取消
 
@@ -870,7 +870,7 @@ int sigwait(sigset_t *set, int *sig);
 
 进程组和会话是为支持`shell`作业控制而定义的抽象概念。
 
-![](https://img.codekissyoung.com/2019/10/31/e1b23666422d9855f3d6b18409dfc40e.png)
+![](http://img.codekissyoung.com/2019/10/31/e1b23666422d9855f3d6b18409dfc40e.png)
 
 ```c
 pid_t getpgrp(void); // 进程组id
@@ -927,9 +927,9 @@ int setrlimit(int resource, struct rlimit *rlim); // 设置资源使用限制
 
 ## 43. 进程间通信简介
 
-![](https://img.codekissyoung.com/2019/10/31/10c231c3d28b421a92446a04ac1a315c.png)
-![](https://img.codekissyoung.com/2019/10/31/46ff0695cf6b4783484accd04b374a5f.png)
-![](https://img.codekissyoung.com/2019/10/31/130600ff61102c7fe61da523e7111856.png)
+![](http://img.codekissyoung.com/2019/10/31/10c231c3d28b421a92446a04ac1a315c.png)
+![](http://img.codekissyoung.com/2019/10/31/46ff0695cf6b4783484accd04b374a5f.png)
+![](http://img.codekissyoung.com/2019/10/31/130600ff61102c7fe61da523e7111856.png)
 
 ## 44. 管道和 FIFO
 
@@ -941,7 +941,7 @@ int setrlimit(int resource, struct rlimit *rlim); // 设置资源使用限制
 int pipe(int fields[2]);
 ```
 
-![](https://img.codekissyoung.com/2019/10/31/c5f645be12774ab9e46c057ccb71339e.png)
+![](http://img.codekissyoung.com/2019/10/31/c5f645be12774ab9e46c057ccb71339e.png)
 
 ### 有名管道 FIFO
 

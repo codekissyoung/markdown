@@ -20,7 +20,7 @@
 
 - 认证性（authentication）
 
-![image-20210222174410440](https://img.codekissyoung.com/2021/02/22/e72a6f831a876c8898663a39898de054.png)
+![image-20210222174410440](http://img.codekissyoung.com/2021/02/22/e72a6f831a876c8898663a39898de054.png)
 
 安全合规：密钥管理系统底层使用国家密码局或 FIPS-140-2 认证的硬件安全模块 HSM 来保护密钥的安全，确保密钥的保密性、完整性和可用性。
 
@@ -63,15 +63,15 @@
 
 
 
-![](https://img.codekissyoung.com/2021/02/18/3ff14fedc2f476f29d41f9468ce29c46.jpg)
+![](http://img.codekissyoung.com/2021/02/18/3ff14fedc2f476f29d41f9468ce29c46.jpg)
 
 
 
-![image-20210219162506845](https://img.codekissyoung.com/2021/02/19/f4041de3d7f0d3b9d3fa83819cd2fcba.png)
+![image-20210219162506845](http://img.codekissyoung.com/2021/02/19/f4041de3d7f0d3b9d3fa83819cd2fcba.png)
 
-![image-20210219161846752](https://img.codekissyoung.com/2021/02/19/9704a8daabc225c33b0c9e835e7c4663.png)
+![image-20210219161846752](http://img.codekissyoung.com/2021/02/19/9704a8daabc225c33b0c9e835e7c4663.png)
 
-![image-20210219163024870](https://img.codekissyoung.com/2021/02/19/f00174e76d6c48aa1066649c794a2ec6.png)
+![image-20210219163024870](http://img.codekissyoung.com/2021/02/19/f00174e76d6c48aa1066649c794a2ec6.png)
 
 说明 仅密钥类型为Aliyun_AES_256和Aliyun_SM4的对称密钥支持设置轮转周期。
 

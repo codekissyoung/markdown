@@ -144,20 +144,20 @@ $ kubectl exec -it kubia-rs-ll75w -- bash # 在指定的Pod中运行bash
 root@kubia-rs-ll75w:~# curl http://kubia-service # 访问服务
 ```
 
-![image-20210124151356430](https://img.codekissyoung.com/2021/01/24/c021a04de9c9a6fd35daef8d009663fe.png)
+![image-20210124151356430](http://img.codekissyoung.com/2021/01/24/c021a04de9c9a6fd35daef8d009663fe.png)
 
 ### Ingress
 
 通过一个 IP 地址，公开所有服务。
 
-![image-20210125015634842](https://img.codekissyoung.com/2021/01/25/ddb332b486496ffd7ba8a4b329faf96e.png)
+![image-20210125015634842](http://img.codekissyoung.com/2021/01/25/ddb332b486496ffd7ba8a4b329faf96e.png)
 
-![image-20210125020038562](https://img.codekissyoung.com/2021/01/25/21fc3a777daa9733656f87c424bd5ddd.png)
+![image-20210125020038562](http://img.codekissyoung.com/2021/01/25/21fc3a777daa9733656f87c424bd5ddd.png)
 
-![](https://img.codekissyoung.com/2021/01/08/8b15efec8824c13d07f0629380fb701e.png)
+![](http://img.codekissyoung.com/2021/01/08/8b15efec8824c13d07f0629380fb701e.png)
 
-![](https://img.codekissyoung.com/2021/01/10/5790a9ee7f4d349e40aa5e164abe6184.png)
+![](http://img.codekissyoung.com/2021/01/10/5790a9ee7f4d349e40aa5e164abe6184.png)
 
 [「命令式」的前 Kubernetes 时代的分布式 VS 「声明式」的基于 Kubernetes 的云原生分布式](https://www.yuque.com/office/yuque/0/2020/xlsx/788484/1605013794417-32876a80-a758-4a0d-b5c0-253a364ae4f8.xlsx?from=https%3A%2F%2Fwww.yuque.com%2Fpolaris-docs%2Fcontainer%2Fk8s-basic-overview)
 
-![image-20210111125256735](https://img.codekissyoung.com/2021/01/11/23e1f889f725b7383441e1b1b60195e9.png)
+![image-20210111125256735](http://img.codekissyoung.com/2021/01/11/23e1f889f725b7383441e1b1b60195e9.png)

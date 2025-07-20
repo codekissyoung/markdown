@@ -32,7 +32,7 @@ $ sudo apt-get install php7.2-fpm           # 直接安装 php-fpm ，就不会�
 
 首先需要知道`php-fpm`到底是监听`named sock`还是`socket`,以及监听位置（或端口），查阅`php-fpm`的配置：
 
-![](https://img.codekissyoung.com/2019/11/28/533543b1767f3962a4919d2360c973c9.png)
+![](http://img.codekissyoung.com/2019/11/28/533543b1767f3962a4919d2360c973c9.png)
 
 ```bash
 link@link2:/etc/nginx/sites-available$ sudo cp default db.link.com.conf # 新建 Virtual Server
