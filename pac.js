@@ -2,10 +2,19 @@ var rules = [
     [
         [
             "xinhulu.com",
-            "codekissyoung.com"
+            "codekissyoung.com",
+            "wolai.com"
         ],
         [
-	        "ping0.cc",
+            "claude.ai",
+            "anthropic.com",
+            "ifconfig.me",
+            "ipinfo.io",
+            "api.anthropic.com",
+            "statsig.anthropic.com",
+            "sentry.io",
+            "ipinfo.io",
+            "ping0.cc",
             "flutter.dev",
             "github.com",
             "github.io",
@@ -5986,14 +5995,16 @@ var rules = [
 ];
 var proxy = 'SOCKS5 127.0.0.1:1081';
 var lastRule = '';
+
 function FindProxyForURL(url, host) {
     for (var i = 0; i < rules.length; i++) {
         ret = testHost(host, i);
         if (ret != undefined)
             return ret;
     }
-    return 'DIRECT';
+    return proxy;
 }
+
 function testHost(host, index) {
     for (var i = 0; i < rules[index].length; i++) {
         for (var j = 0; j < rules[index][i].length; j++) {
