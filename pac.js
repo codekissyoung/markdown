@@ -3,7 +3,8 @@ var rules = [
         [
             "xinhulu.com",
             "codekissyoung.com",
-            "wolai.com"
+            "wolai.com",
+            "bilibili.com"
         ],
         [
             "claude.ai",
@@ -13,7 +14,6 @@ var rules = [
             "api.anthropic.com",
             "statsig.anthropic.com",
             "sentry.io",
-            "ipinfo.io",
             "ping0.cc",
             "flutter.dev",
             "github.com",
@@ -5994,6 +5994,7 @@ var rules = [
     ]
 ];
 var proxy = 'SOCKS5 127.0.0.1:1081';
+var direct = "DIRECT";
 var lastRule = '';
 
 function FindProxyForURL(url, host) {
@@ -6010,11 +6011,12 @@ function testHost(host, index) {
         for (var j = 0; j < rules[index][i].length; j++) {
             lastRule = rules[index][i][j];
             if (host == lastRule || host.endsWith('.' + lastRule))
-                return i % 2 == 0 ? 'DIRECT' : proxy;
+                return i % 2 == 0 ? direct : proxy;
         }
     }
     lastRule = '';
 }
+
 if (!String.prototype.endsWith) {
     String.prototype.endsWith = function(searchString, position) {
         var subjectString = this.toString();
