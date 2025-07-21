@@ -11,6 +11,7 @@ var rules = [
             "s1.hdslb.com"
         ],
         [
+            "registry.npmjs.org",
             "claude.ai",
             "anthropic.com",
             "ifconfig.me",
