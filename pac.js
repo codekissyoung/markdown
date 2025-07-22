@@ -1,6 +1,7 @@
 var rules = [
     [
         [
+            "tapd.cn",
             "xinhulu.com",
             "codekissyoung.com",
             "wolai.com",
