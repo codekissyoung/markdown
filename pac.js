@@ -1,6 +1,7 @@
 var rules = [
     [
         [
+            "zh.javascript.info",
             "cn.vuejs.org",
             "lixueduan.com",
             "learnku.com",
