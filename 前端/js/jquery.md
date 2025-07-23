@@ -112,7 +112,6 @@ $('#test2').click(function () {
 });
 ```
 
-
 ## 样式篇
 
 `DOM`节点常见的属性有：`src` `title` `id` `class` 
@@ -356,7 +355,6 @@ $("#test").click(); // 手动触发
 `$("#test").focusin()` `focus()` 当一个元素，或者其内部任何一个元素获得焦点的时候，比如表单
 `$("#test").focusout()` `blur()` 当一个元素，或者其内部任何一个元素失去焦点的时候
 `$("#test").select(fn)` 当 `textarea` 或文本类型的 `input` 元素中的文本被选择时，会发生 `select` 事件
-
 
 ### 鼠标悬停事件
 
