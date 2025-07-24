@@ -150,98 +150,31 @@ const adultNames = users
     .map(user => user.name);
 ```
 
-## 🔥 必须掌握：调度 - setTimeout和setInterval
+## 🔄 异步编程基础
 
-### setTimeout基础
+> **注意**: setTimeout/setInterval的详细用法和事件循环机制请参考 [`js-event-loop-complete-analysis.md`](./js-event-loop-complete-analysis.md) 完整分析文档。
 
-```javascript
-// 基本用法
-setTimeout(() => {
-    console.log("3秒后执行");
-}, 3000);
-
-// 传递参数
-function greet(name, age) {
-    console.log(`Hello ${name}, you are ${age} years old`);
-}
-
-setTimeout(greet, 2000, "张三", 25);
-
-// 取消定时器
-const timerId = setTimeout(() => {
-    console.log("这不会执行");
-}, 5000);
-
-clearTimeout(timerId); // 取消
-```
-
-### 实际应用场景
+这里只保留与函数相关的核心概念：
 
 ```javascript
-// 防抖函数（搜索框优化）
-function debounce(func, delay) {
-    let timeoutId;
-    return function(...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func.apply(this, args), delay);
-    };
-}
-
-// 使用示例
-const searchInput = document.getElementById('search');
-const debouncedSearch = debounce((query) => {
-    console.log('搜索:', query);
-    // 发送API请求
-}, 500);
-
-searchInput.addEventListener('input', (e) => {
-    debouncedSearch(e.target.value);
-});
-
-// 延迟加载
-function loadData() {
-    console.log("开始加载数据...");
-    // 模拟异步操作
-}
-
-setTimeout(loadData, 1000); // 1秒后加载
-
-// Promise延迟
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// 使用async/await
-async function example() {
-    console.log("开始");
-    await delay(2000);
-    console.log("2秒后");
-}
-```
-
-### setInterval和clearInterval
-
-```javascript
-// 定期执行
-const intervalId = setInterval(() => {
-    console.log("每2秒执行一次");
-}, 2000);
-
-// 停止执行
-setTimeout(() => {
-    clearInterval(intervalId);
-    console.log("停止定期执行");
-}, 10000); // 10秒后停止
-
-// 实际应用：实时时钟
-function updateClock() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString();
-    console.log(timeString);
-    // 更新页面显示
-}
-
-const clockInterval = setInterval(updateClock, 1000);
+// 在异步回调中保持this绑定
+const obj = {
+    name: "示例对象",
+    
+    // 普通函数：this可能丢失
+    regularCallback: function() {
+        setTimeout(function() {
+            console.log(this.name); // undefined
+        }, 100);
+    },
+    
+    // 箭头函数：自动绑定this
+    arrowCallback: function() {
+        setTimeout(() => {
+            console.log(this.name); // "示例对象"
+        }, 100);
+    }
+};
 ```
 
 ## ⚡ 重要理解：变量作用域和闭包

@@ -52,27 +52,11 @@ async function processUser(userId) {
 ### Go语言的同步风格：
 ```go
 func processUser(userID int) error {
-    // Go的代码本来就是这样的同步风格
+    // Go的代码本来就是这样的同步风格 , 忽略错误处理
     user, err := getUser(userID)
-    if err != nil {
-        return err
-    }
-    
     profile, err := getProfile(user.ID)
-    if err != nil {
-        return err
-    }
-    
     settings, err := getSettings(profile.ID)
-    if err != nil {
-        return err
-    }
-    
     err = updateUI(settings)
-    if err != nil {
-        return err
-    }
-    
     fmt.Println("全部完成")
     return nil
 }
@@ -104,7 +88,6 @@ async function processUser(userId) {
 async function myFunction() {
     // 函数体
 }
-
 // 箭头函数版本
 const myFunction = async () => {
     // 函数体
@@ -199,7 +182,6 @@ function fetchUser(id) {
         }, 1000)
     })
 }
-
 function fetchDepartment(depId) {
     return new Promise(resolve => {
         setTimeout(() => {
@@ -207,7 +189,6 @@ function fetchDepartment(depId) {
         }, 800)
     })
 }
-
 function fetchProjects(userId) {
     return new Promise(resolve => {
         setTimeout(() => {
@@ -365,7 +346,6 @@ function processData() {
 async function processData() {
     try {
         const result1 = await step1()
-        
         let result2
         try {
             result2 = await step2(result1)
@@ -373,10 +353,8 @@ async function processData() {
             console.log("步骤2失败，使用默认值")
             result2 = "default_value"
         }
-        
         const result3 = await step3(result2)
         return result3
-        
     } catch (error) {
         console.error("整体流程失败:", error)
         throw error
@@ -436,7 +414,7 @@ async function mixedExecution() {
 
 ## 在Vue中的应用
 
-```vue
+```html
 <template>
     <div>
         <button @click="loadData" :disabled="loading">
@@ -514,7 +492,6 @@ async function wrong() {
     const result = fetchData()  // 缺少 await
     console.log(result)  // [object Promise]
 }
-
 // 正确
 async function correct() {
     const result = await fetchData()
@@ -659,9 +636,7 @@ async function fetchWithTimeout() {
 #### 1. **简单的单次异步操作**
 ```javascript
 // ✅ Promise链更简洁
-fetchUser(123)
-    .then(user => console.log(user.name))
-    .catch(error => console.log(error))
+fetchUser(123).then(user => console.log(user.name)).catch(error => console.log(error))
 
 // ❌ async/await反而啰嗦
 async function showUser() {
@@ -885,7 +860,7 @@ async function robustDataFetch(userId) {
 
 ### Vue 3项目中的实际应用模式
 
-```vue
+```js
 <template>
     <div class="dashboard">
         <div v-if="loading">加载中...</div>
