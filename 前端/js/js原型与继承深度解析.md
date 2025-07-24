@@ -11,43 +11,40 @@
 ### Class只是语法糖的本质
 
 ```javascript
-// ES6 Class语法
 class Animal {
     constructor(name) {
         this.name = name;
     }
-    
     speak() {
         console.log(`${this.name} makes a sound`);
     }
 }
-
 class Dog extends Animal {
     speak() {
         console.log(`${this.name} barks`);
     }
 }
+```
 
+```js
 // 上面的Class实际上等价于：
 function Animal(name) {
     this.name = name;
 }
-
 Animal.prototype.speak = function() {
     console.log(`${this.name} makes a sound`);
 };
-
 function Dog(name) {
     Animal.call(this, name);
 }
-
 Dog.prototype = Object.create(Animal.prototype);
 Dog.prototype.constructor = Dog;
-
 Dog.prototype.speak = function() {
     console.log(`${this.name} barks`);
 };
+```
 
+```js
 // 验证Class本质上还是原型
 const obj = new Animal("test");
 console.log(obj.__proto__ === Animal.prototype);         // true
@@ -79,22 +76,18 @@ Brendan Eich著名的总结：**JavaScript = Scheme + Self + Java**
 ```javascript
 // Self语言的核心思想：没有类，只有对象
 // "为什么要先定义类再创建对象？直接从已有对象创建新对象不是更自然吗？"
-
 const parent = {
     species: "animal",
     eat() {
         console.log(`${this.species} is eating`);
     }
 };
-
 // 直接从对象创建对象
 const dog = Object.create(parent);
 dog.species = "dog";
 dog.bark = function() { console.log("Woof!"); };
-
 dog.eat();  // "dog is eating" - 继承了parent的方法
 dog.bark(); // "Woof!" - 自己的方法
-
 // 这就是Self语言的原型继承：对象直接克隆对象
 ```
 
@@ -111,11 +104,9 @@ function createAnimal(species) {
     };
 }
 
-// 函数可以作为值传递、返回、存储
+// 函数可以作为值传递、返回、存储 这种函数式的对象创建方式来自Scheme
 const animalFactory = createAnimal;
 const dog = animalFactory("dog");
-
-// 这种函数式的对象创建方式来自Scheme
 ```
 
 #### 3. Java的语法外观
@@ -125,11 +116,9 @@ const dog = animalFactory("dog");
 function Animal(species) {    // 构造函数，类似Java类
     this.species = species;
 }
-
 Animal.prototype.eat = function() {
     console.log(`${this.species} is eating`);
 };
-
 const dog = new Animal("dog");  // new关键字来自Java
 ```
 
@@ -137,9 +126,9 @@ const dog = new Animal("dog");  // new关键字来自Java
 
 #### "一切皆对象"的统一模型
 
-```javascript
-// Eich的理念：在JavaScript中，一切都是对象（除了原始类型）
+Eich的理念：在JavaScript中，一切都是对象（除了原始类型）,这种统一性让JavaScript极其简洁,只需要理解对象和原型链，就能理解整个语言 .
 
+```javascript
 // 函数也是对象
 function myFunc() {}
 console.log(typeof myFunc);           // "function"
@@ -155,9 +144,6 @@ console.log(myFunc.call);              // [Function: call]
 const arr = [1, 2, 3];
 arr.customProp = "我是数组的自定义属性";
 console.log(arr instanceof Object);   // true
-
-// 这种统一性让JavaScript极其简洁：
-// 只需要理解对象和原型链，就能理解整个语言
 ```
 
 #### 动态性优于静态安全

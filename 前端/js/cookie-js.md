@@ -1,6 +1,6 @@
 ## 请求页面携带 cookie
 
-```http
+```bash
 GET /Cookies/Test.aspx HTTP/1.1
 Host: localhost:1335
 User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.2; zh-CN; rv:1.9.1.1)
@@ -15,7 +15,7 @@ Cookie: My.Common.TestCookieInfo=Pkid=999&TestValue=aaabbbcccdddeee
 
 ## 服务器响应设置 cookie
 
-```http
+```bash
 HTTP/1.x 200 OK
 Server: ASP.NET Development Server/9.0.0.0
 Date: Thu, 06 Aug 2009 03:40:59 GMT
@@ -29,7 +29,7 @@ Connection: Close
 
 ## javascript 中的 cookie
 
-```http
+```bash
 My.Common.SubKey=Pkid=999&TestValue=aaabbbcccdddeee;SingleKey=SingleKeyValue
 ```
 
@@ -40,7 +40,7 @@ My.Common.SubKey=Pkid=999&TestValue=aaabbbcccdddeee;SingleKey=SingleKeyValue
 
 ## 过期时间
 
-```
+```bash
 var cookieString=name+"="+escape(value);
 //判断是否设置过期时间
 if(expiresHours>0){

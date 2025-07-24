@@ -23,7 +23,6 @@ var Student = {
     console.log(this.name + " is running...");
   }
 };
-
 var xiaoming = {
   name: "小明"
 };
@@ -93,16 +92,16 @@ xiaoming.fly(); // 小明 is flying...现在xiaoming已经无法run()了，他�
 ## 构造函数
 
 - 用于创建一个对象
-  `js function Student(name) { this.name = name; this.hello = function () { alert('Hello, ' + this.name + '!'); } } var xiaoming = new Student('小明'); xiaoming.name; // '小明' xiaoming.hello(); // Hello, 小明!`
+`js function Student(name) { this.name = name; this.hello = function () { alert('Hello, ' + this.name + '!'); } } var xiaoming = new Student('小明'); xiaoming.name; // '小明' xiaoming.hello(); // Hello, 小明!`
   如果不写 new，这就是一个普通函数，它返回 undefined。但是，如果写了 new，它就变成了一个构造函数，它绑定的 this 指向新创建的对象，并默认返回 this，也就是说，不需要在最后写 return this;
   
 - 使用它创建出来的对象的原型链
 
-  ```js
-  xiaoming ↘
-  xiaohong -→ Student.prototype ----> Object.prototype ----> null
-  xiaojun  ↗
-  ```
+```js
+xiaoming ↘
+xiaohong -→ Student.prototype ----> Object.prototype ----> null
+xiaojun  ↗
+```
 
 - 用 new Student()创建的对象还从原型上获得了一个 constructor 属性，它指向函数 Student 本身：
 
@@ -131,7 +130,7 @@ xiaoming.fly(); // 小明 is flying...现在xiaoming已经无法run()了，他�
 
 - 编写一个 createStudent()函数，在内部封装所有的 new 操作
 
-  ````js
+  ```js
   function Student(props) {
   this.name = props.name || '匿名'; // 默认值为'匿名'
   this.grade = props.grade || 1; // 默认值为 1
@@ -180,10 +179,7 @@ class Student {
 var xiaoming = new Student("小明");
 xiaoming.hello();
 ```
-
-
-
-````js
+```js
 class PrimaryStudent extends Student {
     constructor(name, grade) {
         super(name); // 记得用 super 调用父类的构造方法!
