@@ -1,6 +1,7 @@
 var rules = [
     [
         [
+            "weibocdn.com",
             "weibo.com",
             "zh.javascript.info",
             "cn.vuejs.org",
