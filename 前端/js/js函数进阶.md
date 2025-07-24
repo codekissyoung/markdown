@@ -396,11 +396,6 @@ function example() {}
 console.log(example.name); // "example"
 ```
 
-### new Function语法
-```javascript
-// 了解即可：动态创建函数，安全风险大，很少使用
-const fn = new Function('a', 'b', 'return a + b');
-```
 
 ### 装饰器模式
 ```javascript

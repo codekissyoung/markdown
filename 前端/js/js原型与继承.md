@@ -1,14 +1,5 @@
 # JavaScript原型与继承
 
-## 学习优先级说明
-
-原型是JavaScript的核心机制，但现代开发有更简单的替代方案：
-- 🔥 **必须理解** - 原型链概念，理解JavaScript对象的工作原理
-- ⚡ **了解应用** - 原型继承的基本实现方式
-- 📚 **现代替代** - ES6 Class语法（推荐在实际开发中使用）
-
----
-
 ## 🔥 必须理解：原型链概念
 
 ### 什么是原型链
@@ -16,7 +7,6 @@
 在JavaScript中，每个对象都有一个隐藏的`[[Prototype]]`属性，指向另一个对象。当访问对象的属性时，如果对象本身没有，就会沿着原型链向上查找。
 
 ```javascript
-// 创建一个简单对象
 const person = {
     name: "张三",
     greet() {
@@ -26,11 +16,12 @@ const person = {
 
 // 创建另一个对象，以person为原型
 const student = Object.create(person);
+
 student.studentId = "001";
 student.study = function() {
     console.log(`${this.name}正在学习`);
-};
-
+}
+;
 console.log(student.name);    // "张三" (从原型上继承)
 student.greet();              // "你好，我是张三" (从原型上继承)
 student.study();              // "张三正在学习" (自有方法)
@@ -351,7 +342,6 @@ class User {
         this.name = name;
         this.email = email;
     }
-    
     getProfile() {
         return {
             name: this.name,
@@ -359,7 +349,6 @@ class User {
         };
     }
 }
-
 class AdminUser extends User {
     constructor(name, email, permissions) {
         super(name, email);
@@ -529,9 +518,183 @@ if (!Array.prototype.includes) {
 2. **原型污染**：安全相关的高级话题
 3. **内置原型扩展**：有风险，谨慎使用
 
-### 类比理解
-- **原型链 = 汽车发动机原理** - JavaScript的核心动力机制
-- **Class语法 = 自动挡** - 让操作更简单，但底层机制没变
-- **理解原型 = 懂发动机** - 遇到复杂问题时能找到根本原因
+# JavaScript 原型链继承图解
 
-**关键洞察**：现代开发用Class写代码，但理解原型链让你真正掌握JavaScript！
+基于 `practice.js` 中的原型链继承示例，展示 Person 和 Student 类的原型链结构。
+
+## 代码结构概述
+```js
+function Person(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+// 在原型上添加方法
+Person.prototype.sayHello = function() {
+    return `Hello, my name is ${this.name}`;
+};
+
+Person.prototype.eat = function() {
+    return `${this.name} is eating`;
+};
+
+// 创建实例
+const person1 = new Person('Alice', 25);
+const person2 = new Person('Bob', 30);
+
+console.log('person1:', person1);
+console.log('person1.sayHello():', person1.sayHello());
+console.log('person2.eat():', person2.eat());
+
+// 原型链继承示例
+function Student(name, age, major) {
+    // 继承属性
+    Person.call(this, name, age);  // 调用父类构造函数，继承父类的属性
+    this.major = major;  // 添加子类特有的属性
+}
+
+// 继承方法（设置原型链）
+Student.prototype = Object.create(Person.prototype);  // 创建一个以Person.prototype为原型的对象，并将其设为Student的原型
+// 修复构造函数指向
+Student.prototype.constructor = Student;  // 重置constructor属性，使其指向Student本身
+
+// 添加子类特有方法
+Student.prototype.study = function() {
+    return `${this.name} is studying ${this.major}`;
+};
+
+const student1 = new Student('Charlie', 22, 'Computer Science');
+console.log('\nstudent1:', student1);
+console.log('student1.sayHello():', student1.sayHello()); // 继承自Person
+console.log('student1.study():', student1.study()); // Student特有方法
+
+// 原型链查找演示
+console.log('\n原型链查找演示:');
+console.log('student1.__proto__ === Student.prototype:', student1.__proto__ === Student.prototype);
+console.log('Student.prototype.__proto__ === Person.prototype:', Student.prototype.__proto__ === Person.prototype);
+console.log('Person.prototype.__proto__ === Object.prototype:', Person.prototype.__proto__ === Object.prototype);
+console.log('Object.prototype.__proto__:', Object.prototype.__proto__); // null，原型链的终点
+```
+
+- **Person**: 父类构造函数，包含 `name` 和 `age` 属性
+- **Student**: 子类构造函数，继承 Person 并添加 `major` 属性
+- **继承方式**: 使用 `Object.create()` 和 `call()` 实现原型链继承
+
+## 原型链继承图
+
+  1. 原型链继承结构图 - 展示了 Person 和 Student 类的完整原型链关系，包括实例、构造函数、原型对象之间的连接关系
+  2. 方法查找流程图 - 演示了当调用 student1.sayHello() 时，JavaScript 引擎如何沿着原型链查找方法的过程
+
+  图表清楚地展示了：
+  - 实例对象通过 __proto__ 连接到原型对象
+  - 构造函数通过 prototype 连接到原型对象
+  - 原型链的层次结构：student1 → Student.prototype → Person.prototype → Object.prototype → null
+  - 方法继承和查找的机制
+
+  这个可视化图表能帮助你更好地理解 JavaScript 原型链继承的工作原理。
+
+```mermaid
+graph TD
+    %% 实例对象
+    student1["student1<br/>{name: 'Charlie', age: 22, major: 'Computer Science'}"]
+    person1["person1<br/>{name: 'Alice', age: 25}"]
+    
+    %% 构造函数
+    Student["Student 构造函数<br/>function Student(name, age, major)"]
+    Person["Person 构造函数<br/>function Person(name, age)"]
+    Object_Constructor["Object 构造函数<br/>function Object()"]
+    
+    %% 原型对象
+    StudentPrototype["Student.prototype<br/>{constructor: Student, study: function}"]
+    PersonPrototype["Person.prototype<br/>{constructor: Person, sayHello: function, eat: function}"]
+    ObjectPrototype["Object.prototype<br/>{toString, valueOf, hasOwnProperty, ...}"]
+    
+    %% null 终点
+    Null["null<br/>(原型链终点)"]
+    
+    %% 实例到原型的关系 (__proto__)
+    student1 -.->|"__proto__"| StudentPrototype
+    person1 -.->|"__proto__"| PersonPrototype
+    
+    %% 原型链向上查找
+    StudentPrototype -.->|"__proto__"| PersonPrototype
+    PersonPrototype -.->|"__proto__"| ObjectPrototype
+    ObjectPrototype -.->|"__proto__"| Null
+    
+    %% 构造函数到原型的关系 (prototype)
+    Student ==>|"prototype"| StudentPrototype
+    Person ==>|"prototype"| PersonPrototype
+    Object_Constructor ==>|"prototype"| ObjectPrototype
+    
+    %% 原型到构造函数的关系 (constructor)
+    StudentPrototype -->|"constructor"| Student
+    PersonPrototype -->|"constructor"| Person
+    ObjectPrototype -->|"constructor"| Object_Constructor
+    
+    %% 创建关系 (new)
+    Student -.->|"new"| student1
+    Person -.->|"new"| person1
+    
+    %% 样式
+    classDef instance fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef constructor fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef prototype fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef special fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    
+    class student1,person1 instance
+    class Student,Person,Object_Constructor constructor
+    class StudentPrototype,PersonPrototype,ObjectPrototype prototype
+    class Null special
+```
+
+## 方法查找过程
+
+当调用 `student1.sayHello()` 时的查找过程：
+
+```mermaid
+flowchart TD
+    A["student1.sayHello()"] --> B{"在 student1 对象上<br/>找到 sayHello 方法?"}
+    B -->|否| C{"在 Student.prototype 上<br/>找到 sayHello 方法?"}
+    C -->|否| D{"在 Person.prototype 上<br/>找到 sayHello 方法?"}
+    D -->|是| E["调用 Person.prototype.sayHello<br/>返回: 'Hello, my name is Charlie'"]
+    
+    B -->|是| F["调用该方法"]
+    C -->|是| G["调用该方法"]
+    D -->|否| H{"继续向上查找到<br/>Object.prototype"}
+    H -->|找不到| I["抛出 TypeError"]
+    
+    %% 样式
+    classDef found fill:#c8e6c9,stroke:#4caf50,stroke-width:2px
+    classDef notfound fill:#ffcdd2,stroke:#f44336,stroke-width:2px
+    classDef process fill:#e1f5fe,stroke:#2196f3,stroke-width:2px
+    
+    class E,F,G found
+    class I notfound
+    class A,B,C,D,H process
+```
+
+## 关键概念说明
+
+### 1. 原型链查找规则
+- 先在实例对象自身查找属性/方法
+- 找不到则沿着 `__proto__` 链向上查找
+- 直到 `Object.prototype.__proto__` (null) 为止
+
+### 2. 继承实现关键步骤
+```javascript
+// 1. 继承属性: 在子类构造函数中调用父类构造函数
+Person.call(this, name, age);
+
+// 2. 继承方法: 设置原型链关系
+Student.prototype = Object.create(Person.prototype);
+
+// 3. 修复构造函数指向
+Student.prototype.constructor = Student;
+```
+
+### 3. 原型链的优势
+- **方法共享**: 所有实例共享原型上的方法，节省内存
+- **动态扩展**: 可以动态给原型添加方法，所有实例立即可用
+- **继承机制**: 通过原型链实现类之间的继承关系
+
+这种原型链继承机制是 JavaScript 面向对象编程的核心，理解它对掌握 JavaScript 和后续学习 Vue 3 的响应式原理都很重要。
