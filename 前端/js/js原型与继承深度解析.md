@@ -1026,7 +1026,6 @@ class Animal {
 // 比如装饰器、私有字段等
 class Animal {
     #privateField = 'secret';
-    
     @log
     speak() {
         console.log('Animal speaks');
