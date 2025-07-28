@@ -96,6 +96,38 @@
 - 数据库操作优先考虑xorm的使用方式
 - **永远不使用多重继承**: 从多个类继承特性是有害的思想，保持批判性思维，避免复杂的继承关系
 
+### Go编程经验总结
+
+#### JSON序列化陷阱 - []uint8自动Base64编码 ⚠️
+**重要发现**: Go的`json.Marshal()`对`[]uint8`(即`[]byte`)类型会**自动进行Base64编码**。
+
+**问题场景**:
+```go
+// 数据库查询返回的Row包含[]uint8类型字段
+rows, err := db.Table("users").Get()
+jsonData, _ := json.Marshal(rows)
+// 结果: {"name":"5bel56iL5biI","id":"MQ=="} - 被Base64编码了！
+```
+
+**原因**: 这是Go标准库`encoding/json`的设计行为，`[]byte`类型在JSON序列化时自动编码为Base64字符串，防止二进制数据在JSON中出现问题。
+
+**解决方案**:
+**定义结构体让ORM自动映射**:
+```go
+type User struct {
+    ID   int    `xorm:"Fid"`
+    Name string `xorm:"Fname"`
+}
+var users []User
+err := db.Table("users").Find(&users) // 自动处理类型转换
+```
+
+**最佳实践**: 
+- 避免直接对包含`[]uint8`字段的结构体进行`json.Marshal()`
+- 优先使用ORM提供的类型安全的Get方法
+- 设计API时使用明确的数据结构而不是通用的map类型
+- **记住**: 这不是Bug，是Go标准库的正常行为！
+
 ### 项目协作
 - 优先编辑现有文件而非创建新文件
 - 重视代码的可读性和维护性
