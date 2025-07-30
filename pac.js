@@ -1,6 +1,7 @@
 var rules = [
     [
         [
+            "edu.cn",
             "zhipin.com",
             "lagou.com",
             "runoob.com",
