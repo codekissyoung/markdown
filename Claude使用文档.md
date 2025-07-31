@@ -172,6 +172,194 @@ Claude Code提供细粒度的权限管理，让用户精确控制AI助手的操�
 
 不需要复杂的企业级配置，Claude Code会以个人用户模式安全稳定地运行。
 
+## 多API工具链配置实战 🚀
+
+### 背景和动机
+
+在深度使用Claude进行开发工作时，遇到了一个重要挑战：**晚8点后官方API的token限制问题**。对于高频使用Claude进行框架BUG排查和技术学习的工作模式，单一API渠道成为了效率瓶颈。通过配置多个Claude兼容API，成功解决了这个问题，实现了24小时不间断的AI辅助开发。
+
+### 工具链配置过程
+
+#### 1. 环境变量配置
+
+配置了三套API环境变量，实现多渠道切换：
+
+```bash
+# ~/.zshrc 配置
+# 官方Claude API
+export ANTHROPIC_API_KEY="sk-ant-xxx"
+
+# Claude-Kimi兼容API  
+export CLAUDE_KIMI_API_KEY="your_kimi_key"
+export CLAUDE_KIMI_BASE_URL="https://api.moonshot.cn/v1"
+
+# Claude-GLM兼容API
+export CLAUDE_GLM_API_KEY="your_glm_key" 
+export CLAUDE_GLM_BASE_URL="https://open.bigmodel.cn/api/paas/v4"
+```
+
+#### 2. Function配置文件
+
+创建了三个独立的function配置文件，用于快速切换API：
+
+**`~/.claude/functions-official.json`** (官方API)
+```json
+{
+  "claudeApiKey": "$ANTHROPIC_API_KEY",
+  "baseUrl": "https://api.anthropic.com",
+  "model": "claude-3-5-sonnet-20241022"
+}
+```
+
+**`~/.claude/functions-kimi.json`** (Kimi兼容)
+```json
+{
+  "claudeApiKey": "$CLAUDE_KIMI_API_KEY", 
+  "baseUrl": "$CLAUDE_KIMI_BASE_URL",
+  "model": "moonshot-v1-32k"
+}
+```
+
+**`~/.claude/functions-glm.json`** (GLM兼容)
+```json
+{
+  "claudeApiKey": "$CLAUDE_GLM_API_KEY",
+  "baseUrl": "$CLAUDE_GLM_BASE_URL", 
+  "model": "glm-4-plus"
+}
+```
+
+#### 3. 快速切换命令
+
+配置了shell别名，实现一键切换：
+
+```bash
+# ~/.zshrc
+alias claude-official='export CLAUDE_CONFIG=~/.claude/functions-official.json'
+alias claude-kimi='export CLAUDE_CONFIG=~/.claude/functions-kimi.json'  
+alias claude-glm='export CLAUDE_CONFIG=~/.claude/functions-glm.json'
+```
+
+### 三个API能力对比分析
+
+#### 实际测试发现
+
+通过实际使用对比，发现了重要的能力差异：
+
+| API类型 | 代码理解 | 技术问题解答 | 复杂推理 | 中文支持 | 稳定性 |
+|---------|----------|--------------|----------|----------|--------|
+| **Claude官方** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Claude-GLM** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Claude-Kimi** | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+
+#### 关键发现 💡
+
+**Claude-GLM能力显著优于Claude-Kimi**：
+- **代码分析深度**: GLM能更好地理解复杂的代码结构和框架机制
+- **技术问题诊断**: 对BUG排查和系统性问题分析更准确
+- **架构理解**: 能够把握大型项目的整体架构和模块关系
+- **中文技术表达**: 专业术语使用更准确，技术文档写作质量更高
+
+### 优化后的使用策略
+
+#### 时间段分配策略
+
+**白天(8:00-20:00)**: 官方Claude API
+- 处理复杂的架构设计问题
+- 深度代码审查和重构建议
+- 关键技术决策讨论
+
+**晚间(20:00-24:00)**: Claude-GLM API  
+- 框架BUG排查和问题诊断
+- 技术文档编写和学习笔记
+- 代码实现和优化建议
+
+**深夜/凌晨**: Claude-Kimi API
+- 简单的代码查询和语法问题
+- 基础概念学习和答疑
+- 轻量级的开发任务
+
+#### 问题类型分配策略
+
+**优先使用官方Claude**:
+- 复杂的架构设计和系统分析
+- 多文件、多模块的代码重构
+- 性能优化和安全审查
+- 关键业务逻辑的实现
+
+**使用Claude-GLM**:
+- 框架相关问题排查（xorm、gin等）
+- 数据库设计和优化建议  
+- Go/PHP/JavaScript技术问题
+- 技术文档和学习笔记编写
+
+**使用Claude-Kimi**:
+- 简单的语法和概念查询
+- 基础功能实现
+- 工具使用和配置问题
+- 轻量级的代码片段生成
+
+### 重大突破价值
+
+#### 1. 解决token限制瓶颈
+- **24小时不间断**: 彻底解决晚8点后的token限制问题
+- **工作连续性**: 深夜也能继续进行复杂的技术分析
+- **学习不中断**: 支持长时间的深度学习和探索
+
+#### 2. 匹配工作模式
+- **框架BUG排查**: 高频的xorm、gin框架问题都有合适的API支持
+- **技术文档编写**: GLM在中文技术文档方面表现优秀  
+- **多层次需求**: 不同复杂度的问题有对应的最佳API选择
+
+#### 3. 成本效益优化
+- **智能分流**: 复杂问题用官方API，常规问题用替代API
+- **资源最大化**: 充分利用不同API的优势特性
+- **效率提升**: 避免因API限制导致的工作中断
+
+### 配置最佳实践
+
+#### 1. 环境隔离
+```bash
+# 每个项目可以设置独立的API配置
+cd ~/workspace/project1
+echo "export CLAUDE_CONFIG=~/.claude/functions-glm.json" > .claude-env
+
+cd ~/workspace/project2  
+echo "export CLAUDE_CONFIG=~/.claude/functions-official.json" > .claude-env
+```
+
+#### 2. 自动切换脚本
+```bash
+#!/bin/bash
+# auto-switch-claude.sh
+current_hour=$(date +%H)
+
+if [ $current_hour -ge 20 ] || [ $current_hour -lt 8 ]; then
+    export CLAUDE_CONFIG=~/.claude/functions-glm.json
+    echo "Switched to Claude-GLM (evening/night mode)"
+else
+    export CLAUDE_CONFIG=~/.claude/functions-official.json  
+    echo "Using official Claude API (daytime mode)"
+fi
+```
+
+#### 3. 监控和日志
+```bash
+# 记录API使用情况
+echo "$(date): Using $(basename $CLAUDE_CONFIG)" >> ~/.claude/api-usage.log
+```
+
+### 对高频Claude用户的价值
+
+这套多API工具链配置对于像link这样高频使用Claude进行技术工作的开发者具有重大价值：
+
+1. **工作效率倍增**: 消除了token限制对工作节奏的影响
+2. **技术深度保障**: 复杂问题仍有官方API的高质量支持
+3. **成本控制优化**: 根据问题复杂度智能选择API，避免资源浪费
+4. **适应工作习惯**: 支持深夜加班和不同时段的工作强度变化
+
+这不仅仅是技术配置的优化，更是**工作方式的升级**，让AI真正成为24小时不间断的开发伙伴。
+
 ---
 
 *文档持续更新中...*
