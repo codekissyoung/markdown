@@ -1,6 +1,13 @@
 var rules = [
     [
         [
+            "open.bigmodel.cn",
+            "bigmodel.cn",
+            "47.112.125.221",
+            "api.moonshot.cn",
+            "platform.moonshot.cn",
+            "moonshot.cn",
+            "kimi.com",
             "edu.cn",
             "zhipin.com",
             "lagou.com",
