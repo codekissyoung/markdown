@@ -82,6 +82,38 @@
 - **v2net**: 主要代理工具，提供稳定的网络访问
 - **PAC**: 配合v2net使用，智能分流不同网站的代理规则
 
+#### v2net 代理配置详解 (2025-07-30)
+
+**软件安装与配置**:
+- **客户端位置**: `/Applications/V2net.app`
+- **proxy_conf_helper位置**: `/Users/link/Library/Application Support/V2net/proxy_conf_helper`
+- **免密码配置**: 
+  ```bash
+  sudo chown root:wheel "/Users/link/Library/Application Support/V2net/proxy_conf_helper"
+  sudo chmod u+s "/Users/link/Library/Application Support/V2net/proxy_conf_helper"
+  ```
+  解决每次启动代理时询问密码的问题
+
+**PAC配置文件管理**:
+- **源文件**: `~/workspace/markdown/pac.js` (版本控制管理)
+- **V2net使用文件**: `~/Library/Application Support/V2net/pac.txt`
+- **自动同步方案**: 使用软链接实现配置同步
+  ```bash
+  ln -s "/Users/link/workspace/markdown/pac.js" "/Users/link/Library/Application Support/V2net/pac.txt"
+  ```
+- **优势**: PAC配置变更自动进入Git版本控制，跨设备配置同步简单
+
+**PAC分流规则逻辑**:
+- **中国网站**: 走直连(DIRECT)，提供最优访问速度
+- **国外网站**: 走代理(SOCKS5)，解决访问限制问题  
+- **未匹配网站**: 默认走代理，确保网络可达性
+- **智能分流**: 根据域名自动选择最优访问路径，无需手动切换
+
+**配置管理策略**:
+- **版本控制**: PAC文件纳入Git管理，配置变更可追溯
+- **跨设备同步**: 通过Git仓库 + 软链接实现多台电脑配置统一
+- **维护便利**: 修改`~/workspace/markdown/pac.js`即可更新所有环境
+
 ## 工作流程偏好
 
 ### 项目结构
@@ -245,6 +277,7 @@ err := db.Table("users").Find(&users) // 自动处理类型转换
 - 数据库操作通过xorm进行抽象
 - **前端开发已确定Vue 3 + Vite技术栈**: 现代工程化开发，不再使用传统脚本方式
 - **JavaScript开发使用ES6+语法**: Promise/async-await、模块化、现代异步编程，**强制使用严格模式**
+- **ES Modules模块化标准**: ✅ **2025-07-30确认** - ES Modules已是事实标准，所有现代项目都使用ES Modules (import/export)，CommonJS/AMD/UMD等旧标准已淘汰，不再推荐使用
 - **框架设计风格偏好**: **声明式编程** - 偏向描述"要什么结果"而非"如何操作"的开发方式，与Vue数据驱动理念高度契合
 - **设计优先级**: **可维护性、稳定性 > 性能** - 优先考虑代码可读性、长期维护成本和系统稳定性，性能优化在满足业务需求基础上进行
 - 系统运维相关任务可以使用Linux/Shell知识
