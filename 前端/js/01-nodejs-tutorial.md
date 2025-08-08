@@ -1,13 +1,5 @@
 # Node.js 基础教程
 
-### 浏览器中的JavaScript
-```javascript
-// 浏览器环境
-window.alert('Hello');        // 有window对象
-document.getElementById();    // 可以操作DOM
-localStorage.setItem();       // 浏览器API
-```
-
 ### Node.js中的JavaScript
 ```javascript
 // Node.js环境
@@ -17,14 +9,6 @@ require('fs');                // 可以读写文件
 ```
 
 ## 4. Node.js核心概念
-
-### 4.1 全局对象
-```javascript
-console.log('当前Node版本:', process.version);
-console.log('当前系统:', process.platform);
-console.log('当前目录:', __dirname);
-console.log('当前文件:', __filename);
-```
 
 ### 4.2 模块系统（类比Go的import）
 ```javascript
@@ -40,7 +24,6 @@ const os = require('os');      // 操作系统信息
 
 ### 4.3 异步编程
 ```javascript
-// 读取文件（异步）
 const fs = require('fs');
 fs.readFile('README.md', 'utf8', (err, data) => {
   if (err) {
@@ -49,62 +32,6 @@ fs.readFile('README.md', 'utf8', (err, data) => {
     console.log('文件内容:', data);
   }
 });
-```
-
-## 5. npm包管理系统
-
-### 5.1 什么是包(Package)？
-- 包就是别人写好的JavaScript代码库
-- 类似Go的第三方模块，可以直接使用
-- 避免重复造轮子
-
-```mermaid
-graph LR
-    A[你的项目] --> B[package.json]
-    B --> C[依赖列表]
-    C --> D[vue: ^3.0.0]
-    C --> E[vite: ^4.0.0] 
-    C --> F[colors: ^1.4.0]
-    
-    G[npm install] --> H[下载依赖]
-    H --> I[node_modules/]
-    I --> J[vue包]
-    I --> K[vite包]
-    I --> L[colors包]
-    
-    style B fill:#fff3e0
-    style I fill:#e8f5e8
-```
-
-### 5.2 类比Go语言
-| Go | Node.js | 说明 |
-|---|---|---|
-| `go.mod` | `package.json` | 项目配置文件 |
-| `go.sum` | `package-lock.json` | 依赖版本锁定 |
-| `go mod tidy` | `npm install` | 下载依赖 |
-| `$GOPATH/pkg/mod` | `node_modules/` | 依赖存储目录 |
-
-```mermaid
-graph TB
-    subgraph "Go项目"
-        A1[go.mod] --> A2[go mod tidy]
-        A2 --> A3[$GOPATH/pkg/mod/]
-        A3 --> A4[运行: go run main.go]
-    end
-    
-    subgraph "Node.js项目"
-        B1[package.json] --> B2[npm install]
-        B2 --> B3[node_modules/]
-        B3 --> B4[运行: node main.js]
-    end
-    
-    A1 -.-> B1
-    A2 -.-> B2
-    A3 -.-> B3
-    A4 -.-> B4
-    
-    style A1 fill:#e3f2fd
-    style B1 fill:#fff3e0
 ```
 
 ### 5.3 package.json 文件解释
@@ -186,49 +113,10 @@ flowchart TD
     style K fill:#ff9800,color:#fff
 ```
 
-### 8.1 开发阶段
-- **Vite开发服务器**: 提供热更新、实时编译
-- **代码转换**: 将.vue文件转换为浏览器可识别的JavaScript
-- **模块打包**: 将多个文件打包成少数几个文件
-
-### 8.2 构建阶段  
-- **代码压缩**: 减小文件体积
-- **资源优化**: 图片压缩、CSS提取
-- **兼容性处理**: 转换新语法为老浏览器支持的语法
-
-## 9. 实践练习
-
-### 练习1: 创建第一个Node.js程序
-```bash
-# 创建文件
-echo 'console.log("Hello Node.js!");' > hello.js
-# 运行程序
-node hello.js
-```
-
-### 练习2: 使用第三方包
-```bash
-# 安装colors包（用于彩色输出）
-npm install colors
-```
-
-```javascript
-// 创建demo.js文件
-const colors = require('colors');
-console.log('这是红色文字'.red);
-console.log('这是绿色文字'.green);
-console.log('这是彩虹文字'.rainbow);
-```
-
-```bash
-# 运行
-node demo.js
-```
-
 ## 10. 现代前端开发完整流程
 
 ```mermaid
-graph LR
+graph TD
     subgraph "开发环境"
         A[Node.js] --> B[npm包管理]
         B --> C[Vite构建工具]
