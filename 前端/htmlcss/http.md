@@ -37,8 +37,8 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 
 7，http 报文
 
-```
-请求报文
+```bash
+# 请求报文
 请求起始行：GET    /tools.html    HTTP/1.0
 请求首部：    User-agent :Mozilla/4.75
                         Host:www.joes-hardware.com
@@ -46,9 +46,9 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
                         Accept-language:en
 请求主体 ：   没有请求主体(因为是get请求)
 
-响应报文
-响应起始行：HTTP/1.0 200 OK
-响应首部      : Date :Sun ,1st Oct 2000 23:25:17 GMT
+# 响应报文
+响应起始行 : HTTP/1.0 200 OK
+响应首部 : Date :Sun ,1st Oct 2000 23:25:17 GMT
                         Server: Apache/1.3.11    Ubuntu(14.)
                         Last-modified: Tue ,04 Jul 2000 09:46:21 GMT
                         Content-length : 1237
@@ -58,7 +58,7 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 
 8 ，HTTP 网络协议栈
 
-```
+```bash
 应用层                 HTTP
 传输层                 TCP
 网络层                 IP
@@ -68,13 +68,13 @@ HEAD    只需要得到web资源的http首部就可以了，用于在不获取�
 
 9，http 发送报文前会先建立一条 tcp/ip 链接！
 
-```
-  a. http://www.netscape.com/index.html 通过DNS解析域名对应的 ip 地址和端口
-  b. 解析后：http://207.200.83:80/index.html
+```bash
+  a . http://www.netscape.com/index.html 通过DNS解析域名对应的 ip 地址和端口
+  b . 解析后：http://207.200.83:80/index.html
   c . 通过 ip 和端口建立一条 tcp/ip 链接
-  d .浏览器写好一条 http 请求报文发给服务器
-  e  . 服务器接收到请求报文后，回送一条http响应报文
-  c  . 关闭tcp/ip链接 ，浏览器显示文档 !
+  d . 浏览器写好一条 http 请求报文发给服务器
+  e . 服务器接收到请求报文后，回送一条http响应报文
+  c . 关闭tcp/ip链接 ，浏览器显示文档 !
 ```
 
 10 ， HTTP 协议是基于文本的，人很容易通过 http 协议，与 web 服务器对话
@@ -106,6 +106,6 @@ Content-Type: text/html; charset=UTF-8
 
 > telnet  kanjiebao.com  80      /* 通过telnet 建立一条tcp/ip 链接 */
 > GET /index HTTP/1.1
-  Host:kanjiebao.com                /*  手写 http 请求报文 ，回车就拿到了响应的报文 ^ V ^ */
+  Host:kanjiebao.com             /*  手写 http 请求报文 ，回车就拿到了响应的报文 ^ V ^ */
   [空行]
 ```
