@@ -264,4 +264,3 @@ upstream mysvr {
     server 192.168.8.3:80  weight=6;
 }
 ```
-
