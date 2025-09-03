@@ -246,7 +246,7 @@ AllowOverride None      不允许 .htaccess 重写这个目录，改为 All �
 sudo apt-get install apache2
 ```
 
-```
+```conf
 sudo vim /etc/apache2/apache2.conf
     // 将 <Directory /var/www/>
     // 改成 <Directory "你的目录">
@@ -255,6 +255,6 @@ sudo vim /etc/apache2/sites-available/000-default.conf
     // 改成 DocumentRoot "你的目录"
 ```
 
-```
+```bash
 sudo /etc/init.d/apache2 restart
 ```

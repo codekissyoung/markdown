@@ -204,7 +204,7 @@ server {
 
 ## 负载均衡时 nginx http 配置
 
-```nginx
+```conf
 #设定http服务器，利用它的反向代理功能提供负载均衡支持
 http {
      #设定mime类型,类型由mime.type文件定义
@@ -254,7 +254,7 @@ http {
 }
 ```
 
-```nginx
+```conf
 # 设定负载均衡的服务器列表
 upstream mysvr {
     #weigth参数表示权值，权值越高被分配到的几率越大
