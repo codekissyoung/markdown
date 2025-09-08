@@ -2,7 +2,8 @@
 
 ## 概论
 
-`JS` 是一种嵌入式`embedded`语言。本身提供少量核心语法，只用来做一些数学和逻辑运算。不提供任何与 `I/O`（输入/输出）相关的 `API`，都要靠宿主环境`host`(浏览器 | Node)提供，只合适嵌入更大型的应用程序环境，去调用宿主环境提供的底层 `API`。
+`JS` 是一种嵌入式`embedded`语言。本身提供少量核心语法，只用来做一些数学和逻辑运算。
+不提供任何与 `I/O`（输入/输出）相关的 `API`，都要靠宿主环境`host`(浏览器 | Node)提供，只合适嵌入更大型的应用程序环境，去调用宿主环境提供的底层 `API`。
 
 浏览器宿主提供：
 
@@ -48,14 +49,9 @@ for (var i = 0; i < 3; i++){
         console.log('i=' + i + ', j=' + j);
     }
 } // 跳到这里
+```
 
-foo: {
-  console.log(1);
-  break foo;
-  console.log('本行不会输出');
-} // 跳到这里
-console.log(2);
-
+```js
 top:
 for (var i = 0; i < 3; i++){
     for (var j = 0; j < 3; j++){
@@ -68,7 +64,8 @@ for (var i = 0; i < 3; i++){
 
 ## 数据类型
 
-**数值**：`1` 和 `3.14`，小数与整数都是以`64`位浮点数形式储存。[数值](https://wangdoc.com/javascript/types/number.html) 一文有详细说明，坑爹的设计！
+**数值**：`1` 和 `3.14`，小数与整数都是以`64`位浮点数形式储存。
+[数值](https://wangdoc.com/javascript/types/number.html) 一文有详细说明，坑爹的设计！
 **字符串**：`'hello world'`
 `Bool`：`true` `false`
 `undefined`：
@@ -209,7 +206,7 @@ var person = {
   hasCar: true,
   zipcode: null
 };
-person.name; // 'Bob'
+person.name;    // 'Bob'
 person.zipcode; // null
 ```
 

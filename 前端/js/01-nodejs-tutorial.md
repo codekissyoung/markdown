@@ -1,6 +1,7 @@
 # Node.js 基础教程
 
 ### Node.js中的JavaScript
+
 ```javascript
 // Node.js环境
 console.log('Hello');         // 没有window对象
@@ -119,8 +120,8 @@ flowchart TD
 graph TD
     subgraph "开发环境"
         A[Node.js] --> B[npm包管理]
-        B --> C[Vite构建工具]
-        C --> D[Vue 3框架]
+        B --> C[Vite]
+        C --> D[Vue 3]
     end
     
     subgraph "开发过程"
