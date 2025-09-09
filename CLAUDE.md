@@ -4,6 +4,33 @@
 
 This is a comprehensive technical documentation repository containing personal study notes and references across multiple programming languages, technologies, and computer science topics. The repository is structured as a knowledge base with approximately 140 markdown files organized into 22 main topic areas.
 
+## 微信小程序JS限制
+
+由于微信小程序的特殊运行环境，小程序JS有一些重要限制：
+
+- 不能操作Browser context下的DOM
+- 不能通过Node.js相关接口访问操作系统API
+- 基于安全考虑，不支持动态执行JS代码（不支持eval和new Function）
+
+### 微信小程序JS 模块特点与限制
+
+1. **路径限制**：小程序目前不支持直接引入 node_modules
+   - 只能使用相对路径引入模块
+   - 不支持绝对路径引入
+   - 需要使用 ../../../xxx/xxx.js 这样的方式引入，当引入多个模块时会很繁琐
+
+2. **文件作用域**：在JavaScript文件中声明的变量和函数只在该文件中有效
+   - 不同文件可以声明相同名字的变量和函数，不会互相影响
+   - 通过全局函数 getApp() 可以获取全局应用实例
+
+3. **构建限制**：微信小程序构建时不支持从App scope之外require文件
+   - 这导致npm在小程序中不好用
+   - 需要实时build依赖到应用本地
+
+4. **模块加载机制**：
+   - CommonJS的加载是同步的，只有加载完才执行后面的操作
+   - 模块可以多次加载，但只会在第一次加载时运行一次，之后运行结果被缓存
+
 ## Repository Structure
 
 ```
