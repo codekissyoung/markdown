@@ -3,7 +3,6 @@
 ### Node.js中的JavaScript
 
 ```javascript
-// Node.js环境
 console.log('Hello');         // 没有window对象
 process.version;              // 有process全局对象
 require('fs');                // 可以读写文件
@@ -11,13 +10,8 @@ require('fs');                // 可以读写文件
 
 ## 4. Node.js核心概念
 
-### 4.2 模块系统（类比Go的import）
+### 4.2 模块系统
 ```javascript
-// Go语言
-import "fmt"
-import "os"
-
-// Node.js
 const fs = require('fs');      // 文件系统
 const path = require('path');  // 路径处理
 const os = require('os');      // 操作系统信息
