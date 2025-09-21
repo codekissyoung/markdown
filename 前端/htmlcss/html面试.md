@@ -18,18 +18,6 @@ div - 常用块级，dl - 定义列表，dt，dd，ul- 非排序列表，li，ol
 **_空元素_**：
 br-换行，hr-水平分割线；
 
-## 浏览器内核
-
-浏览器最重要或者说核心的部分是“Rendering Engine”，可大概译为“渲染引擎”，不过我们一般习惯将之称为“浏览器内核”。
-负责对网页语法的解释（如标准通用标记语言下的一个应用 HTML、JavaScript）并渲染（显示）网页。
-所以，通常所谓的浏览器内核也就是浏览器所采用的渲染引擎，渲染引擎决定了浏览器如何显示网页的内容以及页面的格式信息。
-不同的浏览器内核对网页编写语法的解释也有不同，因此同一网页在不同的内核的浏览器里的渲染（显示）效果也可能不同，这也是网页编写者需要在不同内核的浏览器中测试网页显示效果的原因。
-Trident 内核：IE,MaxThon,TT,The World,360,搜狗浏览器等。[又称 MSHTML]
-Gecko 内核：Netscape6 及以上版本，FF,MozillaSuite/SeaMonkey 等。
-Presto 内核：Opera7 及以上。 [Opera 内核原为：Presto，现为：Blink;]
-Webkit 内核：Safari,Chrome 等。 [ Chrome 的：Blink（WebKit 的分支）]
-EdgeHTML 内核：Microsoft Edge。 [此内核其实是从 MSHTML fork 而来，删掉了几乎所有的 IE 私有特性]
-
 ## html5 有哪些新特性、移除了那些元素？如何处理 HTML5 新标签的浏览器兼容问题？如何区分 ?
 
 **_新增了以下的几大类元素_**
@@ -64,6 +52,7 @@ canvas,svg,webworker, websocket, Geolocation......
 使用方法：
 (1) 在页面头部像下面一样加入一个 manifest 的属性；
 (2) 在 cache.manifest 文件里编写离线存储资源；
+```html
 CACHE MANIFEST
 #v0.11
 CACHE：
@@ -73,6 +62,7 @@ NETWORK:
 resource/logo.png
 FALLBACK：
 / /offline.html
+```
 (3) 在离线状态时，操作 window.applicationCache 进行需求实现；
 
 ## 浏览器是怎么对 HTML5 的离线储存资源进行管理和加载的呢？
