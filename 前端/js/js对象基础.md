@@ -14,7 +14,7 @@ let car = {
     brand: "Toyota",
     model: "Camry",
     year: 2023,
-    start: function() {
+    start() {
         console.log("发动机启动");
     }
 };

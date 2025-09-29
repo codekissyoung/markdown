@@ -28,10 +28,8 @@ graph LR
 // Promise的生命周期
 const promise = new Promise((resolve, reject) => {
     // 初始状态：Pending（等待中）
-    
     setTimeout(() => {
         const success = Math.random() > 0.5
-        
         if (success) {
             resolve("操作成功！")  // 变为 Fulfilled
         } else {
@@ -41,82 +39,12 @@ const promise = new Promise((resolve, reject) => {
 })
 ```
 
-## 与Go语言的对比
-
-### Go语言的异步处理
-```go
-package main
-
-import (
-    "fmt"
-    "time"
-)
-
-// Go中使用goroutine + channel处理异步
-func fetchDataGo() <-chan string {
-    resultChan := make(chan string, 1)
-    
-    go func() {
-        // 模拟耗时操作
-        time.Sleep(2 * time.Second)
-        
-        // 随机成功或失败
-        if time.Now().Unix()%2 == 0 {
-            resultChan <- "数据获取成功"
-        } else {
-            resultChan <- "ERROR: 获取失败"
-        }
-        close(resultChan)
-    }()
-    
-    return resultChan
-}
-
-func main() {
-    fmt.Println("开始获取数据...")
-    
-    // 阻塞等待结果
-    result := <-fetchDataGo()
-    fmt.Println("结果:", result)
-    
-    fmt.Println("程序结束")
-}
-```
-
-### JavaScript的Promise处理
-```javascript
-// JavaScript中使用Promise处理异步
-function fetchDataJS() {
-    return new Promise((resolve, reject) => {
-        // 模拟耗时操作
-        setTimeout(() => {
-            // 随机成功或失败
-            if (Math.random() > 0.5) {
-                resolve("数据获取成功")
-            } else {
-                reject("ERROR: 获取失败")
-            }
-        }, 2000)
-    })
-}
-
-console.log("开始获取数据...")
-
-// 非阻塞处理结果
-fetchDataJS()
-    .then(result => console.log("结果:", result))
-    .catch(error => console.log("错误:", error))
-
-console.log("程序继续执行...")  // 立即执行，不等待
-```
-
 ## Promise的基本语法
 
 ### 1. 创建Promise
 ```javascript
 const myPromise = new Promise((resolve, reject) => {
     // executor函数：立即执行的代码
-    
     // 异步操作成功时调用resolve
     // 异步操作失败时调用reject
 })
@@ -126,15 +54,12 @@ const myPromise = new Promise((resolve, reject) => {
 ```javascript
 myPromise
     .then(result => {
-        // 处理成功结果
         console.log("成功:", result)
     })
     .catch(error => {
-        // 处理错误
         console.log("失败:", error)
     })
     .finally(() => {
-        // 无论成功失败都会执行
         console.log("操作完成")
     })
 ```
@@ -143,24 +68,20 @@ myPromise
 
 ### 1. 网络请求模拟
 ```javascript
-// 模拟API调用
 function fetchUserInfo(userId) {
     return new Promise((resolve, reject) => {
         console.log(`正在获取用户${userId}的信息...`)
-        
         // 模拟网络延迟
         setTimeout(() => {
             if (userId <= 0) {
                 reject(new Error("用户ID无效"))
                 return
             }
-            
             // 模拟网络失败
             if (Math.random() < 0.2) {
                 reject(new Error("网络连接失败"))
                 return
             }
-            
             // 成功返回用户数据
             const userData = {
                 id: userId,
@@ -168,7 +89,6 @@ function fetchUserInfo(userId) {
                 email: `user${userId}@example.com`,
                 skills: ['Go', 'PHP', 'JavaScript']
             }
-            
             resolve(userData)
         }, 1500)
     })
@@ -189,38 +109,6 @@ fetchUserInfo(123)
     })
     .finally(() => {
         console.log("用户信息请求处理完成")
-    })
-```
-
-### 2. 文件操作模拟
-```javascript
-// 模拟文件读取
-function readFile(filename) {
-    return new Promise((resolve, reject) => {
-        console.log(`正在读取文件: ${filename}`)
-        
-        setTimeout(() => {
-            // 模拟文件不存在
-            if (filename.includes('notfound')) {
-                reject(new Error(`文件不存在: ${filename}`))
-                return
-            }
-            
-            // 模拟文件内容
-            const content = `这是 ${filename} 的内容\n包含一些重要数据...`
-            resolve(content)
-        }, 1000)
-    })
-}
-
-// 使用示例
-readFile('config.json')
-    .then(content => {
-        console.log("文件内容:")
-        console.log(content)
-    })
-    .catch(error => {
-        console.error("读取文件失败:", error.message)
     })
 ```
 
@@ -386,7 +274,6 @@ const loadUser = async () => {
     user.value = null
     
     try {
-        // 使用我们之前定义的fetchUserInfo函数
         const userData = await fetchUserInfo(123)
         user.value = userData
     } catch (err) {
@@ -465,30 +352,3 @@ function createAsyncPromise() {
     })
 }
 ```
-
-## 总结
-
-Promise是JavaScript异步编程的核心概念，它：
-
-1. **解决回调地狱**：让异步代码更加清晰
-2. **统一错误处理**：通过.catch()统一处理错误
-3. **支持链式调用**：可以优雅地组合多个异步操作
-4. **现代语法支持**：与async/await配合使用体验更好
-
-在Vue开发中，Promise无处不在：
-- 网络请求（fetch、axios）
-- 路由切换
-- 组件懒加载
-- 用户交互响应
-
-掌握Promise是现代JavaScript开发的必备技能！
-
-## 练习建议
-
-1. **运行本文档中的代码示例**
-2. **修改示例中的参数**，观察不同结果
-3. **尝试组合多个Promise**，理解链式调用
-4. **用async/await重写Promise代码**，体会语法差异
-5. **在Vue项目中实践**，结合实际应用场景
-
-记住：Promise不难，关键是要多练习和实际应用！
