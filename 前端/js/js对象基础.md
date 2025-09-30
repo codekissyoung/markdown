@@ -9,7 +9,6 @@
 ### 创建对象
 
 ```javascript
-// 对象字面量（最常用）
 let car = {
     brand: "Toyota",
     model: "Camry",
@@ -17,12 +16,7 @@ let car = {
     start() {
         console.log("发动机启动");
     }
-};
-
-// 构造函数方式
-let car2 = new Object();
-car2.brand = "Honda";
-car2.model = "Civic";
+}
 ```
 
 ### 访问对象属性
