@@ -93,7 +93,6 @@ flowchart TD
     B --> C[Vite开发服务器]
     C --> D[实时编译]
     D --> E[浏览器显示]
-    
     F[npm run build] --> G[Vite构建]
     G --> H[代码压缩]
     G --> I[资源优化] 
@@ -102,7 +101,6 @@ flowchart TD
     I --> K
     J --> K
     K --> L[部署到服务器]
-    
     style C fill:#4caf50,color:#fff
     style G fill:#2196f3,color:#fff
     style K fill:#ff9800,color:#fff

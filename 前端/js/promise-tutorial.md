@@ -1,52 +1,19 @@
 # JavaScript Promise 详解
 
-## 什么是Promise？
-
-Promise是JavaScript中处理异步操作的现代方式，它代表一个"将来会完成的操作"的结果。
-
-### 生活中的类比
-想象你在餐厅点餐：
-1. **下单**：你点了一份菜（创建Promise）
-2. **等待**：厨师在做菜，你不知道什么时候好（Pending状态）
-3. **结果**：
-   - 菜做好了，服务员送来（Fulfilled状态）
-   - 厨师说没有这个菜了（Rejected状态）
-
-## Promise的三种状态
-
-```mermaid
-graph LR
-    A[Pending<br/>等待中] --> B[Fulfilled<br/>成功完成]
-    A --> C[Rejected<br/>失败/出错]
-    
-    style A fill:#fff3cd
-    style B fill:#d4edda
-    style C fill:#f8d7da
-```
-
-```javascript
-// Promise的生命周期
-const promise = new Promise((resolve, reject) => {
-    // 初始状态：Pending（等待中）
-    setTimeout(() => {
-        const success = Math.random() > 0.5
-        if (success) {
-            resolve("操作成功！")  // 变为 Fulfilled
-        } else {
-            reject("操作失败！")   // 变为 Rejected
-        }
-    }, 2000)
-})
-```
-
-## Promise的基本语法
-
 ### 1. 创建Promise
 ```javascript
 const myPromise = new Promise((resolve, reject) => {
     // executor函数：立即执行的代码
     // 异步操作成功时调用resolve
     // 异步操作失败时调用reject
+    setTimeout(() => {
+    const success = Math.random() > 0.5
+    if (success) {
+        resolve("操作成功！")  // 变为 Fulfilled
+    } else {
+        reject("操作失败！")   // 变为 Rejected
+    }
+}, 2000)
 })
 ```
 

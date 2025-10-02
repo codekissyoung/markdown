@@ -6,20 +6,6 @@
 
 想象你需要按顺序执行几个异步操作：
 
-#### 传统回调方式（回调地狱）：
-```javascript
-// 恶梦般的回调嵌套
-getUser(userId, function(user) {
-    getProfile(user.id, function(profile) {
-        getSettings(profile.id, function(settings) {
-            updateUI(settings, function() {
-                console.log("全部完成")
-            })
-        })
-    })
-})
-```
-
 #### Promise链式调用（改善但仍复杂）：
 ```javascript
 // 好一些，但还是很长
@@ -33,7 +19,6 @@ getUser(userId)
 
 #### async/await方式（最优雅）：
 ```javascript
-// 看起来像同步代码！
 async function processUser(userId) {
     try {
         const user = await getUser(userId)
@@ -46,39 +31,6 @@ async function processUser(userId) {
     }
 }
 ```
-
-## 与Go语言的对比
-
-### Go语言的同步风格：
-```go
-func processUser(userID int) error {
-    // Go的代码本来就是这样的同步风格 , 忽略错误处理
-    user, err := getUser(userID)
-    profile, err := getProfile(user.ID)
-    settings, err := getSettings(profile.ID)
-    err = updateUI(settings)
-    fmt.Println("全部完成")
-    return nil
-}
-```
-
-### JavaScript的async/await：
-```javascript
-async function processUser(userId) {
-    try {
-        // 几乎和Go代码一样的风格！
-        const user = await getUser(userId)
-        const profile = await getProfile(user.id)
-        const settings = await getSettings(profile.id)
-        await updateUI(settings)
-        console.log("全部完成")
-    } catch (error) {
-        console.error("出错:", error)
-    }
-}
-```
-
-**关键理解**：async/await让JavaScript的异步代码**看起来像Go的同步代码**！
 
 ## async/await 基本语法
 
