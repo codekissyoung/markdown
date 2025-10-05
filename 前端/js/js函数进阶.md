@@ -210,7 +210,7 @@ function outerFunction() {
 // 数据私有化
 function createCounter() {
     let count = 0; // 私有变量
-    
+
     return {
         increment: () => ++count,
         decrement: () => --count,
@@ -227,7 +227,7 @@ console.log(counter.getValue()); // 1
 // 模块模式
 const userModule = (function() {
     let users = []; // 私有数据
-    
+
     return {
         addUser: function(user) {
             users.push(user);
@@ -244,6 +244,219 @@ const userModule = (function() {
 userModule.addUser({name: "张三"});
 console.log(userModule.getUserCount()); // 1
 ```
+
+### ⚠️ 经典闭包陷阱: 循环中的 `var`
+
+```javascript
+function count() {
+    let arr = [];
+    for (var i=1; i<=3; i++) {
+        arr.push(function () {
+            return i * i;
+        });
+    }
+    return arr;
+}
+
+let results = count();
+let [f1, f2, f3] = results;
+
+f1();  // 16 ❌ 预期是 1
+f2();  // 16 ❌ 预期是 4
+f3();  // 16 ❌ 预期是 9
+```
+
+**为什么全都是 16？**
+
+#### 问题根源: `var` 的函数作用域
+
+```javascript
+// var 声明的 i 是函数作用域，不是块作用域
+for (var i=1; i<=3; i++) {
+    // 整个 count() 函数只有一个 i 变量
+}
+
+// 等价于:
+var i;  // 变量提升到函数顶部
+for (i=1; i<=3; i++) {
+    // 所有推入的函数都引用同一个 i
+}
+```
+
+#### 执行流程详解
+
+```javascript
+// 第1轮循环: i=1
+arr.push(function () { return i * i; });  // 推入函数1
+
+// 第2轮循环: i=2
+arr.push(function () { return i * i; });  // 推入函数2
+
+// 第3轮循环: i=3
+arr.push(function () { return i * i; });  // 推入函数3
+
+// 循环结束: i++ → i=4 (条件 i<=3 不满足，退出)
+
+// ⚠️ 此时 arr 包含3个函数，但它们都引用同一个变量 i
+// 此时 i 的值是 4
+
+// 调用函数时:
+f1();  // 执行 i * i，此时 i=4 → 4*4 = 16
+f2();  // 执行 i * i，此时 i=4 → 4*4 = 16
+f3();  // 执行 i * i，此时 i=4 → 4*4 = 16
+```
+
+#### 关键理解: 闭包捕获的是引用，不是值
+
+```javascript
+arr.push(function () { return i * i; });
+
+// 这个函数不是存储 i 的当前值
+// 而是存储对变量 i 的引用
+// 等函数真正执行时，才去取 i 的值
+```
+
+#### 解决方案
+
+**方法1: 使用 `let` (最简单) ✅**
+
+```javascript
+function count() {
+    let arr = [];
+    for (let i=1; i<=3; i++) {  // 改用 let
+        arr.push(function () {
+            return i * i;
+        });
+    }
+    return arr;
+}
+
+let results = count();
+let [f1, f2, f3] = results;
+f1();  // 1 ✅
+f2();  // 4 ✅
+f3();  // 9 ✅
+```
+
+**原理**: `let` 是块作用域，每次循环都创建新的 `i` 变量
+
+```javascript
+for (let i=1; i<=3; i++) {
+    // 每次循环，let 都创建一个新的 i
+    // 第1轮: 新的 i=1
+    // 第2轮: 新的 i=2
+    // 第3轮: 新的 i=3
+}
+```
+
+**方法2: 立即执行函数 (IIFE)**
+
+```javascript
+function count() {
+    let arr = [];
+    for (var i=1; i<=3; i++) {
+        arr.push((function (n) {  // 立即执行函数
+            return function () {
+                return n * n;
+            };
+        })(i));  // 传入当前 i 的值
+    }
+    return arr;
+}
+```
+
+**原理**: 立即执行函数创建新作用域，`n` 捕获当前 `i` 的值
+
+```javascript
+// 第1轮: (function(n) {...})(1) → n=1，返回的函数引用 n=1
+// 第2轮: (function(n) {...})(2) → n=2，返回的函数引用 n=2
+// 第3轮: (function(n) {...})(3) → n=3，返回的函数引用 n=3
+```
+
+**方法3: 辅助函数**
+
+```javascript
+function count() {
+    let arr = [];
+    function createFunc(n) {
+        return function () {
+            return n * n;
+        };
+    }
+    for (var i=1; i<=3; i++) {
+        arr.push(createFunc(i));
+    }
+    return arr;
+}
+```
+
+#### 可视化理解
+
+**使用 `var` 的情况 (错误)**:
+```
+count() 函数作用域
+│
+├── i (共享变量)
+│   ├── 循环后值: 4
+│   │
+│   └── 3个函数都引用这个 i
+│       ├── function() { return i * i }  → i=4 → 16
+│       ├── function() { return i * i }  → i=4 → 16
+│       └── function() { return i * i }  → i=4 → 16
+```
+
+**使用 `let` 的情况 (正确)**:
+```
+循环每次迭代创建新的块作用域
+│
+├── 第1轮: i=1 的块作用域
+│   └── function() { return i * i }  → i=1 → 1
+│
+├── 第2轮: i=2 的块作用域
+│   └── function() { return i * i }  → i=2 → 4
+│
+└── 第3轮: i=3 的块作用域
+    └── function() { return i * i }  → i=3 → 9
+```
+
+#### 对比 Go 语言
+
+Go 没有这个问题，因为循环变量会被正确捕获：
+
+```go
+func count() []func() int {
+    var funcs []func() int
+    for i := 1; i <= 3; i++ {
+        i := i  // 创建新变量 (Go 1.22之前需要)
+        funcs = append(funcs, func() int {
+            return i * i
+        })
+    }
+    return funcs
+}
+
+// 调用:
+// funcs[0]()  → 1
+// funcs[1]()  → 4
+// funcs[2]()  → 9
+```
+
+**注意**: Go 1.22+ 循环变量默认是每次迭代的新变量，不需要 `i := i` 了。
+
+#### 核心总结
+
+1. **`var` vs `let`**:
+   - `var`: 函数作用域，循环中只有一个变量
+   - `let`: 块作用域，每次循环创建新变量
+
+2. **闭包捕获引用**:
+   - 函数保存的是变量的引用，不是值
+   - 函数执行时才取变量的当前值
+
+3. **最佳实践**:
+   - ✅ **优先使用 `let`**，避免这类陷阱
+   - 理解作用域和闭包的工作原理
+   - 老代码中用 IIFE 修复
 
 ## ⚡ 重要理解：函数绑定
 
