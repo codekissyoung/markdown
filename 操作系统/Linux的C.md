@@ -1,24 +1,20 @@
 # Linux 下 C 程序开发
 
-在 `Linux` 下开发 `C` 程序用到的知识。
+在 `Linux` 下开发 `C` 程序用到的知识
 
 ## 匿名半双工管道
 
 ```c
 #define PIPE_BUF 255
-int main( int argc, char *argv[] )
-{
+int main( int argc, char *argv[] ) {
     int fd[2];
     pipe( fd ); // 创建匿名半双工管道
     pid_t pid = fork();
-    if( pid > 0 )
-    {
+    if( pid > 0 ) {
         close( fd[0] ); // 父进程关闭 读出端
         write( fd[1] , "hello my son \n ",14);
         exit(0);
-    }
-    else
-    {
+    } else {
         close( fd[1] ); // 子进程关闭 写入端
         char buf[ PIPE_BUF ];
         int len = read( fd[0], buf, PIPE_BUF );

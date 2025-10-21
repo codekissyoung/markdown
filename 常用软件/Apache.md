@@ -242,10 +242,6 @@ AllowOverride None      不允许 .htaccess 重写这个目录，改为 All �
 
 ## 安装并配置 apache2.4
 
-```bash
-sudo apt-get install apache2
-```
-
 ```conf
 sudo vim /etc/apache2/apache2.conf
     // 将 <Directory /var/www/>
