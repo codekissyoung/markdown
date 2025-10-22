@@ -112,6 +112,37 @@ function processStatus(status: Status) {
 }
 ```
 
+### 函数重载 vs 联合 / 泛型
+
+当函数逻辑只是针对入参做轻量分支，而返回值结构保持一致时，一条带联合或泛型的签名往往比维护多条重载更省心：
+
+- **差异小**：例如 `number` 和 `Date` 都格式化成字符串，用 `number | Date` 即可覆盖全部调用。
+- **结构一致**：返回值只是包裹入参，直接用泛型让 TypeScript 推断即可。
+
+```typescript
+// 联合类型：同一签名覆盖两种输入
+function format(data: number | Date): string {
+  return data instanceof Date ? data.toISOString() : data.toFixed(2);
+}
+
+// 泛型：返回类型直接携带入参的精确信息
+function wrap<T>(value: T) {
+  return { ok: true as const, payload: value };
+}
+
+const a = format(3.14);                   // string
+const b = format(new Date());             // string
+const user = wrap({ id: 1, name: 'Go' }); // { ok: true; payload: { id: number; name: string } }
+```
+
+但当 API 存在“截然不同的调用语义”时，重载仍然不可替代：
+
+- **参数数量/结构差异大**：`readFile(path, callback)` 与 `readFile(path, options, callback)`。
+- **返回类型随入参精确变化**：事件监听根据事件名返回不同事件对象。
+- **同名接口兼容多个调用方式**：例如既支持 Promise，也支持回调。
+
+这类场景使用重载列出所有外部契约更清晰，也能为调用者提供最精确的类型提示。
+
 ### 交叉类型 (Intersection Types)
 
 **类似 Go 的结构体嵌入**：
