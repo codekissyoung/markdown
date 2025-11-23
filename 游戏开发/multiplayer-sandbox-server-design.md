@@ -214,6 +214,484 @@ func (s *GameServer) HandleChunkTransfer(player *Player, oldChunk, newChunk Chun
 
 ---
 
+## 统一大世界架构 (Single-Shard Architecture)
+
+### 核心理念
+
+**与传统多服架构的本质区别**:
+
+```
+传统多服架构 (Multi-Shard):
+  服务器1 (世界副本1) - 1000 人
+  服务器2 (世界副本2) - 1000 人
+  ❌ 玩家隔离，无法相遇
+  ❌ 经济系统分裂
+  ❌ 社交割裂
+
+统一大世界 (Single-Shard):
+  1 个世界，多个服务器协同承载
+  ✅ 所有玩家可以相遇
+  ✅ 全局经济系统
+  ✅ 真正的大型社交网络
+```
+
+**代表作品**:
+
+| 游戏 | 架构特点 | 承载能力 |
+|:---|:---|:---|
+| **EVE Online** | 单一宇宙，7000+ 星系 | 30,000+ 同时在线 |
+| **Dual Universe** | SpatialOS 单分片 | 目标 10,000+ |
+| **Second Life** | 单一虚拟世界 | 数千人在线 |
+
+### 必须分布式的核心架构
+
+```
+                    统一大世界
+                    ↓ 动态分片
+    ┌──────────────────────────────────────┐
+    │  World Partition (空间分片层)         │
+    │  • 256 个 Chunk (10km²)               │
+    │  • 动态负载均衡                        │
+    │  • 热点区域自动分裂                    │
+    └──────────────────────────────────────┘
+          ↓
+    ┌──────────────────────────────────────┐
+    │  Chunk Server 集群 (计算层)           │
+    │  • Server-A: Chunk 0,1,5              │
+    │  • Server-B: Chunk 2,3 (热点独立)     │
+    │  • Server-C: Chunk 4,6,7              │
+    │  • 20-100 台物理服务器                │
+    └──────────────────────────────────────┘
+          ↓
+    ┌──────────────────────────────────────┐
+    │  全局协调层                            │
+    │  • Gateway: 玩家路由 + 长连接管理      │
+    │  • Message Bus: NATS/Kafka 消息总线   │
+    │  • Global State: Redis Cluster        │
+    │  • Chunk Allocator: 动态分配管理       │
+    └──────────────────────────────────────┘
+          ↓
+    ┌──────────────────────────────────────┐
+    │  数据层                                │
+    │  • Redis Cluster (实时状态)           │
+    │  • PostgreSQL Cluster (持久化)        │
+    │  • 对象存储 (地图数据)                 │
+    └──────────────────────────────────────┘
+```
+
+### 关键技术实现
+
+#### 1. 动态 Chunk 分配
+
+```go
+type ChunkAllocator struct {
+    ChunkServers  map[string]*ChunkServer  // 物理服务器池
+    ChunkMapping  map[ChunkID]string       // Chunk → Server 映射
+    LoadBalancer  *LoadBalancer
+}
+
+// 启动时初始分配
+func (a *ChunkAllocator) InitialAllocation(totalChunks int) {
+    servers := a.GetAvailableServers()
+    chunksPerServer := totalChunks / len(servers)
+
+    for i, chunk := range allChunks {
+        serverID := servers[i / chunksPerServer]
+        a.AssignChunk(chunk, serverID)
+    }
+}
+
+// 运行时动态调整
+func (a *ChunkAllocator) Rebalance() {
+    for _, chunk := range a.GetHotChunks() {
+        if chunk.PlayerCount > 50 {
+            // 热点 Chunk 迁移到独立服务器
+            newServer := a.GetIdleServer()
+            a.MigrateChunk(chunk.ID, newServer)
+        }
+    }
+}
+
+// Chunk 过载时自动分裂
+func (a *ChunkAllocator) SplitChunk(chunk *Chunk) {
+    // 256x256 → 4 个 128x128
+    subChunks := chunk.Split(4)
+
+    for _, subChunk := range subChunks {
+        server := a.GetIdleServer()
+        a.AssignChunk(subChunk.ID, server)
+    }
+}
+```
+
+#### 2. 玩家跨服务器无缝迁移
+
+```go
+type Gateway struct {
+    PlayerConnections map[string]*WebSocketConn
+    ChunkAllocator    *ChunkAllocator
+}
+
+// 玩家移动检测
+func (g *Gateway) OnPlayerMove(playerID string, newPos Position) {
+    oldChunk := g.GetPlayerChunk(playerID)
+    newChunk := WorldPosToChunkID(newPos)
+
+    if oldChunk != newChunk {
+        oldServer := g.ChunkAllocator.GetServer(oldChunk)
+        newServer := g.ChunkAllocator.GetServer(newChunk)
+
+        if oldServer != newServer {
+            // 跨物理服务器迁移（玩家无感知）
+            g.MigratePlayerAcrossServers(playerID, oldServer, newServer)
+        } else {
+            // 同服务器内 Chunk 切换
+            g.TransferPlayerChunk(playerID, oldChunk, newChunk)
+        }
+    }
+}
+
+// 跨服务器迁移实现
+func (g *Gateway) MigratePlayerAcrossServers(playerID, oldServer, newServer string) {
+    // 1. 从旧服务器序列化玩家状态
+    playerState := g.RPC(oldServer, "ExportPlayer", playerID)
+
+    // 2. 导入到新服务器
+    g.RPC(newServer, "ImportPlayer", playerState)
+
+    // 3. Gateway 更新路由
+    g.UpdatePlayerRoute(playerID, newServer)
+
+    // 4. 客户端完全透明，无感知切换
+}
+```
+
+#### 3. 全局状态一致性
+
+```go
+// Redis Cluster 存储全局状态
+type GlobalState struct {
+    RedisCluster *redis.ClusterClient
+}
+
+// 玩家在线状态（全局可查）
+func (s *GlobalState) SetPlayerOnline(playerID, chunkID, serverID string) {
+    key := fmt.Sprintf("player:%s", playerID)
+    s.RedisCluster.HSet(ctx, key, map[string]interface{}{
+        "chunk":  chunkID,
+        "server": serverID,
+        "online": time.Now().Unix(),
+    })
+}
+
+// 全局查找玩家
+func (s *GlobalState) FindPlayer(playerID string) (chunkID, serverID string) {
+    key := fmt.Sprintf("player:%s", playerID)
+    result := s.RedisCluster.HGetAll(ctx, key)
+    return result["chunk"], result["server"]
+}
+
+// 全局排行榜
+func (s *GlobalState) UpdateLeaderboard(playerID string, score int64) {
+    s.RedisCluster.ZAdd(ctx, "leaderboard:global", &redis.Z{
+        Score:  float64(score),
+        Member: playerID,
+    })
+}
+
+// 分布式锁（强一致性操作）
+func (s *GlobalState) PlayerTrade(playerA, playerB string) error {
+    lockA := s.RedisCluster.Lock(fmt.Sprintf("player:%s", playerA), 5*time.Second)
+    lockB := s.RedisCluster.Lock(fmt.Sprintf("player:%s", playerB), 5*time.Second)
+    defer lockA.Unlock()
+    defer lockB.Unlock()
+
+    // 原子操作
+    // ...
+}
+```
+
+#### 4. 跨 Chunk 通信（消息总线）
+
+```go
+// NATS/Kafka 作为消息总线
+type MessageBus struct {
+    NATS *nats.Conn
+}
+
+// Chunk A 向 Chunk B 发送消息
+func (m *MessageBus) SendToChunk(targetChunk ChunkID, msg Message) {
+    topic := fmt.Sprintf("chunk.%s", targetChunk.String())
+    m.NATS.Publish(topic, msg.Serialize())
+}
+
+// Chunk Server 订阅自己管理的 Chunk
+func (cs *ChunkServer) SubscribeChunks() {
+    for _, chunk := range cs.ManagedChunks {
+        topic := fmt.Sprintf("chunk.%s", chunk.String())
+        cs.MessageBus.Subscribe(topic, cs.OnMessage)
+    }
+}
+
+// 跨 Chunk 法术示例
+func (cs *ChunkServer) CastCrossChunkSpell(spell Spell) {
+    affectedChunks := GetChunksInRadius(spell.Position, spell.Radius)
+
+    for _, chunk := range affectedChunks {
+        msg := Message{
+            Type: "spell_effect",
+            Data: spell,
+        }
+        cs.MessageBus.SendToChunk(chunk, msg)
+    }
+}
+```
+
+### 核心技术挑战
+
+#### 1. Ghost Proxy 带宽爆炸
+
+**问题严重性**:
+
+```
+单一世界 10km² = 1600 个 Chunk
+每个 Chunk 平均 8 个邻居
+
+朴素实现:
+  1600 Chunk × 8 邻居 × 104 KB/s = 1.3 GB/s (服务器间)
+  ❌ 成本和带宽完全不可接受
+```
+
+**解决方案 A: 智能 AOI**
+
+```go
+// 只有玩家视野覆盖时才同步
+type ChunkBorder struct {
+    ChunkID     ChunkID
+    Watchers    map[string]*Player  // 观察者
+}
+
+// 视野检测
+func (g *Gateway) UpdatePlayerAOI(player *Player) {
+    viewCone := player.CalculateViewCone(300)  // 视距 300 米
+    borders := g.GetBordersInViewCone(viewCone)
+
+    for _, border := range borders {
+        border.AddWatcher(player)  // 只订阅视野内的边界
+    }
+}
+
+// 边界只向观察者推送
+func (border *ChunkBorder) SyncToWatchers() {
+    if len(border.Watchers) == 0 {
+        return  // 无人观察，不同步 ✅
+    }
+
+    entities := border.GetBorderEntities(32)
+    for _, watcher := range border.Watchers {
+        g.PushTo(watcher.ID, "border_entities", entities)
+    }
+}
+```
+
+**效果**: 带宽降低 **80-90%**
+
+**解决方案 B: 分层同步**
+
+```go
+var syncStrategies = []SyncStrategy{
+    {Distance: 50,  Frequency: 60, DetailLevel: "full"},
+    {Distance: 200, Frequency: 20, DetailLevel: "medium"},
+    {Distance: 500, Frequency: 5,  DetailLevel: "minimal"},
+}
+
+func (cs *ChunkServer) SyncEntity(entity *Entity, player *Player) {
+    distance := entity.Position.DistanceTo(player.Position)
+
+    for _, strategy := range syncStrategies {
+        if distance < strategy.Distance {
+            cs.ScheduleSync(entity, player, strategy)
+            break
+        }
+    }
+}
+```
+
+#### 2. 热点区域动态扩展
+
+**问题**: 出生点/主城可能聚集数百玩家
+
+**解决方案**: Chunk 自动分裂
+
+```go
+// 监控负载
+func (cs *ChunkServer) CheckOverload() {
+    for _, chunk := range cs.Chunks {
+        if chunk.PlayerCount > 50 {
+            cs.SplitChunk(chunk)  // 自动分裂
+        }
+    }
+}
+
+// Chunk 分裂
+func (cs *ChunkServer) SplitChunk(chunk *Chunk) {
+    // 256x256 → 4 个 128x128 子 Chunk
+    subChunks := chunk.Split(4)
+
+    // 分配到不同物理服务器
+    for _, subChunk := range subChunks {
+        server := cs.Allocator.GetIdleServer()
+        cs.Allocator.AssignChunk(subChunk.ID, server)
+    }
+
+    // 迁移玩家
+    for _, player := range chunk.Players {
+        subChunk := cs.FindSubChunk(player.Position, subChunks)
+        cs.MigratePlayer(player, chunk, subChunk)
+    }
+}
+```
+
+**效果**: 单个热点可分散到 **4-16 台服务器**
+
+#### 3. 全局一致性保证
+
+**策略**: 分层一致性
+
+```go
+// 强一致性: 交易、战斗结算
+func (s *GameServer) PlayerTrade(playerA, playerB string) error {
+    lockA := s.Redis.Lock(fmt.Sprintf("player:%s", playerA))
+    lockB := s.Redis.Lock(fmt.Sprintf("player:%s", playerB))
+    defer lockA.Unlock()
+    defer lockB.Unlock()
+
+    // 分布式事务
+    tx := s.DB.Begin()
+    tx.Exec("UPDATE players SET items = ... WHERE id = ?", playerA)
+    tx.Exec("UPDATE players SET items = ... WHERE id = ?", playerB)
+    tx.Commit()
+}
+
+// 最终一致性: 位置同步、聊天
+func (s *GameServer) UpdatePlayerPosition(playerID string, pos Position) {
+    // 直接更新 Redis
+    s.Redis.HSet(ctx, fmt.Sprintf("player:%s", playerID), "position", pos)
+
+    // 异步持久化
+    s.AsyncQueue <- UpdateTask{PlayerID: playerID, Position: pos}
+}
+```
+
+### MVP 实施路径（统一大世界）
+
+**重要**: 统一大世界架构必须一开始就分布式，无法从单服起步。
+
+#### 最小可行架构
+
+```
+地图: 2048x2048 米 (4 km²)
+Chunk: 256x256 米 → 8x8 = 64 个
+玩家: 100-500 人
+物理服务器: 10-20 台
+
+技术栈:
+  • Go-Micro (微服务)
+  • NATS (消息总线)
+  • Redis Cluster (全局状态)
+  • PostgreSQL (持久化)
+  • K8s (容器编排)
+```
+
+#### 分阶段实现
+
+**阶段 1: 核心分布式** (3-6 个月)
+
+```
+✅ Chunk 动态分配
+✅ 玩家跨服务器迁移
+✅ 全局状态同步 (Redis)
+✅ 基础 Ghost Proxy (固定同步，未优化)
+✅ 消息总线 (NATS)
+
+验证: 100 人同时在线，无缝漫游
+成本: ~5,000 元/月
+```
+
+**阶段 2: 带宽优化** (6-9 个月)
+
+```
+✅ 智能 AOI (只同步视野内)
+✅ 分层同步 (距离分级)
+✅ 增量更新
+✅ 热点 Chunk 动态分裂
+
+目标: 500 人同时在线
+成本: ~15,000 元/月
+```
+
+**阶段 3: 规模扩展** (9-12 个月)
+
+```
+✅ 自动扩缩容 (K8s HPA)
+✅ 跨区域部署
+✅ CDN 加速
+✅ 完整监控
+
+目标: 1000+ 人
+成本: ~30,000 元/月
+```
+
+### 成本估算（统一大世界）
+
+#### 500 人在线
+
+```
+物理服务器: 15 台
+  - 规格: 4核 8GB
+  - 单价: 500 元/月
+  - 小计: 7,500 元/月
+
+带宽 (优化后):
+  - 总带宽: 34 Mbps
+  - 成本: ~5,000 元/月
+
+Redis Cluster: 3 节点
+  - 成本: 2,000 元/月
+
+数据库: PostgreSQL 主从
+  - 成本: 1,500 元/月
+
+总成本: ~16,000 元/月
+```
+
+### 架构选择对比
+
+| 维度 | 传统多服 | 统一大世界 |
+|:---|:---|:---|
+| **开发复杂度** | ⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **初期成本** | 500 元/月 | 5,000 元/月 |
+| **扩展难度** | 简单 (加服) | 复杂 (动态分片) |
+| **玩家体验** | 隔离 | **全局互动** ✅ |
+| **技术门槛** | 中等 | **极高** |
+| **适用场景** | 验证玩法 | **核心卖点是统一世界** |
+
+### 何时选择统一大世界
+
+**必须选择的场景**:
+- ✅ 全局经济系统是核心玩法
+- ✅ 大型公会/宗门社交是卖点
+- ✅ 玩家规模是竞争力（"万人同服"）
+- ✅ 有充足的开发资源和预算
+
+**不建议选择的场景**:
+- ❌ 独立游戏/小团队验证玩法
+- ❌ 预算和技术储备不足
+- ❌ 玩法与全局互动无关
+- ❌ 短期内需要快速上线
+
+---
+
 ## 带宽计算详解
 
 ### 单玩家带宽消耗
@@ -553,8 +1031,80 @@ type SecretRealm struct {
 1. **服务端权威**: 客户端只做渲染，服务端掌握真相
 2. **Chunk 分片**: 空间划分是水平扩展的基础
 3. **带宽优化**: 增量更新 > 动态频率 > Ghost 过滤
-4. **规模控制**: 从小做起，别过早优化
+4. **架构选择**: 根据核心玩法决定单服还是统一大世界
 5. **玩法优先**: 技术服务于玩法，不要本末倒置
+
+### 两种架构路线选择
+
+#### 路线 A: 传统多服架构（推荐大多数项目）
+
+**特点**:
+- 从单服起步，逐步扩展到小集群
+- 开发周期短，成本可控
+- 技术复杂度适中
+- 适合验证玩法和快速迭代
+
+**适用场景**:
+- 独立游戏/小团队项目
+- 核心玩法与全局互动无关
+- 预算和技术资源有限
+- 需要快速上线验证市场
+
+**实施路径**:
+```
+阶段 1: 单服 MVP (1-3 个月)
+  → 512x512 米, 10-50 人, 成本 < 100 元/月
+
+阶段 2: 小集群 (3-6 个月)
+  → 1024x1024 米, 50-200 人, 成本 ~1,000 元/月
+
+阶段 3: 商业化 (6-12 个月)
+  → 2048x2048 米, 200-500 人, 成本 5,000-20,000 元/月
+```
+
+#### 路线 B: 统一大世界架构（高难度高回报）
+
+**特点**:
+- 必须一开始就分布式
+- 开发周期长，成本高
+- 技术复杂度极高
+- 玩家体验独特（真正的大世界）
+
+**适用场景**:
+- **全局互动是核心卖点**
+- 大型公会/经济系统是玩法基础
+- "万人同服"是竞争力
+- 有充足的开发资源和预算
+
+**实施路径**:
+```
+阶段 1: 核心分布式 (3-6 个月)
+  → 2048x2048 米, 100-500 人, 成本 ~5,000 元/月
+
+阶段 2: 带宽优化 (6-9 个月)
+  → 同规模, 500 人, 成本 ~15,000 元/月
+
+阶段 3: 规模扩展 (9-12 个月)
+  → 同规模或更大, 1000+ 人, 成本 ~30,000 元/月
+```
+
+### 决策树
+
+```
+你的游戏核心玩法是什么？
+    │
+    ├─→ 全局经济/大型公会/万人互动
+    │   └─→ 【必须】统一大世界架构
+    │       • 接受高开发成本
+    │       • 接受高技术复杂度
+    │       • 一开始就做分布式
+    │
+    └─→ 小队合作/区域社交/PVE内容
+        └─→ 【推荐】传统多服架构
+            • 单服起步验证玩法
+            • 成功后再扩展
+            • 成本和风险可控
+```
 
 ### 开发检查清单
 
@@ -594,5 +1144,5 @@ type SecretRealm struct {
 
 ---
 
-*最后更新: 2025-11-22*
-*核心观点: 技术服务于玩法，从小做起，数据驱动优化*
+*最后更新: 2025-11-23*
+*核心观点: 架构选择取决于核心玩法 - 全局互动选统一大世界，其他选传统多服*
