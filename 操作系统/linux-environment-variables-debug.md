@@ -20,10 +20,6 @@ $ sudo grep -inr "ENVMARK" /etc/*
 $ grep -n "ENVMARK" ~/.bashrc ~/.bash_profile
 /home/xuser/.bashrc:123:export ENVMARK=900
 /home/xuser/.bash_profile:132:export ENVMARK=900
-
-# 但实际值是 1000
-$ echo $ENVMARK
-1000
 ```
 
 ## 配置文件加载顺序对比

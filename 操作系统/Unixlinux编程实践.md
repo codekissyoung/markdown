@@ -1071,5 +1071,3 @@ rm /tmp/pb.tmp
 - 环境，比如`$HOME`
 
 ![environ环境变量的问题](http://img.codekissyoung.com/2019/06/15/5520ffa6adafe8f092655508fc6b3c00.png)
-
-## 
